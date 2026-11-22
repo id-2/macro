@@ -106,7 +106,7 @@ impl NotionPlanRepo for Recorder {
 
 #[tokio::test(start_paused = true)]
 async fn scan_counts_are_written_at_most_every_two_seconds_and_once_at_the_end() {
-    let user = RoxUserIdStr::parse_from_str("macro|owner@acme.test")
+    let user = RoxUserIdStr::parse_from_str("rox|owner@acme.test")
         .unwrap()
         .into_owned();
     let (writes, mut written) = mpsc::unbounded_channel();

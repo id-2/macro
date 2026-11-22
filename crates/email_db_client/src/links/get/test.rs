@@ -11,9 +11,9 @@ use models_email::service::link::UserProvider;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
-const CHILD: &str = "macro|sharedbox@corp.test"; // owns the inbox
-const PRIMARY: &str = "macro|primary@corp.test"; // delegate
-const STRANGER: &str = "macro|stranger@corp.test"; // no relationship
+const CHILD: &str = "rox|sharedbox@corp.test"; // owns the inbox
+const PRIMARY: &str = "rox|primary@corp.test"; // delegate
+const STRANGER: &str = "rox|stranger@corp.test"; // no relationship
 
 fn rox_id(s: &str) -> RoxUserIdStr<'_> {
     RoxUserIdStr::try_from(s).unwrap()

@@ -19,7 +19,7 @@ fn link(i: u8) -> Uuid {
 }
 
 fn user(i: u8) -> String {
-    format!("macro|u{i}@gamma.test")
+    format!("rox|u{i}@gamma.test")
 }
 
 /// Every way the team read takes a page, by name.

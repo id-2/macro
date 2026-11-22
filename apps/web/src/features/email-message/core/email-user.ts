@@ -33,7 +33,7 @@ export function getSenderDisplayName(
  */
 export function getSenderRoxId(message: EmailMessage): string | undefined {
   const senderEmail = message.from?.email;
-  return senderEmail?.includes('@') ? `macro|${senderEmail}` : undefined;
+  return senderEmail?.includes('@') ? `rox|${senderEmail}` : undefined;
 }
 
 interface Recipient {

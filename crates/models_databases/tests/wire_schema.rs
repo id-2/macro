@@ -328,7 +328,7 @@ fn ops() -> Vec<DatabaseOp> {
         }),
         view(ViewChange::MoveCard {
             row: ROW,
-            lane: LaneKey::User("macro|sam@rox.one".try_into().unwrap()),
+            lane: LaneKey::User("rox|sam@rox.one".try_into().unwrap()),
             before: None,
             after: None,
         }),

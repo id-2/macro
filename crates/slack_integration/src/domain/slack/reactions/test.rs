@@ -82,14 +82,14 @@ fn reactors_dedupe_after_email_alias_and_tone_mapping_with_exact_times() {
     assert_eq!(
         converted
             .iter()
-            .filter(|r| r.user_id.as_ref() == "macro|a+tag@example.com")
+            .filter(|r| r.user_id.as_ref() == "rox|a+tag@example.com")
             .count(),
         2
     );
     assert_eq!(
         converted
             .iter()
-            .filter(|r| r.user_id.as_ref() == "macro|a@example.com")
+            .filter(|r| r.user_id.as_ref() == "rox|a@example.com")
             .count(),
         1
     );

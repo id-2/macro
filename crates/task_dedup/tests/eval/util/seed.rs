@@ -10,7 +10,7 @@ use task_dedup::eval::EvalCorpus;
 /// fixture creates this user, and `Document.owner` is a foreign key to it.
 /// Seeding everything under one owner makes all tasks mutually visible to the
 /// owner-scoped search without needing team rows.
-pub const EVAL_OWNER: &str = "macro|user@user.com";
+pub const EVAL_OWNER: &str = "rox|user@user.com";
 
 /// Inserts every corpus task as a task document owned by [`EVAL_OWNER`], under
 /// its seeded document id. Does not embed anything — each measurement embeds as

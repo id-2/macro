@@ -54,7 +54,7 @@ async function mount(page: Page, mode: CacheMode, initial?: string[]) {
   const unexpected: string[] = [];
   page.on('pageerror', (error) => unexpected.push(error.message));
   // GraphQL Soup builds its cache only for a signed-in tab.
-  await page.addInitScript(() => localStorage.setItem('macro:login', 'true'));
+  await page.addInitScript(() => localStorage.setItem('rox:login', 'true'));
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());

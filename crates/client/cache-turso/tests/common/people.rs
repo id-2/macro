@@ -6,12 +6,12 @@ use cache_core::{
 };
 use uuid::Uuid;
 
-const VIEWER: &str = "macro|viewer@example.com";
-const WINNER: &str = "macro|winner@example.com";
-const BLOCKED: &str = "macro|blocked@example.com";
-const GHOST: &str = "macro|ghost@example.com";
-const DUPLICATE: &str = "macro|duplicate@example.com";
-const EXACT: &str = "macro|exact@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
+const WINNER: &str = "rox|winner@example.com";
+const BLOCKED: &str = "rox|blocked@example.com";
+const GHOST: &str = "rox|ghost@example.com";
+const DUPLICATE: &str = "rox|duplicate@example.com";
+const EXACT: &str = "rox|exact@example.com";
 fn contact_key(user: &str) -> EntityKey<'static> {
     EntityKey::entity(
         "GraphqlContact",
@@ -34,7 +34,7 @@ fn contact(user: &str, id: &str) -> Record {
             ("name".into(), CacheValue::String("Alpha".into())),
             (
                 "email".into(),
-                CacheValue::String(user.strip_prefix("macro|").unwrap().into()),
+                CacheValue::String(user.strip_prefix("rox|").unwrap().into()),
             ),
         ]
         .into(),
@@ -49,7 +49,7 @@ pub async fn seed<S: Storage>(storage: &mut S, count: usize) {
             .put_batch(
                 (start..(start + 500).min(count))
                     .map(|index| {
-                        let user = format!("macro|p{index:06}@example.com");
+                        let user = format!("rox|p{index:06}@example.com");
                         let key = contact_key(&user);
                         let record = contact(&user, key.id().unwrap());
                         (key, record)
@@ -209,7 +209,7 @@ pub async fn assert_policy<S: Storage>(storage: S) -> S {
         "secondary inbox exclusion precedes ambiguity checks"
     );
     let mut foreign = references.clone();
-    foreign.scope.identity = "macro|other@example.com".into();
+    foreign.scope.identity = "rox|other@example.com".into();
     assert!(engine.resolve_people_references(&foreign).await.is_err());
     foreign.scope = scope.clone();
     foreign.scope.storage_generation = Uuid::now_v7();
@@ -353,7 +353,7 @@ pub async fn assert_policy<S: Storage>(storage: S) -> S {
     else {
         panic!("ready")
     };
-    assert_eq!(people[0].user_id.as_ref(), "macro|p000001@example.com");
+    assert_eq!(people[0].user_id.as_ref(), "rox|p000001@example.com");
     assert_eq!(people[0].match_rank, 5);
     request.mode = PeopleMode::Mention;
     request.query = "al".into();

@@ -18,7 +18,7 @@ impl CompletedMailboxGrantSource for Grants {
 
 async fn actor(db: &PgPool, email: &str) -> (Uuid, RoxUserIdStr<'static>) {
     let id = rox_uuid::generate_uuid_v7();
-    let rox_id = RoxUserIdStr::try_from(format!("macro|{email}")).unwrap();
+    let rox_id = RoxUserIdStr::try_from(format!("rox|{email}")).unwrap();
     sqlx::query!(
         "INSERT INTO rox_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
         id,
@@ -151,7 +151,7 @@ async fn shared_promotion_keeps_one_inbox_and_both_scoped_access_edges(db: PgPoo
     .fetch_one(&db)
     .await
     .unwrap();
-    assert_eq!(row.rox_id, "macro|mailbox@example.com");
+    assert_eq!(row.rox_id, "rox|mailbox@example.com");
     assert_eq!(row.fusionauth_user_id, second.0.to_string());
     assert_eq!(row.sync_generation, 2);
     assert_eq!(
@@ -566,14 +566,14 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
             .await
             .unwrap()
             .username,
-        "macro|legacy@example.com"
+        "rox|legacy@example.com"
     );
     assert_eq!(
         rox_db_client::user::get::get_user_id_by_email(db.clone(), "legacy@example.com")
             .await
             .unwrap(),
         owner.1.as_ref(),
-        "an existing macro|email fixture still resolves before a handle is claimed"
+        "an existing rox|email fixture still resolves before a handle is claimed"
     );
     assert!(
         ensure_rox_mailbox(&db, &owner.0.to_string(), owner.1.clone(), true)

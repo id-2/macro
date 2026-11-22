@@ -67,7 +67,7 @@ async fn the_organizer_changes_the_guest_policy() {
 
     service(organizer_repo(), provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             policy_patch(NO_INVITES),
@@ -89,7 +89,7 @@ async fn an_unchanged_guest_policy_is_not_sent() {
 
     service(organizer_repo(), provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -118,7 +118,7 @@ async fn a_guest_who_may_modify_still_cannot_change_the_guest_policy() {
 
     let error = service(modifying_guest_repo(), provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             policy_patch(NO_INVITES),
@@ -141,7 +141,7 @@ async fn an_outlook_event_refuses_a_guest_policy_as_unsupported() {
 
     let error = service(outlook_organizer_repo(), provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             policy_patch(NO_INVITES),
@@ -177,7 +177,7 @@ async fn a_new_event_carries_a_guest_policy_only_when_it_departs_from_the_defaul
             FakeTokens::ok(),
         )
         .create_event(
-            "macro|user",
+            "rox|user",
             None,
             None,
             CalendarEventDraft {
@@ -212,7 +212,7 @@ async fn a_new_outlook_event_refuses_a_guest_policy() {
         FakeTokens::ok(),
     )
     .create_event(
-        "macro|user",
+        "rox|user",
         None,
         None,
         CalendarEventDraft {
@@ -237,7 +237,7 @@ async fn a_guest_policy_change_to_one_occurrence_is_refused() {
 
     let error = service(organizer_repo(), provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             policy_patch(NO_INVITES),
@@ -269,7 +269,7 @@ async fn an_out_of_office_event_refuses_a_guest_policy() {
         FakeTokens::ok(),
     )
     .create_event(
-        "macro|user",
+        "rox|user",
         None,
         None,
         CalendarEventDraft {

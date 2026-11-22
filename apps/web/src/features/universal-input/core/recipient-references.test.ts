@@ -11,13 +11,13 @@ import { resolveSearchFilters } from './search';
 
 it('requires complete per-label evidence and preserves preferred-full-name ambiguity rules', () => {
   const full: Recipient = {
-    id: 'macro|full@example.com',
+    id: 'rox|full@example.com',
     email: 'full@example.com',
     label: 'Shared',
     kind: 'user',
   };
   const first: Recipient = {
-    id: 'macro|first@example.com',
+    id: 'rox|first@example.com',
     email: 'first@example.com',
     label: 'Shared Person',
     kind: 'user',
@@ -47,7 +47,7 @@ it('requires complete per-label evidence and preserves preferred-full-name ambig
 
 it('never redirects a complete address or user ID through a display-name alias', () => {
   const alias: Recipient = {
-    id: 'macro|other@example.com',
+    id: 'rox|other@example.com',
     email: 'other@example.com',
     label: 'target@example.com',
     kind: 'user',
@@ -71,11 +71,11 @@ it('never redirects a complete address or user ID through a display-name alias',
   ).toEqual(['TARGET@example.com']);
   expect(
     resolveRecipientTerms(
-      ['macro|target@example.com'],
-      [{ ...alias, label: 'macro|target@example.com' }],
+      ['rox|target@example.com'],
+      [{ ...alias, label: 'rox|target@example.com' }],
       true
     ).unresolved
-  ).toEqual(['macro|target@example.com']);
+  ).toEqual(['rox|target@example.com']);
   expect(
     resolveRecipientTerms(
       ['target@example.com', 'TARGET@example.com'],
@@ -115,7 +115,7 @@ it('preserves model boundaries through string fields without changing manual sep
 
 it('preserves an address local-part sigil instead of treating it as a channel prefix', () => {
   const other: Recipient = {
-    id: 'macro|target@example.com',
+    id: 'rox|target@example.com',
     email: 'target@example.com',
     label: 'Other',
     kind: 'user',
@@ -154,7 +154,7 @@ it('resolves explicit channel IDs while people are unavailable but does not gues
     'Shared',
   ]);
   const person: Recipient = {
-    id: 'macro|person@example.com',
+    id: 'rox|person@example.com',
     label: 'Shared',
     email: 'person@example.com',
     kind: 'user',

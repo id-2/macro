@@ -48,7 +48,7 @@ fn message() -> WebhookEventQueueMessage {
 fn webhook(endpoint_url: &str) -> Webhook {
     Webhook {
         id: WEBHOOK_ID.to_string(),
-        workspace_id: "macro|delivery@example.com".to_string(),
+        workspace_id: "rox|delivery@example.com".to_string(),
         namespace: "delivery-test".to_string(),
         name: "Delivery test".to_string(),
         endpoint_url: endpoint_url.to_string(),
@@ -56,7 +56,7 @@ fn webhook(endpoint_url: &str) -> Webhook {
         headers: BTreeMap::new(),
         status: WebhookStatus::Active,
         is_valid: true,
-        created_by_user_id: "macro|delivery@example.com".to_string(),
+        created_by_user_id: "rox|delivery@example.com".to_string(),
         created_at: timestamp(),
         updated_at: timestamp(),
         deleted_at: None,

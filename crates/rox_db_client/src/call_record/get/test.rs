@@ -1,16 +1,16 @@
 use super::*;
 use sqlx::PgPool;
 
-const REQUESTER: &str = "macro|call-list-requester@corp.test";
-const SAME_TEAM_OWNER: &str = "macro|call-list-same-team-owner@corp.test";
-const OTHER_TEAM_OWNER: &str = "macro|call-list-other-team-owner@corp.test";
-const OWNER_WITHOUT_TEAM: &str = "macro|call-list-owner-without-team@corp.test";
+const REQUESTER: &str = "rox|call-list-requester@corp.test";
+const SAME_TEAM_OWNER: &str = "rox|call-list-same-team-owner@corp.test";
+const OTHER_TEAM_OWNER: &str = "rox|call-list-other-team-owner@corp.test";
+const OWNER_WITHOUT_TEAM: &str = "rox|call-list-owner-without-team@corp.test";
 const REQUESTER_TEAM: Uuid = Uuid::from_u128(0x00000000000000000000000000001101);
 const OTHER_TEAM: Uuid = Uuid::from_u128(0x00000000000000000000000000001102);
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
 
     sqlx::query!(
         r#"

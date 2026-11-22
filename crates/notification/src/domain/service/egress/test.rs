@@ -8,7 +8,7 @@ fn ios_delivery_binds_the_destination_to_each_receiving_account() {
         aps: Aps::default(),
         push_notification_data: json!({
             "notificationId": "019a0000-0000-7000-8000-000000000004",
-            "recipientId": "macro|stale@example.com",
+            "recipientId": "rox|stale@example.com",
             "navigation": {
                 "type": "channel",
                 "channelId": "019a0000-0000-7000-8000-000000000001",
@@ -32,7 +32,7 @@ fn ios_delivery_binds_the_destination_to_each_receiving_account() {
     }
     assert_eq!(
         template.push_notification_data["recipientId"],
-        "macro|stale@example.com"
+        "rox|stale@example.com"
     );
 }
 
@@ -52,7 +52,7 @@ fn notification(alert: Option<Alert>, push_type: PushType) -> FCMMessage<serde_j
             },
             ios_device_endpoints: Default::default(),
         },
-        RoxUserIdStr::parse_from_str("macro|alice@example.com")
+        RoxUserIdStr::parse_from_str("rox|alice@example.com")
             .unwrap()
             .into_owned(),
     )
@@ -76,7 +76,7 @@ fn empty_alerts_have_visible_fallback_text() {
         assert_eq!(message.title.as_deref(), Some("New notification"));
         assert_eq!(message.identifier, "identifier");
         assert_eq!(message.data["notificationId"], "notification-id");
-        assert_eq!(message.recipient_id.as_ref(), "macro|alice@example.com");
+        assert_eq!(message.recipient_id.as_ref(), "rox|alice@example.com");
     }
 }
 

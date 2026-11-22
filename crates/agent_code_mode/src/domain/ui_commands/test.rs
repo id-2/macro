@@ -23,13 +23,13 @@ const TURN: u128 = 1;
 const DOC: &str = "/drive/md/0190f5a4-0000-7000-8000-000000000001";
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned()
 }
 
 fn other_person() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|other@example.com")
+    RoxUserIdStr::parse_from_str("rox|other@example.com")
         .unwrap()
         .into_owned()
 }

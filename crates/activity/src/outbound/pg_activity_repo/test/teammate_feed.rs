@@ -1,11 +1,11 @@
 use super::super::team_feed::{TeamScan, teammate_feed};
 use super::*;
 
-const VIEWER: &str = "macro|viewer@example.com";
-const ALICE: &str = "macro|alice@example.com";
-const BOB: &str = "macro|bob@example.com";
-const OUTSIDER: &str = "macro|outsider@example.com";
-const LONER: &str = "macro|loner@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
+const ALICE: &str = "rox|alice@example.com";
+const BOB: &str = "rox|bob@example.com";
+const OUTSIDER: &str = "rox|outsider@example.com";
+const LONER: &str = "rox|loner@example.com";
 
 async fn insert_user(pool: &PgPool, id: &str) {
     let rox_user_id = Uuid::now_v7();

@@ -12,7 +12,7 @@ use std::ops::Deref;
 #[cfg(test)]
 mod tests;
 
-const ROX_PREFIX: &str = "macro";
+const ROX_PREFIX: &str = "rox";
 
 fn rox_user_id(input: &str) -> IResult<&str, RoxUserId<ArcCowStr<'_>>> {
     let (rest, ((prefix, pipe), email)) =
@@ -30,7 +30,7 @@ fn rox_user_id(input: &str) -> IResult<&str, RoxUserId<ArcCowStr<'_>>> {
     ))
 }
 
-/// A structure that encapsulates a macro user id
+/// A structure that encapsulates a rox user id
 #[derive(Clone, Copy)]
 pub struct RoxUserId<T> {
     email_part: Email<()>,
@@ -142,7 +142,7 @@ impl<'a> From<RoxUserIdStr<'a>> for RoxUserId<String> {
 }
 
 impl RoxUserIdStr<'static> {
-    /// Create a RoxUserIdStr from an email address by prepending "macro|"
+    /// Create a RoxUserIdStr from an email address by prepending "rox|"
     pub fn try_from_email(email: &str) -> Result<Self, ParseErr> {
         Self::try_from(format!("{}|{}", ROX_PREFIX, email))
     }

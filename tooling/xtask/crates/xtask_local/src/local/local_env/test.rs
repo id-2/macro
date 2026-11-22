@@ -21,7 +21,7 @@ fn local_rox_api_tokens_can_be_signed_and_verified() {
     let claims = serde_json::json!({
         "iss": env["ROX_API_TOKEN_ISSUER"],
         "exp": SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() + 60,
-        "rox_user_id": "macro|local@example.test",
+        "rox_user_id": "rox|local@example.test",
     });
     let mut header = Header::new(Algorithm::RS256);
     header.kid = Some("macro".into());

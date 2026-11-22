@@ -34,7 +34,7 @@ pub struct ActivityWireRow {
     pub agent_verb: Option<String>,
     /// The stored activity id.
     pub id: Uuid,
-    /// Who mechanically acted, as a principal string (`macro|…` / `bot|…`).
+    /// Who mechanically acted, as a principal string (`rox|…` / `bot|…`).
     pub actor_id: String,
     /// Whose activity this is (a principal string).
     pub subject_id: String,
@@ -99,7 +99,7 @@ pub enum ActivityTopicEvent {
     /// Activities were durably recorded; addressed to one recipient.
     #[serde(rename = "activity.recorded")]
     Recorded {
-        /// The user this delivery is addressed to (a `macro|…` principal).
+        /// The user this delivery is addressed to (a `rox|…` principal).
         /// Not necessarily any row's subject: entity watchers receive other
         /// principals' rows.
         recipient_id: String,

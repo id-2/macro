@@ -65,7 +65,7 @@ mod tests {
     ) {
         let session = Uuid::now_v7();
         let agent = Uuid::now_v7();
-        sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, status) VALUES ($1, 'macro|owner@example.com', $2, 'test', 'test', '/workspace', 'disconnected')", session, agent).execute(&pool).await.unwrap();
+        sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, status) VALUES ($1, 'rox|owner@example.com', $2, 'test', 'test', '/workspace', 'disconnected')", session, agent).execute(&pool).await.unwrap();
         let repo = PgCorrelationRepository(pool.clone());
         let first = repo.create(session, agent, None).await.unwrap();
         let second = repo

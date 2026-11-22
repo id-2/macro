@@ -29,7 +29,7 @@ use uuid::Uuid;
 pub struct AdoptOrSeedUserArgs {
     /// Login email.
     pub email: String,
-    /// The `macro|email` user id.
+    /// The `rox|email` user id.
     pub user_id: String,
     /// Derived uuid used when no `rox_user` row exists for the email.
     pub derived_rox_user_id: Uuid,

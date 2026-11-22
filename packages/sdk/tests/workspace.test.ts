@@ -605,7 +605,7 @@ test('agent sessions are listed by default and by type, with their filter, as se
             botId: 'bot',
             createdAt: '2026-11-01T00:00:00Z',
             harness: 'roxd',
-            ownerId: 'macro|me@example.com',
+            ownerId: 'rox|me@example.com',
             pullRequestUrl: 'https://github.com/acme/app/pull/1',
             properties: [],
           },
@@ -617,10 +617,10 @@ test('agent sessions are listed by default and by type, with their filter, as se
   });
   const page = await macro().workspace.page({
     includeTypes: ['agent_session'],
-    asf: { l: { o: 'macro|me@example.com' } },
+    asf: { l: { o: 'rox|me@example.com' } },
   });
   expect(bodies[0]?.asf).toEqual({
-    '&': [{ l: { o: 'macro|me@example.com' } }, { l: { inc: true } }],
+    '&': [{ l: { o: 'rox|me@example.com' } }, { l: { inc: true } }],
   });
   expect(bodies[0]?.df).toEqual({ l: { id: nil } });
   const item = page.items[0];

@@ -42,7 +42,7 @@ fn setup(pool: PgPool) -> (Service, TestClock) {
     )
 }
 fn user(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{name}@requests.test")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{name}@requests.test")).unwrap()
 }
 fn entity() -> ShareEntity {
     ShareEntity {
@@ -618,7 +618,7 @@ async fn folder_grants_propagate_without_overwriting_direct_child_access(pool: P
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn recorded_owner_reports_owner_access_over_its_grant_row(pool: PgPool) {
     sqlx::query!(
-        "UPDATE entity_access SET access_level = 'edit' WHERE source_id = 'macro|owner@requests.test'"
+        "UPDATE entity_access SET access_level = 'edit' WHERE source_id = 'rox|owner@requests.test'"
     )
     .execute(&pool)
     .await
@@ -627,7 +627,7 @@ async fn recorded_owner_reports_owner_access_over_its_grant_row(pool: PgPool) {
     let owner = s.state(user("owner"), entity(), 0).await.unwrap();
     assert_eq!(owner.access_level, Some(AccessLevel::Owner));
     assert!(owner.can_review);
-    sqlx::query!("DELETE FROM entity_access WHERE source_id = 'macro|owner@requests.test'")
+    sqlx::query!("DELETE FROM entity_access WHERE source_id = 'rox|owner@requests.test'")
         .execute(&pool)
         .await
         .unwrap();
@@ -649,11 +649,11 @@ async fn recorded_owner_reports_owner_access_over_its_grant_row(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn bot_sponsor_can_review_without_a_separate_user_grant(pool: PgPool) {
-    sqlx::query!("INSERT INTO bots (id, kind, owner_user_id, name, handle) VALUES ('00000000-0000-0000-0000-000000000020', 'owned', 'macro|owner@requests.test', 'Owner bot', 'request-owner')")
+    sqlx::query!("INSERT INTO bots (id, kind, owner_user_id, name, handle) VALUES ('00000000-0000-0000-0000-000000000020', 'owned', 'rox|owner@requests.test', 'Owner bot', 'request-owner')")
         .execute(&pool).await.unwrap();
     sqlx::query!(r#"UPDATE "Document" SET owner = 'bot|00000000-0000-0000-0000-000000000020' WHERE id = '00000000-0000-0000-0000-000000000010'"#)
         .execute(&pool).await.unwrap();
-    sqlx::query!("DELETE FROM entity_access WHERE source_id = 'macro|owner@requests.test'")
+    sqlx::query!("DELETE FROM entity_access WHERE source_id = 'rox|owner@requests.test'")
         .execute(&pool)
         .await
         .unwrap();

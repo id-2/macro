@@ -17,10 +17,10 @@ fn user_authentication() -> RoxUserAuthentication {
         origin: crate::CredentialOrigin::Session,
         agent_id: None,
         agent_via: None,
-        rox_user_id: RoxUserIdStr::try_from("macro|user@example.com".to_string())
+        rox_user_id: RoxUserIdStr::try_from("rox|user@example.com".to_string())
             .expect("valid Rox user id"),
         user_context: UserContext {
-            user_id: "macro|user@example.com".to_string(),
+            user_id: "rox|user@example.com".to_string(),
             fusion_user_id: "fusion-user-id".to_string(),
             permissions: None,
             organization_id: Some(42),
@@ -29,8 +29,8 @@ fn user_authentication() -> RoxUserAuthentication {
 }
 
 fn assert_acting_user(user: &RoxUserAuthentication) {
-    assert_eq!(user.rox_user_id.as_ref(), "macro|user@example.com");
-    assert_eq!(user.user_context.user_id, "macro|user@example.com");
+    assert_eq!(user.rox_user_id.as_ref(), "rox|user@example.com");
+    assert_eq!(user.user_context.user_id, "rox|user@example.com");
     assert_eq!(user.user_context.fusion_user_id, "fusion-user-id");
     assert_eq!(user.user_context.organization_id, Some(42));
 }
@@ -140,12 +140,12 @@ fn internal_authorization_can_have_no_acting_user() {
 #[test]
 fn bot_acting_user_claims_carry_unverified_values() {
     let claims = BotActingUserClaims {
-        user_id: Some("macro|claimed@example.com".to_string()),
+        user_id: Some("rox|claimed@example.com".to_string()),
         fusion_user_id: Some("claimed-fusion-id".to_string()),
         organization_id: Some(7),
     };
 
-    assert_eq!(claims.user_id.as_deref(), Some("macro|claimed@example.com"));
+    assert_eq!(claims.user_id.as_deref(), Some("rox|claimed@example.com"));
     assert_eq!(claims.fusion_user_id.as_deref(), Some("claimed-fusion-id"));
     assert_eq!(claims.organization_id, Some(7));
 }

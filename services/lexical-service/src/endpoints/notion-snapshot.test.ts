@@ -29,7 +29,7 @@ const page = {
     },
     users: {
       '12345678123412341234123456789abc': {
-        userId: 'macro|teo@acme.test',
+        userId: 'rox|teo@acme.test',
         email: 'teo@acme.test',
       },
     },

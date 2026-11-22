@@ -235,14 +235,14 @@ async fn completing_verifies_and_stores_the_connected_app() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_1".into(),
-        account("apn_1", Some("macro|user-1@example.com"), "linear"),
+        account("apn_1", Some("rox|user-1@example.com"), "linear"),
     );
 
     let record = complete_pipedream_connection(
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_1",
         None,
     )
@@ -255,7 +255,7 @@ async fn completing_verifies_and_stores_the_connected_app() {
     assert!(record.enabled);
     assert!(
         store
-            .load(&user("macro|user-1@example.com"), "linear")
+            .load(&user("rox|user-1@example.com"), "linear")
             .await
             .unwrap()
             .is_some()
@@ -268,14 +268,14 @@ async fn completing_rejects_accounts_owned_by_someone_else() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_1".into(),
-        account("apn_1", Some("macro|user-2@example.com"), "linear"),
+        account("apn_1", Some("rox|user-2@example.com"), "linear"),
     );
 
     let err = complete_pipedream_connection(
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_1",
         None,
     )
@@ -295,7 +295,7 @@ async fn completing_rejects_unknown_accounts() {
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_missing",
         None,
     )
@@ -310,7 +310,7 @@ async fn reconnecting_keeps_the_name_turns_the_app_on_and_swaps_the_account() {
     let store = FakeStore::default();
     store
         .save(&PipedreamConnection {
-            user_id: user("macro|user-1@example.com"),
+            user_id: user("rox|user-1@example.com"),
             app_slug: "linear".into(),
             server_name: "My Linear".into(),
             account_id: "apn_old".into(),
@@ -323,14 +323,14 @@ async fn reconnecting_keeps_the_name_turns_the_app_on_and_swaps_the_account() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_new".into(),
-        account("apn_new", Some("macro|user-1@example.com"), "linear"),
+        account("apn_new", Some("rox|user-1@example.com"), "linear"),
     );
 
     let record = complete_pipedream_connection(
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_new",
         None,
     )
@@ -351,14 +351,14 @@ async fn explicit_server_name_wins() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_1".into(),
-        account("apn_1", Some("macro|user-1@example.com"), "linear"),
+        account("apn_1", Some("rox|user-1@example.com"), "linear"),
     );
 
     let record = complete_pipedream_connection(
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_1",
         Some("Work Linear"),
     )
@@ -373,7 +373,7 @@ async fn disconnect_revokes_the_pipedream_account_and_deletes_the_row() {
     let store = FakeStore::default();
     store
         .save(&PipedreamConnection {
-            user_id: user("macro|user-1@example.com"),
+            user_id: user("rox|user-1@example.com"),
             app_slug: "linear".into(),
             server_name: "Linear".into(),
             account_id: "apn_1".into(),
@@ -384,7 +384,7 @@ async fn disconnect_revokes_the_pipedream_account_and_deletes_the_row() {
         .unwrap();
     let pd = FakePipedream::default();
 
-    let removed = disconnect_mcp_server(&store, &pd, &user("macro|user-1@example.com"), "linear")
+    let removed = disconnect_mcp_server(&store, &pd, &user("rox|user-1@example.com"), "linear")
         .await
         .unwrap();
 
@@ -401,7 +401,7 @@ async fn disconnect_of_unknown_app_is_a_quiet_noop() {
     let store = FakeStore::default();
     let pd = FakePipedream::default();
 
-    let removed = disconnect_mcp_server(&store, &pd, &user("macro|user-1@example.com"), "linear")
+    let removed = disconnect_mcp_server(&store, &pd, &user("rox|user-1@example.com"), "linear")
         .await
         .unwrap();
 
@@ -415,14 +415,14 @@ async fn completing_an_overlaid_app_is_refused_and_its_account_deleted() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_1".into(),
-        account("apn_1", Some("macro|user-1@example.com"), "sentry"),
+        account("apn_1", Some("rox|user-1@example.com"), "sentry"),
     );
 
     let err = complete_pipedream_connection(
         &store,
         &SentryOverlay,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "apn_1",
         None,
     )
@@ -437,7 +437,7 @@ async fn completing_an_overlaid_app_is_refused_and_its_account_deleted() {
     assert_eq!(*pd.deleted.lock().unwrap(), vec!["apn_1".to_owned()]);
     assert!(
         store
-            .list(&user("macro|user-1@example.com"))
+            .list(&user("rox|user-1@example.com"))
             .await
             .unwrap()
             .is_empty()
@@ -449,8 +449,8 @@ async fn recovery_stores_the_newest_recent_account_the_ui_never_reported() {
     let store = FakeStore::default();
     let mut pd = FakePipedream::default();
     for account in [
-        created("apn_older", "macro|user-1@example.com", 5),
-        created("apn_newest", "macro|user-1@example.com", 1),
+        created("apn_older", "rox|user-1@example.com", 5),
+        created("apn_newest", "rox|user-1@example.com", 1),
     ] {
         pd.accounts.insert(account.id.clone(), account);
     }
@@ -459,7 +459,7 @@ async fn recovery_stores_the_newest_recent_account_the_ui_never_reported() {
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "linear",
         None,
         now(),
@@ -471,7 +471,7 @@ async fn recovery_stores_the_newest_recent_account_the_ui_never_reported() {
     assert_eq!(record.account_id, "apn_newest");
     assert!(
         store
-            .load(&user("macro|user-1@example.com"), "linear")
+            .load(&user("rox|user-1@example.com"), "linear")
             .await
             .unwrap()
             .is_some()
@@ -483,8 +483,8 @@ async fn recovery_ignores_accounts_outside_the_window_and_other_users() {
     let store = FakeStore::default();
     let mut pd = FakePipedream::default();
     for account in [
-        created("apn_stale", "macro|user-1@example.com", 60),
-        created("apn_theirs", "macro|user-2@example.com", 1),
+        created("apn_stale", "rox|user-1@example.com", 60),
+        created("apn_theirs", "rox|user-2@example.com", 1),
     ] {
         pd.accounts.insert(account.id.clone(), account);
     }
@@ -493,7 +493,7 @@ async fn recovery_ignores_accounts_outside_the_window_and_other_users() {
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "linear",
         None,
         now(),
@@ -510,7 +510,7 @@ async fn recovery_does_not_report_the_already_stored_account_as_new() {
     let store = FakeStore::default();
     store
         .save(&PipedreamConnection {
-            user_id: user("macro|user-1@example.com"),
+            user_id: user("rox|user-1@example.com"),
             app_slug: "linear".into(),
             server_name: "Linear".into(),
             account_id: "apn_1".into(),
@@ -522,14 +522,14 @@ async fn recovery_does_not_report_the_already_stored_account_as_new() {
     let mut pd = FakePipedream::default();
     pd.accounts.insert(
         "apn_1".into(),
-        created("apn_1", "macro|user-1@example.com", 1),
+        created("apn_1", "rox|user-1@example.com", 1),
     );
 
     let recovered = recover_pipedream_connection(
         &store,
         &NoOverlays,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "linear",
         None,
         now(),
@@ -548,7 +548,7 @@ async fn recovering_an_overlaid_app_is_refused_and_its_account_deleted() {
         "apn_1".into(),
         PipedreamAccount {
             app_slug: "sentry".into(),
-            ..created("apn_1", "macro|user-1@example.com", 1)
+            ..created("apn_1", "rox|user-1@example.com", 1)
         },
     );
 
@@ -556,7 +556,7 @@ async fn recovering_an_overlaid_app_is_refused_and_its_account_deleted() {
         &store,
         &SentryOverlay,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "sentry",
         None,
         now(),
@@ -573,13 +573,13 @@ async fn recovering_an_overlaid_app_is_refused_and_its_account_deleted() {
 async fn connect_session_starts_for_an_app_connect_serves() {
     let pd = FakePipedream::default().with_connect_app("linear", "linear");
 
-    let url = start_connect_session(&pd, &user("macro|user-1@example.com"), "linear")
+    let url = start_connect_session(&pd, &user("rox|user-1@example.com"), "linear")
         .await
         .unwrap();
 
     assert_eq!(
         url.as_deref(),
-        Some("https://connect.test/v1/connect/linear/macro|user-1@example.com")
+        Some("https://connect.test/v1/connect/linear/rox|user-1@example.com")
     );
 }
 
@@ -588,7 +588,7 @@ async fn connect_serves_overlaid_apps_and_granola_and_nothing_it_lacks() {
     let pd = FakePipedream::default()
         .with_connect_app("sentry", "sentry")
         .with_connect_app("granola", "granola");
-    let user = user("macro|user-1@example.com");
+    let user = user("rox|user-1@example.com");
 
     for slug in ["sentry", "granola"] {
         let url = start_connect_session(&pd, &user, slug).await.unwrap();
@@ -605,12 +605,12 @@ async fn completing_through_connect_stores_a_connect_record() {
     let store = FakeStore::default();
     let pd = FakePipedream::default()
         .with_connect_app("airtable_oauth", "airtable")
-        .connected_on_connect("macro|user-1@example.com", "airtable");
+        .connected_on_connect("rox|user-1@example.com", "airtable");
 
     let record = complete_connect_connection(
         &store,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "airtable_oauth",
         None,
     )
@@ -623,7 +623,7 @@ async fn completing_through_connect_stores_a_connect_record() {
     assert!(record.enabled);
     assert_eq!(
         store
-            .load(&user("macro|user-1@example.com"), "airtable_oauth")
+            .load(&user("rox|user-1@example.com"), "airtable_oauth")
             .await
             .unwrap(),
         Some(record)
@@ -636,12 +636,12 @@ async fn completing_through_connect_before_connect_confirms_is_not_found() {
     // Connected for someone else: the caller cannot claim it.
     let pd = FakePipedream::default()
         .with_connect_app("linear", "linear")
-        .connected_on_connect("macro|user-2@example.com", "linear");
+        .connected_on_connect("rox|user-2@example.com", "linear");
 
     let err = complete_connect_connection(
         &store,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "linear",
         None,
     )
@@ -657,7 +657,7 @@ async fn completing_through_connect_revokes_the_pipedream_grant_it_replaces() {
     let store = FakeStore::default();
     store
         .save(&PipedreamConnection {
-            user_id: user("macro|user-1@example.com"),
+            user_id: user("rox|user-1@example.com"),
             app_slug: "linear".into(),
             server_name: "My Linear".into(),
             account_id: "apn_1".into(),
@@ -668,12 +668,12 @@ async fn completing_through_connect_revokes_the_pipedream_grant_it_replaces() {
         .unwrap();
     let pd = FakePipedream::default()
         .with_connect_app("linear", "linear")
-        .connected_on_connect("macro|user-1@example.com", "linear");
+        .connected_on_connect("rox|user-1@example.com", "linear");
 
     let record = complete_connect_connection(
         &store,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "linear",
         None,
     )
@@ -694,7 +694,7 @@ async fn disconnecting_a_connect_app_deletes_it_from_connect() {
     let store = FakeStore::default();
     store
         .save(&PipedreamConnection {
-            user_id: user("macro|user-1@example.com"),
+            user_id: user("rox|user-1@example.com"),
             app_slug: "airtable_oauth".into(),
             server_name: "Airtable".into(),
             account_id: "airtable".into(),
@@ -708,7 +708,7 @@ async fn disconnecting_a_connect_app_deletes_it_from_connect() {
     disconnect_mcp_server(
         &store,
         &pd,
-        &user("macro|user-1@example.com"),
+        &user("rox|user-1@example.com"),
         "airtable_oauth",
     )
     .await
@@ -716,7 +716,7 @@ async fn disconnecting_a_connect_app_deletes_it_from_connect() {
 
     assert_eq!(
         *pd.connect_deleted.lock().unwrap(),
-        vec![("macro|user-1@example.com".to_owned(), "airtable".to_owned())]
+        vec![("rox|user-1@example.com".to_owned(), "airtable".to_owned())]
     );
     assert!(pd.deleted.lock().unwrap().is_empty());
     assert!(store.records.lock().unwrap().is_empty());

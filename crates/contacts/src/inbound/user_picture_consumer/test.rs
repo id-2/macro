@@ -9,7 +9,7 @@ struct TestMessage<'a> {
 
 impl MessageParts for TestMessage<'_> {
     fn key(&self) -> Option<&str> {
-        Some("macro|owner@example.com")
+        Some("rox|owner@example.com")
     }
 
     fn payload(&self) -> Option<&[u8]> {
@@ -23,7 +23,7 @@ impl MessageParts for TestMessage<'_> {
 
 fn picture_changed() -> UserTopicEvent {
     UserTopicEvent::PictureChanged(UserPictureChangedMetadata {
-        user_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        user_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
         file_id: Some("file".to_string()),
         url: None,
     })
@@ -46,7 +46,7 @@ fn decodes_picture_changed_events() {
     match decoded {
         DeclaredMacroEvent::UserMacroEvent(event) => {
             let user = picture_changed_user(&event.event().event).expect("picture event");
-            assert_eq!(user.as_ref() as &str, "macro|owner@example.com");
+            assert_eq!(user.as_ref() as &str, "rox|owner@example.com");
         }
     }
 }

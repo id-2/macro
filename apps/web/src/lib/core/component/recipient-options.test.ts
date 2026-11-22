@@ -4,9 +4,9 @@ import { uniqueRecipientMatches } from './recipient-options';
 
 const USER: CombinedRecipientItem<'user'> = {
   kind: 'user',
-  id: 'macro|person@example.com',
+  id: 'rox|person@example.com',
   data: {
-    id: 'macro|person@example.com',
+    id: 'rox|person@example.com',
     email: 'person@example.com',
     name: 'Directory name',
   },

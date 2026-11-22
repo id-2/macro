@@ -20,7 +20,7 @@ test('create sends stages and fields in one call and returns the pipeline', asyn
       return Response.json({
         id: 'hiring',
         teamId: 'team',
-        userId: 'macro|owner@example.com',
+        userId: 'rox|owner@example.com',
         name: 'Hiring',
         recordType: 'contact',
         databaseId: 'database',

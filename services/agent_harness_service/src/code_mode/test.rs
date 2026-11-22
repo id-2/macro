@@ -574,7 +574,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
         INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ('00000000-0000-4000-8000-000000000001', 'owner@example.com', 'owner@example.com', 'stripe_owner');
         INSERT INTO "User" (id, email, rox_user_id)
-        VALUES ('macro|owner@example.com', 'owner@example.com', '00000000-0000-4000-8000-000000000001');
+        VALUES ('rox|owner@example.com', 'owner@example.com', '00000000-0000-4000-8000-000000000001');
         "#,
     )
     .execute(&pool)

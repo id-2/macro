@@ -347,7 +347,7 @@ async function boot(world: WorldCore) {
                 }
               : handles,
             senderLinkId: INBOX,
-            senderAccount: { rox_id: `macro|${SENDER}` },
+            senderAccount: { rox_id: `rox|${SENDER}` },
             senderEmail: SENDER,
           }),
           localRevision: local?.revision,
@@ -534,7 +534,7 @@ async function boot(world: WorldCore) {
                 draft: snapshot().draft,
                 handles: { draftId, threadId },
                 senderLinkId: INBOX,
-                senderAccount: { rox_id: `macro|${SENDER}` },
+                senderAccount: { rox_id: `rox|${SENDER}` },
                 senderEmail: SENDER,
               }),
               attachmentIds: [],

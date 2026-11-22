@@ -60,7 +60,7 @@ impl ProgramExecutor for Returns {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|fixture@example.com").unwrap()
 }
 
 fn request() -> ExecuteRequest {
@@ -95,7 +95,7 @@ async fn runs_as_the_authenticated_user_and_returns_data_with_activity() {
     );
     assert_eq!(
         *credentials.0.lock().unwrap(),
-        [("macro|fixture@example.com".to_owned(), caller)]
+        [("rox|fixture@example.com".to_owned(), caller)]
     );
 }
 

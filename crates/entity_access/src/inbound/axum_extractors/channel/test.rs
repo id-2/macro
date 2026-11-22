@@ -34,9 +34,9 @@ use crate::{
 };
 
 const CHANNEL_ID: &str = "550e8400-e29b-41d4-a716-446655440000";
-const USER_ID: &str = "macro|user@example.com";
-const ACT_AS_ID: &str = "macro|internal@example.com";
-const DEFAULT_INTERNAL_ID: &str = "macro|default@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const ACT_AS_ID: &str = "rox|internal@example.com";
+const DEFAULT_INTERNAL_ID: &str = "rox|default@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const ORGANIZATION_ID: i32 = 42;
 

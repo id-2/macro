@@ -103,7 +103,7 @@ fn star_expands_and_every_column_kind_types_its_literal() {
            OR amount <= 10
            OR stage != 'Won'
            OR \"closed at\" >= '2026-09-01'
-           OR owner = 'macro|sam@example.com'
+           OR owner = 'rox|sam@example.com'
            OR tags NOT HAS 'VIP'
            OR done = TRUE
            OR website = 'https://acme.example'
@@ -196,7 +196,7 @@ fn star_expands_and_every_column_kind_types_its_literal() {
             Filter::Comparison {
                 column: OWNER,
                 operator: ComparisonOperator::Equal,
-                value: Value::Entity("macro|sam@example.com".into()),
+                value: Value::Entity("rox|sam@example.com".into()),
             },
             Filter::Has {
                 column: TAGS,
@@ -291,7 +291,7 @@ fn order_by_aggregate_resolves_to_its_select_item() {
 fn insert_types_each_cell_and_drops_nulls() {
     let sql = "
         INSERT INTO crm.deals (name, stage, amount, \"closed at\", owner)
-        VALUES ('Acme', 'Won', 12000, '2026-09-01T09:30:00Z', 'macro|sam@example.com'),
+        VALUES ('Acme', 'Won', 12000, '2026-09-01T09:30:00Z', 'rox|sam@example.com'),
                ('Globex', 'lead', NULL, NULL, NULL)
     ";
 
@@ -306,7 +306,7 @@ fn insert_types_each_cell_and_drops_nulls() {
                     CLOSED_AT,
                     Value::Date(Utc.with_ymd_and_hms(2026, 9, 1, 9, 30, 0).unwrap()),
                 ),
-                (OWNER, Value::Entity("macro|sam@example.com".into())),
+                (OWNER, Value::Entity("rox|sam@example.com".into())),
             ],
             vec![
                 (NAME, Value::Text("Globex".into())),
@@ -649,7 +649,7 @@ fn join_rejections_quote_what_the_agent_wrote() {
 
 #[test]
 fn lists_type_multi_valued_cells_and_bare_values_become_one_element_lists() {
-    let sql = "UPDATE crm.deals SET tags = ['vip'], owner = 'macro|sam@example.com', stage = ['Won'] WHERE row_id = '00000000-0000-0000-0000-0000000000a1'";
+    let sql = "UPDATE crm.deals SET tags = ['vip'], owner = 'rox|sam@example.com', stage = ['Won'] WHERE row_id = '00000000-0000-0000-0000-0000000000a1'";
     let Query::Update(update) = resolve(&catalog(), parse(sql).unwrap()).unwrap() else {
         panic!("an update");
     };
@@ -662,7 +662,7 @@ fn lists_type_multi_valued_cells_and_bare_values_become_one_element_lists() {
             },
             Assignment {
                 column: OWNER,
-                value: Assigned::Value(Some(Value::Entity("macro|sam@example.com".into()))),
+                value: Assigned::Value(Some(Value::Entity("rox|sam@example.com".into()))),
             },
             Assignment {
                 column: STAGE,
@@ -728,7 +728,7 @@ fn rejections_quote_what_the_agent_wrote() {
             "cannot use < on \"done\": checkbox columns support = and !=",
         ),
         (
-            "SELECT * FROM crm.deals WHERE owner HAS 'macro|a@b.com'",
+            "SELECT * FROM crm.deals WHERE owner HAS 'rox|a@b.com'",
             "\"owner\" holds one value; use = instead of HAS",
         ),
         (
@@ -753,7 +753,7 @@ fn rejections_quote_what_the_agent_wrote() {
         ),
         (
             "SELECT * FROM crm.deals WHERE owner = 42",
-            "\"owner\" is an entity column; give an id like 'macro|sam@example.com', not a name",
+            "\"owner\" is an entity column; give an id like 'rox|sam@example.com', not a name",
         ),
         (
             "SELECT * FROM crm.deals WHERE amount LIKE '1%'",
@@ -813,15 +813,15 @@ fn rejections_quote_what_the_agent_wrote() {
         ),
         (
             "INSERT INTO crm.deals (owner) VALUES ('Sam')",
-            "\"owner\" is an entity column; give an id like 'macro|sam@example.com', not a name",
+            "\"owner\" is an entity column; give an id like 'rox|sam@example.com', not a name",
         ),
         (
             "UPDATE crm.deals SET name = amount WHERE done = TRUE",
             "\"name\" (text) can't be set from \"amount\" (number): a column copies only a column of the same kind",
         ),
         (
-            "UPDATE macro.tasks SET deal = 'macro|sam@example.com' WHERE title = 'Ship it'",
-            "'macro|sam@example.com' is not a row id; row ids are the UUIDs a SELECT returns",
+            "UPDATE macro.tasks SET deal = 'rox|sam@example.com' WHERE title = 'Ship it'",
+            "'rox|sam@example.com' is not a row id; row ids are the UUIDs a SELECT returns",
         ),
         (
             "DELETE FROM macro.people WHERE name = 'Sam'",

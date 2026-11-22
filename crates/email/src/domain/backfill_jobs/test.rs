@@ -233,7 +233,7 @@ fn job(id: Uuid, link_id: Option<Uuid>, status: BackfillJobStatus, fusion_id: &s
 fn inbox(id: Uuid, active: bool, provider: UserProvider) -> Link {
     Link {
         id,
-        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fusion-owner".into(),
         email_address: EmailStr::try_from("inbox@example.com".to_string()).unwrap(),
         provider,

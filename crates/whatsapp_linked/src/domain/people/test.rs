@@ -128,7 +128,7 @@ fn members_seen_writing_go_by_their_whatsapp_name() {
         HashMap::new(),
         vec![SeenPerson {
             person_id: Uuid::from_u128(2),
-            user_id: Some("macro|ben@example.com".to_owned()),
+            user_id: Some("rox|ben@example.com".to_owned()),
             whatsapp_name: Some("Ben".to_owned()),
             jids: vec![phone("5550002")],
         }],
@@ -146,7 +146,7 @@ fn members_seen_writing_go_by_their_whatsapp_name() {
         names.people(Some(&roster())).get(BEN_LID),
         ExternalChatPersonRef {
             name: "Ben".to_owned(),
-            user_id: Some("macro|ben@example.com".to_owned()),
+            user_id: Some("rox|ben@example.com".to_owned()),
             picture_file_id: None,
         }
     );

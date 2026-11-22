@@ -398,7 +398,7 @@ export function initialGuestOptions(
     return (
       existing ??
       recipientEntityMapper('custom')({
-        id: `macro|${email}`,
+        id: `rox|${email}`,
         email,
         invalid: false,
       })

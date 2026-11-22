@@ -14,7 +14,7 @@ it('inserts real person chips through QuickJS into text, ellipse labels and empt
   const operations = runCanvasCode(
     await getQuickJS(),
     `
-    const person = {userId:'macro|alice@example.com',email:'alice@example.com',displayName:'Alice'};
+    const person = {userId:'rox|alice@example.com',email:'alice@example.com',displayName:'Alice'};
     const t=editor.create({type:'text',x:0,y:0,text:'Review with  today'});
     editor.mentionUser(t,12,person);
     const e=editor.create({type:'ellipse',x:400,y:0,text:'Owner: '});
@@ -35,7 +35,7 @@ it('inserts real person chips through QuickJS into text, ellipse labels and empt
   ).toEqual(
     [12, 7, 0].map((at) => [
       {
-        userId: 'macro|alice@example.com',
+        userId: 'rox|alice@example.com',
         email: 'alice@example.com',
         displayName: 'Alice',
         at,
@@ -48,7 +48,7 @@ it('keeps formatting and existing decorators, and shares read offsets across par
   const state = JSON.parse(plainRichText('bold link\nNext'));
   state.root.children[0].children[0].format = 1;
   const person = {
-    userId: 'macro|alice@example.com',
+    userId: 'rox|alice@example.com',
     email: 'alice@example.com',
   };
   const first = insertCanvasUserMention(JSON.stringify(state), 5, person);
@@ -89,7 +89,7 @@ it('rejects bad person data and late invalid offsets before changing the origina
   ).toThrow();
   const ops = runCanvasCode(
     quick,
-    `editor.move(['text'],10,0); editor.mentionUser('text',99,{userId:'macro|alice@example.com',email:'alice@example.com'});`
+    `editor.move(['text'],10,0); editor.mentionUser('text',99,{userId:'rox|alice@example.com',email:'alice@example.com'});`
   );
   expect(() => prepareCanvasEdit(original, ops)).toThrow('offset');
   expect(JSON.stringify(original)).toBe(saved);
@@ -101,7 +101,7 @@ it('bounds identity metadata from existing imported chips without changing ident
     {
       type: 'user-mention',
       version: 1,
-      userId: 'macro|alice@example.com',
+      userId: 'rox|alice@example.com',
       email: 'alice@example.com',
       displayName: 'x'.repeat(500_000),
     },
@@ -114,7 +114,7 @@ it('bounds identity metadata from existing imported chips without changing ident
     {
       type: 'user-mention',
       version: 1,
-      userId: 'macro|bob@example.com',
+      userId: 'rox|bob@example.com',
       email: 'bob@example.com',
       displayName: 'Bob',
     },
@@ -123,7 +123,7 @@ it('bounds identity metadata from existing imported chips without changing ident
   expect(canvasUserMentions(content)).toEqual({
     mentions: [
       {
-        userId: 'macro|bob@example.com',
+        userId: 'rox|bob@example.com',
         email: 'bob@example.com',
         displayName: 'Bob',
         at: 2,
@@ -146,12 +146,12 @@ it('bounds identity metadata from existing imported chips without changing ident
     })
   );
   expect(read.items[0].userMentionsTruncated).toBe(true);
-  expect(read.items[0].userMentions[0].userId).toBe('macro|bob@example.com');
+  expect(read.items[0].userMentions[0].userId).toBe('rox|bob@example.com');
   expect(JSON.stringify(read).length).toBeLessThan(2000);
   state.root.children[0].children = Array.from({ length: 100 }, () => ({
     type: 'user-mention',
     version: 1,
-    userId: 'macro|alice@example.com',
+    userId: 'rox|alice@example.com',
     email: 'alice@example.com',
   }));
   const bounded = canvasUserMentions(JSON.stringify(state));

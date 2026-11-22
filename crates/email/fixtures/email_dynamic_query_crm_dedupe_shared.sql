@@ -13,11 +13,11 @@ VALUES
 
 INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
-    ('macro|faye@out.com', 'faye@out.com', 'Faye', 'f1111111-1111-1111-1111-111111111111');
+    ('rox|faye@out.com', 'faye@out.com', 'Faye', 'f1111111-1111-1111-1111-111111111111');
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('d0000003-0000-0000-0000-000000000003', 'macro|faye@out.com', 'fa_faye', 'faye@out.com', 'GMAIL', true, NOW(), NOW());
+    ('d0000003-0000-0000-0000-000000000003', 'rox|faye@out.com', 'fa_faye', 'faye@out.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)
 VALUES
@@ -62,4 +62,4 @@ VALUES
 -- Direct share of faye's thread with dave
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
 VALUES
-    ('55550003-0000-0000-0000-000000000001'::uuid, 'email_thread', 'macro|dave@beta.com', 'user', 'view');
+    ('55550003-0000-0000-0000-000000000001'::uuid, 'email_thread', 'rox|dave@beta.com', 'user', 'view');

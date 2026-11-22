@@ -132,7 +132,7 @@ async fn serve(remote: Remote) -> (GoogleCalendarClient<UnmeteredGate>, Provider
         binding: None,
         provider: crate::domain::models::CalendarProvider::Google,
         observed_access_role: Some("owner".to_owned()),
-        owner_id: "macro|truncate@example.test".to_owned(),
+        owner_id: "rox|truncate@example.test".to_owned(),
         email_link_id: Uuid::now_v7(),
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),

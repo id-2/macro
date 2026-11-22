@@ -20,7 +20,7 @@ fn mentions_name_people_seen_in_the_group_else_their_number() {
     let mut people = People::new(phone_number);
     people.learn(
         "15550001111@s.whatsapp.net",
-        person("Ana", Some("macro|ana@example.com")),
+        person("Ana", Some("rox|ana@example.com")),
     );
 
     let mentions = mentions_view(
@@ -37,7 +37,7 @@ fn mentions_name_people_seen_in_the_group_else_their_number() {
         vec![
             ExternalChatMention {
                 token: "15550001111".to_owned(),
-                person: person("Ana", Some("macro|ana@example.com")),
+                person: person("Ana", Some("rox|ana@example.com")),
             },
             ExternalChatMention {
                 token: "15550002222".to_owned(),
@@ -73,7 +73,7 @@ fn a_poll_tallies_current_votes_per_option_and_marks_the_viewers() {
         selected: vec!["aa".to_owned()],
         voter: StoredPerson {
             person_id: Uuid::from_u128(10),
-            user_id: Some("macro|ana@example.com".to_owned()),
+            user_id: Some("rox|ana@example.com".to_owned()),
         },
     };
     let ben = StoredVote {
@@ -92,7 +92,7 @@ fn a_poll_tallies_current_votes_per_option_and_marks_the_viewers() {
         poll,
         &person("Ana", None),
         &[&ana, &ben],
-        "macro|ana@example.com",
+        "rox|ana@example.com",
         &people,
     );
 
@@ -106,7 +106,7 @@ fn a_poll_tallies_current_votes_per_option_and_marks_the_viewers() {
                     votes: 2,
                     mine: true,
                     voters: vec![
-                        person("Ana", Some("macro|ana@example.com")),
+                        person("Ana", Some("rox|ana@example.com")),
                         person("Ben", None)
                     ],
                 },
@@ -221,7 +221,7 @@ fn a_stored_group_created_line_holding_creation_metadata_names_no_subject() {
         call: None,
         by_whatsapp: false,
     });
-    let ana = person("Ana", Some("macro|ana@example.com"));
+    let ana = person("Ana", Some("rox|ana@example.com"));
 
     assert_eq!(
         rich_view(created, &ana, &[], "viewer", &People::default()),

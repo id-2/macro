@@ -11,7 +11,7 @@ for (const mode of ['edit', 'add']) {
     await expect(input).toBeVisible();
     if (mode === 'add') {
       await expect(page.getByTestId('excluded')).toContainText(
-        'macro|person0@example.com'
+        'rox|person0@example.com'
       );
       await expect(
         page

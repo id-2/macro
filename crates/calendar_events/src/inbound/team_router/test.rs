@@ -14,7 +14,7 @@ use crate::domain::team_availability::{
     AvailabilityCoverage, AvailabilityInterval, TeamAvailability, TeamMemberAvailability,
 };
 
-const REQUESTER: &str = "macro|requester@example.com";
+const REQUESTER: &str = "rox|requester@example.com";
 const VALID_JWT: &str = "valid";
 
 #[derive(Clone)]
@@ -124,7 +124,7 @@ impl CalendarTeamService for FakeService {
                 unknown_reasons: vec![],
             }],
             free_windows: None,
-            unknown_user_ids: vec!["macro|unknown@example.com".to_string()],
+            unknown_user_ids: vec!["rox|unknown@example.com".to_string()],
             complete: false,
             summary: "Coverage is incomplete".to_string(),
         })
@@ -166,7 +166,7 @@ async fn availability_reads_the_selected_teammates_for_the_requester() {
         serde_json::json!({
             "start": "2026-10-07T09:00:00Z",
             "end": "2026-10-07T17:00:00Z",
-            "userIds": ["macro|unknown@example.com"],
+            "userIds": ["rox|unknown@example.com"],
         }),
     )
     .await;
@@ -183,7 +183,7 @@ async fn availability_reads_the_selected_teammates_for_the_requester() {
                 "coverage": "complete",
                 "unknownReasons": [],
             }],
-            "unknownUserIds": ["macro|unknown@example.com"],
+            "unknownUserIds": ["rox|unknown@example.com"],
             "complete": false,
             "summary": "Coverage is incomplete",
         })
@@ -199,7 +199,7 @@ async fn availability_reads_the_selected_teammates_for_the_requester() {
                 start_date: "2026-10-07".parse().unwrap(),
                 end_date: "2026-10-08".parse().unwrap(),
             },
-            Some(vec!["macro|unknown@example.com".to_string()]),
+            Some(vec!["rox|unknown@example.com".to_string()]),
         )]
     );
 }

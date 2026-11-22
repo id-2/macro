@@ -7,7 +7,7 @@ fn activity_and_name_deltas_preserve_unrelated_fact_rows() {
     block_on(async {
         let mut engine = Engine::new(TursoStorage::open_in_memory("name-fact-deltas").unwrap());
         let scope = contract::seed(&mut engine, 20).await;
-        let user = "macro|p000000@example.com";
+        let user = "rox|p000000@example.com";
         let key = EntityKey::entity("GraphqlContact", &[&contract::key(contract::VIEWER, user)]);
         let connection = engine.storage().connection();
         let id = required_i64(
@@ -118,7 +118,7 @@ fn failed_fact_delta_rolls_back_deleted_words_and_record_values() {
             "GraphqlContact",
             &[&contract::key(
                 contract::VIEWER,
-                "macro|p000000@example.com",
+                "rox|p000000@example.com",
             )],
         );
         let mut storage = engine.into_storage();

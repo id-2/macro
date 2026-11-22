@@ -56,7 +56,7 @@ async fn drafts_for_the_signed_in_user() {
     let (status, draft) = request(&app, "POST", path, "owner", body("label invoices")).await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(draft["outcome"], "failed");
-    assert!(draft["message"].as_str().unwrap().starts_with("macro|"));
+    assert!(draft["message"].as_str().unwrap().starts_with("rox|"));
 
     assert_eq!(
         request(&app, "POST", path, "invalid", body("x")).await.0,

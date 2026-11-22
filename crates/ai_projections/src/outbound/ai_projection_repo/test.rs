@@ -90,7 +90,7 @@ async fn upsert_projection_definition_revises_on_version_change(
 )]
 async fn get_or_create_target_projection_is_idempotent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
 
@@ -105,7 +105,7 @@ async fn get_or_create_target_projection_is_idempotent(pool: Pool<Postgres>) -> 
     // one. The composite primary key guarantees no duplicate can be inserted.
     assert_eq!(first, second);
     assert_eq!(first.ai_projection_id, "inbox/important");
-    assert_eq!(first.target_id, "macro|pro@user.com");
+    assert_eq!(first.target_id, "rox|pro@user.com");
     assert_eq!(first.status, ProjectionStatus::Cold);
     assert!(first.result.is_none());
 
@@ -120,7 +120,7 @@ async fn get_or_create_target_projection_resets_to_cold_on_version_change(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/important", user.as_ref(), "hash_v1")
@@ -158,7 +158,7 @@ async fn get_or_create_target_projection_bumps_last_requested_at(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool.clone());
-    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
 
@@ -245,7 +245,7 @@ async fn get_target_projection_returns_instance_or_not_found(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
 
     assert!(matches!(
         repo.get_target_projection("inbox/important", user.as_ref())
@@ -273,8 +273,8 @@ async fn get_target_projection_returns_instance_or_not_found(
 async fn get_user_team_ids_returns_memberships(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
 
-    let pro = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
-    let free = RoxUserIdStr::parse_from_str("macro|free@user.com")?;
+    let pro = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
+    let free = RoxUserIdStr::parse_from_str("rox|free@user.com")?;
 
     let pro_teams = repo.get_user_team_ids(&pro).await?;
     assert_eq!(pro_teams.len(), 1);
@@ -320,7 +320,7 @@ async fn processing_claim_is_exclusive_and_releasable(pool: Pool<Postgres>) -> a
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
 
-    let target = "macro|pro@user.com";
+    let target = "rox|pro@user.com";
 
     // First claim acquires the lock; a second concurrent claim is refused.
     assert!(repo.try_start_processing("inbox/important", target).await?);
@@ -339,7 +339,7 @@ async fn processing_claim_is_exclusive_and_releasable(pool: Pool<Postgres>) -> a
 )]
 async fn set_projection_result_and_error_update_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let target = "macro|pro@user.com";
+    let target = "rox|pro@user.com";
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/important", target, "hash_v1")
@@ -383,7 +383,7 @@ async fn projection_writes_are_scoped_to_the_message_version(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let target = "macro|pro@user.com";
+    let target = "rox|pro@user.com";
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/important", target, "hash_v1")
@@ -425,7 +425,7 @@ async fn projection_writes_are_scoped_to_the_message_version(
 )]
 async fn set_projection_refreshing_updates_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let target = "macro|pro@user.com";
+    let target = "rox|pro@user.com";
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/important", target, "hash_v1")
@@ -449,8 +449,8 @@ async fn set_projection_refreshing_updates_status(pool: Pool<Postgres>) -> anyho
 async fn user_has_permission_reflects_roles(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
 
-    let pro = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
-    let free = RoxUserIdStr::parse_from_str("macro|free@user.com")?;
+    let pro = RoxUserIdStr::parse_from_str("rox|pro@user.com")?;
+    let free = RoxUserIdStr::parse_from_str("rox|free@user.com")?;
 
     assert!(
         repo.user_has_permission(&pro, READ_PROFESSIONAL_FEATURES)
@@ -471,7 +471,7 @@ async fn user_has_permission_reflects_roles(pool: Pool<Postgres>) -> anyhow::Res
 )]
 async fn reading_abandoned_loading_recovers_generation(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let target = "macro|recovery@example.com";
+    let target = "rox|recovery@example.com";
     upsert_definition(&repo, "inbox/recovery", "Summarize unread items", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/recovery", target, "hash_v1")
         .await?;
@@ -501,7 +501,7 @@ async fn reading_refresh_keeps_queued_work_and_recovers_abandoned_generation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let target = "macro|recovery@example.com";
+    let target = "rox|recovery@example.com";
     upsert_definition(&repo, "inbox/recovery", "Summarize unread items", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/recovery", target, "hash_v1")
         .await?;
@@ -550,7 +550,7 @@ async fn reading_loading_reclaims_an_expired_processing_lease(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool.clone());
-    let target = "macro|recovery@example.com";
+    let target = "rox|recovery@example.com";
     upsert_definition(&repo, "inbox/recovery", "Summarize unread items", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/recovery", target, "hash_v1")
         .await?;
@@ -585,7 +585,7 @@ async fn reading_during_worker_start_preserves_the_new_processing_claim(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool.clone());
-    let target = "macro|recovery@example.com";
+    let target = "rox|recovery@example.com";
     upsert_definition(&repo, "inbox/recovery", "Summarize unread items", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/recovery", target, "hash_v1")
         .await?;

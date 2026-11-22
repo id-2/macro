@@ -21,7 +21,7 @@ use uuid::Uuid;
 use super::{SavedViewDefinitionsState, router};
 use crate::api::context::AuthorizationService;
 
-const VIEWER: &str = "macro|member@example.com";
+const VIEWER: &str = "rox|member@example.com";
 const VIEW: Uuid = Uuid::from_u128(0x51);
 const TEAM: Uuid = Uuid::from_u128(0x7EA);
 

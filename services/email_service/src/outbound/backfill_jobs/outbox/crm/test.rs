@@ -15,7 +15,7 @@ use std::time::Duration;
 use tokio::{net::TcpListener, task::JoinHandle};
 use uuid::Uuid;
 
-const USER: &str = "macro|outbox@example.com";
+const USER: &str = "rox|outbox@example.com";
 
 #[derive(Default)]
 struct QueueState {

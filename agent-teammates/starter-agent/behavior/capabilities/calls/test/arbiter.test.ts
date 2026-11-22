@@ -45,10 +45,10 @@ const decide = (...args: Parameters<typeof arbitrate>) => {
 		leaveTo: plan.leaving?.to ?? null,
 	};
 };
-const assistant = "macro|agent@example.com";
-const owner = "macro|owner@example.com";
-const cy = "macro|cy@example.com";
-const dee = "macro|dee@example.com";
+const assistant = "rox|agent@example.com";
+const owner = "rox|owner@example.com";
+const cy = "rox|cy@example.com";
+const dee = "rox|dee@example.com";
 const base = (over: Partial<World> = {}): World => ({
 	me: assistant,
 	owner,
@@ -424,7 +424,7 @@ test("a meeting has no channel: the owner waiting gets a DM; anyone else's invit
 		meetings: [
 			invite("owner", owner),
 			invite("inner", dee),
-			invite("outer", "macro|someone@acme.test"),
+			invite("outer", "rox|someone@acme.test"),
 		],
 		judged: new Map([
 			["inner", { join: true, reason: "x" }],
@@ -610,7 +610,7 @@ const nowMs = 100 * 3600_000;
 const now = at(nowMs);
 /** `ms` before now. */
 const ago = (ms: number): Temporal.Instant => at(nowMs - ms);
-const eve = "macro|eve@example.com";
+const eve = "rox|eve@example.com";
 const ask = (over: Partial<Ask> = {}): Ask => ({
 	id: "q",
 	from: cy,

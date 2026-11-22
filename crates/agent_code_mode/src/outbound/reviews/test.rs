@@ -41,7 +41,7 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
     let mut record: ReviewRecord = serde_json::from_value(json!({
         "id": rox_uuid::generate_uuid_v7(),
         "sessionId": session.as_uuid(),
-        "actingUser": "macro|owner@example.com",
+        "actingUser": "rox|owner@example.com",
         "executionId": execution,
         "presentedAt": null,
         "title": "Pick one",
@@ -106,7 +106,7 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
                 agent_runtime_protocol::domain::notification::ReviewOutcome {
                     outcome:
                         agent_runtime_protocol::domain::notification::DecisionOutcome::Approved,
-                    by: "macro|owner@example.com".into(),
+                    by: "rox|owner@example.com".into(),
                     via: agent_runtime_protocol::domain::notification::DecisionVia::Card,
                     items: vec![],
                 },

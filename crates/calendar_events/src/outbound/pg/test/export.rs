@@ -3,11 +3,11 @@ use crate::domain::ics::CalendarEventExportAccess;
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_export_resolves_own_copies_before_channel_shares(pool: PgPool) {
-    let author_id = "macro|export-author@example.com";
-    let attendee_id = "macro|export-attendee@example.com";
-    let member_id = "macro|export-member@example.com";
-    let former_id = "macro|export-former@example.com";
-    let stranger_id = "macro|export-stranger@example.com";
+    let author_id = "rox|export-author@example.com";
+    let attendee_id = "rox|export-attendee@example.com";
+    let member_id = "rox|export-member@example.com";
+    let former_id = "rox|export-former@example.com";
+    let stranger_id = "rox|export-stranger@example.com";
     let author_link = insert_link(&pool, author_id).await;
     let attendee_link = insert_link(&pool, attendee_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -139,7 +139,7 @@ fn with_raw_payload(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn forwarded_copy_reads_googles_private_copy_flag_and_the_conference(pool: PgPool) {
-    let owner_id = "macro|forward-guest@example.com";
+    let owner_id = "rox|forward-guest@example.com";
     let link = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, link).await;
@@ -214,7 +214,7 @@ async fn forwarded_copy_reads_googles_private_copy_flag_and_the_conference(pool:
     assert!(snapshot.is_snapshot);
 
     assert_eq!(
-        repo.forwarded_copy("macro|someone-else@example.com", outside_id)
+        repo.forwarded_copy("rox|someone-else@example.com", outside_id)
             .await
             .unwrap(),
         None
@@ -223,7 +223,7 @@ async fn forwarded_copy_reads_googles_private_copy_flag_and_the_conference(pool:
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_copy_is_private_only_when_every_calendar_holding_it_says_so(pool: PgPool) {
-    let owner_id = "macro|forward-two-calendars@example.com";
+    let owner_id = "rox|forward-two-calendars@example.com";
     let link = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (account_id, primary_id) = provider_ids(&repo, link).await;

@@ -293,7 +293,7 @@ async fn a_ping_for_an_entity_with_no_entry_recreates_it() {
             model_entity::EntityType::Document
                 .with_entity_str("document-id")
                 .with_connection_str("connection-id")
-                .with_user_str("macro|viewer@example.com"),
+                .with_user_str("rox|viewer@example.com"),
         )
         .await
         .unwrap();
@@ -302,12 +302,12 @@ async fn a_ping_for_an_entity_with_no_entry_recreates_it() {
     assert_eq!(inserted.len(), 1, "the missing entry must be written back");
     assert_eq!(inserted[0].pk, "#document#document-id");
     assert_eq!(inserted[0].sk, "connection-id");
-    assert_eq!(inserted[0].user_id, "macro|viewer@example.com");
+    assert_eq!(inserted[0].user_id, "rox|viewer@example.com");
     assert_eq!(
         *repo.user_pings.lock().unwrap(),
         vec![(
             "connection-id".to_owned(),
-            "macro|viewer@example.com".to_owned()
+            "rox|viewer@example.com".to_owned()
         )]
     );
 }

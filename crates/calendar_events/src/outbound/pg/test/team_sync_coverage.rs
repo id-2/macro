@@ -48,8 +48,8 @@ fn shift_event(event: &mut CalendarEventUpsert, hours: i64) {
 
 impl SyncFixture {
     async fn new(pool: PgPool, label: &str) -> Self {
-        let owner = format!("macro|{label}-owner@example.com");
-        let viewer = format!("macro|{label}-viewer@example.com");
+        let owner = format!("rox|{label}-owner@example.com");
+        let viewer = format!("rox|{label}-viewer@example.com");
         insert_team(&pool, &viewer, &[&viewer, &owner]).await;
         let link = insert_link(&pool, &owner).await;
         let repo = PgCalendarRepository::new(pool.clone());

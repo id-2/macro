@@ -59,8 +59,8 @@ async fn one_queued_push_gets_the_correct_account_for_each_ios_recipient() {
                 },
                 "attributes": {"push_type": "Alert", "collapse_key": "message"},
                 "ios_device_endpoints": {
-                    "macro|alice@example.com": {"endpoints": ["alice-phone"]},
-                    "macro|bob@example.com": {"endpoints": ["bob-phone"]}
+                    "rox|alice@example.com": {"endpoints": ["alice-phone"]},
+                    "rox|bob@example.com": {"endpoints": ["bob-phone"]}
                 }
             }
         }
@@ -72,11 +72,11 @@ async fn one_queued_push_gets_the_correct_account_for_each_ios_recipient() {
     let payloads = service.mobile.payloads.lock().unwrap();
     assert_eq!(
         payloads["alice-phone"]["recipientId"],
-        "macro|alice@example.com"
+        "rox|alice@example.com"
     );
     assert_eq!(
         payloads["bob-phone"]["recipientId"],
-        "macro|bob@example.com"
+        "rox|bob@example.com"
     );
     for payload in payloads.values() {
         assert_eq!(

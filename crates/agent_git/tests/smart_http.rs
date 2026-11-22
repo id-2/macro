@@ -42,15 +42,15 @@ async fn insert_fixtures(pool: &PgPool) {
             ('01900000-0000-7000-8000-00000000000c', 'admin', 'admin@example.com', 'cus_c'),
             ('01900000-0000-7000-8000-00000000000d', 'member', 'member@example.com', 'cus_d');
         INSERT INTO "User" (id, email, rox_user_id) VALUES
-            ('macro|agent-a@example.com', 'agent-a@example.com', '01900000-0000-7000-8000-00000000000a'),
-            ('macro|agent-b@example.com', 'agent-b@example.com', '01900000-0000-7000-8000-00000000000b'),
-            ('macro|admin@example.com', 'admin@example.com', '01900000-0000-7000-8000-00000000000c'),
-            ('macro|member@example.com', 'member@example.com', '01900000-0000-7000-8000-00000000000d');
+            ('rox|agent-a@example.com', 'agent-a@example.com', '01900000-0000-7000-8000-00000000000a'),
+            ('rox|agent-b@example.com', 'agent-b@example.com', '01900000-0000-7000-8000-00000000000b'),
+            ('rox|admin@example.com', 'admin@example.com', '01900000-0000-7000-8000-00000000000c'),
+            ('rox|member@example.com', 'member@example.com', '01900000-0000-7000-8000-00000000000d');
         INSERT INTO team (id, name, owner_id) VALUES
-            ('01900000-0000-7000-8000-000000000001', 'Team', 'macro|admin@example.com');
+            ('01900000-0000-7000-8000-000000000001', 'Team', 'rox|admin@example.com');
         INSERT INTO team_user (user_id, team_id, team_role) VALUES
-            ('macro|admin@example.com', '01900000-0000-7000-8000-000000000001', 'admin'),
-            ('macro|member@example.com', '01900000-0000-7000-8000-000000000001', 'member');
+            ('rox|admin@example.com', '01900000-0000-7000-8000-000000000001', 'admin'),
+            ('rox|member@example.com', '01900000-0000-7000-8000-000000000001', 'member');
         "#,
     )
     .execute(pool)
@@ -60,7 +60,7 @@ async fn insert_fixtures(pool: &PgPool) {
     sqlx::query!(
         r#"INSERT INTO "UserApiKey" (id, user_id, name, hash) VALUES ($1, $2, 'git', $3)"#,
         Uuid::now_v7(),
-        "macro|admin@example.com",
+        "rox|admin@example.com",
         Sha256::digest(ADMIN_API_KEY.as_bytes()).to_vec(),
     )
     .execute(pool)
@@ -87,10 +87,10 @@ impl feature_flags::FeatureFlags for Rollout {
 async fn start_server(pool: PgPool, storage_root: &Path, max_repo_size_bytes: u64) -> String {
     let directories = RepoDirectories::new(storage_root.to_path_buf());
     let mut creators = agent_credentials::FakeAgentCreators::default();
-    for agent in ["macro|agent-a@example.com", "macro|agent-b@example.com"] {
+    for agent in ["rox|agent-a@example.com", "rox|agent-b@example.com"] {
         creators.set(
             RoxUserIdStr::try_from(agent.to_owned()).unwrap(),
-            RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap(),
         );
     }
     let service = AgentGitServiceImpl::new(
@@ -161,8 +161,8 @@ async fn agents_push_their_own_repo_and_admins_read_it(pool: PgPool) {
     let base_url = start_server(pool, storage.path(), 500 * 1024 * 1024).await;
     let client = AgentGitClient::new(base_url, INTERNAL_API_KEY.to_owned()).unwrap();
 
-    let agent_a = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
-    let agent_b = RoxUserIdStr::try_from("macro|agent-b@example.com".to_owned()).unwrap();
+    let agent_a = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
+    let agent_b = RoxUserIdStr::try_from("rox|agent-b@example.com".to_owned()).unwrap();
     let repo_a = client
         .create_repo(agent_a.clone(), TEAM_ID, seed())
         .await
@@ -199,7 +199,7 @@ async fn agents_push_their_own_repo_and_admins_read_it(pool: PgPool) {
         assert_ne!(mode & 0o111, 0, "bin/agent is executable");
     }
     let settings = std::fs::read_to_string(work.path().join("first/agent.json")).unwrap();
-    assert!(settings.contains("\"owner\": \"macro|admin@example.com\""));
+    assert!(settings.contains("\"owner\": \"rox|admin@example.com\""));
 
     std::fs::write(work.path().join("first/memory.md"), "remembered\n").unwrap();
     let added = git(&work.path().join("first"), &["add", "memory.md"]).await;
@@ -353,7 +353,7 @@ async fn a_repo_at_its_size_limit_refuses_pushes_with_a_message(pool: PgPool) {
     // Every repo, even a fresh one, is over one byte.
     let base_url = start_server(pool, storage.path(), 1).await;
     let client = AgentGitClient::new(base_url, INTERNAL_API_KEY.to_owned()).unwrap();
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
     let repo = client.create_repo(agent, TEAM_ID, seed()).await.unwrap();
 
     let cloned = git(
@@ -384,7 +384,7 @@ fn seed() -> agent_git::domain::template::PersonaSeed {
         personality: "Warm and direct.".to_owned(),
         voice: None,
         creator_id: Some(
-            RoxUserIdStr::parse_from_str("macro|admin@example.com")
+            RoxUserIdStr::parse_from_str("rox|admin@example.com")
                 .expect("creator id")
                 .into_owned(),
         ),
@@ -400,7 +400,7 @@ async fn compressed_push_is_rejected_without_writing_the_repository(pool: PgPool
     let storage = tempfile::tempdir().unwrap();
     let base = start_server(pool, storage.path(), 1024 * 1024).await;
     let client = AgentGitClient::new(base.clone(), INTERNAL_API_KEY.to_owned()).unwrap();
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
     let repo = client
         .create_repo(agent.clone(), TEAM_ID, seed())
         .await
@@ -445,7 +445,7 @@ async fn missing_repo_and_bad_token_have_the_same_authentication_response(pool: 
     let storage = tempfile::tempdir().unwrap();
     let base = start_server(pool, storage.path(), 1024 * 1024).await;
     let client = AgentGitClient::new(base.clone(), INTERNAL_API_KEY.to_owned()).unwrap();
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
     let repo = client.create_repo(agent, TEAM_ID, seed()).await.unwrap();
     let http = reqwest::Client::new();
     let existing = http
@@ -459,7 +459,7 @@ async fn missing_repo_and_bad_token_have_the_same_authentication_response(pool: 
         .unwrap();
     let missing = http
         .get(format!(
-            "{base}/macro%7Cmissing%40example.com.git/info/refs?service=git-upload-pack"
+            "{base}/rox%7Cmissing%40example.com.git/info/refs?service=git-upload-pack"
         ))
         .basic_auth("agent", Some("bad-token"))
         .send()
@@ -486,7 +486,7 @@ async fn a_voice_change_is_one_server_commit_that_keeps_the_agents_work(pool: Pg
     let work = tempfile::tempdir().unwrap();
     let base = start_server(pool, storage.path(), 1024 * 1024).await;
     let client = AgentGitClient::new(base, INTERNAL_API_KEY.to_owned()).unwrap();
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
     let mut chosen = seed();
     chosen.voice = Some(VoiceModel::parse("aura-2-thalia-en").unwrap());
     let repo = client
@@ -577,7 +577,7 @@ async fn voice_commits_never_follow_symlinks_the_agent_committed() {
         std::fs::create_dir(&storage).unwrap();
         let directories = RepoDirectories::new(storage);
         let store = BareRepoStore::new(directories.clone());
-        let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
+        let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
         store
             .create_repo(&agent, &WORKSPACE_TEMPLATE.render(&agent, &seed()).unwrap())
             .await
@@ -651,15 +651,15 @@ async fn every_replica_draws_from_one_push_budget_that_refills(pool: PgPool) {
     insert_fixtures(&pool).await;
     sqlx::query!(
         "INSERT INTO agent_repos (agent_user_id, team_id, token_hash) VALUES ($1, $2, 'x'), ($3, $2, 'y')",
-        "macro|agent-a@example.com",
+        "rox|agent-a@example.com",
         Uuid::parse_str("01900000-0000-7000-8000-000000000001").unwrap(),
-        "macro|agent-b@example.com",
+        "rox|agent-b@example.com",
     )
     .execute(&pool)
     .await
     .unwrap();
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
-    let other = RoxUserIdStr::try_from("macro|agent-b@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("rox|agent-b@example.com".to_owned()).unwrap();
     // Two replicas, one database.
     let first = PgPushRateLimiter::new(pool.clone(), 2);
     let second = PgPushRateLimiter::new(pool.clone(), 2);
@@ -672,7 +672,7 @@ async fn every_replica_draws_from_one_push_budget_that_refills(pool: PgPool) {
     // Half a minute later the bucket holds one more push.
     sqlx::query!(
         "UPDATE agent_repos SET push_tokens_refilled_at = push_tokens_refilled_at - interval '30 seconds' WHERE agent_user_id = $1",
-        "macro|agent-a@example.com",
+        "rox|agent-a@example.com",
     )
     .execute(&pool)
     .await
@@ -680,7 +680,7 @@ async fn every_replica_draws_from_one_push_budget_that_refills(pool: PgPool) {
     assert!(second.try_acquire_push(&agent).await.unwrap());
     assert!(!first.try_acquire_push(&agent).await.unwrap());
 
-    let missing = RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap();
+    let missing = RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap();
     assert!(!first.try_acquire_push(&missing).await.unwrap());
 }
 
@@ -688,8 +688,8 @@ async fn every_replica_draws_from_one_push_budget_that_refills(pool: PgPool) {
 async fn a_repo_lock_excludes_other_replicas_until_it_drops(pool: PgPool) {
     let first = PgRepoRepository::new(pool.clone());
     let second = PgRepoRepository::new(pool.clone());
-    let agent = RoxUserIdStr::try_from("macro|agent-a@example.com".to_owned()).unwrap();
-    let other = RoxUserIdStr::try_from("macro|agent-b@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent-a@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("rox|agent-b@example.com".to_owned()).unwrap();
 
     let held = first.lock_repo(&agent).await.unwrap();
     // Another repo's lock is independent.

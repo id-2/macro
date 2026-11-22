@@ -54,7 +54,7 @@ it('keeps inference evidence per term and replaces only the active reference inp
         term === 'person one'
           ? [
               {
-                userId: 'macro|one@example.com',
+                userId: 'rox|one@example.com',
                 email: 'one@example.com',
                 name: 'Person One',
               },
@@ -63,7 +63,7 @@ it('keeps inference evidence per term and replaces only the active reference inp
       );
       expect(source.lookup('person one')).toEqual([
         {
-          id: 'macro|one@example.com',
+          id: 'rox|one@example.com',
           email: 'one@example.com',
           label: 'Person One',
           kind: 'user',

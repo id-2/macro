@@ -41,7 +41,7 @@ async fn updates_send_acting_user_only_in_authenticated_header() {
 }
 
 const KEY: &str = "test-internal-key";
-const USER: &str = "macro|coding-owner@example.com";
+const USER: &str = "rox|coding-owner@example.com";
 
 struct Reply {
     status: u16,

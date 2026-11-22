@@ -15,9 +15,9 @@ use super::*;
 use crate::anthropic_gateway::brain::BrainLookup;
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
 
-const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
+const AGENT: &str = "rox|sam-rivera-abc123@agents.macro.invalid";
 const AGENT_KEY: &str = "mak_agent";
-const CREATOR: &str = "macro|admin@rox.one";
+const CREATOR: &str = "rox|admin@rox.one";
 const TEAM: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00aa);
 
 /// Knows one agent key; `mak_down` fails the lookup.
@@ -539,7 +539,7 @@ async fn the_catalog_keeps_aura_two_voices_and_each_sample_is_billed_once() {
     assert_eq!(catalog.catalog().await.unwrap(), voices);
     assert_eq!(catalog_requests.load(Ordering::SeqCst), 1);
 
-    let admin = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
     let thalia = VoiceModel::parse("aura-2-thalia-en").unwrap();
     let first = catalog.sample(&admin, TEAM, &thalia).await.unwrap();
     let second = catalog.sample(&admin, TEAM, &thalia).await.unwrap();

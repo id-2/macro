@@ -1,7 +1,7 @@
 use super::*;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap()
 }
 
 fn row_bot() -> NonSystemBotId {
@@ -12,7 +12,7 @@ fn row_bot() -> NonSystemBotId {
 fn user_owns_and_acts() {
     let principal = CreationPrincipal::User(user());
 
-    assert_eq!(principal.owner().principal_id(), "macro|owner@example.com");
+    assert_eq!(principal.owner().principal_id(), "rox|owner@example.com");
     assert_eq!(principal.user(), Some(&user()));
     assert_eq!(principal.bot(), None);
 }
@@ -24,7 +24,7 @@ fn bot_for_user_is_owned_by_the_user() {
         user: user(),
     };
 
-    assert_eq!(principal.owner().principal_id(), "macro|owner@example.com");
+    assert_eq!(principal.owner().principal_id(), "rox|owner@example.com");
     assert_eq!(principal.user(), Some(&user()));
     assert_eq!(principal.bot(), Some(BotId::TEST_A));
 }

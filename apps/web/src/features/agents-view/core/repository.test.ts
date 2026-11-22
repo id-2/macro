@@ -85,7 +85,7 @@ describe('orderRepositories', () => {
         [rox],
         [
           'https://github.com/rox-inc/gone',
-          'https://github.com/Macro-Inc/MACRO',
+          'https://github.com/ROX-INC/GONE',
         ]
       )
     ).toEqual([rox]);
@@ -109,7 +109,7 @@ describe('defaultBranchFor', () => {
   it("starts on the repository's default branch, or main without one", () => {
     const all = [rox, infra, scratch];
     expect(defaultBranchFor(all, infra.url)).toBe('develop');
-    expect(defaultBranchFor(all, 'https://github.com/Macro-Inc/Infra')).toBe(
+    expect(defaultBranchFor(all, 'https://github.com/rox-inc/infra')).toBe(
       'develop'
     );
     expect(defaultBranchFor(all, scratch.url)).toBe('main');

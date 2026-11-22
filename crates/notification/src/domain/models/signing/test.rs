@@ -96,23 +96,23 @@ fn public_request_url_uses_request_host_and_full_path() {
     let legacy = public_request_url(
         "https",
         "notifications.rox.one",
-        "/user_notifications/preferences/x/disable?id=macro%7Cuser",
+        "/user_notifications/preferences/x/disable?id=rox%7Cuser",
     )
     .unwrap();
     assert_eq!(
         legacy.as_str(),
-        "https://notifications.rox.one/user_notifications/preferences/x/disable?id=macro%7Cuser"
+        "https://notifications.rox.one/user_notifications/preferences/x/disable?id=rox%7Cuser"
     );
 
     let gateway = public_request_url(
         "https",
         "gateway.rox.one",
-        "/notification/user_notifications/preferences/x/disable?id=macro%7Cuser",
+        "/notification/user_notifications/preferences/x/disable?id=rox%7Cuser",
     )
     .unwrap();
     assert_eq!(
         gateway.as_str(),
-        "https://gateway.rox.one/notification/user_notifications/preferences/x/disable?id=macro%7Cuser"
+        "https://gateway.rox.one/notification/user_notifications/preferences/x/disable?id=rox%7Cuser"
     );
 }
 
@@ -137,7 +137,7 @@ fn unsubscribe_placeholders_become_signed_links_for_the_recipient() {
         unsubscribe_placeholder("colleague_joined_macro")
     );
 
-    let signed = sign_unsubscribe_placeholders(&body, &base, "macro|bob@acme.com", &secret)
+    let signed = sign_unsubscribe_placeholders(&body, &base, "rox|bob@acme.com", &secret)
         .expect("the body has a placeholder");
 
     assert!(!signed.contains(UNSUBSCRIBE_PLACEHOLDER_PREFIX));
@@ -153,7 +153,7 @@ fn unsubscribe_placeholders_become_signed_links_for_the_recipient() {
     );
     assert!(
         url.query_pairs()
-            .any(|(k, v)| k == "id" && v == "macro|bob@acme.com")
+            .any(|(k, v)| k == "id" && v == "rox|bob@acme.com")
     );
     assert!(SignedUrl::verify(url, secret).is_some());
 }
@@ -162,7 +162,7 @@ fn unsubscribe_placeholders_become_signed_links_for_the_recipient() {
 fn bodies_without_a_placeholder_are_left_alone() {
     let secret = make_secret(b"test-secret");
     let base = Url::parse("https://notifications.example.com").unwrap();
-    assert!(sign_unsubscribe_placeholders("<p>hi</p>", &base, "macro|a@b.com", &secret).is_none());
+    assert!(sign_unsubscribe_placeholders("<p>hi</p>", &base, "rox|a@b.com", &secret).is_none());
 }
 
 #[test]
@@ -174,7 +174,7 @@ fn hyphenated_type_names_are_signed_whole() {
         unsubscribe_placeholder("email-digest-notification")
     );
 
-    let signed = sign_unsubscribe_placeholders(&body, &base, "macro|a@b.com", &secret).unwrap();
+    let signed = sign_unsubscribe_placeholders(&body, &base, "rox|a@b.com", &secret).unwrap();
 
     assert!(signed.contains("/preferences/email-digest-notification/disable"));
 }

@@ -24,7 +24,7 @@ fn project_notifications_keep_canonical_message_targets_and_project_wording() {
     ] {
         let metadata = InitiativeDiscussionMetadata {
             project_name: "Launch".into(),
-            owner: Owner::from_principal_str("macro|owner@example.com").unwrap(),
+            owner: Owner::from_principal_str("rox|owner@example.com").unwrap(),
             reason,
             message_id,
             thread_id,

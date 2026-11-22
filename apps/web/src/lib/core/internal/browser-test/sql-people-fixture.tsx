@@ -50,7 +50,7 @@ export function SqlPeopleFixture() {
                         'GraphqlContact:'.length
                       ),
                       userId,
-                      email: userId.slice(6),
+                      email: userId.slice(4),
                       name: null,
                     })),
                   },
@@ -74,7 +74,7 @@ export function SqlPeopleFixture() {
                     : index === 1000
                       ? 'late@example.com'
                       : `person${index}@example.com`;
-                const userId = `macro|${email}`;
+                const userId = `rox|${email}`;
                 return {
                   __typename: 'GraphqlContact',
                   id: contactRecordKey(viewer, userId).slice(

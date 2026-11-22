@@ -98,7 +98,7 @@ async fn scoped_backfill_publishes_only_primary_channel_history_and_can_replay(p
             &pool,
             CreateMessageOptions {
                 channel_id,
-                sender_id: "macro|user1@test.com".into(),
+                sender_id: "rox|user1@test.com".into(),
                 content: "history".into(),
                 thread_id: None,
             },
@@ -188,9 +188,9 @@ fn page_of_clamps_a_limit_beyond_the_end() {
 fn groups_threads_by_owner() {
     let page = email_source_page(
         vec![
-            (uuid(1), "macro|a@example.com".into()),
-            (uuid(2), "macro|b@example.com".into()),
-            (uuid(3), "macro|a@example.com".into()),
+            (uuid(1), "rox|a@example.com".into()),
+            (uuid(2), "rox|b@example.com".into()),
+            (uuid(3), "rox|a@example.com".into()),
         ],
         50,
         3,
@@ -206,7 +206,7 @@ fn groups_threads_by_owner() {
 #[test]
 fn chunks_each_owner_at_the_batch_size() {
     let rows: Vec<(uuid::Uuid, String)> = (0..120)
-        .map(|n| (uuid(n), "macro|a@example.com".to_string()))
+        .map(|n| (uuid(n), "rox|a@example.com".to_string()))
         .collect();
 
     let page = email_source_page(rows, 50, 120, None);
@@ -220,7 +220,7 @@ fn chunks_each_owner_at_the_batch_size() {
 #[test]
 fn rows_consumed_is_independent_of_rows_found() {
     // Unknown ids resolve to nothing; the loop still has to advance past them.
-    let page = email_source_page(vec![(uuid(1), "macro|a@example.com".into())], 50, 10, None);
+    let page = email_source_page(vec![(uuid(1), "rox|a@example.com".into())], 50, 10, None);
 
     assert_eq!(page.rows_consumed, 10);
     assert_eq!(thread_ids(&page), vec![vec![uuid(1).to_string()]]);
@@ -229,7 +229,7 @@ fn rows_consumed_is_independent_of_rows_found() {
 #[test]
 fn carries_the_index_override() {
     let page = email_source_page(
-        vec![(uuid(1), "macro|a@example.com".into())],
+        vec![(uuid(1), "rox|a@example.com".into())],
         50,
         1,
         Some("emails_v2"),

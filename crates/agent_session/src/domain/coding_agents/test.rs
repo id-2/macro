@@ -89,7 +89,7 @@ impl RoutineSessions for Sessions {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|coder@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|coder@example.com".to_owned()).unwrap()
 }
 
 fn candidate(is_coding: bool, available: bool) -> CodingAgentCandidate {

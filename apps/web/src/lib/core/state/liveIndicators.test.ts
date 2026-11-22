@@ -36,14 +36,14 @@ it('re-renders an entity viewers on each change to that entity only', () => {
     data: JSON.stringify({
       entity_id: 'document-id',
       entity_type: 'document',
-      user_ids: ['macro|first@example.com'],
+      user_ids: ['rox|first@example.com'],
     }),
   });
   mocks.trackingChange!({
     data: JSON.stringify({
       entity_id: 'document-id',
       entity_type: 'document',
-      user_ids: ['macro|first@example.com', 'macro|second@example.com'],
+      user_ids: ['rox|first@example.com', 'rox|second@example.com'],
     }),
   });
   mocks.trackingChange!({
@@ -57,7 +57,7 @@ it('re-renders an entity viewers on each change to that entity only', () => {
 
   expect(rendered).toEqual([
     undefined,
-    ['macro|first@example.com'],
-    ['macro|first@example.com', 'macro|second@example.com'],
+    ['rox|first@example.com'],
+    ['rox|first@example.com', 'rox|second@example.com'],
   ]);
 });

@@ -68,7 +68,7 @@ async fn the_owner_connecting_notion_wakes_the_session_with_an_app_connected_eve
             archived: false,
         })),
         Arc::new(Connections(vec![(
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             "notion",
             "Notion",
         )])),
@@ -114,7 +114,7 @@ async fn someone_other_than_the_owner_cannot_continue_the_session() {
             archived: false,
         })),
         Arc::new(Connections(vec![(
-            "macro|editor@example.com",
+            "rox|editor@example.com",
             "notion",
             "Notion",
         )])),
@@ -168,7 +168,7 @@ async fn an_archived_session_is_not_continued() {
             archived: true,
         })),
         Arc::new(Connections(vec![(
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             "notion",
             "Notion",
         )])),

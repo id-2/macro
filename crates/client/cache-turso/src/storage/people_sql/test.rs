@@ -48,7 +48,7 @@ fn normalized_authority_owns_membership_names_deletes_and_rebuilds() {
         let database = crate::TursoMemoryDatabase::new("local-people-sql-lifecycle.db");
         let mut engine = Engine::new(database.open("local-people-sql").unwrap());
         let scope = contract::seed(&mut engine, 20).await;
-        let user = "macro|p000000@example.com";
+        let user = "rox|p000000@example.com";
         let key = EntityKey::entity("GraphqlContact", &[&contract::key(contract::VIEWER, user)]);
         let mut storage = engine.into_storage();
         let mut record = storage
@@ -115,13 +115,13 @@ fn normalized_authority_owns_membership_names_deletes_and_rebuilds() {
             .unwrap();
         let foreign = EntityKey::entity(
             "GraphqlContact",
-            &[&contract::key("macro|other@example.com", user)],
+            &[&contract::key("rox|other@example.com", user)],
         );
         storage
             .put_batch(vec![
                 (foreign, record.clone()),
                 (
-                    EntityKey::entity("GraphqlUser", &["macro|public@example.com"]),
+                    EntityKey::entity("GraphqlUser", &["rox|public@example.com"]),
                     record.clone(),
                 ),
                 (

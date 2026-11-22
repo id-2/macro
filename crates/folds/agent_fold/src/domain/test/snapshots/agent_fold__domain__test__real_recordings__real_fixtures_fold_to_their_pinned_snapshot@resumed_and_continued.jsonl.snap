@@ -313,7 +313,7 @@ input_file: crates/folds/agent_fold/fixtures/real/resumed_and_continued.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(
@@ -357,7 +357,7 @@ input_file: crates/folds/agent_fold/fixtures/real/resumed_and_continued.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(
@@ -454,7 +454,7 @@ input_file: crates/folds/agent_fold/fixtures/real/resumed_and_continued.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(

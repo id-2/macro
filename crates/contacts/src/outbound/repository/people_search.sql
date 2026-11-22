@@ -14,12 +14,12 @@ candidates AS MATERIALIZED (
         SELECT lower(user2 COLLATE "C") COLLATE "default" AS id, FALSE AS is_teammate
         FROM contacts_connections
         WHERE user1 = (SELECT id FROM viewer)
-          AND user2 COLLATE "C" LIKE 'macro|%'
+          AND user2 COLLATE "C" LIKE 'rox|%'
         UNION ALL
         SELECT lower(user1 COLLATE "C") COLLATE "default", FALSE
         FROM contacts_connections
         WHERE user2 = (SELECT id FROM viewer)
-          AND user1 COLLATE "C" LIKE 'macro|%'
+          AND user1 COLLATE "C" LIKE 'rox|%'
         UNION ALL
         SELECT lower((SELECT id FROM viewer) COLLATE "C") COLLATE "default", FALSE
         UNION ALL
@@ -36,7 +36,7 @@ profiles AS (
         c.id,
         c.is_teammate,
         COALESCE(u."isAgent", FALSE) AS is_agent,
-        substr(c.id, length('macro|') + 1) AS email,
+        substr(c.id, length('rox|') + 1) AS email,
         NULLIF(mui.first_name, 'N/A') AS first_name,
         NULLIF(mui.last_name, 'N/A') AS last_name,
         lower(concat_ws(' ',

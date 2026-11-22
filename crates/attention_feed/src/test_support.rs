@@ -25,7 +25,7 @@ use crate::domain::{
 };
 
 /// The viewer every fixture belongs to.
-pub const USER: &str = "macro|viewer@example.com";
+pub const USER: &str = "rox|viewer@example.com";
 
 /// A minute past 10:00 on 2024-06-01, UTC.
 pub fn at(minute: u32) -> DateTime<Utc> {

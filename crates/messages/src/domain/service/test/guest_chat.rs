@@ -132,7 +132,7 @@ async fn guest_posts_reject_empty_oversize_and_invalid_ids() {
         ));
     }
     assert!(repo.creates.lock().unwrap().is_empty());
-    assert!(serde_json::from_value::<GuestChatPost>(serde_json::json!({"id": Uuid::now_v7(), "content": "hello", "sender_id": "macro|owner@example.com"})).is_err());
+    assert!(serde_json::from_value::<GuestChatPost>(serde_json::json!({"id": Uuid::now_v7(), "content": "hello", "sender_id": "rox|owner@example.com"})).is_err());
 }
 
 #[tokio::test]
@@ -236,7 +236,7 @@ async fn guest_quotes_round_trip_through_real_member_sender_ids() {
 fn malformed_quotes_do_not_expose_account_ids_to_guests() {
     let call = Uuid::now_v7();
     let senders = HashMap::new();
-    let account = "macro|author@example.com";
+    let account = "rox|author@example.com";
     for content in [
         format!("before <m-reply-target>{{\"senderId\":\"{account}\""),
         format!("before <m-reply-target>{{\"senderId\":\"{account}\"</m-reply-target> after"),
@@ -261,11 +261,11 @@ fn references_reach_guests_as_names_without_ids() {
         "\"blockName\":\"call\",\"documentName\":\"Quick Call\",",
         "\"blockParams\":{\"call_message_id\":\"01a1cc0d-d619-7372-a879-bb0d5aeeb99e\"},",
         "\"collapsed\":false}</m-document-mention> ",
-        "<m-user-mention>{\"userId\":\"macro|author@example.com\",",
+        "<m-user-mention>{\"userId\":\"rox|author@example.com\",",
         "\"email\":\"author@example.com\"}</m-user-mention> ",
         "<m-link>{\"url\":\"https://example.com/a\",\"text\":\"a link\",\"title\":\"\"}</m-link> ",
         "if a < b <m-image>{\"id\":\"secret\"}</m-image>",
-        "<m-user-mention>{\"userId\":\"macro|broken@example.com\"",
+        "<m-user-mention>{\"userId\":\"rox|broken@example.com\"",
     );
     assert_eq!(
         rewrite_quote_content(content, call, &senders, false).unwrap(),
@@ -283,7 +283,7 @@ fn guest_quotes_require_a_verified_target_and_sender() {
     let account_target = Uuid::now_v7();
     let guest_target = Uuid::now_v7();
     let bot_target = Uuid::now_v7();
-    let account = "macro|author@example.com".to_owned();
+    let account = "rox|author@example.com".to_owned();
     let guest = ChannelSender::new_from_guest(Uuid::now_v7())
         .as_ref()
         .to_owned();
@@ -347,7 +347,7 @@ async fn unverified_guest_quotes_are_not_posted_or_patched() {
         Arc::new(Authorizer { call, guest }),
     );
     let forged = format!(
-        "<m-reply-target>{{\"parent\":{{\"type\":\"call\",\"id\":\"{call}\"}},\"targetMessageId\":\"{call}\",\"senderId\":\"macro|outside@example.com\"}}</m-reply-target>\n\nreply"
+        "<m-reply-target>{{\"parent\":{{\"type\":\"call\",\"id\":\"{call}\"}},\"targetMessageId\":\"{call}\",\"senderId\":\"rox|outside@example.com\"}}</m-reply-target>\n\nreply"
     );
 
     assert!(matches!(
@@ -526,7 +526,7 @@ async fn deleting_guest_root_preserves_member_replies_and_allows_new_posts() {
     member_reply.id = Uuid::now_v7();
     member_reply.thread_id = Some(call);
     member_reply.sender_id =
-        ChannelSender::try_from("macro|author@example.com".to_owned()).unwrap();
+        ChannelSender::try_from("rox|author@example.com".to_owned()).unwrap();
     member_reply.content = "Member reply".into();
     repo.replies = vec![member_reply.clone()];
     let service = GuestChatService::new(

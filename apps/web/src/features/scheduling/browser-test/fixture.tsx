@@ -91,7 +91,7 @@ function Fixture() {
   const [slug, setSlug] = createSignal<string>();
   const schedule = newSchedule('America/New_York');
   const event = {
-    ...newEventType(schedule.id, ['macro|alex@example.com'], false),
+    ...newEventType(schedule.id, ['rox|alex@example.com'], false),
     title: '30 minute meeting',
     slug: '30-minute-meeting',
     enabled: true,
@@ -123,7 +123,7 @@ function Fixture() {
           title: 'Team introduction',
           slug: 'team-introduction',
           mode: 'collective',
-          hosts: ['macro|alex@example.com', 'macro|sam@example.com'],
+          hosts: ['rox|alex@example.com', 'rox|sam@example.com'],
         },
       ],
       revision: 1,
@@ -141,7 +141,7 @@ function Fixture() {
           title: 'Operations introduction',
           slug: 'operations-introduction',
           mode: 'collective',
-          hosts: ['macro|alex@example.com', 'macro|sam@example.com'],
+          hosts: ['rox|alex@example.com', 'rox|sam@example.com'],
         },
       ],
       revision: 1,
@@ -231,7 +231,7 @@ function Fixture() {
   });
   const [readOnlyTeam, setReadOnlyTeam] = createSignal(false);
   const capabilities: SchedulingCapabilities = {
-    userId: () => 'macro|alex@example.com',
+    userId: () => 'rox|alex@example.com',
     scopes: () => [
       { id: 'me', name: 'Personal', canEdit: true, canManageBookings: true },
       {
@@ -251,12 +251,12 @@ function Fixture() {
     ],
     members: () => [
       {
-        id: 'macro|alex@example.com',
+        id: 'rox|alex@example.com',
         name: 'Alex Morgan',
         email: 'alex@example.com',
       },
       {
-        id: 'macro|sam@example.com',
+        id: 'rox|sam@example.com',
         name: 'Sam Rivera',
         email: 'sam@example.com',
       },
@@ -302,7 +302,7 @@ function Fixture() {
           if (
             !booking ||
             (!scope().canManageBookings &&
-              !booking.hosts.includes('macro|alex@example.com'))
+              !booking.hosts.includes('rox|alex@example.com'))
           )
             throw new Error('Forbidden');
           if (

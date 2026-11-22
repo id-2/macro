@@ -135,7 +135,7 @@ impl TermMatchingRollout for Rollout {
     }
 }
 
-const CALLER: &str = "macro|person@example.com";
+const CALLER: &str = "rox|person@example.com";
 
 #[tokio::test]
 async fn a_request_that_does_not_ask_stays_strict_without_reading_the_rollout() {

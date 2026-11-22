@@ -167,8 +167,13 @@ let previewSnapshot: {
 } | null = null;
 let previewEndVersion = 0;
 
+/** Theme ids saved before the product was renamed still point at their theme. */
+const LEGACY_THEME_IDS: Record<string, string> = {
+  'Macro-Gruvbox': 'Rox-Gruvbox',
+};
+
 export function applyTheme(id: string): void {
-  let theme = themes().find((t) => t.id === id);
+  let theme = themes().find((t) => t.id === (LEGACY_THEME_IDS[id] ?? id));
   if (!theme) {
     console.error(`theme not found: ${id}`);
     theme = themes().find((t) => t.id === DEFAULT_DARK_THEME)!;

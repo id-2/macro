@@ -56,7 +56,7 @@ async fn update(
     scope: CalendarUpdateScope,
 ) -> Result<CalendarEvent, CalendarMutationError> {
     service(repo, provider, FakeTokens::ok())
-        .update_event("macro|user", Uuid::now_v7(), None, patch, scope)
+        .update_event("rox|user", Uuid::now_v7(), None, patch, scope)
         .await
 }
 
@@ -410,7 +410,7 @@ async fn details_for_an_update_read_the_addressed_occurrence() {
         FakeTokens::ok(),
     )
     .details_for_update(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         &CalendarUpdateScope::ThisEvent {
@@ -440,7 +440,7 @@ async fn details_for_an_update_are_refused_without_write_access() {
         FakeTokens::ok(),
     )
     .details_for_update(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         &CalendarUpdateScope::All,
@@ -460,7 +460,7 @@ async fn details_for_an_update_are_refused_without_write_access() {
         FakeTokens::ok(),
     )
     .details_for_update(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         &CalendarUpdateScope::All,

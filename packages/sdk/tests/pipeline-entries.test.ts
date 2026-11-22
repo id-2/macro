@@ -13,7 +13,7 @@ afterEach(() => {
 const pipelineRecord = {
   id: 'sales',
   teamId: 'team',
-  userId: 'macro|owner@example.com',
+  userId: 'rox|owner@example.com',
   name: 'Sales',
   recordType: 'company',
   databaseId: 'database',
@@ -85,7 +85,7 @@ test('entries are written and read by field name and handle, never by column id'
                 },
                 {
                   field: 'Owner',
-                  before: { type: 'references', value: ['macro|a@b.test'] },
+                  before: { type: 'references', value: ['rox|a@b.test'] },
                   after: null,
                 },
                 {
@@ -189,7 +189,7 @@ test('entries are written and read by field name and handle, never by column id'
     },
     {
       field: 'Owner',
-      before: { type: 'references', value: ['macro|a@b.test'] },
+      before: { type: 'references', value: ['rox|a@b.test'] },
       after: undefined,
     },
     {

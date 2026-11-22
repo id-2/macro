@@ -10,7 +10,7 @@ fn picture(channel: Uuid, ordinal: u32) -> Activity {
     Activity::from_domain(
         Uuid::from_u128(1),
         ordinal,
-        Actor::new_from_user("macro|test@example.com".to_owned().try_into().unwrap()),
+        Actor::new_from_user("rox|test@example.com".to_owned().try_into().unwrap()),
         None,
         ChannelActivity {
             channel_id: channel.to_string(),
@@ -27,7 +27,7 @@ async fn queue_groups_one_channels_facts_and_ignores_non_timeline_activity() {
     let ignored = Activity::common(
         Uuid::from_u128(2),
         0,
-        Actor::new_from_user("macro|test@example.com".to_owned().try_into().unwrap()),
+        Actor::new_from_user("rox|test@example.com".to_owned().try_into().unwrap()),
         None,
         activity::EntityType::Channel,
         CHANNEL.to_string(),
@@ -45,7 +45,7 @@ async fn queue_groups_one_channels_facts_and_ignores_non_timeline_activity() {
         [first.id, second.id]
     );
     assert_eq!(activities[0].action, "picture_changed");
-    assert_eq!(activities[0].actor_id, "macro|test@example.com");
+    assert_eq!(activities[0].actor_id, "rox|test@example.com");
     assert!(receiver.try_recv().is_err());
 }
 

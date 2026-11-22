@@ -267,7 +267,7 @@ describe("spoofs", () => {
 		).toMatchObject({ action: "ignore", category: "spoofed" });
 	});
 	test("an owner at a public provider: a stranger there is no colleague, and no spoof either", () => {
-		const atGmail = whoOf(`my-agent@${provider}`, `macro|bo@${provider}`);
+		const atGmail = whoOf(`my-agent@${provider}`, `rox|bo@${provider}`);
 		const stranger = parseMail(
 			raw({ from: `Sam <sam@${provider}>`, auth: pass(provider) }),
 			atGmail,

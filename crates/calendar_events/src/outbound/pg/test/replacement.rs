@@ -6,9 +6,9 @@ use serde_json::json;
 async fn replacement_journal_serializes_confirmation_preserves_privacy_and_survives_source_retirement(
     pool: PgPool,
 ) {
-    let user = "macro|replacement@example.com";
+    let user = "rox|replacement@example.com";
     insert_user(&pool, user).await;
-    let other = "macro|other@example.com";
+    let other = "rox|other@example.com";
     insert_user(&pool, other).await;
     let link = insert_link(&pool, user).await;
     let repo = PgCalendarRepository::new(pool.clone());

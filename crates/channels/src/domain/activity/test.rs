@@ -32,7 +32,7 @@ fn posted(parent: MessageParent, created_at: chrono::DateTime<Utc>) -> MessagePo
         thread_id: None,
         root_id: Uuid::from_u128(8),
         sender: Actor::new_from_bot(BotId::new_from_uuid(Uuid::from_u128(9))),
-        triggered_by: Some("macro|teo@example.com".to_string()),
+        triggered_by: Some("rox|teo@example.com".to_string()),
         content: "hi".to_string(),
         mentions: vec![],
         attachments: vec![],
@@ -44,7 +44,7 @@ fn posted(parent: MessageParent, created_at: chrono::DateTime<Utc>) -> MessagePo
 fn rename_preserves_names_and_skips_noops() {
     let metadata = crate::domain::broker_events::ChannelUpdatedMetadata {
         channel_id: CHANNEL_ID,
-        actor: user("macro|actor@example.com"),
+        actor: user("rox|actor@example.com"),
         previous_name: Some("Before".into()),
         channel_name: Some("After".into()),
     };
@@ -73,7 +73,7 @@ fn picture_changes_are_attributed_and_replay_stable() {
     let event = envelope(ChannelTopicEvent::PictureChanged(
         crate::domain::broker_events::ChannelPictureChangedMetadata {
             channel_id: CHANNEL_ID,
-            actor: user("macro|actor@example.com"),
+            actor: user("rox|actor@example.com"),
         },
     ));
     let first = event.event.ingest(event.event_id);
@@ -82,7 +82,7 @@ fn picture_changes_are_attributed_and_replay_stable() {
         panic!("expected picture activity");
     };
     assert_eq!(rows[0].action, Action::PictureChanged);
-    assert_eq!(rows[0].actor.as_ref(), "macro|actor@example.com");
+    assert_eq!(rows[0].actor.as_ref(), "rox|actor@example.com");
     assert_eq!(rows[0].entity_id, CHANNEL_ID.to_string());
 }
 
@@ -98,7 +98,7 @@ fn message_posted_maps_to_messaged_with_triggered_by_as_subject() {
     assert_eq!(activities.len(), 1);
     assert_eq!(activities[0].action, Action::Messaged);
     // Delegation: the triggering user is the subject; the sender the actor.
-    assert_eq!(activities[0].subject_id, "macro|teo@example.com");
+    assert_eq!(activities[0].subject_id, "rox|teo@example.com");
     assert_eq!(
         activities[0].actor.as_ref(),
         Actor::new_from_bot(BotId::new_from_uuid(Uuid::from_u128(9))).as_ref()
@@ -111,8 +111,8 @@ fn message_posted_maps_to_messaged_with_triggered_by_as_subject() {
 #[test]
 fn a_message_from_an_account_manager_stays_the_senders_activity() {
     let mut posted = posted(MessageParent::Channel(CHANNEL_ID), Utc::now());
-    posted.sender = Actor::new_from_user(user("macro|managed@example.com"));
-    posted.triggered_by = Some("macro|manager@example.com".to_string());
+    posted.sender = Actor::new_from_user(user("rox|managed@example.com"));
+    posted.triggered_by = Some("rox|manager@example.com".to_string());
 
     let Ingest::Insert(activities) =
         ingest_message_event(Uuid::now_v7(), &MessageTopicEvent::Posted(posted))
@@ -120,7 +120,7 @@ fn a_message_from_an_account_manager_stays_the_senders_activity() {
         panic!("expected activities");
     };
 
-    assert_eq!(activities[0].subject_id, "macro|managed@example.com");
+    assert_eq!(activities[0].subject_id, "rox|managed@example.com");
 }
 
 #[test]
@@ -141,8 +141,8 @@ fn participant_added_yields_one_activity_per_user_with_stable_ordinals() {
         ChannelParticipantAddedMetadata {
             channel_id: CHANNEL_ID,
             channel_type: ChannelType::Public,
-            added_by: Actor::new_from_user(user("macro|admin@example.com")),
-            added_user_ids: vec![user("macro|a@example.com"), user("macro|b@example.com")],
+            added_by: Actor::new_from_user(user("rox|admin@example.com")),
+            added_user_ids: vec![user("rox|a@example.com"), user("rox|b@example.com")],
         },
     ));
 
@@ -154,12 +154,12 @@ fn participant_added_yields_one_activity_per_user_with_stable_ordinals() {
     assert!(
         activities
             .iter()
-            .all(|a| a.subject_id == "macro|admin@example.com")
+            .all(|a| a.subject_id == "rox|admin@example.com")
     );
     assert_eq!(
         activities[0].action,
         Action::ParticipantAdded(::activity::ParticipantChange {
-            participant: Actor::new_from_user(user("macro|a@example.com"))
+            participant: Actor::new_from_user(user("rox|a@example.com"))
         })
     );
 
@@ -176,7 +176,7 @@ fn access_requested_keeps_the_requesters_name_from_the_event() {
     let metadata = ChannelAccessRequestedMetadata {
         channel_id: CHANNEL_ID,
         request_id: Uuid::from_u128(3),
-        requester_id: user("macro|sarah@example.com"),
+        requester_id: user("rox|sarah@example.com"),
         requester_name: Some("Sarah Lee".to_string()),
     };
     let event = envelope(ChannelTopicEvent::AccessRequested(metadata.clone()));
@@ -185,7 +185,7 @@ fn access_requested_keeps_the_requesters_name_from_the_event() {
         panic!("expected activities");
     };
     assert_eq!(activities.len(), 1);
-    assert_eq!(activities[0].subject_id, "macro|sarah@example.com");
+    assert_eq!(activities[0].subject_id, "rox|sarah@example.com");
     assert_eq!(
         activities[0].action,
         Action::AccessRequested(::activity::AccessRequest {
@@ -213,19 +213,19 @@ fn access_requested_keeps_the_requesters_name_from_the_event() {
 fn created_maps_to_created_by_the_actor() {
     let event = envelope(ChannelTopicEvent::Created(ChannelCreatedMetadata {
         channel_id: CHANNEL_ID,
-        actor: Actor::new_from_user(user("macro|owner@example.com")),
+        actor: Actor::new_from_user(user("rox|owner@example.com")),
         on_behalf_of: None,
         channel_type: ChannelType::Public,
         channel_name: Some("general".to_string()),
-        participant_user_ids: vec![user("macro|owner@example.com")],
+        participant_user_ids: vec![user("rox|owner@example.com")],
     }));
 
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
         panic!("expected activities");
     };
     assert_eq!(activities[0].action, Action::Created);
-    assert_eq!(activities[0].actor.as_ref(), "macro|owner@example.com");
-    assert_eq!(activities[0].subject_id, "macro|owner@example.com");
+    assert_eq!(activities[0].actor.as_ref(), "rox|owner@example.com");
+    assert_eq!(activities[0].subject_id, "rox|owner@example.com");
 }
 
 #[test]
@@ -233,10 +233,10 @@ fn created_by_system_stays_on_the_owner_feed() {
     let event = envelope(ChannelTopicEvent::Created(ChannelCreatedMetadata {
         channel_id: CHANNEL_ID,
         actor: Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
-        on_behalf_of: Some(user("macro|owner@example.com")),
+        on_behalf_of: Some(user("rox|owner@example.com")),
         channel_type: ChannelType::Private,
         channel_name: Some("Rox Support x owner".to_string()),
-        participant_user_ids: vec![user("macro|owner@example.com")],
+        participant_user_ids: vec![user("rox|owner@example.com")],
     }));
 
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
@@ -247,5 +247,5 @@ fn created_by_system_stays_on_the_owner_feed() {
         activities[0].actor.as_ref(),
         Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID).as_ref()
     );
-    assert_eq!(activities[0].subject_id, "macro|owner@example.com");
+    assert_eq!(activities[0].subject_id, "rox|owner@example.com");
 }

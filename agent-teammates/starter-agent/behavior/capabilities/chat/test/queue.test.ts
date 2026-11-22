@@ -11,7 +11,7 @@ const queued = (id: string, channel_id = "c1"): Queued => ({
 	thread: null,
 	dm: true,
 	from: "Ada",
-	sender_id: "macro|owner@example.com",
+	sender_id: "rox|owner@example.com",
 	at: "2026-11-09T15:00:00Z",
 	text: id,
 	channel_id,

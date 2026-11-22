@@ -18,7 +18,7 @@ enum OutputFormat {
 #[derive(Debug, Parser)]
 #[command(version, about = "Explain how a user has access to an entity")]
 struct Args {
-    /// Rox user id, for example `macro|alice@example.com`.
+    /// Rox user id, for example `rox|alice@example.com`.
     #[arg(long)]
     user: String,
 

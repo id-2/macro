@@ -34,7 +34,7 @@ async fn create_answered_by(response: ResponseTemplate) -> Result<(), CreateDocu
         skip_history: true,
     };
     DocumentStorageServiceClient::new("internal-key".into(), server.uri())
-        .create_document_internal(request, "macro|user@example.com")
+        .create_document_internal(request, "rox|user@example.com")
         .await
         .map(|_| ())
 }

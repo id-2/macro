@@ -175,7 +175,7 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("basic_user_with_documents")))]
     async fn test_create_instructions_document_success(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+        let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
         let result = create_instructions_document(&pool, user_id.clone()).await;
 
@@ -238,7 +238,7 @@ mod tests {
     async fn test_create_instructions_document_duplicate_user(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+        let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
         let first_id = create_instructions_document(&pool, user_id.clone())
             .await
@@ -286,7 +286,7 @@ mod tests {
     async fn test_create_instructions_document_replaces_stale_mapping(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+        let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
         let stale_id = create_instructions_document(&pool, user_id.clone())
             .await
             .expect("first creation should succeed");
@@ -333,8 +333,8 @@ mod tests {
     async fn test_create_instructions_document_different_users(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        let user1 = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
-        let user2 = RoxUserIdStr::parse_from_str("macro|user2@user.com").unwrap();
+        let user1 = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
+        let user2 = RoxUserIdStr::parse_from_str("rox|user2@user.com").unwrap();
 
         // Add second user to the database (only if it doesn't exist)
         let _ = sqlx::query!(

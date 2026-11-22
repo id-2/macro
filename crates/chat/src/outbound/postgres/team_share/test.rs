@@ -19,7 +19,7 @@ use crate::domain::models::{ChatErr, CreateChatArgs, PatchChatRepoArgs};
 use crate::domain::ports::ChatRepo;
 use crate::outbound::postgres::test::{TestRepo, test_repo};
 
-const OWNER: &str = "macro|test@example.com";
+const OWNER: &str = "rox|test@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 
 fn owner() -> RoxUserIdStr<'static> {

@@ -204,7 +204,7 @@ async fn assignees_share_the_initiative_and_allow_assigning_the_owner() {
             Some(SetPropertyValue::MultiEntityReference {
                 references: vec![
                     EntityReference::new(owner.as_ref(), EntityType::User),
-                    EntityReference::new("macro|assignee@test.com", EntityType::User),
+                    EntityReference::new("rox|assignee@test.com", EntityType::User),
                     EntityReference::new(
                         bot_id::CODEX_BOT_ID.into_storage_id().as_ref(),
                         EntityType::User,
@@ -219,7 +219,7 @@ async fn assignees_share_the_initiative_and_allow_assigning_the_owner() {
         sharing.calls.lock().unwrap()[0],
         (
             "initiative1".into(),
-            vec![owner.to_string(), "macro|assignee@test.com".into()],
+            vec![owner.to_string(), "rox|assignee@test.com".into()],
         )
     );
 }
@@ -243,7 +243,7 @@ async fn assignee_grant_failure_does_not_persist_or_publish() {
             SystemPropertyKey::ASSIGNEES_UUID,
             Some(SetPropertyValue::MultiEntityReference {
                 references: vec![EntityReference::new(
-                    "macro|assignee@test.com",
+                    "rox|assignee@test.com",
                     EntityType::User,
                 )],
             }),

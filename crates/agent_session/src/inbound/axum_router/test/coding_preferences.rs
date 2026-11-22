@@ -106,7 +106,7 @@ async fn coding_preferences_are_off_until_the_caller_sets_them() {
     );
 
     assert_eq!(
-        read(&router, "macro|someone-else@example.com").await,
+        read(&router, "rox|someone-else@example.com").await,
         serde_json::json!({ "createTasks": false, "openPullRequests": false })
     );
 }

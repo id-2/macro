@@ -32,8 +32,8 @@ export const lockWaitMs = 30_000;
 export const tellMs = 4000;
 
 const calling = /\b(call(s|ed|ing)?|ring|phone|dial)\b/i;
-const person = /^(macro\|)?[^@\s]+@[^@\s]+$/;
-const macroPrefix = 'macro|';
+const person = /^(rox\|)?[^@\s]+@[^@\s]+$/;
+const macroPrefix = 'rox|';
 
 /** Rox's message and channel ids are UUIDs; anything else, e.g. a `{id}` copied from a template, would only come back as a 400. */
 const macroUuid =
@@ -115,7 +115,7 @@ export const noAnswerLine = (reason: string): string =>
   `Called, no answer. ${reason.trim()}`;
 
 const mention = (id: string): string =>
-  `<m-user-mention>${JSON.stringify({ userId: id, email: id.replace(/^macro\|/, '') })}</m-user-mention>`;
+  `<m-user-mention>${JSON.stringify({ userId: id, email: id.replace(/^rox\|/, '') })}</m-user-mention>`;
 
 export const askerLine = (
   target: string,

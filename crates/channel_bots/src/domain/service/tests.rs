@@ -548,7 +548,7 @@ async fn top_level_channel_mention_marks_the_trigger_inline_in_channel_context()
     let mut before = message(1, None, "before");
     before.parent = parent;
     before.sender_id = channel_sender::ChannelSender::new_from_user(
-        "macro|alice@example.com".to_string().try_into().unwrap(),
+        "rox|alice@example.com".to_string().try_into().unwrap(),
     );
     let mut api = MockMessageServiceApi::new();
     configure_reads(&mut api, &trigger, thread(trigger.clone(), vec![]));
@@ -592,7 +592,7 @@ async fn a_trigger_that_moved_threads_or_changed_author_is_not_prompted() {
     let trigger = message(1, None, "@macro help");
     let mut relocated = trigger.clone();
     relocated.sender_id = channel_sender::ChannelSender::new_from_user(
-        "macro|someone-else@example.com"
+        "rox|someone-else@example.com"
             .to_string()
             .try_into()
             .unwrap(),

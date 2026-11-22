@@ -36,7 +36,7 @@ transformer is in every set but does nothing in an editor without the node, so
 editors and services keep `<details>` as text.
 
 Human user mention Markdown requires only a nonempty string `userId`; the importer
-derives a missing email from `macro|` IDs so web name lookup and clipboard round
+derives a missing email from `rox|` IDs so web name lookup and clipboard round
 trips can resolve the user. Other identities still need an email or display name.
 Document mention Markdown requires only `documentId` (cards also need
 `blockName`); `documentName` is a cached label the chip replaces with the live

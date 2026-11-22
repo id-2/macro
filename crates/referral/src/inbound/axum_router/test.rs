@@ -23,8 +23,8 @@ use crate::domain::models::{ReferralCode, ReferralError};
 use crate::domain::ports::ReferralService;
 use crate::inbound::axum_router::{ReferralRouterState, referral_router};
 
-const TEST_USER_ID: &str = "macro|test@test.com";
-const INTERNAL_ACTING_USER_ID: &str = "macro|internal@test.com";
+const TEST_USER_ID: &str = "rox|test@test.com";
+const INTERNAL_ACTING_USER_ID: &str = "rox|internal@test.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 
 #[derive(Clone)]

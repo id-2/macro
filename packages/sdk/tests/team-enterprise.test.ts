@@ -4,7 +4,7 @@ import { RoxError } from '../src/utils';
 
 const TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602700';
 const OTHER_TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602701';
-const MEMBER_ID = 'macro|member@example.com';
+const MEMBER_ID = 'rox|member@example.com';
 const MEMBER_PATH = encodeURIComponent(MEMBER_ID);
 
 const originalFetch = globalThis.fetch;
@@ -47,7 +47,7 @@ const currentTeam =
         id,
         name: 'Acme',
         slug: 'acme',
-        owner_id: 'macro|owner@example.com',
+        owner_id: 'rox|owner@example.com',
       },
       members: [],
     });

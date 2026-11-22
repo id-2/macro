@@ -435,7 +435,7 @@ impl TeamRepository for TeamRepositoryImpl {
 
         let rox_user_ids: Vec<String> = invites
             .iter()
-            .map(|email| format!("macro|{}", email.as_ref()))
+            .map(|email| format!("rox|{}", email.as_ref()))
             .collect();
 
         let team_invite_ids: Vec<uuid::Uuid> = invites
@@ -550,7 +550,7 @@ impl TeamRepository for TeamRepositoryImpl {
 
         let rox_user_ids: Vec<String> = invites
             .iter()
-            .map(|email| format!("macro|{}", email.as_ref()))
+            .map(|email| format!("rox|{}", email.as_ref()))
             .collect();
 
         let rows = sqlx::query!(
@@ -634,7 +634,7 @@ impl TeamRepository for TeamRepositoryImpl {
                   )
                   AND NOT EXISTS (
                       SELECT 1 FROM team_user tu
-                      WHERE tu.team_id = ti.team_id AND tu.user_id = 'macro|' || ti.email
+                      WHERE tu.team_id = ti.team_id AND tu.user_id = 'rox|' || ti.email
                   )
                 ORDER BY ti.created_at
                 LIMIT $1

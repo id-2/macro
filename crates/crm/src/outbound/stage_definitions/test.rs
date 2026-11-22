@@ -106,7 +106,7 @@ fn owned(labels: &[&str]) -> Vec<String> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_without_definition_has_no_stage_set(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     assert_eq!(
         store(&pool).get_team_stage_set(&access).await.unwrap(),
         None
@@ -115,7 +115,7 @@ async fn team_without_definition_has_no_stage_set(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_seeds_options_in_order_and_reads_back(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
 
     let created = store
@@ -138,7 +138,7 @@ async fn create_seeds_options_in_order_and_reads_back(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replace_applies_delete_rewrite_and_insert_together(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&access, &owned(&["Lead", "Demo", "Churned"]))
@@ -183,7 +183,7 @@ async fn replace_applies_delete_rewrite_and_insert_together(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_stages_can_trade_labels(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&access, &owned(&["Lead", "Demo"]))
@@ -218,7 +218,7 @@ async fn two_stages_can_trade_labels(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_label_rolls_back_the_whole_plan(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&access, &owned(&["Lead", "Demo"]))
@@ -248,7 +248,7 @@ async fn duplicate_label_rolls_back_the_whole_plan(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_label_is_a_client_error(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&access, &owned(&["Lead"]))
@@ -273,7 +273,7 @@ async fn duplicate_label_is_a_client_error(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_set_returns_team_to_defaults(pool: PgPool) {
-    let access = team_receipt(&pool, "macro|owner@test.com").await;
+    let access = team_receipt(&pool, "rox|owner@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&access, &owned(&["Lead"]))
@@ -288,8 +288,8 @@ async fn delete_set_returns_team_to_defaults(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_team_cannot_see_or_touch_the_set(pool: PgPool) {
-    let owner = team_receipt(&pool, "macro|owner@test.com").await;
-    let stranger = team_receipt(&pool, "macro|stranger@test.com").await;
+    let owner = team_receipt(&pool, "rox|owner@test.com").await;
+    let stranger = team_receipt(&pool, "rox|stranger@test.com").await;
     let store = store(&pool);
     let set = store
         .create_team_stage_set(&owner, &owned(&["Lead"]))
@@ -328,7 +328,7 @@ async fn another_team_cannot_see_or_touch_the_set(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn internal_receipt_cannot_write(pool: PgPool) {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com")
+    seed_team(&pool, team_id, "rox|owner@test.com")
         .await
         .unwrap();
     let access = CrmTeamReceipt::<MemberTeamRole>::dangerously_internal(team_id);

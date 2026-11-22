@@ -100,7 +100,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
   }
 
   /**
-   * This user's email address. Rox user ids encode it as `macro|<email>`,
+   * This user's email address. Rox user ids encode it as `rox|<email>`,
    * so this reads straight off the id — no auth-service endpoint returns
    * emails for arbitrary users.
    *
@@ -109,7 +109,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
    * @readonly
    */
   email(): string | undefined {
-    const email = this.id.startsWith('macro|') ? this.id.slice(6) : undefined;
+    const email = this.id.startsWith('rox|') ? this.id.slice('rox|'.length) : undefined;
     return email?.includes('@') ? email : undefined;
   }
 

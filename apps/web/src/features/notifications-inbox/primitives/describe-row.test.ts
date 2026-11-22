@@ -15,7 +15,7 @@ const taskAssigned = {
   id: 'n-1',
   entity_type: 'task',
   entity_id: 'task-a',
-  sender_id: 'macro|ana@example.com',
+  sender_id: 'rox|ana@example.com',
   notification_metadata: {
     tag: 'task_assigned',
     content: { taskName: 'Ship the inbox' },
@@ -54,7 +54,7 @@ const row = (
 type Names = Parameters<typeof describeInboxRow>[1];
 
 const names: Names = {
-  userName: (id) => (id === 'macro|ana@example.com' ? 'Ana' : 'Bo'),
+  userName: (id) => (id === 'rox|ana@example.com' ? 'Ana' : 'Bo'),
   senderName: () => undefined,
 };
 
@@ -65,7 +65,7 @@ const action = (
 
 describe('describeInboxRow', () => {
   it('names the row’s author from its actor', () => {
-    expect(action({ kind: 'user', id: 'macro|ana@example.com' })).toBe(
+    expect(action({ kind: 'user', id: 'rox|ana@example.com' })).toBe(
       'Ana assigned you a task'
     );
     expect(action({ kind: 'agent', name: 'Builder' })).toBe(
@@ -76,7 +76,7 @@ describe('describeInboxRow', () => {
 
   it('keeps the sender a notification names itself, such as a GitHub login', () => {
     expect(
-      action({ kind: 'user', id: 'macro|ana@example.com' }, () => 'octocat')
+      action({ kind: 'user', id: 'rox|ana@example.com' }, () => 'octocat')
     ).toBe('octocat assigned you a task');
   });
 
@@ -89,7 +89,7 @@ describe('describeInboxRow', () => {
       id: 'n-3',
       entity_type: 'harness',
       entity_id: '0198a4cc-e138-7670-a308-a6b766602712',
-      sender_id: 'macro|ana@example.com',
+      sender_id: 'rox|ana@example.com',
       notification_metadata: {
         tag: 'entity_access_requested',
         content: {
@@ -102,7 +102,7 @@ describe('describeInboxRow', () => {
     } as unknown as UnifiedNotification;
     expect(
       describeInboxRow(
-        row({ kind: 'user', id: 'macro|ana@example.com' }, request),
+        row({ kind: 'user', id: 'rox|ana@example.com' }, request),
         names
       )
     ).toEqual({ action: 'Ana requested to use', subject: 'Render box' });
@@ -114,7 +114,7 @@ describe('describeInboxRow', () => {
         id: 'n-4',
         entity_type: 'harness',
         entity_id: '0198a4cc-e138-7670-a308-a6b766602712',
-        sender_id: 'macro|ana@example.com',
+        sender_id: 'rox|ana@example.com',
         notification_metadata: {
           tag: 'runtime_access_removed',
           content: {
@@ -128,7 +128,7 @@ describe('describeInboxRow', () => {
       }) as unknown as UnifiedNotification;
     const describe = (agents: string[]) =>
       describeInboxRow(
-        row({ kind: 'user', id: 'macro|ana@example.com' }, removal(agents)),
+        row({ kind: 'user', id: 'rox|ana@example.com' }, removal(agents)),
         names
       );
     expect(describe(['Scout'])).toEqual({

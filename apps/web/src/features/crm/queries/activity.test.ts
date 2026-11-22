@@ -80,7 +80,7 @@ describe('CRM activity queries', () => {
       const source = useCrmActivityQuery(createQuery, tab, userId);
       const [args, options] = createQuery.mock.calls[0];
       expect(options?.().enabled).toBe(false);
-      setUserId('macro|viewer@example.com');
+      setUserId('rox|viewer@example.com');
       expect(options?.().enabled).toBe(true);
       expect(args().body).toEqual(crmActivityBody('tasks'));
       setTab('calls');
@@ -126,7 +126,7 @@ describe('CRM activity queries', () => {
       'notes',
       {
         search: '',
-        facets: { 'created-by': ['macro|viewer@example.com'], tags: ['tag'] },
+        facets: { 'created-by': ['rox|viewer@example.com'], tags: ['tag'] },
         sort: 'updated_at',
         direction: 'desc',
         groupBy: 'date',
@@ -137,7 +137,7 @@ describe('CRM activity queries', () => {
     expect(query.body?.df).toEqual({
       '&': [
         crmActivityBody('notes').df,
-        { l: { o: 'macro|viewer@example.com' } },
+        { l: { o: 'rox|viewer@example.com' } },
       ],
     });
     expect(query.body?.propf).toEqual({

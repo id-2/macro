@@ -81,7 +81,7 @@ const CHAT_ID: &str = "30000000-0000-0000-0000-000000000001";
 const DELETED_CHAT_ID: &str = "30000000-0000-0000-0000-000000000002";
 
 fn project_owner() -> Owner {
-    Owner::User(RoxUserIdStr::try_from("macro|owner@test.com").unwrap())
+    Owner::User(RoxUserIdStr::try_from("rox|owner@test.com").unwrap())
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -187,7 +187,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -214,7 +214,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     assert_eq!(audits.len(), 1);
     assert_eq!(
         audits[0].get::<String, _>("actor_id"),
-        "macro|owner@test.com"
+        "rox|owner@test.com"
     );
     assert_eq!(audits[0].get::<String, _>("action"), "share_link_create");
     assert_eq!(audits[0].get::<String, _>("resource_id"), project.id);
@@ -240,7 +240,7 @@ async fn concurrent_first_enable_writes_only_one_audit(pool: Pool<Postgres>) {
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -286,7 +286,7 @@ async fn history_listing_differs_from_owner_pending_listing(
 ) -> anyhow::Result<()> {
     let repo = test_repo(pool);
 
-    let viewed = repo.get_projects_for_user("macro|viewer@test.com").await?;
+    let viewed = repo.get_projects_for_user("rox|viewer@test.com").await?;
     assert_eq!(
         viewed
             .iter()
@@ -296,7 +296,7 @@ async fn history_listing_differs_from_owner_pending_listing(
     );
 
     let owner_pending = repo
-        .get_pending_root_projects("macro|owner@test.com")
+        .get_pending_root_projects("rox|owner@test.com")
         .await?;
     assert_eq!(owner_pending.len(), 1);
     assert_eq!(
@@ -309,7 +309,7 @@ async fn history_listing_differs_from_owner_pending_listing(
     );
 
     let viewer_pending = repo
-        .get_pending_root_projects("macro|viewer@test.com")
+        .get_pending_root_projects("rox|viewer@test.com")
         .await?;
     assert_eq!(viewer_pending.len(), 1);
     assert_eq!(
@@ -329,7 +329,7 @@ async fn accessible_listing_uses_entity_access_not_history(
     let repo = test_repo(pool);
 
     let owner = repo
-        .get_accessible_projects_for_user("macro|owner@test.com")
+        .get_accessible_projects_for_user("rox|owner@test.com")
         .await?;
     assert_eq!(
         owner
@@ -347,7 +347,7 @@ async fn accessible_listing_uses_entity_access_not_history(
     );
 
     let viewer = repo
-        .get_accessible_projects_for_user("macro|viewer@test.com")
+        .get_accessible_projects_for_user("rox|viewer@test.com")
         .await?;
     assert_eq!(
         viewer
@@ -455,7 +455,7 @@ async fn reads_share_permissions_and_bumps_modified_timestamp(
     let repo = test_repo(pool);
     let permission = repo.get_project_share_permission(ROOT_ID).await?;
     assert_eq!(permission.id, "share-root");
-    assert_eq!(permission.owner, "macro|owner@test.com");
+    assert_eq!(permission.owner, "rox|owner@test.com");
     assert_eq!(permission.link_share, Some(LinkShare::Public));
     assert_eq!(permission.link_share_access_level, Some(AccessLevel::Edit));
     assert_eq!(
@@ -546,7 +546,7 @@ async fn create_is_atomic_and_inserts_all_metadata(pool: Pool<Postgres>) -> anyh
 
     let entity = fetch_entity_row(&pool, &project.id).await;
     assert_eq!(entity.owner_type, "user");
-    assert_eq!(entity.owner_id, "macro|owner@test.com");
+    assert_eq!(entity.owner_id, "rox|owner@test.com");
     assert_eq!(entity.entity_type, "project");
     assert_eq!(entity.deleted_at, None);
 
@@ -685,7 +685,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     let repo = test_repo(pool.clone());
     let unchanged = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: Some("Renamed".to_owned()),
             update_parent: false,
@@ -698,7 +698,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let moved = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -714,7 +714,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let updated = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
             project_id: ROOT_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -738,7 +738,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -761,7 +761,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -785,7 +785,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -805,7 +805,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("rox|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -1045,7 +1045,7 @@ fn nested_upload_args() -> anyhow::Result<UploadFolderRepoArgs> {
     let mut share_permission = SharePermissionV2::new_project_share_permission(None);
     share_permission.link_share = Some(LinkShare::Team);
     Ok(UploadFolderRepoArgs {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@test.com")?.into_owned(),
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@test.com")?.into_owned(),
         share_permission,
         root_folder,
         root_folder_name: "Upload".to_owned(),
@@ -1092,7 +1092,7 @@ async fn uploader_rows(pool: &Pool<Postgres>) -> UploaderRows {
             (SELECT COUNT(*) FROM entity WHERE owner_id = $1) AS "entities!",
             (SELECT COUNT(*) FROM entity_access WHERE source_id = $1) AS "grants!"
         "#,
-        "macro|owner@test.com",
+        "rox|owner@test.com",
     )
     .fetch_one(pool)
     .await
@@ -1161,20 +1161,20 @@ async fn upload_folder_preserves_tree_metadata_and_compensates(
     let uploader_grant = || {
         (
             "user".to_owned(),
-            "macro|owner@test.com".to_owned(),
+            "rox|owner@test.com".to_owned(),
             "owner".to_owned(),
         )
     };
     for project_id in &result.project_ids {
         let entity = fetch_entity_row(&pool, project_id).await;
         assert_eq!(entity.owner_type, "user");
-        assert_eq!(entity.owner_id, "macro|owner@test.com");
+        assert_eq!(entity.owner_id, "rox|owner@test.com");
         assert_eq!(entity.entity_type, "project");
         assert_eq!(direct_grants(&pool, project_id).await, [uploader_grant()]);
     }
     let document_entity = fetch_entity_row(&pool, &result.documents[0].document_id).await;
     assert_eq!(document_entity.owner_type, "user");
-    assert_eq!(document_entity.owner_id, "macro|owner@test.com");
+    assert_eq!(document_entity.owner_id, "rox|owner@test.com");
     assert_eq!(document_entity.entity_type, "document");
     assert_eq!(
         direct_grants(&pool, &result.documents[0].document_id).await,
@@ -1257,7 +1257,7 @@ async fn mark_uploaded_is_recursive_and_rejects_missing_root(
         .await?;
     assert_eq!(uploaded_tree.id, "10000000-0000-0000-0000-000000000006");
     assert_eq!(uploaded_tree.name, "Owner pending");
-    assert_eq!(uploaded_tree.user_id.as_ref(), "macro|owner@test.com");
+    assert_eq!(uploaded_tree.user_id.as_ref(), "rox|owner@test.com");
     assert_eq!(uploaded_tree.parent_id, None);
     assert!(uploaded_tree.upload_pending_transitioned);
 

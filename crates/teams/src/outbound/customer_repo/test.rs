@@ -135,7 +135,7 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
     )
     .await;
     let repo = repo(&server, pool);
-    let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|max@example.com").unwrap();
     repo.schedule_seat_plan(&sub.id, &user, Some(SeatPlan::Premium))
         .await
         .unwrap();
@@ -184,7 +184,7 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
             .unwrap()
             .is_none()
     );
-    let other = RoxUserIdStr::try_from("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from("rox|other@example.com").unwrap();
     assert!(
         repo.scheduled_seat_plan(&sub.id, &sched.id, &other)
             .await
@@ -233,7 +233,7 @@ async fn pending_seat_plans_reads_all_members_once_and_excludes_applied_or_untru
     let mut sched = schedule();
     let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
-    let members = json!({"macro|one@example.com": "premium", "macro|two@example.com": "premium"});
+    let members = json!({"rox|one@example.com": "premium", "rox|two@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
     sched.status = stripe::SubscriptionScheduleStatus::Active;
     sched
@@ -257,7 +257,7 @@ async fn pending_seat_plans_reads_all_members_once_and_excludes_applied_or_untru
     let repo = repo(&server, pool);
     let pending = repo.pending_seat_plans(&sub.id).await.unwrap();
     assert_eq!(pending.len(), 2);
-    for user in ["macro|one@example.com", "macro|two@example.com"] {
+    for user in ["rox|one@example.com", "rox|two@example.com"] {
         assert_eq!(
             pending[user],
             ScheduledSeatPlan {
@@ -362,7 +362,7 @@ async fn downgrade_preserves_current_prices_and_terms_then_keep_max_releases_sch
     )
     .await;
     let repo = repo(&server, pool.clone());
-    let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|max@example.com").unwrap();
     repo.schedule_seat_plan(&sub.id, &user, Some(SeatPlan::Premium))
         .await
         .unwrap();
@@ -440,7 +440,7 @@ async fn unrelated_upgrade_keeps_other_seats_pending_and_prorates_only_current_p
     let mut sched = schedule();
     let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
-    let members = json!({"macro|one@example.com": "premium", "macro|two@example.com": "premium"});
+    let members = json!({"rox|one@example.com": "premium", "rox|two@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
     sched
         .metadata
@@ -493,7 +493,7 @@ async fn scheduled_members_are_returned_only_after_the_provider_renews(pool: sql
     let mut sub = subscription();
     let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
-    let members = json!({"macro|max@example.com": "premium"});
+    let members = json!({"rox|max@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
     sub.metadata.insert(APPLIED_KEY.into(), id.to_string());
     mount(&server, "GET", "/v1/subscriptions/sub_team", &sub, 5).await;
@@ -503,7 +503,7 @@ async fn scheduled_members_are_returned_only_after_the_provider_renews(pool: sql
     mount(&server, "GET", "/v1/subscriptions/sub_team", &sub, 1).await;
     assert_eq!(
         repo.renewed_seat_plans(&sub.id).await.unwrap(),
-        vec![("macro|max@example.com".into(), SeatPlan::Premium)]
+        vec![("rox|max@example.com".into(), SeatPlan::Premium)]
     );
 }
 
@@ -678,7 +678,7 @@ async fn a_max_trial_seat_change_keeps_scheduled_downgrades(pool: sqlx::PgPool) 
     let mut sched = schedule();
     let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
-    let members = json!({"macro|one@example.com": "premium"});
+    let members = json!({"rox|one@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
     sched
         .metadata
@@ -812,8 +812,8 @@ async fn concurrent_instances_preserve_all_scheduled_members_and_seat_additions(
     let two = repo(&server, pool.clone());
     let seats = repo(&server, pool);
     let subscription = "sub_team".parse().unwrap();
-    let first = RoxUserIdStr::try_from("macro|one@example.com").unwrap();
-    let second = RoxUserIdStr::try_from("macro|two@example.com").unwrap();
+    let first = RoxUserIdStr::try_from("rox|one@example.com").unwrap();
+    let second = RoxUserIdStr::try_from("rox|two@example.com").unwrap();
     let (a, b, c) = tokio::join!(
         one.schedule_seat_plan(&subscription, &first, Some(SeatPlan::Premium)),
         two.schedule_seat_plan(&subscription, &second, Some(SeatPlan::Premium)),

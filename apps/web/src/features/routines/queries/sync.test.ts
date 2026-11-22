@@ -24,7 +24,7 @@ const receive = subscribe.mock.calls[0][0];
 
 const schedule: ScheduledAction = {
   id: 'routine',
-  owner: 'macro|owner@example.com',
+  owner: 'rox|owner@example.com',
   name: 'Routine',
   kind: 'Agent',
   task: { steps: [] },

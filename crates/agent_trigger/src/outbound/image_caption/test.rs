@@ -6,7 +6,7 @@ use rox_uuid::Uuid;
 use std::sync::Mutex;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|image-caption-test@rox.one")
+    RoxUserIdStr::parse_from_str("rox|image-caption-test@rox.one")
         .expect("valid user id")
         .into_owned()
 }

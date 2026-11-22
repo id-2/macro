@@ -63,7 +63,7 @@ fn contact_target_changes_refresh_materialized_people() {
     let mut after = before.clone();
     after.fields.insert(
         "userId".into(),
-        CacheValue::String("macro|person@example.com".into()),
+        CacheValue::String("rox|person@example.com".into()),
     );
     assert_eq!(
         changes("GraphqlContact", Some(&before), Some(&after)),

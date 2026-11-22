@@ -18,7 +18,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 use super::*;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 /// The search's internal key and user headers (document storage's).
 const KEY_HEADER: &str = "x-document-storage-service-auth-key";
 const USER_HEADER: &str = "x-document-storage-service-user-id";

@@ -15,7 +15,7 @@ async fn session_parent_lookup_accepts_live_document_and_call_threads(pool: PgPo
         let parent_id = root.to_string();
         sqlx::query!(
             r#"INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
-               VALUES ($1, $2, $3, 'macro|owner@team.com', 'Agent invocation')"#,
+               VALUES ($1, $2, $3, 'rox|owner@team.com', 'Agent invocation')"#,
             root,
             kind,
             parent_id,

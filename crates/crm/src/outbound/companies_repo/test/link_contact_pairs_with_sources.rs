@@ -14,7 +14,7 @@ fn as_set(pairs: Vec<(Uuid, String)>) -> HashSet<(Uuid, String)> {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn keeps_only_pairs_backed_by_a_source_row(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
@@ -44,7 +44,7 @@ async fn keeps_only_pairs_backed_by_a_source_row(pool: PgPool) -> anyhow::Result
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn does_not_match_a_source_owned_by_a_different_link(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let link_a = insert_email_link(&pool, owner_id, "a@rox.one").await?;
     let link_b = insert_email_link(&pool, owner_id, "b@rox.one").await?;
@@ -71,7 +71,7 @@ async fn does_not_match_a_source_owned_by_a_different_link(pool: PgPool) -> anyh
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn matches_case_insensitively_and_returns_lowercased(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;

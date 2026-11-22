@@ -146,7 +146,7 @@ function Fixture() {
                                 pick(
                                   encodeCellMention({
                                     type: 'user',
-                                    userId: 'macro|taylor@rox.one',
+                                    userId: 'rox|taylor@rox.one',
                                     email: 'taylor@rox.one',
                                     displayName: 'Taylor',
                                   })

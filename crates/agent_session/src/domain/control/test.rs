@@ -85,7 +85,7 @@ fn runtimes_cannot_answer_even_when_forwarding_an_owner_or_editor() {
 fn trigger() -> trigger_context::TriggerContext {
     trigger_context::TriggerContext::Requested(trigger_context::RequestedContext {
         requested_by: trigger_context::ContextPerson {
-            id: "macro|owner@example.com".to_owned(),
+            id: "rox|owner@example.com".to_owned(),
             name: "Owner".to_owned(),
             email: Some("owner@example.com".to_owned()),
         },

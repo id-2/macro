@@ -4,4 +4,4 @@ INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, acces
     ('20000000-0000-0000-0000-000000000004', 'chat', 'bot|60000000-0000-0000-0000-000000000001', 'bot', 'owner', NULL),
     ('20000000-0000-0000-0000-000000000002', 'document', 'bot|60000000-0000-0000-0000-000000000001', 'bot', 'view', '20000000-0000-0000-0000-000000000001'),
     ('20000000-0000-0000-0000-000000000002', 'document', 'bot|60000000-0000-0000-0000-000000000002', 'bot', 'edit', NULL),
-    ('20000000-0000-0000-0000-000000000002', 'document', 'macro|owner@example.com', 'user', 'owner', NULL);
+    ('20000000-0000-0000-0000-000000000002', 'document', 'rox|owner@example.com', 'user', 'owner', NULL);

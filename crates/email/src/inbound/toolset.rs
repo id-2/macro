@@ -34,7 +34,7 @@ pub use update_thread_labels::{UpdateThreadLabels, UpdateThreadLabelsResponse};
 
 /// The caller's default inbox: the primary link they own. Falls back to any
 /// link they own, then any accessible inbox. `caller_rox_id` is the caller's
-/// own macro id (e.g. `macro|user@example.com`).
+/// own macro id (e.g. `rox|user@example.com`).
 pub fn caller_primary_inbox<'a>(inboxes: &'a [Link], caller_rox_id: &str) -> Option<&'a Link> {
     inboxes
         .iter()

@@ -9,7 +9,7 @@ use std::sync::{
 };
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|decisions@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|decisions@example.com".to_owned()).unwrap()
 }
 
 fn request() -> DecisionRequest {

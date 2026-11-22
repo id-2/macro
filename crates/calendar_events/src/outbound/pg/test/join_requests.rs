@@ -46,7 +46,7 @@ impl CalendarRefreshNotifier for ListReadingRefresh {
 /// they may add one.
 fn sharer_copy(link_id: Uuid, provider: (Uuid, Uuid)) -> CalendarEventUpsert {
     let mut copy = timed_upsert(
-        "macro|ask-sharer@example.com",
+        "rox|ask-sharer@example.com",
         link_id,
         provider,
         "ask@example.com",
@@ -72,11 +72,11 @@ async fn delegate(pool: &PgPool, primary: &str, child: &str, link_id: Uuid) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_request_reaches_the_inbox_holding_the_shared_copy_once(pool: PgPool) {
-    let sharer_id = "macro|ask-sharer@example.com";
-    let member_id = "macro|ask-member@example.com";
-    let delegate_id = "macro|ask-delegate@example.com";
-    let mailbox_id = "macro|ask-mailbox@example.com";
-    let other_delegate_id = "macro|ask-other-delegate@example.com";
+    let sharer_id = "rox|ask-sharer@example.com";
+    let member_id = "rox|ask-member@example.com";
+    let delegate_id = "rox|ask-delegate@example.com";
+    let mailbox_id = "rox|ask-mailbox@example.com";
+    let other_delegate_id = "rox|ask-other-delegate@example.com";
     for user in [
         sharer_id,
         member_id,
@@ -153,8 +153,8 @@ async fn a_new_request_reaches_the_inbox_holding_the_shared_copy_once(pool: PgPo
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn join_requests_open_once_and_resolve_once(pool: PgPool) {
-    let sharer_id = "macro|join-sharer@example.com";
-    let member_id = "macro|join-member@example.com";
+    let sharer_id = "rox|join-sharer@example.com";
+    let member_id = "rox|join-member@example.com";
     insert_user(&pool, member_id).await;
     let sharer_link = insert_link(&pool, sharer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -224,7 +224,7 @@ async fn join_requests_open_once_and_resolve_once(pool: PgPool) {
     );
 
     // Another member's request is accepted.
-    let second_id = "macro|join-second@example.com";
+    let second_id = "rox|join-second@example.com";
     insert_user(&pool, second_id).await;
     let (second, opened) = repo
         .open_join_request(event_id, second_id, "second@work.example.com")
@@ -361,8 +361,8 @@ pub(super) async fn recipient_holds(pool: &PgPool, notification_id: Uuid) -> boo
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_join_request_notification_goes_with_the_last_copy_of_its_event(pool: PgPool) {
-    let sharer_id = "macro|join-copies@example.com";
-    let member_id = "macro|join-copies-member@example.com";
+    let sharer_id = "rox|join-copies@example.com";
+    let member_id = "rox|join-copies-member@example.com";
     insert_user(&pool, member_id).await;
     let sharer_link = insert_link(&pool, sharer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -452,8 +452,8 @@ async fn a_join_request_notification_goes_with_the_last_copy_of_its_event(pool: 
 async fn a_cancelled_occurrence_keeps_the_join_request_notification_and_a_cancelled_series_drops_it(
     pool: PgPool,
 ) {
-    let sharer_id = "macro|join-series@example.com";
-    let member_id = "macro|join-series-member@example.com";
+    let sharer_id = "rox|join-series@example.com";
+    let member_id = "rox|join-series-member@example.com";
     insert_user(&pool, member_id).await;
     let sharer_link = insert_link(&pool, sharer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -529,8 +529,8 @@ async fn a_cancelled_occurrence_keeps_the_join_request_notification_and_a_cancel
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_the_calendar_or_the_inbox_removes_join_request_notifications(pool: PgPool) {
-    let sharer_id = "macro|join-inbox@example.com";
-    let member_id = "macro|join-inbox-member@example.com";
+    let sharer_id = "rox|join-inbox@example.com";
+    let member_id = "rox|join-inbox-member@example.com";
     insert_user(&pool, member_id).await;
     let disconnected_link = insert_link(&pool, sharer_id).await;
     let removed_link = insert_link(&pool, sharer_id).await;
@@ -600,9 +600,9 @@ async fn ingress_insert(
     .map(|result| result.rows_affected() == 1)
 }
 
-const SHARER_ID: &str = "macro|join-queued@example.com";
-const MEMBER_ID: &str = "macro|join-queued-member@example.com";
-const OTHER_MEMBER_ID: &str = "macro|join-queued-other@example.com";
+const SHARER_ID: &str = "rox|join-queued@example.com";
+const MEMBER_ID: &str = "rox|join-queued-member@example.com";
+const OTHER_MEMBER_ID: &str = "rox|join-queued-other@example.com";
 
 /// A pending request to join an event a sharer shared.
 async fn open_request(pool: &PgPool) -> CalendarJoinRequest {
@@ -795,7 +795,7 @@ async fn answer_within(transaction: &mut Transaction<'_, Postgres>, request: &Ca
 async fn answering_a_join_request_retires_its_notification_for_every_recipient(pool: PgPool) {
     let accepted = open_request(&pool).await;
     let declined = another_open_request(&pool, &accepted).await;
-    let delegate_id = "macro|join-queued-delegate@example.com";
+    let delegate_id = "rox|join-queued-delegate@example.com";
     insert_user(&pool, delegate_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let reminder = store_notification(
@@ -868,7 +868,7 @@ async fn a_queued_join_request_notification_is_not_stored_after_its_request_was_
 ) {
     let accepted = open_request(&pool).await;
     let declined = another_open_request(&pool, &accepted).await;
-    let third_member = "macro|join-queued-third@example.com";
+    let third_member = "rox|join-queued-third@example.com";
     insert_user(&pool, third_member).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (still_open, _) = repo
@@ -980,7 +980,7 @@ async fn delete_account(
 async fn deleting_the_requesters_account_retires_their_requests_notification(pool: PgPool) {
     let removed = open_request(&pool).await;
     let still_open = another_open_request(&pool, &removed).await;
-    let delegate_id = "macro|join-queued-delegate@example.com";
+    let delegate_id = "rox|join-queued-delegate@example.com";
     insert_user(&pool, delegate_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let about_removed =

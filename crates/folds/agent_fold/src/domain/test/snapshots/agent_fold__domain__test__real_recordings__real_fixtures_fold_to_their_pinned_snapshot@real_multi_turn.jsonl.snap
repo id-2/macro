@@ -10,7 +10,7 @@ input_file: crates/folds/agent_fold/fixtures/real/real_multi_turn.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(
@@ -159,7 +159,7 @@ input_file: crates/folds/agent_fold/fixtures/real/real_multi_turn.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(
@@ -806,7 +806,7 @@ input_file: crates/folds/agent_fold/fixtures/real/real_multi_turn.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(

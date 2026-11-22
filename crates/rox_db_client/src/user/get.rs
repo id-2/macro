@@ -99,7 +99,7 @@ pub async fn get_rox_user_id_by_email(
 /// whether that email may claim the account.
 #[derive(Debug, Clone)]
 pub struct ExistingUserForSignup {
-    /// The `User` row id, `macro|{email}` for accounts created by signup.
+    /// The `User` row id, `rox|{email}` for accounts created by signup.
     pub id: String,
     /// The account's linked login: the FusionAuth user id.
     pub rox_user_id: uuid::Uuid,

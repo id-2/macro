@@ -122,7 +122,7 @@ impl GmailOpsLinks for Fake {
         self.record("link", Call::Link)?;
         Ok((!self.0.lock().unwrap().missing_link).then(|| Link {
             id: LINK,
-            rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("inbox@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,

@@ -184,7 +184,7 @@ try {
       ),
     { timeout: 120_000 }
   );
-  await browser.execute(() => localStorage.setItem('macro:login', 'true'));
+  await browser.execute(() => localStorage.setItem('rox:login', 'true'));
   await browser.refresh();
   const emailNavigation = browser.$('button[aria-label="Email"]');
   await emailNavigation.waitForDisplayed({ timeout: 120_000 });

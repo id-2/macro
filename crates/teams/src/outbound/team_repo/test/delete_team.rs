@@ -43,7 +43,7 @@ async fn delete_team_sweeps_the_grants_of_the_team_and_its_bots_only(
                 EntityAccessSourceType::Team
             ),
             (
-                "macro|user@user.com".to_owned(),
+                "rox|user@user.com".to_owned(),
                 EntityAccessSourceType::User
             ),
         ]

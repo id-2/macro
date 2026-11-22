@@ -6,7 +6,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::BTreeSet;
 
-const ACTOR: &str = "macro|transfer@example.com";
+const ACTOR: &str = "rox|transfer@example.com";
 
 async fn fixture(db: &PgPool) -> (EmailPgRepo, DraftTransferRequest) {
     let source = Uuid::now_v7();
@@ -154,13 +154,13 @@ async fn stale_materialization_cannot_commit_over_newer_edits_or_replanned_trans
 async fn transfer_rechecks_both_inboxes_and_refuses_a_scheduled_source(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     assert!(matches!(
-        repo.begin_transfer("macro|stranger@example.com", &request)
+        repo.begin_transfer("rox|stranger@example.com", &request)
             .await,
         Err(EmailErr::Unauthorized)
     ));
     let plan = prepare(&repo, &request).await;
     sqlx::query!(
-        "UPDATE email_links SET rox_id='macro|another@example.com' WHERE id=$1",
+        "UPDATE email_links SET rox_id='rox|another@example.com' WHERE id=$1",
         request.destination_link_id
     )
     .execute(&db)
@@ -414,7 +414,7 @@ async fn recovery_before_a_delayed_request_prevents_it_from_committing(db: PgPoo
     );
     assert!(repo.begin_transfer(ACTOR, &request).await.is_err());
     assert!(
-        repo.recover_transfer("macro|stranger@example.com", request.id)
+        repo.recover_transfer("rox|stranger@example.com", request.id)
             .await
             .is_err()
     );
@@ -482,12 +482,12 @@ async fn a_lost_commit_response_is_recoverable_after_the_source_disconnects(db: 
         receipt.message_id
     );
     assert!(
-        repo.recover_transfer("macro|stranger@example.com", request.id)
+        repo.recover_transfer("rox|stranger@example.com", request.id)
             .await
             .is_err()
     );
     sqlx::query!(
-        "UPDATE email_links SET rox_id='macro|stranger@example.com' WHERE id=$1",
+        "UPDATE email_links SET rox_id='rox|stranger@example.com' WHERE id=$1",
         request.destination_link_id
     )
     .execute(&db)

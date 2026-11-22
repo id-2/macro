@@ -27,7 +27,7 @@ async fn a_delayed_server_event_posts_but_a_client_with_the_same_old_id_is_rejec
     assert!(matches!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input.clone()
             )
             .await,
@@ -35,7 +35,7 @@ async fn a_delayed_server_event_posts_but_a_client_with_the_same_old_id_is_rejec
     ));
     let message = service
         .post_from_event(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             id,
             input,
         )
@@ -54,7 +54,7 @@ async fn replay_preserves_edited_content_and_does_not_publish_again() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post_from_event(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             post_input(),
         )
@@ -73,7 +73,7 @@ async fn replay_returns_a_deleted_discussion_without_resurrecting_it() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post_from_event(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             post_input(),
         )
@@ -91,9 +91,9 @@ async fn replay_cannot_reuse_another_author_parent_or_thread() {
     let events = Events::default();
     let service = MessageService::new(repo.clone(), events.clone());
     for (author, parent, thread_id) in [
-        ("macro|other@example.com", "doc", None),
-        ("macro|author@example.com", "other-doc", None),
-        ("macro|author@example.com", "doc", Some(Uuid::now_v7())),
+        ("rox|other@example.com", "doc", None),
+        ("rox|author@example.com", "other-doc", None),
+        ("rox|author@example.com", "doc", Some(Uuid::now_v7())),
     ] {
         let mut input = post_input();
         input.thread_id = thread_id;
@@ -119,7 +119,7 @@ async fn concurrent_event_delivery_recovers_the_committed_message() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post_from_event(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             post_input(),
         )
@@ -151,7 +151,7 @@ async fn trusted_event_posts_still_validate_ids_content_and_references() {
         assert!(
             service
                 .post_from_event(
-                    access("macro|author@example.com", "doc", AccessLevel::Comment),
+                    access("rox|author@example.com", "doc", AccessLevel::Comment),
                     id,
                     input,
                 )

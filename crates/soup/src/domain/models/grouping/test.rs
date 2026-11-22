@@ -12,7 +12,7 @@ fn project(id: u128) -> SoupItem<SoupPropertiesField> {
     SoupItem::Project(SoupProject {
         id: Uuid::from_u128(id),
         name: format!("Project {id}"),
-        owner_id: Owner::from_principal_str("macro|user@example.com").unwrap(),
+        owner_id: Owner::from_principal_str("rox|user@example.com").unwrap(),
         parent_id: None,
         created_at: DateTime::default(),
         updated_at: DateTime::default(),

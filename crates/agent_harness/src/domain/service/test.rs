@@ -137,7 +137,7 @@ fn trigger() -> TriggerContext {
         },
         prompt_message_id: Uuid::from_u128(0xf2),
         sender: ContextPerson {
-            id: "macro|sender@example.com".to_owned(),
+            id: "rox|sender@example.com".to_owned(),
             name: "sender@example.com".to_owned(),
             email: Some("sender@example.com".to_owned()),
         },

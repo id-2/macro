@@ -11,7 +11,7 @@ use tower::ServiceExt as _;
 
 use super::*;
 
-const USER_ID: &str = "macro|mode-chooser@example.com";
+const USER_ID: &str = "rox|mode-chooser@example.com";
 
 /// Admits the one token `valid`, as the user above.
 #[derive(Clone)]

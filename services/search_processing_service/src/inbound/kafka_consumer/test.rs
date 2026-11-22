@@ -121,7 +121,7 @@ impl MessageParts for TestMessage {
 }
 
 fn channel_sender() -> ChannelSender<'static> {
-    ChannelSender::try_from("macro|owner@example.com".to_string()).expect("valid channel sender")
+    ChannelSender::try_from("rox|owner@example.com".to_string()).expect("valid channel sender")
 }
 
 /// Builds a [`WorkerPool`] whose worker channels are captured as receivers.
@@ -146,7 +146,7 @@ fn received_thread_backfilled_event(thread_id: Uuid, offset: i64) -> ReceivedEve
 }
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn started_event() -> CallTopicEvent {
@@ -252,7 +252,7 @@ fn draft_email_event(is_spam_or_trash: bool) -> EmailTopicEvent {
 }
 
 fn email_event_cases() -> Vec<(EmailTopicEvent, EmailEventDescription)> {
-    let owner = "macro|owner@example.com".to_string();
+    let owner = "rox|owner@example.com".to_string();
 
     vec![
         (
@@ -1415,7 +1415,7 @@ fn email_message_sync_actions_remove_spam_or_trash_and_upsert_other_messages() {
         describe_email_event(&draft_email_event(false)).action,
         EmailIndexAction::UpsertMessage {
             message_id: MESSAGE_ID,
-            owner: "macro|owner@example.com".to_string(),
+            owner: "rox|owner@example.com".to_string(),
         }
     );
 }
@@ -1479,7 +1479,7 @@ fn document_extraction_actions_preserve_optional_versions() {
     assert_eq!(
         describe_document_event(&content_uploaded).action,
         DocumentIndexAction::ExtractText {
-            owner: "macro|owner@example.com".to_string(),
+            owner: "rox|owner@example.com".to_string(),
             file_type: FileType::Pdf,
             document_version_id: None,
         }
@@ -1507,11 +1507,11 @@ fn document_extraction_actions_preserve_optional_versions() {
 fn document_extractor_messages_disable_index_overrides_and_set_expected_users() {
     let stored = stored_extractor_message(
         DOCUMENT_ID,
-        "macro|owner@example.com".to_string(),
+        "rox|owner@example.com".to_string(),
         FileType::Pdf,
         None,
     );
-    assert_eq!(stored.user_id, "macro|owner@example.com");
+    assert_eq!(stored.user_id, "rox|owner@example.com");
     assert_eq!(stored.document_id, DOCUMENT_ID);
     assert_eq!(stored.file_type, FileType::Pdf);
     assert_eq!(stored.document_version_id, None);
@@ -1709,7 +1709,7 @@ fn calendar_envelope_decodes_round_trip_keyed_by_event_id() {
     let event_id = uuid::Uuid::now_v7();
     let event = CalendarTopicEvent::Updated(CalendarEventMetadata {
         event_id,
-        owner_id: "macro|user".to_string(),
+        owner_id: "rox|user".to_string(),
     });
     let message = encoded_message(
         RoxCalendarTopic::TOPIC_STR,
@@ -1731,7 +1731,7 @@ fn calendar_variants_choose_reindex_or_remove() {
     // instead of spending a query to learn the row is gone.
     let metadata = CalendarEventMetadata {
         event_id: uuid::Uuid::now_v7(),
-        owner_id: "macro|user".to_string(),
+        owner_id: "rox|user".to_string(),
     };
     assert_eq!(
         super::calendar_event::index_action(&CalendarTopicEvent::Created(metadata.clone())).0,
@@ -1755,14 +1755,14 @@ fn calendar_events_shard_by_event_id_so_one_event_stays_ordered() {
     let first = DeclaredMacroEvent::CalendarMacroEvent(CalendarMacroEvent::for_change(
         CalendarTopicEvent::Created(CalendarEventMetadata {
             event_id,
-            owner_id: "macro|user".to_string(),
+            owner_id: "rox|user".to_string(),
         }),
     ));
     // A different variant for the same entity must still shard together.
     let second = DeclaredMacroEvent::CalendarMacroEvent(CalendarMacroEvent::for_change(
         CalendarTopicEvent::Deleted(CalendarEventMetadata {
             event_id,
-            owner_id: "macro|user".to_string(),
+            owner_id: "rox|user".to_string(),
         }),
     ));
     assert_eq!(ordering_key(&first), event_id.to_string());
@@ -1825,7 +1825,7 @@ fn exact_rox_documents_envelopes_decode_into_document_events() {
                 "event_type":"document.content_uploaded",
                 "metadata":{
                     "document_id":"document-id",
-                    "owner":"macro|owner@example.com",
+                    "owner":"rox|owner@example.com",
                     "file_type":"pdf",
                     "document_version_id":"convert"
                 }

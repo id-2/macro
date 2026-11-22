@@ -51,7 +51,7 @@ async fn insert_recipient_inbox(pool: &Pool<Postgres>) -> anyhow::Result<Uuid> {
     let inbox = Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd")?;
     sqlx::query!(
         "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-         VALUES ($1, 'macro|user2@example.com', 'fa-user-2', 'user2@example.com', 'GMAIL', true, NOW(), NOW())",
+         VALUES ($1, 'rox|user2@example.com', 'fa-user-2', 'user2@example.com', 'GMAIL', true, NOW(), NOW())",
         inbox
     )
     .execute(pool)
@@ -60,7 +60,7 @@ async fn insert_recipient_inbox(pool: &Pool<Postgres>) -> anyhow::Result<Uuid> {
 }
 
 fn recipient() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user2@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user2@example.com").unwrap()
 }
 
 fn reply_to(message: Uuid) -> CreateDraftInput {
@@ -192,7 +192,7 @@ async fn revoked_share_keeps_the_reply_draft_when_switching_inboxes(
     let other_inbox = Uuid::parse_str("dddddddd-0000-0000-0000-00000000000e")?;
     sqlx::query!(
         "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-         VALUES ($1, 'macro|user2@example.com', 'fa-user-2', 'user2-alt@example.com', 'GMAIL', true, NOW(), NOW())",
+         VALUES ($1, 'rox|user2@example.com', 'fa-user-2', 'user2-alt@example.com', 'GMAIL', true, NOW(), NOW())",
         other_inbox
     )
     .execute(&pool)

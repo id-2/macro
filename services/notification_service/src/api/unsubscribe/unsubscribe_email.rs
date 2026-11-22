@@ -30,7 +30,7 @@ pub async fn handler(
         .user
         .user_context
         .user_id
-        .replace("macro|", "");
+        .replace("rox|", "");
     notification_db_client::unsubscribe::email::upsert_email_unsubscribe(&ctx.db, &email)
         .await
         .map_err(|e| {

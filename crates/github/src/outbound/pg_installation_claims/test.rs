@@ -5,7 +5,7 @@ use sqlx::{Pool, Postgres};
 use super::PgGithubInstallationClaims;
 use crate::domain::ports::GithubInstallationClaims;
 
-const SOLO: &str = "macro|solo@user.com";
+const SOLO: &str = "rox|solo@user.com";
 const SOLO_GITHUB: &str = "67890";
 
 async fn install(pool: &Pool<Postgres>, installation_id: &str, source_id: &str, source_type: &str) {
@@ -68,8 +68,8 @@ async fn a_claim_comes_from_installing_or_from_a_team(pool: Pool<Postgres>) {
     install(&pool, "200", "dddddddd-dddd-dddd-dddd-dddddddddddd", "team").await;
     let claims = PgGithubInstallationClaims::new(pool);
     let solo = user(SOLO);
-    let alpha_member = user("macro|user@user.com");
-    let beta_member = user("macro|user2@user.com");
+    let alpha_member = user("rox|user@user.com");
+    let beta_member = user("rox|user2@user.com");
 
     assert!(claims.has_claim(&solo, 100).await.unwrap());
     assert!(!claims.has_claim(&solo, 200).await.unwrap());
@@ -89,7 +89,7 @@ async fn linking_is_per_user(pool: Pool<Postgres>) {
     assert!(claims.is_linked(&user(SOLO)).await.unwrap());
     assert!(
         !claims
-            .is_linked(&user("macro|user2@user.com"))
+            .is_linked(&user("rox|user2@user.com"))
             .await
             .unwrap()
     );
@@ -104,13 +104,13 @@ async fn nothing_is_claimed_while_github_is_disconnected(pool: Pool<Postgres>) {
     installed_by(&pool, "100", SOLO_GITHUB).await;
     install(&pool, "200", "dddddddd-dddd-dddd-dddd-dddddddddddd", "team").await;
     relink(&pool, SOLO, None).await;
-    relink(&pool, "macro|user@user.com", None).await;
+    relink(&pool, "rox|user@user.com", None).await;
     let claims = PgGithubInstallationClaims::new(pool);
 
     assert!(!claims.has_claim(&user(SOLO), 100).await.unwrap());
     assert!(
         !claims
-            .has_claim(&user("macro|user@user.com"), 200)
+            .has_claim(&user("rox|user@user.com"), 200)
             .await
             .unwrap()
     );
@@ -127,7 +127,7 @@ async fn a_personal_installation_follows_the_linked_account(pool: Pool<Postgres>
     installed_by(&pool, "101", "55555").await;
     install(&pool, "200", "dddddddd-dddd-dddd-dddd-dddddddddddd", "team").await;
     relink(&pool, SOLO, Some("55555")).await;
-    relink(&pool, "macro|user@user.com", Some("55555")).await;
+    relink(&pool, "rox|user@user.com", Some("55555")).await;
     let claims = PgGithubInstallationClaims::new(pool);
 
     // Made with the account solo disconnected; made with the one linked now.
@@ -136,7 +136,7 @@ async fn a_personal_installation_follows_the_linked_account(pool: Pool<Postgres>
     // A team's installation stays whichever account a member links.
     assert!(
         claims
-            .has_claim(&user("macro|user@user.com"), 200)
+            .has_claim(&user("rox|user@user.com"), 200)
             .await
             .unwrap()
     );

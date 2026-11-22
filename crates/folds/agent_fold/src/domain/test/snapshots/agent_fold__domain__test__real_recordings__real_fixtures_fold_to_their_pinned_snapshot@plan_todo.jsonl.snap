@@ -10,7 +10,7 @@ input_file: crates/folds/agent_fold/fixtures/real/plan_todo.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: Some(

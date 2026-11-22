@@ -8,8 +8,8 @@ use cache_core::people::{
 fn native_person_policy_preserves_scope_and_publication() {
     block_on(async {
         let handle = spawn_handle();
-        let viewer = "macro|viewer@example.com";
-        let user = "macro|person@example.com";
+        let viewer = "rox|viewer@example.com";
+        let user = "rox|person@example.com";
         let contact = "8b6318fd-4063-5ddb-90c2-83a401b63538";
         let mut scope = HydrationScope {
             contact_fence: None,

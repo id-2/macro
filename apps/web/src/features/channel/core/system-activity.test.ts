@@ -15,7 +15,7 @@ import {
   requesterLabel,
 } from './system-activity';
 
-const ACTOR = 'macro|owner@example.com';
+const ACTOR = 'rox|owner@example.com';
 
 function added(
   id: string,
@@ -59,7 +59,7 @@ function rowActivities(
 it('describes completed calls, renames, and self membership changes', () => {
   const event = {
     id: 'a',
-    actor_id: 'macro|teo@example.com',
+    actor_id: 'rox|teo@example.com',
     occurred_at: '2026-09-19T12:00:00Z',
   };
   expect(
@@ -129,9 +129,9 @@ it('formats durations and tolerates malformed future activity', () => {
 
 it('merges consecutive additions by one actor into a row keyed by the newest', () => {
   const built = index([
-    added('a', 'macro|a@example.com'),
-    added('b', 'macro|b@example.com'),
-    added('c', 'macro|c@example.com'),
+    added('a', 'rox|a@example.com'),
+    added('b', 'rox|b@example.com'),
+    added('c', 'rox|c@example.com'),
   ]);
   expect(built.entryKeys).toEqual(['activity:c']);
   const row = decodeSystemActivityRow(rowActivities(built, 'activity:c'));
@@ -139,9 +139,9 @@ it('merges consecutive additions by one actor into a row keyed by the newest', (
   expect(row.action).toEqual({
     kind: 'participant_added',
     participants: [
-      'macro|a@example.com',
-      'macro|b@example.com',
-      'macro|c@example.com',
+      'rox|a@example.com',
+      'rox|b@example.com',
+      'rox|c@example.com',
     ],
   });
   expect(describeSystemActivity(row, 'A, B, C')).toBe('added A, B, C');
@@ -149,10 +149,10 @@ it('merges consecutive additions by one actor into a row keyed by the newest', (
 
 it('keeps additions apart across other actors, joins, and messages', () => {
   const built = index([
-    added('a', 'macro|a@example.com'),
-    added('other', 'macro|b@example.com', 'macro|other@example.com'),
-    added('join', 'macro|other@example.com', 'macro|other@example.com'),
-    added('b', 'macro|b@example.com'),
+    added('a', 'rox|a@example.com'),
+    added('other', 'rox|b@example.com', 'rox|other@example.com'),
+    added('join', 'rox|other@example.com', 'rox|other@example.com'),
+    added('b', 'rox|b@example.com'),
     {
       type: 'message',
       message: {
@@ -160,7 +160,7 @@ it('keeps additions apart across other actors, joins, and messages', () => {
         created_at: '2026-09-19T12:01:00Z',
       } as Extract<MessageTimelineEntry, { type: 'message' }>['message'],
     },
-    added('c', 'macro|c@example.com'),
+    added('c', 'rox|c@example.com'),
   ]);
   expect(built.entryKeys).toEqual([
     'activity:a',

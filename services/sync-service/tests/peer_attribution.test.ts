@@ -49,16 +49,16 @@ const authorized = (path: string) =>
 test("an agent's AI peer resolves to the agent in metadata and blame", async () => {
   const aiPeer = 0xa1a1_a100_0000_0001n;
   const humanPeer = 4242n;
-  await editAs({ user_id: "macro|owner@example.com", actor: "bot|agent-1" }, aiPeer, "agent ");
-  await editAs({ user_id: "macro|human@example.com" }, humanPeer, "human ");
+  await editAs({ user_id: "rox|owner@example.com", actor: "bot|agent-1" }, aiPeer, "agent ");
+  await editAs({ user_id: "rox|human@example.com" }, humanPeer, "human ");
 
   const metadata = (await (await authorized("metadata")).json()) as {
     peers: { peer_id: string; user_id: string; actor: string | null }[];
   };
   expect(metadata.peers).toEqual(
     expect.arrayContaining([
-      { peer_id: aiPeer.toString(), user_id: "macro|owner@example.com", actor: "bot|agent-1" },
-      { peer_id: humanPeer.toString(), user_id: "macro|human@example.com", actor: null },
+      { peer_id: aiPeer.toString(), user_id: "rox|owner@example.com", actor: "bot|agent-1" },
+      { peer_id: humanPeer.toString(), user_id: "rox|human@example.com", actor: null },
     ]),
   );
 
@@ -69,7 +69,7 @@ test("an agent's AI peer resolves to the agent in metadata and blame", async () 
     .run();
   expect(await (await authorized("blame/node")).json()).toEqual({
     peer_id: aiPeer.toString(),
-    user_id: "macro|owner@example.com",
+    user_id: "rox|owner@example.com",
     actor: "bot|agent-1",
     timestamp_ms: 7,
   });
@@ -97,7 +97,7 @@ test("an agent's HTTP update records the agent, and a copy keeps it", async () =
   doc.commit();
   const agentToken = jwt.sign(
     {
-      user_id: "macro|owner@example.com",
+      user_id: "rox|owner@example.com",
       actor: "bot|agent-1",
       document_id: documentId,
       access_level: "edit",
@@ -115,7 +115,7 @@ test("an agent's HTTP update records the agent, and a copy keeps it", async () =
   });
   expect(updated.status).toBe(200);
 
-  const agentPeer = { peer_id: aiPeer.toString(), user_id: "macro|owner@example.com", actor: "bot|agent-1" };
+  const agentPeer = { peer_id: aiPeer.toString(), user_id: "rox|owner@example.com", actor: "bot|agent-1" };
   const metadata = (await (await authorized("metadata")).json()) as { peers: unknown[] };
   expect(metadata.peers).toContainEqual(agentPeer);
 
@@ -128,13 +128,13 @@ test("an agent's HTTP update records the agent, and a copy keeps it", async () =
 
 test("re-registering a peer someone else owns keeps its original author", async () => {
   const peer = 0xa1a1_a100_0000_0003n;
-  await editAs({ user_id: "macro|owner@example.com", actor: "bot|agent-1" }, peer, "agent ");
-  await editAs({ user_id: "macro|other@example.com" }, peer, "other ");
+  await editAs({ user_id: "rox|owner@example.com", actor: "bot|agent-1" }, peer, "agent ");
+  await editAs({ user_id: "rox|other@example.com" }, peer, "other ");
 
   const metadata = (await (await authorized("metadata")).json()) as { peers: unknown[] };
   expect(metadata.peers).toContainEqual({
     peer_id: peer.toString(),
-    user_id: "macro|owner@example.com",
+    user_id: "rox|owner@example.com",
     actor: "bot|agent-1",
   });
 });

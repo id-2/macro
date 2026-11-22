@@ -156,7 +156,7 @@ impl CalendarChangeQueryService for FakeReads {
     }
 }
 
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 
 async fn execute(reads: Arc<FakeReads>, query: &str) -> async_graphql::Response {
     let schema = Schema::build(

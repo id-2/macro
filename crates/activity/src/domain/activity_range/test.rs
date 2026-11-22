@@ -125,8 +125,8 @@ fn record() -> ActivityRecord {
         agent_correlation_id: None,
         agent_verb: None,
         id: Uuid::from_u128(1),
-        actor: Actor::new_from_user(user("macro|agent@example.com")),
-        subject_id: "macro|caller@example.com".to_string(),
+        actor: Actor::new_from_user(user("rox|agent@example.com")),
+        subject_id: "rox|caller@example.com".to_string(),
         entity_type: crate::EntityType::Document,
         entity_id: "doc-1".to_string(),
         action: RecordedAction::Known(Action::Edited),
@@ -174,7 +174,7 @@ async fn reads_only_the_authenticated_users_activity_with_a_fixed_cap() {
     let queries = Arc::clone(&reads.queries);
     let response = ReadActivityResponse::read(
         &ActivityReadService::new(reads),
-        &user("macro|caller@example.com"),
+        &user("rox|caller@example.com"),
         from,
         to,
     )
@@ -184,7 +184,7 @@ async fn reads_only_the_authenticated_users_activity_with_a_fixed_cap() {
     assert_eq!(
         queries.lock().unwrap().as_slice(),
         &[RangeQuery {
-            subject_id: "macro|caller@example.com".to_string(),
+            subject_id: "rox|caller@example.com".to_string(),
             from,
             to,
             limit: NonZeroU32::new(100).unwrap(),
@@ -192,7 +192,7 @@ async fn reads_only_the_authenticated_users_activity_with_a_fixed_cap() {
     );
     assert!(response.truncated);
     assert_eq!(response.activities.len(), 1);
-    assert_eq!(response.activities[0].actor_id, "macro|agent@example.com");
+    assert_eq!(response.activities[0].actor_id, "rox|agent@example.com");
     assert_eq!(response.activities[0].entity_type, "document");
     assert_eq!(response.activities[0].entity_id, "doc-1");
     assert_eq!(response.activities[0].action, ToolActivityAction::Edited);
@@ -208,7 +208,7 @@ async fn rejects_an_empty_or_reversed_range_before_reading() {
     let queries = Arc::clone(&reads.queries);
     let error = ReadActivityResponse::read(
         &ActivityReadService::new(reads),
-        &user("macro|caller@example.com"),
+        &user("rox|caller@example.com"),
         at,
         at,
     )
@@ -239,7 +239,7 @@ async fn resolves_property_and_option_names_for_the_reader() {
 
     let response = ReadActivityResponse::read(
         &ActivityReadService::new(reads).with_metadata_resolver(FakeMetadata),
-        &user("macro|caller@example.com"),
+        &user("rox|caller@example.com"),
         time("2026-08-17T12:00:00Z"),
         time("2026-08-17T14:00:00Z"),
     )

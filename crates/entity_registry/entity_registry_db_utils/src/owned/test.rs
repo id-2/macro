@@ -17,7 +17,7 @@ impl BotFacts for Facts {
 }
 
 fn user() -> Owner {
-    Owner::parse(OwnerType::User, "macro|sponsor@example.com").unwrap()
+    Owner::parse(OwnerType::User, "rox|sponsor@example.com").unwrap()
 }
 
 fn registrar(sponsor: Option<Owner>) -> OwnedEntityRegistrar<Facts> {

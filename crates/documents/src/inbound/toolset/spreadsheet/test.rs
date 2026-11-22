@@ -24,7 +24,7 @@ fn edit_operations_reject_unknown_actions_and_style_properties() {
 #[tokio::test]
 async fn cancelled_request_never_starts_the_worker_operation() {
     let req = RequestContext::new(
-        rox_user_id::user_id::RoxUserIdStr::try_from("macro|test@example.com".to_owned())
+        rox_user_id::user_id::RoxUserIdStr::try_from("rox|test@example.com".to_owned())
             .unwrap(),
     );
     req.cancel.cancel();

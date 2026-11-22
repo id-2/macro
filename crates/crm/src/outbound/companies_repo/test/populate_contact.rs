@@ -35,7 +35,7 @@ async fn service_populate_contact_skips_when_domain_matches_user_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -73,7 +73,7 @@ async fn service_populate_contact_same_domain_check_is_case_insensitive(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "User@ROX.one").await?;
@@ -110,7 +110,7 @@ async fn service_populate_contact_refreshes_existing_company_and_contact_updated
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -191,7 +191,7 @@ async fn service_populate_contact_refreshes_existing_company_and_contact_updated
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_populate_contact_writes_when_domain_differs(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -226,7 +226,7 @@ async fn service_populate_contact_writes_when_domain_differs(pool: PgPool) -> an
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_is_available_when_legacy_settings_missing(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|user@rox.one";
+    let owner = "rox|user@rox.one";
     seed_team(&pool, team, owner).await?;
     // intentionally no team_crm_settings row
 
@@ -243,7 +243,7 @@ async fn precheck_is_available_when_legacy_settings_missing(pool: PgPool) -> any
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_resolves_domain_with_company_state(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|user@rox.one";
+    let owner = "rox|user@rox.one";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     insert_company(&pool, team, true, &["acme.example.com"]).await?;
@@ -282,7 +282,7 @@ async fn precheck_reports_hidden_and_email_sync_disabled_companies(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|user@rox.one";
+    let owner = "rox|user@rox.one";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     let hidden_co = insert_company(&pool, team, false, &["hidden.com"]).await?;
@@ -305,7 +305,7 @@ async fn precheck_reports_hidden_and_email_sync_disabled_companies(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_address_resolves_contact_within_team(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|user@rox.one";
+    let owner = "rox|user@rox.one";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["acme.example.com"]).await?;
@@ -347,8 +347,8 @@ async fn precheck_address_resolves_contact_within_team(pool: PgPool) -> anyhow::
 async fn precheck_address_does_not_leak_other_team_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    let owner_a = "macro|owner_a@test.com";
-    let owner_b = "macro|owner_b@test.com";
+    let owner_a = "rox|owner_a@test.com";
+    let owner_b = "rox|owner_b@test.com";
     seed_team(&pool, team_a, owner_a).await?;
     seed_team(&pool, team_b, owner_b).await?;
     enable_crm_for_team(&pool, team_b).await?;
@@ -371,7 +371,7 @@ async fn precheck_address_does_not_leak_other_team_contacts(pool: PgPool) -> any
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_is_sent_false_skips_when_no_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -413,7 +413,7 @@ async fn populate_contact_insert_seeds_first_and_last_from_payload(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -470,7 +470,7 @@ async fn populate_contact_is_sent_true_merges_first_least_and_last_greatest(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -566,7 +566,7 @@ async fn populate_contact_is_sent_false_leaves_first_interaction_unchanged(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -669,7 +669,7 @@ async fn populate_contact_is_sent_false_inserts_contact_at_existing_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -747,7 +747,7 @@ async fn populate_contact_without_consent_noops_both_directions(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     // No explicit mailbox consent, regardless of legacy team settings.
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -797,7 +797,7 @@ async fn populate_contact_without_consent_noops_both_directions(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_respects_legacy_company_block(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -861,7 +861,7 @@ async fn populate_contact_seed_style_range_merges_into_existing(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -935,7 +935,7 @@ async fn email_sync_disable_then_re_enable_requires_eligible_backfill(
     // Blocking preserves old rows but stops new ingestion; unblocking queues
     // backfill, whose consumer rechecks the eligible stored history.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -1030,7 +1030,7 @@ async fn populate_contact_into_hidden_company_inserts_hidden_contact(
     // team-level CRM killswitch is on), so this is the only line of
     // defense.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;
@@ -1075,7 +1075,7 @@ async fn populate_contact_upsert_does_not_overwrite_individual_hide(
     // existing `hidden` so individual `set_contact_hidden` actions
     // survive subsequent email activity.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|user@rox.one";
+    let owner_id = "rox|user@rox.one";
     seed_team(&pool, team_id, owner_id).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner_id, "user@rox.one").await?;

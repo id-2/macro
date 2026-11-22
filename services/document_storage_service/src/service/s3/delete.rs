@@ -82,7 +82,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_delete_document() {
-        let owner = Owner::from_principal_str("macro|user@example.com").unwrap();
+        let owner = Owner::from_principal_str("rox|user@example.com").unwrap();
         let mut mock = S3::default();
         mock.expect_delete_document()
             .with(eq(owner.clone()), eq("document_id"))

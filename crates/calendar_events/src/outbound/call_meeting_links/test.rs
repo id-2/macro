@@ -46,7 +46,7 @@ fn provider_validation_failures_surface_as_invalid_input() {
 
 #[test]
 fn requester_ids_must_be_rox_user_ids() {
-    assert!(requester("macro|owner@example.com").is_ok());
+    assert!(requester("rox|owner@example.com").is_ok());
     assert!(matches!(
         requester("not a user id"),
         Err(MeetingLinkError::InvalidInput(_))

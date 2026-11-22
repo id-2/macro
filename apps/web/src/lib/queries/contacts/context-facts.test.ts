@@ -4,7 +4,7 @@ import { buildContactContextFacts } from './context-facts';
 
 it('uses source-order interaction but viewed-first one-to-one command activity, never a group target', () => {
   const result = buildContactContextFacts({
-    viewer: 'macro|self@example.com',
+    viewer: 'rox|self@example.com',
     channels: [
       {
         id: '00000000-0000-4000-8000-000000000001',
@@ -13,8 +13,8 @@ it('uses source-order interaction but viewed-first one-to-one command activity, 
         updated_at: '2026-01-02T00:00:00Z',
         viewed_at: '2026-01-03T00:00:00Z',
         participants: [
-          { user_id: 'macro|self@example.com' },
-          { user_id: 'macro|peer@example.com' },
+          { user_id: 'rox|self@example.com' },
+          { user_id: 'rox|peer@example.com' },
         ],
       },
       {
@@ -23,9 +23,9 @@ it('uses source-order interaction but viewed-first one-to-one command activity, 
         name: 'Group',
         updated_at: '2026-01-04T00:00:00Z',
         participants: [
-          { user_id: 'macro|self@example.com' },
-          { user_id: 'macro|peer@example.com' },
-          { user_id: 'macro|other@example.com' },
+          { user_id: 'rox|self@example.com' },
+          { user_id: 'rox|peer@example.com' },
+          { user_id: 'rox|other@example.com' },
         ],
       },
     ],
@@ -44,15 +44,15 @@ it('uses source-order interaction but viewed-first one-to-one command activity, 
         id: '00000000-0000-4000-8000-000000000001',
         name: 'Cached peer label',
         channelType: 'direct_message',
-        participantIds: ['macro|self@example.com', 'macro|peer@example.com'],
-        ownerId: 'macro|self@example.com',
+        participantIds: ['rox|self@example.com', 'rox|peer@example.com'],
+        ownerId: 'rox|self@example.com',
         createdAt: '2026-01-01T00:00:00Z',
         updatedAt: '2026-01-06T00:00:00Z',
       },
     ],
   });
   expect(result.size).toBe(1);
-  expect(result.get('macro|peer@example.com')).toEqual({
+  expect(result.get('rox|peer@example.com')).toEqual({
     lastInteractionMs: Date.parse('2026-01-04T00:00:00Z'),
     secondaryInbox: true,
     directMessage: {
@@ -65,7 +65,7 @@ it('uses source-order interaction but viewed-first one-to-one command activity, 
 
 it('excludes the viewer case-insensitively from peers and command targets', () => {
   const result = buildContactContextFacts({
-    viewer: 'MACRO|SELF@example.com',
+    viewer: 'ROX|SELF@example.com',
     activity: [],
     links: [],
     channels: [
@@ -76,8 +76,8 @@ it('excludes the viewer case-insensitively from peers and command targets', () =
         updated_at: '2026-01-02T00:00:00Z',
         viewed_at: '2026-01-03T00:00:00Z',
         participants: [
-          { user_id: 'macro|SELF@example.com' },
-          { user_id: 'MACRO|PEER@example.com' },
+          { user_id: 'rox|SELF@example.com' },
+          { user_id: 'ROX|PEER@example.com' },
         ],
       },
     ],
@@ -86,22 +86,22 @@ it('excludes the viewer case-insensitively from peers and command targets', () =
         id: '00000000-0000-4000-8000-000000000001',
         name: 'Peer',
         channelType: 'direct_message',
-        participantIds: ['MACRO|SELF@example.com', 'MACRO|PEER@example.com'],
-        ownerId: 'macro|self@example.com',
+        participantIds: ['ROX|SELF@example.com', 'ROX|PEER@example.com'],
+        ownerId: 'rox|self@example.com',
         createdAt: '2026-01-01T00:00:00Z',
         updatedAt: '2026-01-04T00:00:00Z',
       },
     ],
   });
-  expect([...result.keys()]).toEqual(['macro|peer@example.com']);
-  expect(result.get('macro|peer@example.com')?.directMessage?.id).toBe(
+  expect([...result.keys()]).toEqual(['rox|peer@example.com']);
+  expect(result.get('rox|peer@example.com')?.directMessage?.id).toBe(
     '00000000-0000-4000-8000-000000000001'
   );
 });
 
 it('ignores malformed peers and oversized labels without losing valid activity or other rows', () => {
   const result = buildContactContextFacts({
-    viewer: 'macro|self@example.com',
+    viewer: 'rox|self@example.com',
     activity: [],
     links: [],
     cachedChannels: [],
@@ -111,7 +111,7 @@ it('ignores malformed peers and oversized labels without losing valid activity o
         channel_type: ChannelType.direct_message,
         name: 'é'.repeat(2049),
         updated_at: '1970-01-01T00:00:00Z',
-        participants: [{ user_id: 'macro|peer@example.com' }],
+        participants: [{ user_id: 'rox|peer@example.com' }],
       },
       {
         id: '00000000-0000-4000-8000-000000000002',
@@ -123,7 +123,7 @@ it('ignores malformed peers and oversized labels without losing valid activity o
     ],
   });
   expect(result.size).toBe(1);
-  expect(result.get('macro|peer@example.com')).toEqual({
+  expect(result.get('rox|peer@example.com')).toEqual({
     lastInteractionMs: 0,
     directMessage: null,
     secondaryInbox: false,

@@ -19,12 +19,12 @@ async fn can_edit_matches_http_value_and_totp_write_authorization() {
         availability: Arc::new(FakeAvailability),
     };
     let creator = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|creator@example.com")
             .unwrap()
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|synthetic@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|synthetic@example.test")
             .unwrap()
             .into_owned(),
     };

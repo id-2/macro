@@ -154,9 +154,9 @@ async fn shared_definitions_keep_the_callers_context_and_check_each_sessions_gat
         calls: Mutex::new(Vec::new()),
     });
     for (session, user, label) in [
-        (allowed, "macro|first@example.com", "first turn"),
-        (refused, "macro|second@example.com", "refused turn"),
-        (allowed, "macro|third@example.com", "third turn"),
+        (allowed, "rox|first@example.com", "first turn"),
+        (refused, "rox|second@example.com", "refused turn"),
+        (allowed, "rox|third@example.com", "third turn"),
     ] {
         let tools = GatedToolSet {
             tools: Arc::clone(&definitions),

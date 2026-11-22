@@ -26,7 +26,7 @@ const DOCUMENT_ID: &str = "created-task";
 const EMAIL_SEED: &str = r#"<m-document-mention>{"documentId":"thread-7","blockName":"email","documentName":"Re: invoice"}</m-document-mention>"#;
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap()
 }
 
 fn team_bot() -> CreationPrincipal {
@@ -349,7 +349,7 @@ async fn markdown_creation_tracks_the_seeded_mentions_once() {
         tracker.calls(),
         vec![(
             DOCUMENT_ID.to_string(),
-            Some("macro|owner@example.com".to_string()),
+            Some("rox|owner@example.com".to_string()),
             EMAIL_SEED.to_string(),
         )]
     );
@@ -380,7 +380,7 @@ async fn notion_creation_tracks_the_mentions_of_the_converted_markdown() {
         tracker.calls(),
         vec![(
             DOCUMENT_ID.to_string(),
-            Some("macro|owner@example.com".to_string()),
+            Some("rox|owner@example.com".to_string()),
             "converted: <mention-page url=\"https://www.notion.so/p\">Plan</mention-page>"
                 .to_string(),
         )]
@@ -432,7 +432,7 @@ async fn mentions_are_tracked_with_an_optional_acting_user() {
         user: owner(),
     };
     for (principal, expected_user) in [
-        (bot_for_user, Some("macro|owner@example.com")),
+        (bot_for_user, Some("rox|owner@example.com")),
         (team_bot(), None),
     ] {
         let tracker = RecordingMentionTracker::default();

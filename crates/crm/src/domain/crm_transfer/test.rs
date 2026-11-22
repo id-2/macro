@@ -18,7 +18,7 @@ use crate::domain::{
 
 fn viewer() -> Viewer {
     Viewer {
-        user_id: RoxUserIdStr::parse_from_str("macro|me@example.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|me@example.com")
             .unwrap()
             .into_owned(),
         acting_bot: None,
@@ -44,7 +44,7 @@ fn overview(record_type: PipelineRecordType) -> PipelineOverview {
                 commercial_fields: Default::default(),
                 id: Uuid::now_v7(),
                 team_id: Uuid::now_v7(),
-                user_id: "macro|me@example.com".into(),
+                user_id: "rox|me@example.com".into(),
                 name: "Deals".into(),
                 record_type: Some(record_type),
                 database_id: DatabaseId::new(),
@@ -770,7 +770,7 @@ async fn an_export_writes_people_as_emails_and_reimports() {
             ("Stage".into(), FieldValue::Labels(vec!["Lead".into()])),
             (
                 "Owner".into(),
-                FieldValue::References(vec!["macro|jane@rox.one".into()]),
+                FieldValue::References(vec!["rox|jane@rox.one".into()]),
             ),
             ("Revenue".into(), FieldValue::Number(48000.1234)),
             (

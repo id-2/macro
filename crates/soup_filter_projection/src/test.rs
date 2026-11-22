@@ -12,7 +12,7 @@ use super::*;
 use soup::domain::models::SoupDocumentServerFacts;
 
 fn owner() -> Owner {
-    Owner::from_principal_str("macro|owner@example.com").unwrap()
+    Owner::from_principal_str("rox|owner@example.com").unwrap()
 }
 
 fn timestamp(micros: u32) -> chrono::DateTime<Utc> {
@@ -98,7 +98,7 @@ fn optimistic_direct_projection_and_patch_share_authoritative_vocabulary() {
         record_key: key.clone(),
         kind: SoupFlatEntityKind::Document,
         id: Uuid::from_u128(1),
-        owner: "macro|owner@example.com".to_owned(),
+        owner: "rox|owner@example.com".to_owned(),
         project_id: None,
         file_type: Some(".MD".to_owned()),
         created_at: timestamp(1),

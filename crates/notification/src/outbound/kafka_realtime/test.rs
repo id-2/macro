@@ -93,8 +93,8 @@ async fn publishes_one_event_per_call_with_all_recipients() {
         TokioSpawner,
     ));
     let recipients = [
-        user("macro|first@example.com"),
-        user("macro|second@example.com"),
+        user("rox|first@example.com"),
+        user("rox|second@example.com"),
     ];
     let notification = notification();
 
@@ -137,11 +137,11 @@ async fn publishes_one_event_per_call_with_all_recipients() {
     );
     assert_eq!(
         payload["metadata"]["notifications"][0]["owner_id"],
-        "macro|first@example.com"
+        "rox|first@example.com"
     );
     assert_eq!(
         payload["metadata"]["notifications"][1]["owner_id"],
-        "macro|second@example.com"
+        "rox|second@example.com"
     );
 
     let decoded = NotificationMacroEvent::decode(record.key.clone(), &record.payload)
@@ -188,7 +188,7 @@ async fn propagates_publish_failures() {
     ));
 
     sender
-        .send_notifications(&[user("macro|recipient@example.com")], &notification())
+        .send_notifications(&[user("rox|recipient@example.com")], &notification())
         .await
         .expect_err("publish failure propagates");
 }
@@ -217,7 +217,7 @@ async fn propagates_serialization_failures_without_publishing() {
 
     sender
         .send_notifications(
-            &[user("macro|recipient@example.com")],
+            &[user("rox|recipient@example.com")],
             &SerializationFailure,
         )
         .await

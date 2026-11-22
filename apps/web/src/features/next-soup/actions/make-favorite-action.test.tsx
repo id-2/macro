@@ -64,7 +64,7 @@ beforeEach(() => {
   getGraphqlSoupClient.mockReturnValue({
     executeQuery: vi.fn(() =>
       fromValue({
-        data: { user: { id: 'macro|user@example.com', favorites: [] } },
+        data: { user: { id: 'rox|user@example.com', favorites: [] } },
       })
     ),
     mutation,

@@ -269,7 +269,7 @@ export class RoxClient {
 
   /**
    * The authenticated caller's mentionable principal — `bot|<uuid>` for bot
-   * auth, `macro|<email>` for user auth — fetched once and cached. Failed
+   * auth, `rox|<email>` for user auth — fetched once and cached. Failed
    * lookups are not cached, so a later call retries.
    */
   myPrincipalId(): Promise<string> {

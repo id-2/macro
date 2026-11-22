@@ -174,7 +174,7 @@ fn every_value_kind_round_trips_through_json() {
         CellValue::Options(vec![OptionRef::Id(GOING), OptionRef::Label("Going".into())]),
         CellValue::Entities(vec![EntityRef {
             entity_type: EntityKind::User,
-            entity_id: "macro|sam@rox.one".into(),
+            entity_id: "rox|sam@rox.one".into(),
         }]),
         CellValue::Rows(vec![SAM]),
         CellValue::Clear,
@@ -191,7 +191,7 @@ fn every_value_kind_round_trips_through_json() {
             {"type": "date", "value": "2026-09-30T00:00:00Z"},
             {"type": "link", "value": ["https://rox.one"]},
             {"type": "options", "value": [{"id": GOING}, {"label": "Going"}]},
-            {"type": "entities", "value": [{"entityType": "USER", "entityId": "macro|sam@rox.one"}]},
+            {"type": "entities", "value": [{"entityType": "USER", "entityId": "rox|sam@rox.one"}]},
             {"type": "rows", "value": [SAM]},
             {"type": "clear"},
         ])

@@ -8,7 +8,7 @@ fn signed_execution_token_preserves_owner_agent_and_lifetime() {
         agent_correlation_id: Some(uuid::Uuid::from_u128(123)),
         agent_session_id: Some(uuid::Uuid::from_u128(456)),
         fusionauth_id: "fusion-owner".into(),
-        rox_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "rox|owner@example.com".into(),
         organization_id: Some(42),
         issuer: "execution-test".into(),
         private_key: tests::PRIVATE_KEY.into(),
@@ -38,7 +38,7 @@ fn signed_execution_token_preserves_owner_agent_and_lifetime() {
     );
     assert_eq!(claims.agent_session_id, Some(uuid::Uuid::from_u128(456)));
     assert_eq!(claims.agent_via.as_deref(), Some("Claude Code"));
-    assert_eq!(claims.rox_user_id, "macro|owner@example.com");
+    assert_eq!(claims.rox_user_id, "rox|owner@example.com");
     assert_eq!(claims.rox_organization_id, Some(42));
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -65,7 +65,7 @@ fn signed_execution_token_preserves_owner_agent_and_lifetime() {
 fn legacy_user_token_has_no_agent_attribution() {
     let claims: RoxApiToken = serde_json::from_value(serde_json::json!({
         "exp": 12345, "iss": "test", "fusion_user_id": "fusion-owner",
-        "rox_user_id": "macro|owner@example.com", "rox_organization_id": null,
+        "rox_user_id": "rox|owner@example.com", "rox_organization_id": null,
     }))
     .unwrap();
     assert_eq!(claims.agent_id, None);
@@ -80,7 +80,7 @@ fn signed_routine_token_carries_its_routine_and_rejects_a_forged_one() {
     let routine = uuid::Uuid::from_u128(0x7001);
     let token = encode_rox_api_token(EncodeMacroApiTokenArgs {
         fusionauth_id: "fusion-owner".into(),
-        rox_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "rox|owner@example.com".into(),
         organization_id: None,
         issuer: "routine-test".into(),
         private_key: tests::PRIVATE_KEY.into(),
@@ -111,7 +111,7 @@ fn signed_routine_token_carries_its_routine_and_rejects_a_forged_one() {
     // A payload without the routine cannot borrow the routine token's signature.
     let plain_token = encode_rox_api_token(EncodeMacroApiTokenArgs {
         fusionauth_id: "fusion-owner".into(),
-        rox_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "rox|owner@example.com".into(),
         organization_id: None,
         issuer: "routine-test".into(),
         private_key: tests::PRIVATE_KEY.into(),
@@ -149,7 +149,7 @@ fn a_signed_scope_survives_decoding_and_cannot_be_dropped() {
     let mint = |agent_scope: Option<&str>| {
         encode_rox_api_token(EncodeMacroApiTokenArgs {
             fusionauth_id: "fusion-owner".into(),
-            rox_user_id: "macro|owner@example.com".into(),
+            rox_user_id: "rox|owner@example.com".into(),
             organization_id: None,
             issuer: "scope-test".into(),
             private_key: tests::PRIVATE_KEY.into(),

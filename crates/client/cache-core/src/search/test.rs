@@ -16,7 +16,7 @@ fn only_directory_contacts_prove_person_membership() {
             ("__typename", typename),
             ("name", "  CAFÉ   Person "),
             ("email", "PERSON@example.com"),
-            ("userId", "macro|person@example.com"),
+            ("userId", "rox|person@example.com"),
         ]);
         let key = EntityKey::entity(typename, &["viewer-scoped-record"]);
         let documents = project_search_documents(&key, &record);

@@ -27,14 +27,14 @@ describe('task filter extraction', () => {
   it('requests strict JSON without a personal catalog or fixed viewer disclosure', () => {
     const request = buildAiTaskFilterRequest('  high priority  ', {
       ...catalog,
-      viewer: 'macro|viewer@example.com',
+      viewer: 'rox|viewer@example.com',
     });
     expect(request.messages.at(-1)).toEqual({
       role: 'user',
       content: 'high priority',
     });
     expect(request.messages[0].content).not.toContain(
-      'macro|viewer@example.com'
+      'rox|viewer@example.com'
     );
     expect(request.messages[0].content).toContain(TASK_VIEWER);
     expect(buildAiTaskFilterResponseFormat().json_schema.strict).toBe(true);
@@ -56,7 +56,7 @@ describe('task filter extraction', () => {
 describe('task filter resolution', () => {
   it('retains viewer semantics while literal identities stay fixed', () => {
     const person = vi.fn((label: string) =>
-      label === 'viewer@example.com' ? 'macro|viewer@example.com' : undefined
+      label === 'viewer@example.com' ? 'rox|viewer@example.com' : undefined
     );
     const data = {
       ...reply,
@@ -68,7 +68,7 @@ describe('task filter resolution', () => {
       plan: {
         facets: {
           status: ['in-progress'],
-          assignees: [TASK_VIEWER, 'macro|viewer@example.com'],
+          assignees: [TASK_VIEWER, 'rox|viewer@example.com'],
           'created-by': [TASK_VIEWER],
         },
         search: undefined,
@@ -77,17 +77,17 @@ describe('task filter resolution', () => {
     });
     const embedded = resolveAiTaskFilterPlan(
       data,
-      { ...catalog, viewer: 'macro|viewer@example.com' },
+      { ...catalog, viewer: 'rox|viewer@example.com' },
       person
     );
     expect(embedded.ok && embedded.plan.facets.assignees).toEqual([
-      'macro|viewer@example.com',
+      'rox|viewer@example.com',
     ]);
     expect(person).not.toHaveBeenCalledWith(TASK_VIEWER);
   });
   it('does not apply other restrictions or free text when any person is unresolved', () => {
     const person = (label: string) =>
-      label === 'Known' ? 'macro|known@example.com' : undefined;
+      label === 'Known' ? 'rox|known@example.com' : undefined;
     for (const data of [
       { ...reply, assignees: ['Known', 'Unknown'], search: 'billing' },
       {
@@ -104,7 +104,7 @@ describe('task filter resolution', () => {
   });
   it('preserves model name boundaries and existing status/tag/search behavior', () => {
     const person = vi.fn((label: string) =>
-      label === 'Family, Given' ? 'macro|person@example.com' : undefined
+      label === 'Family, Given' ? 'rox|person@example.com' : undefined
     );
     const result = resolveAiTaskFilterPlan(
       {
@@ -124,7 +124,7 @@ describe('task filter resolution', () => {
       plan: {
         facets: {
           status: ['in-progress'],
-          assignees: ['macro|person@example.com'],
+          assignees: ['rox|person@example.com'],
           priority: ['high'],
           tags: ['tag-design'],
         },

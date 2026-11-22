@@ -12,7 +12,7 @@ use crate::domain::models::{
     AgentApiKey, AgentRepo, ComputerSize, ComputerState, RepoToken, VoiceModel,
 };
 
-const ADMIN: &str = "macro|admin@example.com";
+const ADMIN: &str = "rox|admin@example.com";
 const TEAM: &str = "0193a1b2-0000-7000-8000-0000000000aa";
 const COMPUTER: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00c1);
 
@@ -372,7 +372,7 @@ async fn inviting_an_agent_creates_its_account_seat_repo_and_computer_in_order()
     assert_eq!(agent.name, "Sam Rivera");
     assert_eq!(agent.status, TeamAgentStatus::Provisioning);
     assert_eq!(agent.computer_id, Some(ComputerId::new_from_uuid(COMPUTER)));
-    assert!(agent.user_id.as_ref().starts_with("macro|sam-rivera-"));
+    assert!(agent.user_id.as_ref().starts_with("rox|sam-rivera-"));
     assert!(agent.user_id.as_ref().ends_with("@agents.macro.invalid"));
     let entries = journal.entries();
     assert_eq!(entries.len(), 4);
@@ -381,7 +381,7 @@ async fn inviting_an_agent_creates_its_account_seat_repo_and_computer_in_order()
     assert_eq!(entries[2], "repo.create Sam Rivera");
     assert_eq!(
         entries[3],
-        "computer.purchase Sam Rivera by macro|admin@example.com"
+        "computer.purchase Sam Rivera by rox|admin@example.com"
     );
 }
 
@@ -415,7 +415,7 @@ async fn a_refused_purchase_takes_back_the_repo_seat_and_account() {
     assert_eq!(
         entries[3..],
         [
-            "computer.purchase Sam Rivera by macro|admin@example.com".to_owned(),
+            "computer.purchase Sam Rivera by rox|admin@example.com".to_owned(),
             "repo.delete".to_owned(),
             "team.undo".to_owned(),
             "account.delete".to_owned(),

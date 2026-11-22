@@ -11,7 +11,7 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 pub const SESSION: &str = "00000000-0000-0000-0000-000000000001";
-pub const USER: &str = "macro|viewer@example.com";
+pub const USER: &str = "rox|viewer@example.com";
 /// The session every fixture receipt and identity refers to.
 pub fn session() -> AgentSessionId {
     SESSION.parse().unwrap()

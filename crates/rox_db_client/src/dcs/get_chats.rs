@@ -53,7 +53,7 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("chat_example")))]
     async fn test_get_chats(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        let chats = get_chats(&pool, "macro|user@user.com").await?;
+        let chats = get_chats(&pool, "rox|user@user.com").await?;
         assert_eq!(chats.len(), 3);
         Ok(())
     }

@@ -3,7 +3,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 async fn channel(pool: &PgPool) -> Uuid {
     let id = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', 'macro|dm@example.com')", id)
+    sqlx::query!("INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', 'rox|dm@example.com')", id)
         .execute(pool).await.unwrap();
     id
 }

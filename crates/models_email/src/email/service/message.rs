@@ -328,7 +328,7 @@ pub struct ScheduledMessage {
     /// whether the message is currently being processed by the background job.
     pub processing: bool,
     /// The authenticated user who initiated the send, as a principal string
-    /// (`macro|…`). `None` for rows created before actor tracking existed.
+    /// (`rox|…`). `None` for rows created before actor tracking existed.
     pub actor_id: Option<String>,
     /// Code-mode invocation that scheduled this delivery.
     #[serde(default)]

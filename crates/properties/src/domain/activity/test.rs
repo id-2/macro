@@ -38,7 +38,7 @@ fn update(actor: Option<RoxUserIdStr<'static>>) -> EntityPropertyUpdatedMetadata
 #[test]
 fn property_update_carries_the_previous_value_as_the_transition_from() {
     let previous = PropertyValue::SelectOption(vec![Uuid::from_u128(7)]);
-    let mut metadata = update(Some(user("macro|seamus@example.com")));
+    let mut metadata = update(Some(user("rox|seamus@example.com")));
     metadata.previous_value = Some(previous.clone());
     let event = envelope(PropertyTopicEvent::EntityPropertyUpdated(metadata));
 
@@ -60,7 +60,7 @@ fn property_update_carries_the_previous_value_as_the_transition_from() {
 #[test]
 fn task_property_update_maps_to_property_changed_on_the_document() {
     let event = envelope(PropertyTopicEvent::EntityPropertyUpdated(update(Some(
-        user("macro|seamus@example.com"),
+        user("rox|seamus@example.com"),
     ))));
 
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
@@ -70,8 +70,8 @@ fn task_property_update_maps_to_property_changed_on_the_document() {
     // `actor_user_id` (main's TaskPropertiesAdapter receipt) is Direct(user):
     // the feed renders "You" for that owner.
     assert_eq!(activities[0].entity_type, ActivityEntityType::Document);
-    assert_eq!(activities[0].actor.as_ref(), "macro|seamus@example.com");
-    assert_eq!(activities[0].subject_id, "macro|seamus@example.com");
+    assert_eq!(activities[0].actor.as_ref(), "rox|seamus@example.com");
+    assert_eq!(activities[0].subject_id, "rox|seamus@example.com");
     match &activities[0].action {
         Action::PropertyChanged(change) => {
             assert_eq!(change.property, Uuid::from_u128(3).to_string());
@@ -91,7 +91,7 @@ fn unattributed_property_update_is_dropped() {
 
 #[test]
 fn initiative_property_changes_keep_the_initiative_identity() {
-    let mut metadata = update(Some(user("macro|seamus@example.com")));
+    let mut metadata = update(Some(user("rox|seamus@example.com")));
     metadata.entity_type = PropertyEntityType::Initiative;
     let event = envelope(PropertyTopicEvent::EntityPropertyUpdated(metadata));
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
@@ -103,7 +103,7 @@ fn initiative_property_changes_keep_the_initiative_identity() {
 
 #[test]
 fn database_row_property_changes_have_no_activity() {
-    let mut metadata = update(Some(user("macro|seamus@example.com")));
+    let mut metadata = update(Some(user("rox|seamus@example.com")));
     metadata.entity_type = PropertyEntityType::DatabaseRow;
     let event = envelope(PropertyTopicEvent::EntityPropertyUpdated(metadata));
     assert_eq!(event.event.ingest(event.event_id), Ingest::Ignore);
@@ -116,7 +116,7 @@ fn delegated_property_update_keeps_the_user_as_subject() {
         Actor::try_from("bot|00000000-0000-0000-0000-000000005759".to_string())
             .expect("system bot"),
     );
-    metadata.on_behalf_of = Some(user("macro|owner@example.com"));
+    metadata.on_behalf_of = Some(user("rox|owner@example.com"));
     let event = envelope(PropertyTopicEvent::EntityPropertyUpdated(metadata));
 
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
@@ -126,7 +126,7 @@ fn delegated_property_update_keeps_the_user_as_subject() {
         activities[0].actor.as_ref(),
         "bot|00000000-0000-0000-0000-000000005759"
     );
-    assert_eq!(activities[0].subject_id, "macro|owner@example.com");
+    assert_eq!(activities[0].subject_id, "rox|owner@example.com");
 }
 
 fn project(id: &str) -> Option<PropertyValue> {
@@ -137,7 +137,7 @@ fn project(id: &str) -> Option<PropertyValue> {
 
 #[test]
 fn moving_a_task_between_projects_is_activity_on_the_task_and_both_projects() {
-    let mut metadata = update(Some(user("macro|seamus@example.com")));
+    let mut metadata = update(Some(user("rox|seamus@example.com")));
     metadata.property_definition_id = SystemPropertyKey::PROJECT_UUID;
     metadata.previous_value = project("project-from");
     metadata.value = project("project-to");
@@ -161,13 +161,13 @@ fn moving_a_task_between_projects_is_activity_on_the_task_and_both_projects() {
         Action::TaskAdded(change) if change.task_id == "task-1"
     ));
     for activity in &activities {
-        assert_eq!(activity.actor.as_ref(), "macro|seamus@example.com");
+        assert_eq!(activity.actor.as_ref(), "rox|seamus@example.com");
     }
 }
 
 #[test]
 fn unchanged_or_unattributed_project_saves_record_no_membership_activity() {
-    let mut unchanged = update(Some(user("macro|seamus@example.com")));
+    let mut unchanged = update(Some(user("rox|seamus@example.com")));
     unchanged.property_definition_id = SystemPropertyKey::PROJECT_UUID;
     unchanged.previous_value = project("project");
     unchanged.value = project("project");

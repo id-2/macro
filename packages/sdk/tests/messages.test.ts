@@ -27,7 +27,7 @@ function message(overrides: Partial<Message> = {}): Message {
   return {
     id: rootId,
     parent: { type: 'channel', id: channelId },
-    sender_id: 'macro|owner@example.com',
+    sender_id: 'rox|owner@example.com',
     content: 'A shared message',
     mentions: [],
     attachments: [],
@@ -140,7 +140,7 @@ describe('shared message API contracts', () => {
     await expect(event.target.message.content()).resolves.toBe(
       'Edited call message',
     );
-    const body = msg`Thanks ${client.users.byId('macro|colleague@example.com')}`;
+    const body = msg`Thanks ${client.users.byId('rox|colleague@example.com')}`;
     const reply = await event.target.message.reply(body);
     expect(reply.callId).toBe(callId);
     await expect(reply.content()).resolves.toBe(body.content);
@@ -204,7 +204,7 @@ describe('shared message API contracts', () => {
       return new Response(null, { status: 404 });
     });
     const client = macro();
-    const user = client.users.byId('macro|colleague@example.com');
+    const user = client.users.byId('rox|colleague@example.com');
     const body = msg`Hello ${user}`;
     const posted = await client.channels.byId(channelId).send(body);
     expect(posted.id).toBe(rootId);
@@ -355,7 +355,7 @@ describe('shared message API contracts', () => {
     });
     const client = macro();
     const document = client.documents.byId(documentId);
-    const body = msg`Please review ${client.users.byId('macro|colleague@example.com')}`;
+    const body = msg`Please review ${client.users.byId('rox|colleague@example.com')}`;
     const comment = await document.comment(body);
     expect(comment.id).toBe(rootId);
     await expect(comment.threadId()).resolves.toBe(rootId);
@@ -520,7 +520,7 @@ describe('shared message API contracts', () => {
     await team.channels.byId(channelId).send('Team bot');
     expect(requests[1]?.headers.get('x-rox-bot-token')).toBe('mbot_team');
     expect(requests[1]?.headers.get('x-rox-bot-scope')).toBe('team');
-    owner = { type: 'user', user_id: 'macro|owner@example.com' };
+    owner = { type: 'user', user_id: 'rox|owner@example.com' };
     const user = new Rox({
       auth: { type: 'bot', token: 'mbot_user' },
       hosts: { storage: host },

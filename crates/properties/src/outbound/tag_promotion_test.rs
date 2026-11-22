@@ -359,7 +359,7 @@ async fn promoted_label_reads_back_from_the_team_tag_set(
 
     // user3 is on Team 1 but never had the personal label, so this asserts the
     // whole point of promotion: the label is now theirs to see and use.
-    let user3 = rox_user_id::user_id::RoxUserIdStr::try_from("macro|user3@test.com")?;
+    let user3 = rox_user_id::user_id::RoxUserIdStr::try_from("rox|user3@test.com")?;
     let visible = repo.get_caller_tag_definitions(user3.as_ref()).await?;
     let team_labels = visible
         .iter()

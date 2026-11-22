@@ -23,7 +23,7 @@ fn request() -> DeleteUnthreadedAnchorRequest {
 async fn another_user_cannot_delete_annotation_or_its_discussion(pool: PgPool) {
     let events = RecordedEvents::default();
     let result =
-        delete_document_anchor(&pool, "macro|user2@user.com", request(), events.clone()).await;
+        delete_document_anchor(&pool, "rox|user2@user.com", request(), events.clone()).await;
     assert!(matches!(result.unwrap_err(), MessageError::Forbidden));
     assert!(events.0.lock().unwrap().is_empty());
     let roots = sqlx::query_scalar!(
@@ -38,7 +38,7 @@ async fn another_user_cannot_delete_annotation_or_its_discussion(pool: PgPool) {
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn deleting_threaded_annotation_uses_shared_thread_tombstones(pool: PgPool) {
     let events = RecordedEvents::default();
-    let response = delete_document_anchor(&pool, "macro|user@user.com", request(), events.clone())
+    let response = delete_document_anchor(&pool, "rox|user@user.com", request(), events.clone())
         .await
         .unwrap();
     assert_eq!(response.root_id, Some(Uuid::from_u128(4)));
@@ -63,7 +63,7 @@ async fn deleting_threaded_annotation_uses_shared_thread_tombstones(pool: PgPool
     let emitted = events.0.lock().unwrap();
     assert_eq!(emitted.len(), 1);
     assert_eq!(emitted[0].parent.entity_id(), "document-with-comments");
-    assert_eq!(emitted[0].actor, "macro|user@user.com");
+    assert_eq!(emitted[0].actor, "rox|user@user.com");
     let MessageChange::ThreadUpdated { state } = &emitted[0].change else {
         panic!("annotation deletion must reach shared message subscribers");
     };

@@ -163,7 +163,7 @@ mod tests {
 
     #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn test_upsert_new_user_device(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        let user_id = "macro|tester@macro-test.com";
+        let user_id = "rox|tester@macro-test.com";
         let device_token = "test_token_47295";
         let device_endpoint = "test_endpoint_89937";
         let device_type = DeviceType::Ios;

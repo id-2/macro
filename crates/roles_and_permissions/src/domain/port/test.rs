@@ -41,7 +41,7 @@ async fn test_get_user_permissions() -> anyhow::Result<()> {
     let user_roles_and_permissions_repository = MockUserRolesAndPermissionsRepository::default();
 
     let permissions = user_roles_and_permissions_repository
-        .get_user_permissions(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .get_user_permissions(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     assert_eq!(permissions.len(), 0);
@@ -57,7 +57,7 @@ async fn test_add_roles_to_user() -> anyhow::Result<()> {
 
     user_roles_and_permissions_repository
         .add_roles_to_user(
-            &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
             &roles,
         )
         .await?;
@@ -70,7 +70,7 @@ async fn test_get_user_roles() -> anyhow::Result<()> {
     let user_roles_and_permissions_repository = MockUserRolesAndPermissionsRepository::default();
 
     let roles = user_roles_and_permissions_repository
-        .get_user_roles(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .get_user_roles(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     assert_eq!(roles.len(), 1);
@@ -88,7 +88,7 @@ async fn test_remove_roles_from_user() -> anyhow::Result<()> {
     // Remove role
     user_roles_and_permissions_repository
         .remove_roles_from_user(
-            &RoxUserIdStr::parse_from_str("macro|user@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@user.com")?,
             &roles,
         )
         .await?;

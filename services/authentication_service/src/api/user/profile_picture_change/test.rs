@@ -6,7 +6,7 @@ use std::time::Duration;
 use super::{picture_changed_metadata, throttle_result};
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap()
 }
 
 #[test]

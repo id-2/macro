@@ -14,7 +14,7 @@ export const Entry = z.object({
 	dm: z.boolean(),
 	/** The sender's display name. Never proof of who sent it. */
 	from: z.string(),
-	/** Rox's id for the sender, e.g. `macro|owner@example.com`. The only thing that says who sent it. */
+	/** Rox's id for the sender, e.g. `rox|owner@example.com`. The only thing that says who sent it. */
 	sender_id: z.string(),
 	at: z.string(),
 	text: z.string(),

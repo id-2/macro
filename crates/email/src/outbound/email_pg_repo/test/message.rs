@@ -541,7 +541,7 @@ async fn test_process_scheduled_message_insert(pool: Pool<Postgres>) -> anyhow::
         link_id,
         msg_id,
         Some(send_time),
-        Some("macro|actor@example.com"),
+        Some("rox|actor@example.com"),
     )
     .await?;
     tx.commit().await?;
@@ -559,7 +559,7 @@ async fn test_process_scheduled_message_insert(pool: Pool<Postgres>) -> anyhow::
     let actor_id = row.get::<Option<String>, _>("actor_id");
     assert_eq!(stored_time, send_time);
     assert!(!sent);
-    assert_eq!(actor_id.as_deref(), Some("macro|actor@example.com"));
+    assert_eq!(actor_id.as_deref(), Some("rox|actor@example.com"));
 
     Ok(())
 }
@@ -643,7 +643,7 @@ async fn test_process_scheduled_message_delete(pool: Pool<Postgres>) -> anyhow::
         link_id,
         msg_id,
         Some(send_time),
-        Some("macro|actor@example.com"),
+        Some("rox|actor@example.com"),
     )
     .await?;
     tx.commit().await?;

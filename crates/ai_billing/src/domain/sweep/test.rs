@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 /// The `(since, now)` window one candidate query was asked for.

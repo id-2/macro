@@ -67,7 +67,7 @@ async fn runtime_branch_survives_without_pr_and_respects_owner_repository_and_fe
     let same = AgentSessionRepo::get(&repo, session.id).await.unwrap();
     assert_eq!(same.modified_at, row.modified_at);
     assert_eq!(realtime.updated(), [session.id]);
-    let other = user_id("macro|other@example.com");
+    let other = user_id("rox|other@example.com");
     assert!(matches!(
         repo.record_working_branch(
             session.id,

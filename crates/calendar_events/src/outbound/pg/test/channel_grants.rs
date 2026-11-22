@@ -17,8 +17,8 @@ async fn granted_event_ids(pool: &PgPool) -> Vec<Uuid> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_an_event_through_rox_removes_its_channel_grants(pool: PgPool) {
-    let sharer_id = "macro|grant-sharer@example.com";
-    let member_id = "macro|grant-member@example.com";
+    let sharer_id = "rox|grant-sharer@example.com";
+    let member_id = "rox|grant-member@example.com";
     let sharer_link = insert_link(&pool, sharer_id).await;
     let member_link = insert_link(&pool, member_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -114,7 +114,7 @@ async fn deleting_an_event_through_rox_removes_its_channel_grants(pool: PgPool) 
 async fn a_cancelled_occurrence_keeps_the_series_grant_and_a_cancelled_series_drops_it(
     pool: PgPool,
 ) {
-    let owner_id = "macro|grant-series@example.com";
+    let owner_id = "rox|grant-series@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let enabled = repo
@@ -194,7 +194,7 @@ async fn a_cancelled_occurrence_keeps_the_series_grant_and_a_cancelled_series_dr
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_the_calendar_or_the_inbox_removes_its_events_grants(pool: PgPool) {
-    let owner_id = "macro|grant-inbox@example.com";
+    let owner_id = "rox|grant-inbox@example.com";
     let disconnected_link = insert_link(&pool, owner_id).await;
     let removed_link = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());

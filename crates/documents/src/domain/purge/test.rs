@@ -15,7 +15,7 @@ use super::{
 };
 use crate::domain::models::DocumentError;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 #[derive(Clone, Copy, Default)]
 enum BrokerFailure {

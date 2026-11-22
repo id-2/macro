@@ -11,7 +11,7 @@ import type { Notification } from '../types/notification';
 
 vi.mock('@core/user', () => ({
   getDisplayNameParts: (id: string) => ({
-    firstName: id === 'macro|peter@rox.one' ? 'Peter' : 'Ana',
+    firstName: id === 'rox|peter@rox.one' ? 'Peter' : 'Ana',
     fullName: '',
   }),
   tryRoxId: (id: string) => id,
@@ -75,7 +75,7 @@ describe('getNotificationAgentSender', () => {
     expect(
       getNotificationAgentSender(
         commentNotification({
-          senderId: 'macro|peter@rox.one',
+          senderId: 'rox|peter@rox.one',
           senderDisplayName: 'Rox',
         })
       )
@@ -131,7 +131,7 @@ describe('agent-authored comment notifications', () => {
 
   it('counts the agent as a sender in a stack', () => {
     const stack = stackOf([
-      commentNotification({ senderId: 'macro|peter@rox.one' }),
+      commentNotification({ senderId: 'rox|peter@rox.one' }),
       commentNotification({ senderDisplayName: 'Rox' }),
       commentNotification({ senderDisplayName: 'Rox' }),
     ]);

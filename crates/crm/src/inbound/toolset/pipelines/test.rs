@@ -100,10 +100,10 @@ fn single_values_read_plainly_and_several_as_lists() {
     );
     assert_eq!(
         json(&FieldValue::References(vec![
-            "macro|a@x.com".into(),
-            "macro|b@x.com".into()
+            "rox|a@x.com".into(),
+            "rox|b@x.com".into()
         ])),
-        serde_json::json!(["macro|a@x.com", "macro|b@x.com"])
+        serde_json::json!(["rox|a@x.com", "rox|b@x.com"])
     );
     assert_eq!(
         json(&FieldValue::Number(48_000.0)),

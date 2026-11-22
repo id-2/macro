@@ -26,7 +26,7 @@ beforeAll(() =>
 );
 const person = encodeCellMention({
   type: 'user',
-  userId: 'macro|test@rox.one',
+  userId: 'rox|test@rox.one',
   email: 'test@rox.one',
   displayName: 'Taylor',
 });

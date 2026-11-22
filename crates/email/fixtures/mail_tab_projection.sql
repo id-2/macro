@@ -11,18 +11,18 @@ VALUES ('50001003-0000-0000-0000-000000000003','10000006-0000-0000-0000-00000000
 UPDATE email_threads SET latest_outbound_message_ts = '2024-01-13', has_calendar_attachment = true
 WHERE id = '20000001-0000-0000-0000-000000000001';
 
-INSERT INTO team (id,name,owner_id) VALUES ('77771111-0000-0000-0000-000000007777','Mail projection team','macro|user2@test.com');
-INSERT INTO team_user (user_id,team_id,team_role) VALUES ('macro|user1@test.com','77771111-0000-0000-0000-000000007777','member');
+INSERT INTO team (id,name,owner_id) VALUES ('77771111-0000-0000-0000-000000007777','Mail projection team','rox|user2@test.com');
+INSERT INTO team_user (user_id,team_id,team_role) VALUES ('rox|user1@test.com','77771111-0000-0000-0000-000000007777','member');
 INSERT INTO comms_channels (id,name,channel_type,owner_id,created_at,updated_at) VALUES
- ('00000000-0000-0000-0000-000000000c11','active share','public','macro|user2@test.com',NOW(),NOW()),
- ('00000000-0000-0000-0000-000000000c12','left share','public','macro|user2@test.com',NOW(),NOW());
+ ('00000000-0000-0000-0000-000000000c11','active share','public','rox|user2@test.com',NOW(),NOW()),
+ ('00000000-0000-0000-0000-000000000c12','left share','public','rox|user2@test.com',NOW(),NOW());
 INSERT INTO comms_channel_participants (channel_id,user_id,role,joined_at,left_at) VALUES
- ('00000000-0000-0000-0000-000000000c11','macro|user1@test.com','member',NOW(),NULL),
- ('00000000-0000-0000-0000-000000000c12','macro|user1@test.com','member',NOW(),NOW());
+ ('00000000-0000-0000-0000-000000000c11','rox|user1@test.com','member',NOW(),NULL),
+ ('00000000-0000-0000-0000-000000000c12','rox|user1@test.com','member',NOW(),NOW());
 INSERT INTO entity_access (entity_id,entity_type,source_id,source_type,access_level) VALUES
  ('20000103-0000-0000-0000-000000000103','email_thread','77771111-0000-0000-0000-000000007777','team','view'),
  ('20000008-0000-0000-0000-000000000008','email_thread','00000000-0000-0000-0000-000000000c11','channel','view'),
  ('20000009-0000-0000-0000-000000000009','email_thread','00000000-0000-0000-0000-000000000c12','channel','view'),
- ('20000001-0000-0000-0000-000000000001','document','macro|user1@test.com','user','view'),
+ ('20000001-0000-0000-0000-000000000001','document','rox|user1@test.com','user','view'),
  ('20000001-0000-0000-0000-000000000001','document','77771111-0000-0000-0000-000000007777','team','view'),
  ('20000001-0000-0000-0000-000000000001','document','00000000-0000-0000-0000-000000000c11','channel','view');

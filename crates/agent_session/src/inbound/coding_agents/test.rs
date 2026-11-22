@@ -11,7 +11,7 @@ use std::{future::Future, pin::Pin, sync::Mutex};
 use tower::ServiceExt;
 use uuid::Uuid;
 
-const USER: &str = "macro|coding-owner@example.com";
+const USER: &str = "rox|coding-owner@example.com";
 const KEY: &str = "coding-test-internal-key";
 
 #[derive(Clone)]

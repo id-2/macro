@@ -15,7 +15,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 mod delivery_status;
 mod sent_view;
 
-const ACTOR: &str = "macro|outlook-test@example.com";
+const ACTOR: &str = "rox|outlook-test@example.com";
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sent_sync_settles_uncertainty_and_fences_a_late_coordinator(db: PgPool) {

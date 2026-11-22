@@ -10,7 +10,7 @@ use serde_json::{Value, json};
 const DOCUMENT: &str = include_str!(
     "../../../../../apps/web/src/lib/service-clients/service-storage/graphql/contacts.graphql"
 );
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 const PAGE_SIZE: usize = 500;
 
 /// Persist bounded pages without retaining a directory-sized fixture in the test.
@@ -35,16 +35,16 @@ pub async fn hydrate_contacts<S: Storage>(engine: &mut Engine<S>, pages: usize) 
             .map(|index| {
                 json!({
                     "id": format!("contact-{index:06}"),
-                    "userId": format!("macro|user{index:06}@example.com"),
+                    "userId": format!("rox|user{index:06}@example.com"),
                     "email": format!("user{index:06}@example.com"),
                     "name": if index % 2 == 0 { Some(format!("Person {index:06}")) } else { None },
                 })
             })
             .collect();
         let after =
-            (page > 0).then(|| format!("macro|user{:06}@example.com", page * PAGE_SIZE - 1));
+            (page > 0).then(|| format!("rox|user{:06}@example.com", page * PAGE_SIZE - 1));
         let next = (page + 1 < pages)
-            .then(|| format!("macro|user{:06}@example.com", (page + 1) * PAGE_SIZE - 1));
+            .then(|| format!("rox|user{:06}@example.com", (page + 1) * PAGE_SIZE - 1));
         let variables = json!({"limit": PAGE_SIZE, "after": after});
         let data =
             json!({"user": {"id": VIEWER, "contacts": {"nodes": nodes, "nextCursor": next}}});
@@ -133,7 +133,7 @@ pub async fn assert_contact_search<S: Storage>(engine: &mut Engine<S>, total: us
             assert_ne!(selected.record["id"], selected.record["userId"]);
             assert_eq!(
                 selected.record["userId"],
-                format!("macro|{}", selected.record["email"].as_str().unwrap())
+                format!("rox|{}", selected.record["email"].as_str().unwrap())
             );
         }
         if query == last_email {
@@ -163,7 +163,7 @@ pub async fn assert_contact_search<S: Storage>(engine: &mut Engine<S>, total: us
 
 pub async fn assert_account_reset<S: Storage>(engine: &mut Engine<S>) {
     let old_generation = engine.current_storage_generation().await.unwrap();
-    let viewer = "macro|other@example.com";
+    let viewer = "rox|other@example.com";
     engine
         .write_query(
             None,
@@ -190,7 +190,7 @@ pub async fn assert_account_reset<S: Storage>(engine: &mut Engine<S>) {
             .unwrap()
             .fence,
     );
-    let data = json!({"user": {"id": viewer, "contacts": {"nodes": [{"id": "other-contact", "userId": "macro|other@example.com", "email": "other@example.com", "name": "Other"}], "nextCursor": null}}});
+    let data = json!({"user": {"id": viewer, "contacts": {"nodes": [{"id": "other-contact", "userId": "rox|other@example.com", "email": "other@example.com", "name": "Other"}], "nextCursor": null}}});
     engine
         .hydrate_query_in_scope(
             NetworkWrite {

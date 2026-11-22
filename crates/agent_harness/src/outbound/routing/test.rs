@@ -162,7 +162,7 @@ impl AgentSessionRepo for FixedBotSessions {
             task_id: None,
             id,
             owner_id: model_owner::Owner::User(
-                RoxUserIdStr::try_from("macro|owner@rox.one".to_owned())
+                RoxUserIdStr::try_from("rox|owner@rox.one".to_owned())
                     .expect("valid user id"),
             ),
             thread_id: None,

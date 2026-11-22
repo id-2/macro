@@ -81,7 +81,7 @@ fn reply_target_carries_the_originating_channel_message() {
             target_message_id: "00000000-0000-0000-0000-000000000003".to_owned(),
             target_thread_id: "00000000-0000-0000-0000-000000000002".to_owned(),
             display_text: "@claude fix the failing test".to_owned(),
-            sender_id: "macro|user@example.com".to_owned(),
+            sender_id: "rox|user@example.com".to_owned(),
         }
     );
 }

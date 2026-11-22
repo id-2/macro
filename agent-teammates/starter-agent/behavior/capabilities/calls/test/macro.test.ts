@@ -474,7 +474,7 @@ test("messagesSince is oldest first, at most 100, with the author's name or thei
 							for (let n = count; n >= 1; n--)
 								yield message(
 									String(n),
-									`macro|u${n}@example.com`,
+									`rox|u${n}@example.com`,
 									n === 1 ? new Error("no name") : `User ${n}`,
 								);
 						},
@@ -486,15 +486,15 @@ test("messagesSince is oldest first, at most 100, with the author's name or thei
 	expect(await channel(2).messagesSince("ch", since)).toEqual([
 		{
 			id: "1",
-			from: "macro|u1@example.com",
-			fromId: "macro|u1@example.com",
+			from: "rox|u1@example.com",
+			fromId: "rox|u1@example.com",
 			at: "2026-11-05T14:01:00Z",
 			text: "text 1",
 		},
 		{
 			id: "2",
 			from: "User 2",
-			fromId: "macro|u2@example.com",
+			fromId: "rox|u2@example.com",
 			at: "2026-11-05T14:02:00Z",
 			text: "text 2",
 		},
@@ -514,13 +514,13 @@ test("who wrote a message is Rox's record of it, with whether it was a DM", asyn
 				byId: (channelId: string) => ({
 					type: async () => (channelId === "dm" ? "direct_message" : "public"),
 					name: async () => "eng",
-					message: (id: string) => message(id, "macro|cy@example.com", "Cy"),
+					message: (id: string) => message(id, "rox|cy@example.com", "Cy"),
 				}),
 			},
 		}),
 	);
 	expect(await api.message("dm", "7")).toEqual({
-		author: "macro|cy@example.com",
+		author: "rox|cy@example.com",
 		name: "Cy",
 		text: "text 7",
 		at: Temporal.Instant.from("2026-11-05T14:07:00Z"),
@@ -534,14 +534,14 @@ test("me, members, and the DM channel", async () => {
 	const api = apiOver(
 		fakeMacro({
 			users: {
-				me: async () => ({ id: "macro|agent@example.com" }),
+				me: async () => ({ id: "rox|agent@example.com" }),
 				byId: (id: string) => ({ id }),
 			},
 			channels: {
 				byId: () => ({
 					participants: async () => [
-						{ user_id: "macro|a@example.com" },
-						{ user_id: "macro|b@example.com" },
+						{ user_id: "rox|a@example.com" },
+						{ user_id: "rox|b@example.com" },
 					],
 				}),
 				dm: async (user: { readonly id: string }) => ({
@@ -550,13 +550,13 @@ test("me, members, and the DM channel", async () => {
 			},
 		}),
 	);
-	expect(await api.me()).toBe("macro|agent@example.com");
+	expect(await api.me()).toBe("rox|agent@example.com");
 	expect(await api.members("ch")).toEqual([
-		"macro|a@example.com",
-		"macro|b@example.com",
+		"rox|a@example.com",
+		"rox|b@example.com",
 	]);
-	expect(await api.dmChannel("macro|cy@example.com")).toBe(
-		"dm-with-macro|cy@example.com",
+	expect(await api.dmChannel("rox|cy@example.com")).toBe(
+		"dm-with-rox|cy@example.com",
 	);
 });
 

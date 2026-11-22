@@ -36,7 +36,7 @@ use std::sync::{
 };
 use tower::ServiceExt;
 
-const DEFAULT_BEARER_TOKEN: &str = "macro|bot-admin@example.com";
+const DEFAULT_BEARER_TOKEN: &str = "rox|bot-admin@example.com";
 const INVALID_BEARER_TOKEN: &str = "invalid";
 
 #[derive(Clone, Copy)]
@@ -549,7 +549,7 @@ fn real_router(pool: PgPool, user_id: &str) -> Router {
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
     let stripe_customer_id = format!("stripe_{rox_user_id}");
 
     sqlx::query(
@@ -639,13 +639,13 @@ fn sample_self_bot(bot_id: BotId) -> Bot {
         id: bot_id,
         kind: BotKind::Owned,
         owner: Some(BotOwner::User {
-            user_id: "macro|bot-admin@example.com".to_string(),
+            user_id: "rox|bot-admin@example.com".to_string(),
         }),
         name: "Datadog Alerts".to_string(),
         handle: "datadog-alerts".to_string(),
         description: None,
         avatar_url: None,
-        created_by: Some("macro|bot-admin@example.com".to_string()),
+        created_by: Some("rox|bot-admin@example.com".to_string()),
         created_at: now,
         updated_at: now,
         deleted_at: None,
@@ -961,8 +961,8 @@ async fn channel_admin_still_needs_bot_usability_to_remove_bot() {
 async fn bot_owner_can_list_and_remove_bot_channels_via_bot_routes(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    const BOT_OWNER_ID: &str = "macro|bot-owner@example.com";
-    const CHANNEL_ADMIN_ID: &str = "macro|channel-admin@example.com";
+    const BOT_OWNER_ID: &str = "rox|bot-owner@example.com";
+    const CHANNEL_ADMIN_ID: &str = "rox|channel-admin@example.com";
     let channel_id = Uuid::new_v4();
 
     insert_user(&pool, BOT_OWNER_ID).await?;
@@ -1067,7 +1067,7 @@ async fn bot_owner_can_list_and_remove_bot_channels_via_bot_routes(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_admin_can_add_and_remove_owned_bot_via_http(pool: PgPool) -> anyhow::Result<()> {
-    const ADMIN_USER_ID: &str = "macro|bot-admin@example.com";
+    const ADMIN_USER_ID: &str = "rox|bot-admin@example.com";
     let channel_id = Uuid::new_v4();
 
     insert_user(&pool, ADMIN_USER_ID).await?;
@@ -1159,7 +1159,7 @@ async fn read_bot(response: axum::response::Response) -> Bot {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_owner_can_create_and_patch_has_agent_via_http(pool: PgPool) -> anyhow::Result<()> {
-    const BOT_OWNER_ID: &str = "macro|has-agent-owner@example.com";
+    const BOT_OWNER_ID: &str = "rox|has-agent-owner@example.com";
     insert_user(&pool, BOT_OWNER_ID).await?;
     let router = real_router(pool, BOT_OWNER_ID);
 
@@ -1245,7 +1245,7 @@ async fn bot_owner_can_create_and_patch_has_agent_via_http(pool: PgPool) -> anyh
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patching_an_agent_changes_only_the_fields_sent(pool: PgPool) -> anyhow::Result<()> {
-    const OWNER_ID: &str = "macro|agent-owner@example.com";
+    const OWNER_ID: &str = "rox|agent-owner@example.com";
     insert_user(&pool, OWNER_ID).await?;
     let router = real_router(pool, OWNER_ID);
 

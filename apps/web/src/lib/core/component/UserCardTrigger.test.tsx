@@ -36,7 +36,7 @@ vi.mock('./HoverCard', () => ({
 const jane = {
   displayName: 'Jane Doe',
   email: 'jane.doe@example.com',
-  id: 'macro|jane.doe@example.com',
+  id: 'rox|jane.doe@example.com',
 };
 
 beforeEach(() => {

@@ -4,7 +4,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use rox_user_id::cowlike::CowLike;
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|{email}@test.com"))
+    RoxUserIdStr::parse_from_str(&format!("rox|{email}@test.com"))
         .unwrap()
         .into_owned()
 }

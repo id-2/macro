@@ -78,7 +78,7 @@ impl LinkedGithubTokens for FixedTokens {
 const WIKI: &str = "https://wiki.example.com/mcp";
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user@example.com")
+    RoxUserIdStr::parse_from_str("rox|user@example.com")
         .unwrap()
         .into_owned()
 }

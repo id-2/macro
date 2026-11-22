@@ -433,7 +433,7 @@ async fn outlook_link(db: &PgPool, email: &str, active: bool, needs_reauth: bool
         r#"INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,grant_generation,is_sync_active,needs_reauth)
         VALUES ($1,$2,$3,$4,'OUTLOOK',1,$5,$6)"#,
         link,
-        format!("macro|{email}"),
+        format!("rox|{email}"),
         format!("owner-{email}"),
         email,
         active,
@@ -474,7 +474,7 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
     queue(&db, paused, "waiting", true, 0).await;
     outlook_link(&db, "idle@example.com", false, false).await;
     sqlx::query!(
-        "INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|gmail@example.com','gmail-owner','gmail@example.com','GMAIL')",
+        "INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'rox|gmail@example.com','gmail-owner','gmail@example.com','GMAIL')",
         rox_uuid::generate_uuid_v7()
     )
     .execute(&db)

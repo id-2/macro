@@ -507,9 +507,9 @@ impl ScenarioSpec {
         Ok(spec)
     }
 
-    /// The `macro|email` user id for a user key.
+    /// The `rox|email` user id for a user key.
     pub fn user_id(&self, key: &str) -> String {
-        format!("macro|{}", self.users[key].email)
+        format!("rox|{}", self.users[key].email)
     }
 
     /// The derived `rox_user` uuid for a user key.

@@ -8,7 +8,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_contact_hidden_toggles_flag(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -32,7 +32,7 @@ async fn set_contact_hidden_returns_not_found_for_unknown_contact(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -50,8 +50,8 @@ async fn set_contact_hidden_returns_not_found_for_unknown_contact(
 async fn set_contact_hidden_isolates_contacts_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    let owner_a = "macro|owner_a@test.com";
-    let owner_b = "macro|owner_b@test.com";
+    let owner_a = "rox|owner_a@test.com";
+    let owner_b = "rox|owner_b@test.com";
     seed_team(&pool, team_a, owner_a).await?;
     seed_team(&pool, team_b, owner_b).await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;

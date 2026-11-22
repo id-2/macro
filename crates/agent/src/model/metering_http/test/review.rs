@@ -149,11 +149,11 @@ async fn mixed_session_scopes_preserve_identity_and_new_financial_activation() {
     use rig_core::test_utils::{MockCompletionModel, MockStreamEvent};
     let owner = UsageContext::new(
         AiFeature::Chat,
-        "macro|owner@example.com".to_owned().try_into().unwrap(),
+        "rox|owner@example.com".to_owned().try_into().unwrap(),
     );
     let other = UsageContext::new(
         AiFeature::Chat,
-        "macro|other@example.com".to_owned().try_into().unwrap(),
+        "rox|other@example.com".to_owned().try_into().unwrap(),
     );
     for stored_mode in [FinancialMode::Activated, FinancialMode::TrackingOnly] {
         for current_mode in [

@@ -9,7 +9,7 @@ use std::sync::Arc;
 async fn frecency_fallback_keeps_calendar_events_with_aggregates(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let owner_id = "macro|calendar-frecency@example.com";
+    let owner_id = "rox|calendar-frecency@example.com";
     let link_id = Uuid::now_v7();
     let event_id = Uuid::now_v7();
     sqlx::query!(
@@ -81,7 +81,7 @@ async fn frecency_fallback_keeps_calendar_events_with_aggregates(
 /// last-modified time that made reminder rows surface in the past.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Result<()> {
-    let owner_id = "macro|calendar-fired@example.com";
+    let owner_id = "rox|calendar-fired@example.com";
     let link_id = Uuid::now_v7();
     let reminded_id = Uuid::now_v7();
     let edited_id = Uuid::now_v7();
@@ -163,9 +163,9 @@ async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-const UNREAD_OWNER: &str = "macro|calendar-unread@example.com";
-const UNREAD_CHILD: &str = "macro|calendar-unread-child@example.com";
-const UNREAD_STRANGER: &str = "macro|calendar-unread-stranger@example.com";
+const UNREAD_OWNER: &str = "rox|calendar-unread@example.com";
+const UNREAD_CHILD: &str = "rox|calendar-unread-child@example.com";
+const UNREAD_STRANGER: &str = "rox|calendar-unread-stranger@example.com";
 
 /// The owner's events, newest first: `unseen` and `seen` each hold one live
 /// notification in that state, `done` a done one, `deleted` only a

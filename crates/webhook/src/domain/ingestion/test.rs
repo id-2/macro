@@ -45,7 +45,7 @@ use std::{
 
 const DOCUMENT_ID: &str = "11111111-1111-1111-1111-111111111111";
 const COPIED_DOCUMENT_ID: &str = "22222222-2222-2222-2222-222222222222";
-const PERSONAL_WORKSPACE_ID: &str = "macro|reader@example.com";
+const PERSONAL_WORKSPACE_ID: &str = "rox|reader@example.com";
 const BOT_PRINCIPAL_ID: &str = "bot|66666666-6666-6666-6666-666666666666";
 const TEAM_WORKSPACE_ID: &str = "33333333-3333-3333-3333-333333333333";
 const CALL_ID: &str = "0198a1b2-c3d4-7e5f-8061-728394a5b6c7";
@@ -55,7 +55,7 @@ async fn private_call_invitation_reaches_only_the_recipient_workspace() {
     let call_id = Uuid::parse_str(CALL_ID).unwrap();
     let mut metadata = CallNotificationMetadata::new(call_id, None);
     metadata.recipient_user_id = Some(PERSONAL_WORKSPACE_ID.to_string());
-    metadata.invited_by = Some("macro|sender@example.com".to_string());
+    metadata.invited_by = Some("rox|sender@example.com".to_string());
     let event = Event::new(CallNotificationEvent::Invited(metadata));
     let access = MockAccessService::with_users(Vec::new());
     let repository = MockRepository::new(
@@ -555,7 +555,7 @@ fn document_event_cases() -> Vec<EventCase> {
             TestBrokerEvent::Document(Event::with_schema_version(
                 DocumentTopicEvent::Created(DocumentCreatedMetadata {
                     document_id: DOCUMENT_ID.to_string(),
-                    owner: Owner::User(user_id("macro|owner@example.com")),
+                    owner: Owner::User(user_id("rox|owner@example.com")),
                     actor: None,
                     on_behalf_of: None,
                     document_name: "notes".to_string(),
@@ -576,8 +576,8 @@ fn document_event_cases() -> Vec<EventCase> {
                 DocumentTopicEvent::Updated(DocumentUpdatedMetadata {
                     appearance_change: None,
                     document_id: DOCUMENT_ID.to_string(),
-                    owner: Owner::User(user_id("macro|owner@example.com")),
-                    actor_user_id: Some(user_id("macro|editor@example.com")),
+                    owner: Owner::User(user_id("rox|owner@example.com")),
+                    actor_user_id: Some(user_id("rox|editor@example.com")),
                     actor: None,
                     on_behalf_of: None,
                     document_name: Some("renamed".to_string()),
@@ -598,7 +598,7 @@ fn document_event_cases() -> Vec<EventCase> {
                 DocumentTopicEvent::Deleted(DocumentDeletedMetadata {
                     sub_type: None,
                     document_id: DOCUMENT_ID.to_string(),
-                    actor_user_id: Some(user_id("macro|owner@example.com")),
+                    actor_user_id: Some(user_id("rox|owner@example.com")),
                     actor: None,
                     on_behalf_of: None,
                     project_id: None,
@@ -616,7 +616,7 @@ fn document_event_cases() -> Vec<EventCase> {
                     document_id: COPIED_DOCUMENT_ID.to_string(),
                     source_document_id: DOCUMENT_ID.to_string(),
                     source_version_id: None,
-                    owner: Owner::User(user_id("macro|owner@example.com")),
+                    owner: Owner::User(user_id("rox|owner@example.com")),
                     actor: None,
                     on_behalf_of: None,
                     document_name: "notes (copy)".to_string(),
@@ -641,7 +641,7 @@ fn search_only_document_event_cases() -> Vec<(&'static str, Event<DocumentTopicE
             Event::new(DocumentTopicEvent::ContentUploaded(
                 DocumentContentUploadedMetadata {
                     document_id: DOCUMENT_ID.to_string(),
-                    owner: Owner::User(user_id("macro|owner@example.com")),
+                    owner: Owner::User(user_id("rox|owner@example.com")),
                     file_type: "pdf".parse().expect("valid file type"),
                     document_version_id: Some("convert".to_string()),
                 },
@@ -671,8 +671,8 @@ fn search_only_document_event_cases() -> Vec<(&'static str, Event<DocumentTopicE
 
 fn channel_event_cases() -> Vec<EventCase> {
     let channel_id = Uuid::parse_str("44444444-4444-4444-4444-444444444444").unwrap();
-    let owner = "macro|owner@example.com";
-    let member = "macro|member@example.com";
+    let owner = "rox|owner@example.com";
+    let member = "rox|member@example.com";
 
     vec![
         EventCase::new(
@@ -756,7 +756,7 @@ fn channel_event_cases() -> Vec<EventCase> {
 fn message_event_cases() -> Vec<EventCase> {
     let channel_id = Uuid::parse_str("44444444-4444-4444-4444-444444444444").unwrap();
     let message_id = Uuid::parse_str("55555555-5555-5555-5555-555555555555").unwrap();
-    let member = "macro|member@example.com";
+    let member = "rox|member@example.com";
     let channel = MessageParent::Channel(channel_id);
     let document = MessageParent::parse("document", DOCUMENT_ID).unwrap();
     let posted = |parent: MessageParent| MessagePostedMetadata {
@@ -909,7 +909,7 @@ fn webhook_event_cases() -> Vec<WebhookEventCase> {
                     webhook_id: "wh_created".to_string(),
                     workspace_id: PERSONAL_WORKSPACE_ID.to_string(),
                     namespace: "created-webhook".to_string(),
-                    created_by_user_id: user_id("macro|creator@example.com"),
+                    created_by_user_id: user_id("rox|creator@example.com"),
                     name: "Created webhook".to_string(),
                     endpoint_url: "https://example.com/created".to_string(),
                     status: WebhookStatus::Active,
@@ -930,7 +930,7 @@ fn webhook_event_cases() -> Vec<WebhookEventCase> {
                 WebhookTopicEvent::Updated(WebhookUpdatedMetadata {
                     webhook_id: "wh_updated".to_string(),
                     workspace_id: TEAM_WORKSPACE_ID.to_string(),
-                    actor_user_id: user_id("macro|editor@example.com"),
+                    actor_user_id: user_id("rox|editor@example.com"),
                     name: Some("Updated webhook".to_string()),
                     endpoint_url: None,
                     filters: None,
@@ -952,7 +952,7 @@ fn webhook_event_cases() -> Vec<WebhookEventCase> {
                 WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
                     webhook_id: "wh_deleted".to_string(),
                     workspace_id: PERSONAL_WORKSPACE_ID.to_string(),
-                    actor_user_id: user_id("macro|deleter@example.com"),
+                    actor_user_id: user_id("rox|deleter@example.com"),
                 }),
             ),
             event_name: "webhook.deleted",
@@ -966,7 +966,7 @@ fn webhook_event_cases() -> Vec<WebhookEventCase> {
                 WebhookTopicEvent::Validated(WebhookValidatedMetadata {
                     webhook_id: "wh_validated".to_string(),
                     workspace_id: TEAM_WORKSPACE_ID.to_string(),
-                    actor_user_id: user_id("macro|validator@example.com"),
+                    actor_user_id: user_id("rox|validator@example.com"),
                     is_valid: true,
                     response_status: Some(204),
                     message: None,
@@ -1096,7 +1096,7 @@ async fn search_only_document_events_skip_webhook_delivery() {
 async fn normalizes_all_webhook_variants_with_direct_workspace_ownership() {
     for event_case in webhook_event_cases() {
         let access = MockAccessService {
-            users: vec![user_id("macro|unrelated@example.com")],
+            users: vec![user_id("rox|unrelated@example.com")],
             failure: Some(AccessFailure::Internal),
             calls: Arc::default(),
         };
@@ -1228,7 +1228,7 @@ async fn malformed_webhook_ids_are_permanent_and_skip_all_resolution() {
         let event = Event::new(WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
             webhook_id: invalid_id.to_string(),
             workspace_id: PERSONAL_WORKSPACE_ID.to_string(),
-            actor_user_id: user_id("macro|deleter@example.com"),
+            actor_user_id: user_id("rox|deleter@example.com"),
         }));
 
         let error = service
@@ -1469,7 +1469,7 @@ fn agent_trigger_new_event() -> Event<agent_trigger::domain::broker_events::Agen
                 channel_id: uuid::Uuid::from_u128(1),
                 message_id: uuid::Uuid::from_u128(2),
                 thread_id: None,
-                sender: sender("macro|asker@example.com"),
+                sender: sender("rox|asker@example.com"),
                 triggered_by: None,
                 channel_type: ChannelType::Public,
                 content: "fix the flaky test".to_owned(),
@@ -1496,7 +1496,7 @@ fn agent_trigger_requested_event()
             session_id: agent_session::domain::model::AgentSessionId::new_from_uuid(
                 uuid::Uuid::from_u128(0x5E55),
             ),
-            owner: "macro|asker@example.com".to_owned(),
+            owner: "rox|asker@example.com".to_owned(),
             context: None,
             runtime_user: None,
         }),
@@ -1518,7 +1518,7 @@ fn agent_trigger_document_event()
                 message_id: uuid::Uuid::from_u128(2),
                 thread_id: None,
                 root_id: uuid::Uuid::from_u128(2),
-                sender: sender("macro|asker@example.com"),
+                sender: sender("rox|asker@example.com"),
                 triggered_by: None,
                 content: "summarize this".to_owned(),
                 mentions: vec![],
@@ -1545,7 +1545,7 @@ fn agent_trigger_existing_event()
                 channel_id: uuid::Uuid::from_u128(1),
                 message_id: uuid::Uuid::from_u128(2),
                 thread_id: None,
-                sender: sender("macro|asker@example.com"),
+                sender: sender("rox|asker@example.com"),
                 triggered_by: None,
                 channel_type: ChannelType::Public,
                 content: "and now the other one".to_owned(),
@@ -1589,7 +1589,7 @@ fn agent_trigger_task_assignment_event() -> Event<AgentTriggerTopicEvent> {
             parent: messages::domain::models::MessageParent::parse("document", DOCUMENT_ID)
                 .unwrap(),
             discussion_id: uuid::Uuid::from_u128(2),
-            actor: user_id("macro|asker@example.com"),
+            actor: user_id("rox|asker@example.com"),
             prompt: "Complete the assigned task".to_owned(),
             context: None,
         }),
@@ -1786,7 +1786,7 @@ fn agent_session_lifecycle_event(
         session_name: "Fix the flaky test".to_owned(),
         bot_id: bot_id::BotId::new_from_uuid(uuid::Uuid::from_u128(0xB07)),
         bot_name: "Rox Coder".to_owned(),
-        owner_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|asker@example.com")
+        owner_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|asker@example.com")
             .expect("valid user id")
             .into_owned(),
         origin: Some(ThreadOrigin::new(
@@ -1909,7 +1909,7 @@ async fn every_agent_session_lifecycle_variant_is_named_by_its_wire_tag() {
 async fn a_deleted_session_is_delivered_to_its_owner_and_origin_channel() {
     use agent_session::domain::events::{AgentSessionLifecycleEvent, SessionDeletedMetadata};
 
-    let access = MockAccessService::with_users(vec![user_id("macro|teammate@example.com")]);
+    let access = MockAccessService::with_users(vec![user_id("rox|teammate@example.com")]);
     let repository = MockRepository::new(
         vec![PERSONAL_WORKSPACE_ID.to_string()],
         vec![webhook("wh_agent_feed", PERSONAL_WORKSPACE_ID)],
@@ -1946,7 +1946,7 @@ async fn a_deleted_session_is_delivered_to_its_owner_and_origin_channel() {
 async fn a_deleted_session_without_an_origin_is_its_owners_alone() {
     use agent_session::domain::events::{AgentSessionLifecycleEvent, SessionDeletedMetadata};
 
-    let access = MockAccessService::with_users(vec![user_id("macro|teammate@example.com")]);
+    let access = MockAccessService::with_users(vec![user_id("rox|teammate@example.com")]);
     let repository = MockRepository::new(
         vec![PERSONAL_WORKSPACE_ID.to_string()],
         vec![webhook("wh_agent_feed", PERSONAL_WORKSPACE_ID)],
@@ -1992,7 +1992,7 @@ fn a_deleted_session_streams_to_both_its_owner_and_origin_parent() {
         candidate.audience,
         StreamAudience::Any(vec![
             StreamAudience::Workspace {
-                workspace_id: "macro|asker@example.com".to_owned(),
+                workspace_id: "rox|asker@example.com".to_owned(),
             },
             StreamAudience::Entity {
                 entity_id: uuid::Uuid::from_u128(1).to_string(),
@@ -2004,7 +2004,7 @@ fn a_deleted_session_streams_to_both_its_owner_and_origin_parent() {
 
 #[tokio::test]
 async fn user_picture_changed_reaches_only_the_changed_users_workspaces() {
-    let user = "macro|owner@example.com";
+    let user = "rox|owner@example.com";
     let event = Event::new(user_events::UserTopicEvent::PictureChanged(
         user_events::UserPictureChangedMetadata {
             user_id: user_id(user),
@@ -2013,7 +2013,7 @@ async fn user_picture_changed_reaches_only_the_changed_users_workspaces() {
         },
     ));
     let expected_envelope = serde_json::to_value(&event).unwrap();
-    let access = MockAccessService::with_users(vec![user_id("macro|contact@example.com")]);
+    let access = MockAccessService::with_users(vec![user_id("rox|contact@example.com")]);
     let repository = MockRepository::new(
         vec![user.to_string(), TEAM_WORKSPACE_ID.to_string()],
         vec![webhook("wh_match", user)],
@@ -2059,7 +2059,7 @@ async fn user_picture_changed_reaches_only_the_changed_users_workspaces() {
 async fn user_event_workspace_resolution_failure_is_transient() {
     let event = Event::new(user_events::UserTopicEvent::PictureChanged(
         user_events::UserPictureChangedMetadata {
-            user_id: user_id("macro|owner@example.com"),
+            user_id: user_id("rox|owner@example.com"),
             file_id: None,
             url: None,
         },

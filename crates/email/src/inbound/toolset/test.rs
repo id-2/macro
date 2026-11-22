@@ -158,21 +158,21 @@ fn resolve_inbox_selector_defaults_to_caller_primary() {
     // The delegated inbox is primary for its own account but must not be chosen
     // as the caller's default — only is_primary AND owned by the caller counts.
     let inboxes = vec![
-        make_link("macro|gabtest2@rox.one", "gabtest2@rox.one", true),
-        make_link("macro|gab@rox.one", "gabtest1@rox.one", false),
-        make_link("macro|gab@rox.one", "gab@rox.one", true),
+        make_link("rox|gabtest2@rox.one", "gabtest2@rox.one", true),
+        make_link("rox|gab@rox.one", "gabtest1@rox.one", false),
+        make_link("rox|gab@rox.one", "gab@rox.one", true),
     ];
-    let link = resolve_inbox_selector(&inboxes, "macro|gab@rox.one", None).unwrap();
+    let link = resolve_inbox_selector(&inboxes, "rox|gab@rox.one", None).unwrap();
     assert_eq!(link.email_address.0.as_ref(), "gab@rox.one");
 }
 
 #[test]
 fn resolve_inbox_selector_matches_address_case_insensitively() {
     let inboxes = vec![
-        make_link("macro|gab@rox.one", "gab@rox.one", true),
-        make_link("macro|gabtest2@rox.one", "gabtest2@rox.one", true),
+        make_link("rox|gab@rox.one", "gab@rox.one", true),
+        make_link("rox|gabtest2@rox.one", "gabtest2@rox.one", true),
     ];
-    let link = resolve_inbox_selector(&inboxes, "macro|gab@rox.one", Some("GabTest2@rox.one"))
+    let link = resolve_inbox_selector(&inboxes, "rox|gab@rox.one", Some("GabTest2@rox.one"))
         .unwrap();
     assert_eq!(link.email_address.0.as_ref(), "gabtest2@rox.one");
 }
@@ -212,9 +212,9 @@ fn tool_sender_policy_deserializes_snake_case_values() {
 
 #[test]
 fn resolve_inbox_selector_rejects_unknown_address() {
-    let inboxes = vec![make_link("macro|gab@rox.one", "gab@rox.one", true)];
+    let inboxes = vec![make_link("rox|gab@rox.one", "gab@rox.one", true)];
     // Avoid `unwrap_err` so the test does not require `Link: Debug`.
-    let err = resolve_inbox_selector(&inboxes, "macro|gab@rox.one", Some("nope@rox.one"))
+    let err = resolve_inbox_selector(&inboxes, "rox|gab@rox.one", Some("nope@rox.one"))
         .err()
         .expect("unknown inbox address should error");
     assert!(
@@ -446,7 +446,7 @@ async fn a_label_named_both_ways_or_not_at_all_fails_before_any_provider_acts() 
             tool.call(
                 ServiceContext(context),
                 RequestContext::new(
-                    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                    RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap(),
                 ),
             )
             .await

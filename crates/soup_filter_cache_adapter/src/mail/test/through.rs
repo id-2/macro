@@ -16,7 +16,7 @@ fn readable(n: u128) -> Value {
 fn unreadable(n: u128) -> Value {
     let mut row = row(n);
     row["linkId"] = json!(id(9999));
-    row["ownerId"] = json!("macro|other@example.com");
+    row["ownerId"] = json!("rox|other@example.com");
     row
 }
 

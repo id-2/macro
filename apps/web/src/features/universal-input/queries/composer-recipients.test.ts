@@ -3,13 +3,13 @@ import { composerRecipients, recipientAddresses } from './composer-recipients';
 
 const people = [
   {
-    id: 'macro|julia@example.com',
+    id: 'rox|julia@example.com',
     label: 'Julia Park',
     email: 'julia@example.com',
     kind: 'user' as const,
   },
   {
-    id: 'macro|other@example.com',
+    id: 'rox|other@example.com',
     label: 'Julia Adams',
     email: 'other@example.com',
     kind: 'user' as const,

@@ -19,7 +19,7 @@ use crate::domain::ports::{
 use crate::domain::service::ProjectServiceImpl;
 use crate::outbound::PgProjectRepo;
 
-const OWNER: &str = "macro|owner@test.com";
+const OWNER: &str = "rox|owner@test.com";
 const ROOT_ID: &str = "10000000-0000-0000-0000-000000000001";
 const FIRST_CHILD_ID: &str = "10000000-0000-0000-0000-000000000002";
 const DOCUMENT_ID: &str = "20000000-0000-0000-0000-000000000001";

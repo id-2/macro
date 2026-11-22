@@ -15,7 +15,7 @@ pub struct GraphqlActivityEvent {
     /// The activity's stable identifier.
     pub id: ID,
     /// The principal that mechanically acted, as a prefix-parseable string
-    /// (`macro|<email>` for users, `bot|<uuid>` for bots).
+    /// (`rox|<email>` for users, `bot|<uuid>` for bots).
     pub actor_id: String,
     /// Whose activity this is: the delegating user when the actor acted on
     /// someone's behalf, otherwise the actor itself.

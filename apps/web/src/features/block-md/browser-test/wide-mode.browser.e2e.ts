@@ -18,7 +18,7 @@ function message(
     parent: { type: 'document', id: DOCUMENT_ID },
     thread_id: threadId,
     kind: 'message',
-    sender_id: `macro|${sender}@example.com`,
+    sender_id: `rox|${sender}@example.com`,
     mentions: [],
     content,
     created_at: POSTED_AT,

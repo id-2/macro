@@ -86,8 +86,8 @@ impl Fake {
 
 pub(super) fn request(attempt: bool) -> ConnectionRequest {
     ConnectionRequest {
-        actor_rox_id: RoxUserIdStr::try_from("macro|actor@example.com".to_string()).unwrap(),
-        actor_id: "macro|actor@example.com".into(),
+        actor_rox_id: RoxUserIdStr::try_from("rox|actor@example.com".to_string()).unwrap(),
+        actor_id: "rox|actor@example.com".into(),
         actor_fusion_id: OWNER.to_string(),
         attempt: attempt.then_some(ATTEMPT),
         force_share: false,

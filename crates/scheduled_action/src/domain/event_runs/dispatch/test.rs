@@ -281,7 +281,7 @@ fn preparation_binds_receipt_to_authenticated_owner_entity_and_kind() {
         EntityAccessAuth::Internal,
         EntityAccessAuth::Unauthenticated,
         EntityAccessAuth::Authenticated(
-            RoxUserIdStr::parse_from_str("macro|other@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|other@rox.one").unwrap(),
         ),
         EntityAccessAuth::Bot(BotReceiptAuth::new(
             entity_access::domain::models::BotIdStr::parse_from_str(

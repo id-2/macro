@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub(in crate::domain::service) fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|import@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|import@example.com").unwrap()
 }
 
 fn denied() -> AiAdmissionError {

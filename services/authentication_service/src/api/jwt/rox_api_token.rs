@@ -60,7 +60,7 @@ pub async fn handler(
         tracing::error!("user_id is empty");
         return Err((StatusCode::UNAUTHORIZED, "unauthorized").into_response());
     } else {
-        user_context.user_id.replace("macro|", "")
+        user_context.user_id.replace("rox|", "")
     };
 
     let user_profile =

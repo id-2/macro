@@ -14,8 +14,8 @@ use crate::resolve::{
 };
 use crate::test_support::*;
 
-const SAM: &str = "macro|sam@example.com";
-const ANA: &str = "macro|ana@example.com";
+const SAM: &str = "rox|sam@example.com";
+const ANA: &str = "rox|ana@example.com";
 
 #[test]
 fn a_nested_view_is_the_select_its_sql_resolves_to() {

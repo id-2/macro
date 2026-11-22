@@ -130,7 +130,7 @@ mod test {
         let service = PlanService::new(Fake {
             calls: Mutex::new(Vec::new()),
         });
-        let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
+        let user = RoxUserIdStr::try_from("rox|max@example.com").unwrap();
         assert_eq!(
             service.change(&user, SeatPlan::Premium).await.unwrap(),
             SeatPlan::Max

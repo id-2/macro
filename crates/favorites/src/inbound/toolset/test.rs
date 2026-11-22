@@ -13,7 +13,7 @@ use crate::domain::{
     ports::FavoritesMutationService,
 };
 
-const USER: &str = "macro|favoriter@example.com";
+const USER: &str = "rox|favoriter@example.com";
 
 #[derive(Default)]
 struct RecordingFavorites {

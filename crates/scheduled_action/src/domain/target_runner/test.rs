@@ -32,7 +32,7 @@ use model_entity::EntityType;
 use routine_program::RoutineProgram;
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
 
-const USER: &str = "macro|routine@rox.one";
+const USER: &str = "rox|routine@rox.one";
 
 struct NoModelAdmission;
 

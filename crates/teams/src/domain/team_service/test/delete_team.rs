@@ -11,7 +11,7 @@ use crate::domain::owned_entity_cleanup::{
 };
 
 const TEAM_ID: Uuid = Uuid::from_u128(0x900);
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 const SUBSCRIPTION: &str = "sub_team";
 
 /// One effect of a team deletion, in the order the service caused it.

@@ -1,9 +1,9 @@
 -- A Rox message already queued for sending: no provider delivery time yet.
 -- The old draft/envelope timestamps must not determine its Sent recency.
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active)
-VALUES ('019a0000-0000-7000-8000-000000000001', 'macro|sent-cache@example.com',
+VALUES ('019a0000-0000-7000-8000-000000000001', 'rox|sent-cache@example.com',
         '019a0000-0000-7000-8000-000000000001', 'sent-cache@example.com', 'GMAIL', true),
-       ('019a0000-0000-7000-8000-000000000002', 'macro|other-inbox@example.com',
+       ('019a0000-0000-7000-8000-000000000002', 'rox|other-inbox@example.com',
         '019a0000-0000-7000-8000-000000000002', 'other-inbox@example.com', 'GMAIL', true);
 
 INSERT INTO email_contacts (id, link_id, email_address)

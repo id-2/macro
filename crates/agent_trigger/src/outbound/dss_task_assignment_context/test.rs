@@ -33,7 +33,7 @@ fn task() -> Value {
     json!({
         "documentId": "task-1",
         "documentName": "Fix the flaky test",
-        "owner": "macro|assigner@example.com",
+        "owner": "rox|assigner@example.com",
         "fileType": "md",
         "subType": "task",
         "deletedAt": null,
@@ -148,7 +148,7 @@ async fn a_task_brief_names_the_current_status_priority_due_date_and_assignees()
                         is_system: true,
                         value: Some(PropertyValue::EntityRef(vec![
                             EntityReference {
-                                entity_id: "macro|assigner@example.com".to_owned(),
+                                entity_id: "rox|assigner@example.com".to_owned(),
                                 entity_type: PropertyEntityType::User,
                                 specific_message_id: None,
                             },
@@ -163,7 +163,7 @@ async fn a_task_brief_names_the_current_status_priority_due_date_and_assignees()
                     EntityPropertyInfo {
                         property_definition_id: Uuid::from_u128(0x30),
                         owner: PropertyOwner::User {
-                            user_id: "macro|assigner@example.com".to_owned(),
+                            user_id: "rox|assigner@example.com".to_owned(),
                         },
                         display_name: "Estimate".to_owned(),
                         data_type: DataType::Number,
@@ -195,7 +195,7 @@ async fn a_task_brief_names_the_current_status_priority_due_date_and_assignees()
             priority: Some("High".to_owned()),
             due: Some(Utc.with_ymd_and_hms(2026, 10, 15, 17, 0, 0).unwrap()),
             assignee_ids: vec![
-                "macro|assigner@example.com".to_owned(),
+                "rox|assigner@example.com".to_owned(),
                 bot_id::CODEX_BOT_ID.to_string(),
             ],
             project: None,

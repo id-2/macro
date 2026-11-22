@@ -7,7 +7,7 @@ use model_entity::Entity;
 use rootcause::Report;
 use std::sync::{Arc, Mutex};
 
-const USER: &str = "macro|muter@example.com";
+const USER: &str = "rox|muter@example.com";
 
 type Sets = Arc<Mutex<Vec<(String, String, Option<DateTime<Utc>>)>>>;
 type Removes = Arc<Mutex<Vec<(String, String)>>>;

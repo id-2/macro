@@ -8,7 +8,7 @@ use crate::domain::{models::EmailBackfillStatus, ports::EmailUserRepo};
 async fn test_link_by_fusionauth_and_rox_id_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
 
-    let rox_id = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let rox_id = RoxUserIdStr::parse_from_str("rox|user1@test.com")?;
     let link = repo
         .link_by_fusionauth_and_rox_id("fa-user-1", rox_id, UserProvider::Gmail)
         .await?;
@@ -35,7 +35,7 @@ async fn test_link_by_fusionauth_and_rox_id_wrong_fusionauth(
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
 
-    let rox_id = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let rox_id = RoxUserIdStr::parse_from_str("rox|user1@test.com")?;
     let link = repo
         .link_by_fusionauth_and_rox_id("nonexistent-fa-user", rox_id, UserProvider::Gmail)
         .await?;
@@ -57,7 +57,7 @@ async fn test_link_by_fusionauth_and_rox_id_wrong_rox_id(
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
 
-    let rox_id = RoxUserIdStr::parse_from_str("macro|other@test.com")?;
+    let rox_id = RoxUserIdStr::parse_from_str("rox|other@test.com")?;
     let link = repo
         .link_by_fusionauth_and_rox_id("fa-user-1", rox_id, UserProvider::Gmail)
         .await?;
@@ -86,8 +86,8 @@ async fn test_inboxes_for_rox_id_includes_own_and_delegated(
     sqlx::query(
         r#"
         INSERT INTO "User" (id, email, name, rox_user_id) VALUES
-            ('macro|alice@test.com', 'alice@test.com', 'Alice', 'c1000000-0000-0000-0000-000000000001'),
-            ('macro|shared@test.com', 'shared@test.com', 'Shared Inbox', 'c2000000-0000-0000-0000-000000000002')
+            ('rox|alice@test.com', 'alice@test.com', 'Alice', 'c1000000-0000-0000-0000-000000000001'),
+            ('rox|shared@test.com', 'shared@test.com', 'Shared Inbox', 'c2000000-0000-0000-0000-000000000002')
         "#,
     )
     .execute(&pool)
@@ -96,11 +96,11 @@ async fn test_inboxes_for_rox_id_includes_own_and_delegated(
     sqlx::query(
         r#"
         INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at) VALUES
-            ('a1000000-0000-0000-0000-000000000001'::uuid, 'macro|alice@test.com', 'fa-alice', 'alice@test.com', 'GMAIL', true, NOW() - INTERVAL '2 hours', NOW()),
-            ('a2000000-0000-0000-0000-000000000002'::uuid, 'macro|alice@test.com', 'fa-alice', 'alice.work@test.com', 'GMAIL', true, NOW() - INTERVAL '1 hour', NOW()),
-            ('5e000000-0000-0000-0000-000000000003'::uuid, 'macro|shared@test.com', 'fa-shared', 'shared@test.com', 'GMAIL', true, NOW(), NOW()),
-            ('5f000000-0000-0000-0000-000000000005'::uuid, 'macro|shared@test.com', 'fa-shared', 'shared.other@test.com', 'GMAIL', true, NOW(), NOW()),
-            ('b0000000-0000-0000-0000-000000000004'::uuid, 'macro|bob@test.com', 'fa-bob', 'bob@test.com', 'GMAIL', true, NOW(), NOW())
+            ('a1000000-0000-0000-0000-000000000001'::uuid, 'rox|alice@test.com', 'fa-alice', 'alice@test.com', 'GMAIL', true, NOW() - INTERVAL '2 hours', NOW()),
+            ('a2000000-0000-0000-0000-000000000002'::uuid, 'rox|alice@test.com', 'fa-alice', 'alice.work@test.com', 'GMAIL', true, NOW() - INTERVAL '1 hour', NOW()),
+            ('5e000000-0000-0000-0000-000000000003'::uuid, 'rox|shared@test.com', 'fa-shared', 'shared@test.com', 'GMAIL', true, NOW(), NOW()),
+            ('5f000000-0000-0000-0000-000000000005'::uuid, 'rox|shared@test.com', 'fa-shared', 'shared.other@test.com', 'GMAIL', true, NOW(), NOW()),
+            ('b0000000-0000-0000-0000-000000000004'::uuid, 'rox|bob@test.com', 'fa-bob', 'bob@test.com', 'GMAIL', true, NOW(), NOW())
         "#,
     )
     .execute(&pool)
@@ -111,14 +111,14 @@ async fn test_inboxes_for_rox_id_includes_own_and_delegated(
     sqlx::query(
         r#"
         INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES
-            ('macro|alice@test.com', 'macro|shared@test.com', '5e000000-0000-0000-0000-000000000003'::uuid)
+            ('rox|alice@test.com', 'rox|shared@test.com', '5e000000-0000-0000-0000-000000000003'::uuid)
         "#,
     )
     .execute(&pool)
     .await?;
 
     let repo = EmailPgRepo::new(pool);
-    let rox_id = RoxUserIdStr::parse_from_str("macro|alice@test.com")?;
+    let rox_id = RoxUserIdStr::parse_from_str("rox|alice@test.com")?;
     let links = repo.inboxes_for_rox_id(rox_id.clone()).await?;
 
     let emails: std::collections::HashSet<&str> =
@@ -206,7 +206,7 @@ async fn user_inbox_details_maps_enriched_owned_inbox(pool: Pool<Postgres>) -> a
     .await?;
 
     let details = EmailPgRepo::new(pool)
-        .user_inbox_details(RoxUserIdStr::parse_from_str("macro|user1@test.com")?)
+        .user_inbox_details(RoxUserIdStr::parse_from_str("rox|user1@test.com")?)
         .await?;
 
     assert_eq!(details.len(), 1);
@@ -252,7 +252,7 @@ async fn user_inbox_details_reports_the_calendar_grant(pool: Pool<Postgres>) -> 
     .await?;
 
     let details = EmailPgRepo::new(pool)
-        .user_inbox_details(RoxUserIdStr::parse_from_str("macro|user1@test.com")?)
+        .user_inbox_details(RoxUserIdStr::parse_from_str("rox|user1@test.com")?)
         .await?;
 
     let inbox = &details[0];
@@ -344,9 +344,9 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
     sqlx::query(
         r#"
         INSERT INTO "User" (id, email, rox_user_id) VALUES
-            ('macro|child@test.com', 'child@test.com', 'd1000000-0000-0000-0000-000000000001'::uuid),
-            ('macro|primary@test.com', 'primary@test.com', 'd2000000-0000-0000-0000-000000000002'::uuid),
-            ('macro|stranger@test.com', 'stranger@test.com', 'd3000000-0000-0000-0000-000000000003'::uuid)
+            ('rox|child@test.com', 'child@test.com', 'd1000000-0000-0000-0000-000000000001'::uuid),
+            ('rox|primary@test.com', 'primary@test.com', 'd2000000-0000-0000-0000-000000000002'::uuid),
+            ('rox|stranger@test.com', 'stranger@test.com', 'd3000000-0000-0000-0000-000000000003'::uuid)
         "#,
     )
     .execute(&pool)
@@ -355,7 +355,7 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
     sqlx::query(
         r#"
         INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at) VALUES
-            ('c0000000-0000-0000-0000-000000000001'::uuid, 'macro|child@test.com', 'fa-child', 'child@test.com', 'GMAIL', true, NOW(), NOW())
+            ('c0000000-0000-0000-0000-000000000001'::uuid, 'rox|child@test.com', 'fa-child', 'child@test.com', 'GMAIL', true, NOW(), NOW())
         "#,
     )
     .execute(&pool)
@@ -370,7 +370,7 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
 
     sqlx::query(
         r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
-           VALUES ('macro|primary@test.com', 'macro|child@test.com', 'c0000000-0000-0000-0000-000000000001'::uuid)"#,
+           VALUES ('rox|primary@test.com', 'rox|child@test.com', 'c0000000-0000-0000-0000-000000000001'::uuid)"#,
     )
     .execute(&pool)
     .await?;
@@ -383,7 +383,7 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
     let delegated = repo
         .owned_link_for_thread(
             thread_id,
-            RoxUserIdStr::parse_from_str("macro|primary@test.com")?,
+            RoxUserIdStr::parse_from_str("rox|primary@test.com")?,
         )
         .await?;
     assert_eq!(delegated.map(|l| l.id), Some(link_id));
@@ -392,7 +392,7 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
     let owned = repo
         .owned_link_for_thread(
             thread_id,
-            RoxUserIdStr::parse_from_str("macro|child@test.com")?,
+            RoxUserIdStr::parse_from_str("rox|child@test.com")?,
         )
         .await?;
     assert_eq!(owned.map(|l| l.id), Some(link_id));
@@ -401,7 +401,7 @@ async fn test_owned_link_for_thread_resolves_own_and_delegated(
     let none = repo
         .owned_link_for_thread(
             thread_id,
-            RoxUserIdStr::parse_from_str("macro|stranger@test.com")?,
+            RoxUserIdStr::parse_from_str("rox|stranger@test.com")?,
         )
         .await?;
     assert!(none.is_none());

@@ -4,7 +4,7 @@ use models_permissions::share_permission::TeamLinkShareDefault;
 use super::*;
 
 const TEST_BOT: &str = "bot|00000000-0000-0000-0000-00000000b07a";
-const SPONSOR: &str = "macro|test@example.com";
+const SPONSOR: &str = "rox|test@example.com";
 
 #[derive(Debug, PartialEq, Eq)]
 struct ChatOwnership {
@@ -149,7 +149,7 @@ async fn bot_owner_team_default_link_share_comes_from_owner_team(pool: Pool<Post
     .await
     .unwrap();
     let repo = test_repo(pool);
-    let teamless_user = RoxUserIdStr::parse_from_str("macro|no-team@example.com")
+    let teamless_user = RoxUserIdStr::parse_from_str("rox|no-team@example.com")
         .unwrap()
         .into_owned();
 

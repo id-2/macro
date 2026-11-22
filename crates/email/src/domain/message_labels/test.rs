@@ -170,7 +170,7 @@ fn service() -> MessageLabelService<Repository, Enqueuer, Broker> {
             calls: calls.clone(),
             inbox: Some(MessageLabelInbox {
                 id: Uuid::from_u128(1),
-                rox_id: RoxUserIdStr::try_from("macro|owner@example.com").unwrap(),
+                rox_id: RoxUserIdStr::try_from("rox|owner@example.com").unwrap(),
             }),
             label: Some(MessageLabelDefinition {
                 id: Some(Uuid::from_u128(2)),
@@ -204,7 +204,7 @@ fn message(id: u128, thread: u128) -> MessageLabelTarget {
 
 fn request(message_ids: Vec<Uuid>) -> MessageLabelChange {
     MessageLabelChange {
-        caller_rox_id: "macro|caller@example.com".into(),
+        caller_rox_id: "rox|caller@example.com".into(),
         caller_fusionauth_user_id: "caller-auth".into(),
         message_ids,
         label_id: Uuid::from_u128(2),
@@ -243,7 +243,7 @@ async fn missing_inbox_stops_before_label_lookup() {
     assert_eq!(
         *service.repository.calls.lock().unwrap(),
         vec![Call::Inbox(
-            "macro|caller@example.com".into(),
+            "rox|caller@example.com".into(),
             Uuid::from_u128(3)
         )]
     );
@@ -260,7 +260,7 @@ async fn missing_label_stops_before_message_lookup() {
     assert_eq!(
         *service.repository.calls.lock().unwrap(),
         vec![
-            Call::Inbox("macro|caller@example.com".into(), Uuid::from_u128(3)),
+            Call::Inbox("rox|caller@example.com".into(), Uuid::from_u128(3)),
             Call::Label(Uuid::from_u128(2), Uuid::from_u128(1))
         ]
     );
@@ -357,7 +357,7 @@ async fn provider_write_uses_exact_staged_messages_and_write_id_after_events() {
     assert_eq!(
         *service.repository.calls.lock().unwrap(),
         vec![
-            Call::Inbox("macro|caller@example.com".into(), Uuid::from_u128(3)),
+            Call::Inbox("rox|caller@example.com".into(), Uuid::from_u128(3)),
             Call::Label(Uuid::from_u128(2), Uuid::from_u128(1)),
             Call::Messages(
                 vec![Uuid::from_u128(3), Uuid::from_u128(4), Uuid::from_u128(5)],

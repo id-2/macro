@@ -18,14 +18,14 @@ fn archived(
         CallTopicEvent::RecordArchived(crate::domain::events::CallRecordArchivedMetadata {
             call_id: Uuid::from_u128(5),
             channel_id,
-            created_by: "macro|rahul@example.com".to_string().try_into().unwrap(),
+            created_by: "rox|rahul@example.com".to_string().try_into().unwrap(),
             started_at: ended_at - chrono::Duration::minutes(8),
             ended_at,
             duration_ms,
             participant_count: 2,
             participants: vec![
-                "macro|rahul@example.com".to_string().try_into().unwrap(),
-                "macro|teo@example.com".to_string().try_into().unwrap(),
+                "rox|rahul@example.com".to_string().try_into().unwrap(),
+                "rox|teo@example.com".to_string().try_into().unwrap(),
             ],
             has_recording: false,
             archive_reason: crate::domain::events::CallArchiveReason::LastParticipantLeft,
@@ -87,7 +87,7 @@ fn call_started_yields_channel_and_call_activities() {
         CallTopicEvent::Started(CallStartedMetadata {
             call_id,
             channel_id: Some(channel_id),
-            created_by: RoxUserIdStr::try_from("macro|rahul@example.com".to_string()).unwrap(),
+            created_by: RoxUserIdStr::try_from("rox|rahul@example.com".to_string()).unwrap(),
             created_at,
             recording_enabled: false,
         }),

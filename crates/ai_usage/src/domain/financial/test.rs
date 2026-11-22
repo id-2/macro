@@ -27,7 +27,7 @@ fn begin() -> BeginInvocation {
     BeginInvocation {
         run_id: RunId::new(),
         invocation_id: InvocationId::new(),
-        user: RoxUserIdStr::try_from("macro|test@example.com".to_owned()).unwrap(),
+        user: RoxUserIdStr::try_from("rox|test@example.com".to_owned()).unwrap(),
         feature: AiFeature::Chat,
         entity: None,
         model: model("provider-a"),

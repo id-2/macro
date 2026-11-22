@@ -8,12 +8,12 @@ async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: Pg
     let first = TeamId(Uuid::now_v7());
     let second = TeamId(Uuid::now_v7());
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("fixture")
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|viewer@example.test")
             .expect("fixture")
             .into_owned(),
     };
@@ -21,7 +21,7 @@ async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: Pg
         let email = actor
             .user_id
             .as_ref()
-            .strip_prefix("macro|")
+            .strip_prefix("rox|")
             .expect("fixture prefix");
         let rox_user_id = Uuid::now_v7();
         sqlx::query!(
@@ -677,7 +677,7 @@ async fn distinct_team_leases_share_admission_and_reserve_database_query_capacit
 async fn stale_totp_setup_and_removal_cannot_override_a_newer_enrollment_or_removal(pool: PgPool) {
     let team = TeamId(Uuid::now_v7());
     let item = ItemId(Uuid::now_v7());
-    let owner = RoxUserIdStr::parse_from_str("macro|revision@example.test")
+    let owner = RoxUserIdStr::parse_from_str("rox|revision@example.test")
         .expect("identity")
         .into_owned();
     let rox_user_id = Uuid::now_v7();
@@ -804,16 +804,16 @@ async fn first_erasure_and_quarantine_are_not_starved_by_repeat_tombstones(pool:
     let account = Uuid::now_v7();
     sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES($1,'queue@example.test','queue@example.test',$2)", account, format!("fixture-{account}"))
         .execute(&pool).await.expect("account");
-    sqlx::query!(r#"INSERT INTO "User"(id,email,rox_user_id) VALUES('macro|queue@example.test','queue@example.test',$1)"#, account)
+    sqlx::query!(r#"INSERT INTO "User"(id,email,rox_user_id) VALUES('rox|queue@example.test','queue@example.test',$1)"#, account)
         .execute(&pool).await.expect("user");
     sqlx::query!(
-        "INSERT INTO team(id,name,owner_id) VALUES($1,'Fixture','macro|queue@example.test')",
+        "INSERT INTO team(id,name,owner_id) VALUES($1,'Fixture','rox|queue@example.test')",
         team.0
     )
     .execute(&pool)
     .await
     .expect("team");
-    sqlx::query!("INSERT INTO password_item_entities(team_id,id,user_id,metadata,version) VALUES($1,$2,'macro|queue@example.test','{}',1)", team.0,item.0)
+    sqlx::query!("INSERT INTO password_item_entities(team_id,id,user_id,metadata,version) VALUES($1,$2,'rox|queue@example.test','{}',1)", team.0,item.0)
         .execute(&pool).await.expect("item");
     let repository = PgRepository::new(pool).expect("repository");
     for _ in 0..100 {

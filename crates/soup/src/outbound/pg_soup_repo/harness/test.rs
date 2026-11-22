@@ -28,7 +28,7 @@ async fn hydrates_only_runtimes_the_viewer_can_see(
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: RoxUserIdStr::parse_from_str("macro|user-1@example.com")?,
+            user_id: RoxUserIdStr::parse_from_str("rox|user-1@example.com")?,
         },
     )
     .await?;
@@ -40,12 +40,12 @@ async fn hydrates_only_runtimes_the_viewer_can_see(
     assert_eq!(runtime_1.name, "runtime-1");
     assert_eq!(
         runtime_1.owner_id,
-        Owner::from_principal_str("macro|user-1@example.com")?
+        Owner::from_principal_str("rox|user-1@example.com")?
     );
     assert_eq!(runtime_2.name, "runtime-2");
     assert_eq!(
         runtime_2.owner_id,
-        Owner::from_principal_str("macro|user-2@example.com")?
+        Owner::from_principal_str("rox|user-2@example.com")?
     );
     Ok(())
 }
@@ -68,8 +68,8 @@ async fn a_computer_harness_is_visible_to_its_team_not_its_buyers_teammates(
         INSERT INTO hosted_runtime_host (id, name, awake_capacity_units, sold_capacity_units)
         VALUES ('bbbbbbbb-0000-0000-0000-000000000001', 'host-1', 8, 8);
         INSERT INTO harnesses (id, name, owner_user_id, created_by, computer_id)
-        VALUES ('aaaaaaaa-0000-0000-0000-0000000000c1', 'computer', 'macro|user-1@example.com',
-            'macro|user-1@example.com', 'cccccccc-0000-0000-0000-000000000001');
+        VALUES ('aaaaaaaa-0000-0000-0000-0000000000c1', 'computer', 'rox|user-1@example.com',
+            'rox|user-1@example.com', 'cccccccc-0000-0000-0000-000000000001');
         INSERT INTO hosted_runtime (
             id, team_id, name, size, vcpus, memory_gib, disk_gib, catalog_entry,
             purchase_key, host_id, state, harness_id, created_by
@@ -77,7 +77,7 @@ async fn a_computer_harness_is_visible_to_its_team_not_its_buyers_teammates(
         VALUES ('cccccccc-0000-0000-0000-000000000001', '77777777-cccc-cccc-cccc-cccccccccccc',
             'computer', 'standard', 2, 8, 40, 'standard-v1', 'buy-1',
             'bbbbbbbb-0000-0000-0000-000000000001', '{}',
-            'aaaaaaaa-0000-0000-0000-0000000000c1', 'macro|user-1@example.com');
+            'aaaaaaaa-0000-0000-0000-0000000000c1', 'rox|user-1@example.com');
         "#,
     )
     .execute(&pool)
@@ -86,9 +86,9 @@ async fn a_computer_harness_is_visible_to_its_team_not_its_buyers_teammates(
         [EntityType::Harness
             .with_entity_string("aaaaaaaa-0000-0000-0000-0000000000c1".to_string())];
     for (viewer, sees) in [
-        ("macro|user-1@example.com", false),
-        ("macro|user-2@example.com", false),
-        ("macro|user-3@example.com", true),
+        ("rox|user-1@example.com", false),
+        ("rox|user-2@example.com", false),
+        ("rox|user-3@example.com", true),
     ] {
         let items = by_ids(
             &pool,

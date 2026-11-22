@@ -11,7 +11,7 @@ fn agent(owner: BotOwner) -> Agent {
             handle: "bug-fixer".to_string(),
             description: Some("Finds and fixes bugs".to_string()),
             avatar_url: Some("https://static.example/bug-fixer.png".to_string()),
-            created_by: Some("macro|owner@example.com".to_string()),
+            created_by: Some("rox|owner@example.com".to_string()),
             created_at: now,
             updated_at: now,
             deleted_at: None,
@@ -64,7 +64,7 @@ fn empty_patch_reproduces_the_agent_under_its_current_owner() {
 #[test]
 fn user_owned_agent_stays_private() {
     let current = agent(BotOwner::User {
-        user_id: "macro|owner@example.com".to_string(),
+        user_id: "rox|owner@example.com".to_string(),
     });
 
     let update = PatchAgentRequest {

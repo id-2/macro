@@ -7,7 +7,7 @@ use std::pin::Pin;
 use std::sync::Mutex;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|import@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|import@example.com").unwrap()
 }
 
 #[derive(Default)]

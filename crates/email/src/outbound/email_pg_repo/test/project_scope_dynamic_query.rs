@@ -10,7 +10,7 @@
 
 use super::*;
 
-const USER1: &str = "macro|user1@test.com";
+const USER1: &str = "rox|user1@test.com";
 const SHARED_PROJECT: &str = "cccccccc-cccc-cccc-cccc-cccccccccccc";
 const TEAM_PROJECT: &str = "dddd0000-0000-0000-0000-00000000dddd";
 const PRIVATE_PROJECT: &str = "eeee0000-0000-0000-0000-00000000eeee";
@@ -111,7 +111,7 @@ async fn widened_rows_carry_owning_link_metadata(pool: Pool<Postgres>) -> anyhow
         .find(|r| r.id.to_string() == USER2_IN_SHARED)
         .expect("user2's project thread should be returned");
     assert_eq!(
-        user2_row.owner_id, "macro|user2@test.com",
+        user2_row.owner_id, "rox|user2@test.com",
         "widened thread must report its real owner"
     );
     assert_eq!(

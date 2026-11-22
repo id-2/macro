@@ -12,8 +12,8 @@ use crate::domain::model::{
 use crate::domain::ports::{Limits, Written};
 use crate::outbound::pg_suggestion_repo::PgSuggestionRepo;
 
-const OWNER: &str = "macro|suggestions-resolve-owner@rox.one";
-const OTHER: &str = "macro|suggestions-resolve-other@rox.one";
+const OWNER: &str = "rox|suggestions-resolve-owner@rox.one";
+const OTHER: &str = "rox|suggestions-resolve-other@rox.one";
 const THREAD: &str = "01900000-0000-7000-8000-0000000000a1";
 const CHANNEL: &str = "01900000-0000-7000-8000-0000000000c1";
 const DOCUMENT: &str = "document-1";

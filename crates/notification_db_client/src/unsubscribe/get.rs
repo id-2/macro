@@ -46,7 +46,7 @@ mod tests {
         let result = get_user_unsubscribes(&pool, "no-user").await.unwrap();
         assert_eq!(result.len(), 0);
 
-        let result = get_user_unsubscribes(&pool, "macro|user@user.com")
+        let result = get_user_unsubscribes(&pool, "rox|user@user.com")
             .await
             .unwrap();
         assert_eq!(result.len(), 1);

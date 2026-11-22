@@ -6,7 +6,7 @@ use opensearch_client::search::unified::{UnifiedEmailSearchArgs, UnifiedSearchAr
 
 fn main() {
     let args = UnifiedSearchArgs {
-        user_id: "macro|gab@rox.one".to_string(),
+        user_id: "rox|gab@rox.one".to_string(),
         page: 0,
         page_size: 10,
         match_type: "partial".to_string(),

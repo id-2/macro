@@ -6,7 +6,7 @@ use rox_user_id::cowlike::CowLike as _;
 use super::*;
 
 fn user(n: u32) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|night{n}@rox.one"))
+    RoxUserIdStr::parse_from_str(&format!("rox|night{n}@rox.one"))
         .unwrap()
         .into_owned()
 }

@@ -437,7 +437,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
     // shared `signup:{user_id}` event id purely to contribute click-id
     // cookies for attribution; Meta dedupes the pair on that id (see the
     // web app's signupCompletion.ts). Uses the same distinct id
-    // ("macro|{email}") the app identifies with. Fire-and-forget.
+    // ("rox|{email}") the app identifies with. Fire-and-forget.
     tokio::spawn({
         let analytics_client = ctx.analytics_client.clone();
         let db = ctx.db.clone();
@@ -450,7 +450,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
         async move {
             // Seed the profile with the name the identity provider gave us (Google
             // SSO). Keyed on the FusionAuth id, which is rox_user.id — `user_id`
-            // here is the "macro|{email}" User profile id.
+            // here is the "rox|{email}" User profile id.
             if first_name.is_some() || last_name.is_some() {
                 let _ = rox_db_client::user::update_user_name::update_user_name(
                     &db,

@@ -40,7 +40,7 @@ vi.mock('@queries/email/link', () => ({
     refetch: mocks.refetchLinks,
   }),
 }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|self' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|self' }));
 vi.mock('@core/email-link', () => ({
   useAddInboxFlow: () => mocks.startAddInbox,
 }));
@@ -104,7 +104,7 @@ import {
 const link = (id: string, overrides: Partial<Link> = {}): Link =>
   ({
     id,
-    rox_id: 'macro|self',
+    rox_id: 'rox|self',
     email_address: `${id}@example.com`,
     is_primary: id === 'work',
     needs_reauth: false,

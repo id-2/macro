@@ -344,7 +344,7 @@ async fn only_the_persons_open_routines_sessions_may_suggest() {
             .await,
     );
     // Someone else's routines session.
-    let other = RoxUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("rox|someone-else@example.com".to_owned()).unwrap();
     let theirs = h.session_of(other, SessionKind::Routines, &[Surface::Email]);
     assert_not_suggesting(h.service.suggest(&principal, Some(theirs), request()).await);
     // The person's own suggestions session.

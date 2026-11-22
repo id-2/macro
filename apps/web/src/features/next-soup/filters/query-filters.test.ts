@@ -61,17 +61,17 @@ describe('soupItemMatchesQuery', () => {
   it('accepts any in-type item when the type is scoped by a non-id field', () => {
     // Referencing the document target via owner keeps documentId un-nil-filled,
     // so a new document owned by that user still matches optimistically.
-    const query: Query = { include: { documentOwnerId: ['macro|me@x.com'] } };
+    const query: Query = { include: { documentOwnerId: ['rox|me@x.com'] } };
 
     expect(
       soupItemMatchesQuery(
-        documentItem('doc-new', { ownerId: 'macro|me@x.com' }),
+        documentItem('doc-new', { ownerId: 'rox|me@x.com' }),
         query
       )
     ).toBe(true);
     expect(
       soupItemMatchesQuery(
-        documentItem('doc-other', { ownerId: 'macro|other@x.com' }),
+        documentItem('doc-other', { ownerId: 'rox|other@x.com' }),
         query
       )
     ).toBe(false);
@@ -160,7 +160,7 @@ describe('filterSoupItemByRequestBody', () => {
   it('only accepts agent sessions when the body opts into them', () => {
     const session = {
       tag: 'agentSession',
-      data: { id: 'session-1', ownerId: 'macro|a@rox.one' },
+      data: { id: 'session-1', ownerId: 'rox|a@rox.one' },
     } as unknown as SoupApiItem;
 
     expect(filterSoupItemByRequestBody(session, {})).toBe(false);
@@ -174,12 +174,12 @@ describe('filterSoupItemByRequestBody', () => {
     ).toBe(true);
     expect(
       filterSoupItemByRequestBody(session, {
-        agent_session_filters: { owners: ['macro|a@rox.one'] },
+        agent_session_filters: { owners: ['rox|a@rox.one'] },
       })
     ).toBe(true);
     expect(
       filterSoupItemByRequestBody(session, {
-        agent_session_filters: { include: true, owners: ['macro|b@rox.one'] },
+        agent_session_filters: { include: true, owners: ['rox|b@rox.one'] },
       })
     ).toBe(false);
   });

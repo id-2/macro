@@ -13,7 +13,7 @@ parses arguments and prints.
 
   ```bash
   DATABASE_URL=... cargo run -p ai_billing_cli -- grant-credits \
-    --user 'macro|someone@example.com' --amount-cents 1500 \
+    --user 'rox|someone@example.com' --amount-cents 1500 \
     --reason 'refund of October usage, by <you>'
   # ...then the same command plus --execute --grant-id <printed id>
   ```
@@ -33,4 +33,4 @@ parses arguments and prints.
   allowance, at the overage markup (`AI_USAGE_OVERAGE_MARKUP_PERCENT`): $15 of
   credit covers $12 of usage at a 25% markup. It does not reset the allowance,
   and free users are refused (they are hard-capped).
-- `--user` takes the billing id `macro|<email>`, not the `macro_user` UUID.
+- `--user` takes the billing id `rox|<email>`, not the `macro_user` UUID.

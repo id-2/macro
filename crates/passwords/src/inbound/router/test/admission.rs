@@ -246,7 +246,7 @@ async fn session_shaped_agent_account_is_denied_with_team_and_existing_direct_gr
         );
         let team = TeamId(Uuid::from_u128(1));
         let item = ItemId(Uuid::from_u128(2));
-        let agent = "macro|agent@example.test";
+        let agent = "rox|agent@example.test";
         repository
             .memberships
             .lock()
@@ -255,7 +255,7 @@ async fn session_shaped_agent_account_is_denied_with_team_and_existing_direct_gr
         repository.agents.lock().unwrap().insert(agent.into());
         let now = chrono::Utc::now();
         let record:Record=serde_json::from_value(serde_json::json!({
-            "user_id":"macro|creator@example.com", "grants":[{"kind":kind,"id":if kind=="team" {team.0.to_string()} else {agent.into()},"permission":"edit"}],
+            "user_id":"rox|creator@example.com", "grants":[{"kind":kind,"id":if kind=="team" {team.0.to_string()} else {agent.into()},"permission":"edit"}],
             "deleting":false,"revision":1,"totp_key_id":null,
             "metadata":{"id":item,"teamId":team,"name":"Credential","kind":"login","url":null,"folderId":null,"favorite":false,"version":1,"hasTotp":false,"shared":true,"shareCount":1,"createdAt":now,"updatedAt":now,"lastUsedAt":null}
         })).unwrap();
@@ -290,7 +290,7 @@ async fn session_shaped_agent_account_is_denied_with_team_and_existing_direct_gr
             .memberships
             .lock()
             .unwrap()
-            .insert("macro|synthetic@example.test".into(), vec![team]);
+            .insert("rox|synthetic@example.test".into(), vec![team]);
         let human = app
             .clone()
             .oneshot(

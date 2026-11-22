@@ -76,7 +76,7 @@ fn ended_call(transcript: Vec<CallRecordTranscriptSegment>) -> CallRecord {
         call_id: Uuid::parse_str(CALL_ID).unwrap(),
         channel_id: Some(Uuid::parse_str("01928f3e-6a2b-7c3d-8e4f-0000000c4a77").unwrap()),
         room_name: Some("room".into()),
-        created_by: "macro|ana@example.com".into(),
+        created_by: "rox|ana@example.com".into(),
         started_at: at(0),
         ended_at: Some(at(30)),
         duration_ms: Some(1_800_000),
@@ -96,7 +96,7 @@ fn ended_call(transcript: Vec<CallRecordTranscriptSegment>) -> CallRecord {
         user_access_level: None,
         viewer_has_declined: false,
         participants: vec![CallRecordParticipant {
-            user_id: "macro|ana@example.com".into(),
+            user_id: "rox|ana@example.com".into(),
             joined_at: at(0),
             left_at: Some(at(30)),
         }],
@@ -125,12 +125,12 @@ fn a_started_call_carries_who_started_it_and_who_has_joined() {
                 channel_name: Some("eng".into()),
                 started_at: at(0),
                 started_by: ContextPerson {
-                    id: "macro|ana@example.com".into(),
+                    id: "rox|ana@example.com".into(),
                     name: "ana@example.com".into(),
                     email: Some("ana@example.com".into()),
                 },
                 participants: vec![ContextPerson {
-                    id: "macro|ana@example.com".into(),
+                    id: "rox|ana@example.com".into(),
                     name: "ana@example.com".into(),
                     email: Some("ana@example.com".into()),
                 }],
@@ -144,7 +144,7 @@ fn an_ended_call_carries_its_people_and_what_they_said() {
     let guest =
         GuestId::from_uuid(Uuid::parse_str("01928f3e-6a2b-7c3d-8e4f-00000000065e").unwrap());
     let mut record = ended_call(vec![
-        segment("macro|ana@example.com", "Can we ship Friday?", 1),
+        segment("rox|ana@example.com", "Can we ship Friday?", 1),
         segment(&guest.to_string(), "Yes, after QA signs off.", 2),
     ]);
     record.custom_name = Some("Release sync".into());
@@ -167,7 +167,7 @@ fn an_ended_call_carries_its_people_and_what_they_said() {
                 ended_at: at(30),
                 participants: vec![
                     ContextPerson {
-                        id: "macro|ana@example.com".into(),
+                        id: "rox|ana@example.com".into(),
                         name: "ana@example.com".into(),
                         email: Some("ana@example.com".into()),
                     },
@@ -200,12 +200,12 @@ fn an_ended_call_carries_its_people_and_what_they_said() {
 fn a_long_transcript_is_cut_mid_speech_and_says_so() {
     let record = ended_call(vec![
         segment(
-            "macro|ana@example.com",
+            "rox|ana@example.com",
             &"a".repeat(MAX_TRANSCRIPT_CHARS - 10),
             1,
         ),
-        segment("macro|ana@example.com", &"b".repeat(20), 2),
-        segment("macro|ana@example.com", "never reached", 3),
+        segment("rox|ana@example.com", &"b".repeat(20), 2),
+        segment("rox|ana@example.com", "never reached", 3),
     ]);
     let (lines, omitted) = call_transcript(&record);
     assert!(omitted);
@@ -238,7 +238,7 @@ fn a_task_status_change_carries_the_task_as_it_reads_now() {
         document: DocumentBasic {
             document_id: "01928f3e-6a2b-7c3d-8e4f-000000007a5c".into(),
             document_name: "Login page crashes on Safari".into(),
-            owner: Owner::User(RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
+            owner: Owner::User(RoxUserIdStr::parse_from_str("rox|dana@example.com").unwrap()),
             file_type: Some("md".into()),
             sub_type: Some(DocumentSubType::Task),
             branched_from_id: None,
@@ -296,7 +296,7 @@ fn a_task_status_change_carries_the_task_as_it_reads_now() {
                 is_multi_select: true,
                 is_system: true,
                 value: Some(PropertyValue::EntityRef(vec![EntityReference {
-                    entity_id: "macro|sam@example.com".into(),
+                    entity_id: "rox|sam@example.com".into(),
                     entity_type: PropertyEntityType::User,
                     specific_message_id: None,
                 }])),
@@ -328,7 +328,7 @@ fn a_task_status_change_carries_the_task_as_it_reads_now() {
                 priority: Some("High".into()),
                 due: Some(Utc.with_ymd_and_hms(2026, 10, 9, 0, 0, 0).unwrap()),
                 assignees: vec![ContextPerson {
-                    id: "macro|sam@example.com".into(),
+                    id: "rox|sam@example.com".into(),
                     name: "sam@example.com".into(),
                     email: Some("sam@example.com".into()),
                 }],
@@ -357,7 +357,7 @@ fn a_status_change_from_a_pull_request_names_it_and_who_acted() {
         document: DocumentBasic {
             document_id: "01928f3e-6a2b-7c3d-8e4f-000000007a5c".into(),
             document_name: "Login page crashes on Safari".into(),
-            owner: Owner::User(RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
+            owner: Owner::User(RoxUserIdStr::parse_from_str("rox|dana@example.com").unwrap()),
             file_type: Some("md".into()),
             sub_type: Some(DocumentSubType::Task),
             branched_from_id: None,
@@ -483,7 +483,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
         id: prompt_id,
         parent: MessageParent::Channel(channel_id),
         thread_id: Some(root_id),
-        sender_id: "macro|ana@example.com".to_owned().try_into().unwrap(),
+        sender_id: "rox|ana@example.com".to_owned().try_into().unwrap(),
         guest_name: None,
         imported_author: None,
         bot_profile: None,
@@ -508,7 +508,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
             thread: Some(MessageThread {
                 state: ThreadState {
                     root_id,
-                    user_id: "macro|ana@example.com".into(),
+                    user_id: "rox|ana@example.com".into(),
                     resolved: false,
                     anchor: None,
                     created_at: at(1),
@@ -520,7 +520,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
                     id: root_id,
                     parent: MessageParent::Channel(channel_id),
                     thread_id: None,
-                    sender_id: "macro|ana@example.com".to_owned().try_into().unwrap(),
+                    sender_id: "rox|ana@example.com".to_owned().try_into().unwrap(),
                     guest_name: None,
                     imported_author: None,
                     bot_profile: None,
@@ -541,7 +541,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
                         id: answer_id,
                         parent: MessageParent::Channel(channel_id),
                         thread_id: Some(root_id),
-                        sender_id: "macro|sam@example.com".to_owned().try_into().unwrap(),
+                        sender_id: "rox|sam@example.com".to_owned().try_into().unwrap(),
                         guest_name: None,
                         imported_author: None,
                         bot_profile: None,
@@ -561,7 +561,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
                         id: deleted_id,
                         parent: MessageParent::Channel(channel_id),
                         thread_id: Some(root_id),
-                        sender_id: "macro|sam@example.com".to_owned().try_into().unwrap(),
+                        sender_id: "rox|sam@example.com".to_owned().try_into().unwrap(),
                         guest_name: None,
                         imported_author: None,
                         bot_profile: None,
@@ -582,7 +582,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
                         id: later_id,
                         parent: MessageParent::Channel(channel_id),
                         thread_id: Some(root_id),
-                        sender_id: "macro|sam@example.com".to_owned().try_into().unwrap(),
+                        sender_id: "rox|sam@example.com".to_owned().try_into().unwrap(),
                         guest_name: None,
                         imported_author: None,
                         bot_profile: None,
@@ -603,7 +603,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
     };
 
     let ana = ContextPerson {
-        id: "macro|ana@example.com".into(),
+        id: "rox|ana@example.com".into(),
         name: "ana@example.com".into(),
         email: Some("ana@example.com".into()),
     };
@@ -633,7 +633,7 @@ fn a_channel_reply_carries_its_thread_through_the_message() {
                         ContextMessage {
                             id: answer_id,
                             author: ContextPerson {
-                                id: "macro|sam@example.com".into(),
+                                id: "rox|sam@example.com".into(),
                                 name: "sam@example.com".into(),
                                 email: Some("sam@example.com".into()),
                             },

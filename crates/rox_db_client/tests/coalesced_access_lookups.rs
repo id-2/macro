@@ -68,9 +68,9 @@ async fn concurrent_identical_item_lookups_run_the_queries_once(
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO "Document" (id, name, owner)
-        VALUES ('d1000000-0000-0000-0000-000000000001', 'Shared', 'macro|items-once-owner@example.test');
+        VALUES ('d1000000-0000-0000-0000-000000000001', 'Shared', 'rox|items-once-owner@example.test');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('d1000000-0000-0000-0000-000000000001', 'document', 'macro|items-once@example.test', 'user', 'view');
+        VALUES ('d1000000-0000-0000-0000-000000000001', 'document', 'rox|items-once@example.test', 'user', 'view');
         COMMIT;
         "#,
     )
@@ -81,7 +81,7 @@ async fn concurrent_identical_item_lookups_run_the_queries_once(
     let lookups = (0..20).map(|_| {
         get_user_accessible_items(
             &pool,
-            "macro|items-once@example.test",
+            "rox|items-once@example.test",
             Some("document".to_string()),
             false,
         )
@@ -99,7 +99,7 @@ async fn concurrent_identical_item_lookups_run_the_queries_once(
     // The ten second cache still answers the next caller without a statement.
     let cached = get_user_accessible_items(
         &pool,
-        "macro|items-once@example.test",
+        "rox|items-once@example.test",
         Some("document".to_string()),
         false,
     )
@@ -124,11 +124,11 @@ async fn item_lookups_for_other_users_and_filters_stay_separate(
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO "Document" (id, name, owner)
-        VALUES ('d2000000-0000-0000-0000-00000000000a', 'Owned by A', 'macro|items-separate-a@example.test'),
-               ('d2000000-0000-0000-0000-00000000000b', 'Shared with B', 'macro|items-separate-owner@example.test');
+        VALUES ('d2000000-0000-0000-0000-00000000000a', 'Owned by A', 'rox|items-separate-a@example.test'),
+               ('d2000000-0000-0000-0000-00000000000b', 'Shared with B', 'rox|items-separate-owner@example.test');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('d2000000-0000-0000-0000-00000000000a', 'document', 'macro|items-separate-a@example.test', 'user', 'owner'),
-               ('d2000000-0000-0000-0000-00000000000b', 'document', 'macro|items-separate-b@example.test', 'user', 'view');
+        VALUES ('d2000000-0000-0000-0000-00000000000a', 'document', 'rox|items-separate-a@example.test', 'user', 'owner'),
+               ('d2000000-0000-0000-0000-00000000000b', 'document', 'rox|items-separate-b@example.test', 'user', 'view');
         COMMIT;
         "#,
     )
@@ -139,25 +139,25 @@ async fn item_lookups_for_other_users_and_filters_stay_separate(
     let (a_documents, b_documents, a_chats, a_documents_not_owned) = futures::join!(
         get_user_accessible_items(
             &pool,
-            "macro|items-separate-a@example.test",
+            "rox|items-separate-a@example.test",
             Some("document".to_string()),
             false,
         ),
         get_user_accessible_items(
             &pool,
-            "macro|items-separate-b@example.test",
+            "rox|items-separate-b@example.test",
             Some("document".to_string()),
             false,
         ),
         get_user_accessible_items(
             &pool,
-            "macro|items-separate-a@example.test",
+            "rox|items-separate-a@example.test",
             Some("chat".to_string()),
             false,
         ),
         get_user_accessible_items(
             &pool,
-            "macro|items-separate-a@example.test",
+            "rox|items-separate-a@example.test",
             Some("document".to_string()),
             true,
         ),
@@ -191,9 +191,9 @@ async fn a_failed_item_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO "Document" (id, name, owner)
-        VALUES ('d3000000-0000-0000-0000-000000000001', 'Shared', 'macro|items-failed-owner@example.test');
+        VALUES ('d3000000-0000-0000-0000-000000000001', 'Shared', 'rox|items-failed-owner@example.test');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('d3000000-0000-0000-0000-000000000001', 'document', 'macro|items-failed@example.test', 'user', 'view');
+        VALUES ('d3000000-0000-0000-0000-000000000001', 'document', 'rox|items-failed@example.test', 'user', 'view');
         COMMIT;
         ALTER TABLE entity_access RENAME TO entity_access_moved;
         "#,
@@ -205,7 +205,7 @@ async fn a_failed_item_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
     let lookups = (0..5).map(|_| {
         get_user_accessible_items(
             &pool,
-            "macro|items-failed@example.test",
+            "rox|items-failed@example.test",
             Some("document".to_string()),
             false,
         )
@@ -223,7 +223,7 @@ async fn a_failed_item_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
 
     let items = get_user_accessible_items(
         &pool,
-        "macro|items-failed@example.test",
+        "rox|items-failed@example.test",
         Some("document".to_string()),
         false,
     )
@@ -248,9 +248,9 @@ async fn cancelling_the_first_item_lookup_leaves_the_others_one_shared_run(
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO "Document" (id, name, owner)
-        VALUES ('d4000000-0000-0000-0000-000000000001', 'Shared', 'macro|items-cancelled-owner@example.test');
+        VALUES ('d4000000-0000-0000-0000-000000000001', 'Shared', 'rox|items-cancelled-owner@example.test');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('d4000000-0000-0000-0000-000000000001', 'document', 'macro|items-cancelled@example.test', 'user', 'view');
+        VALUES ('d4000000-0000-0000-0000-000000000001', 'document', 'rox|items-cancelled@example.test', 'user', 'view');
         COMMIT;
         "#,
     )
@@ -262,7 +262,7 @@ async fn cancelling_the_first_item_lookup_leaves_the_others_one_shared_run(
     for _ in 0..3 {
         lookups.push(Box::pin(get_user_accessible_items(
             &pool,
-            "macro|items-cancelled@example.test",
+            "rox|items-cancelled@example.test",
             Some("document".to_string()),
             false,
         )));
@@ -294,9 +294,9 @@ async fn concurrent_identical_call_lookups_run_the_query_once_and_nothing_is_cac
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO call_records (id, room_name, created_by, started_at, duration_ms, share_permission_id)
-        VALUES ('c1000000-0000-0000-0000-000000000001', 'room', 'macro|calls-once-owner@example.test', now(), 1000, 'sp-calls-once');
+        VALUES ('c1000000-0000-0000-0000-000000000001', 'room', 'rox|calls-once-owner@example.test', now(), 1000, 'sp-calls-once');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('c1000000-0000-0000-0000-000000000001', 'call', 'macro|calls-once@example.test', 'user', 'view');
+        VALUES ('c1000000-0000-0000-0000-000000000001', 'call', 'rox|calls-once@example.test', 'user', 'view');
         COMMIT;
         "#,
     )
@@ -306,14 +306,14 @@ async fn concurrent_identical_call_lookups_run_the_query_once_and_nothing_is_cac
     let call: Uuid = "c1000000-0000-0000-0000-000000000001".parse()?;
 
     let lookups =
-        (0..20).map(|_| get_accessible_call_ids(&pool, "macro|calls-once@example.test", &[]));
+        (0..20).map(|_| get_accessible_call_ids(&pool, "rox|calls-once@example.test", &[]));
     for call_ids in join_all(lookups).await {
         assert_eq!(call_ids?, vec![call]);
     }
     assert_eq!(checkouts.load(Ordering::SeqCst) - before, 1);
 
     // Call access has no cache: a caller that arrives afterwards asks again.
-    let later = get_accessible_call_ids(&pool, "macro|calls-once@example.test", &[]).await?;
+    let later = get_accessible_call_ids(&pool, "rox|calls-once@example.test", &[]).await?;
     assert_eq!(later, vec![call]);
     assert_eq!(checkouts.load(Ordering::SeqCst) - before, 2);
 
@@ -331,11 +331,11 @@ async fn call_lookups_for_other_users_and_status_filters_stay_separate(
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO call_records (id, room_name, created_by, started_at, duration_ms, share_permission_id)
-        VALUES ('c2000000-0000-0000-0000-00000000000a', 'room-a', 'macro|calls-separate-owner@example.test', now(), 1000, 'sp-calls-separate-a'),
-               ('c2000000-0000-0000-0000-00000000000b', 'room-b', 'macro|calls-separate-owner@example.test', now(), 1000, 'sp-calls-separate-b');
+        VALUES ('c2000000-0000-0000-0000-00000000000a', 'room-a', 'rox|calls-separate-owner@example.test', now(), 1000, 'sp-calls-separate-a'),
+               ('c2000000-0000-0000-0000-00000000000b', 'room-b', 'rox|calls-separate-owner@example.test', now(), 1000, 'sp-calls-separate-b');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('c2000000-0000-0000-0000-00000000000a', 'call', 'macro|calls-separate-a@example.test', 'user', 'view'),
-               ('c2000000-0000-0000-0000-00000000000b', 'call', 'macro|calls-separate-b@example.test', 'user', 'view');
+        VALUES ('c2000000-0000-0000-0000-00000000000a', 'call', 'rox|calls-separate-a@example.test', 'user', 'view'),
+               ('c2000000-0000-0000-0000-00000000000b', 'call', 'rox|calls-separate-b@example.test', 'user', 'view');
         COMMIT;
         "#,
     )
@@ -347,9 +347,9 @@ async fn call_lookups_for_other_users_and_status_filters_stay_separate(
     let attended = ["ATTENDED".to_string()];
 
     let (a_calls, b_calls, a_attended_calls) = futures::join!(
-        get_accessible_call_ids(&pool, "macro|calls-separate-a@example.test", &[]),
-        get_accessible_call_ids(&pool, "macro|calls-separate-b@example.test", &[]),
-        get_accessible_call_ids(&pool, "macro|calls-separate-a@example.test", &attended),
+        get_accessible_call_ids(&pool, "rox|calls-separate-a@example.test", &[]),
+        get_accessible_call_ids(&pool, "rox|calls-separate-b@example.test", &[]),
+        get_accessible_call_ids(&pool, "rox|calls-separate-a@example.test", &attended),
     );
 
     assert_eq!(a_calls?, vec![call_a]);
@@ -371,9 +371,9 @@ async fn a_failed_call_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
         BEGIN;
         SET LOCAL session_replication_role = 'replica';
         INSERT INTO call_records (id, room_name, created_by, started_at, duration_ms, share_permission_id)
-        VALUES ('c3000000-0000-0000-0000-000000000001', 'room', 'macro|calls-failed-owner@example.test', now(), 1000, 'sp-calls-failed');
+        VALUES ('c3000000-0000-0000-0000-000000000001', 'room', 'rox|calls-failed-owner@example.test', now(), 1000, 'sp-calls-failed');
         INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ('c3000000-0000-0000-0000-000000000001', 'call', 'macro|calls-failed@example.test', 'user', 'view');
+        VALUES ('c3000000-0000-0000-0000-000000000001', 'call', 'rox|calls-failed@example.test', 'user', 'view');
         COMMIT;
         ALTER TABLE call_records RENAME TO call_records_moved;
         "#,
@@ -383,7 +383,7 @@ async fn a_failed_call_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
     let before = checkouts.load(Ordering::SeqCst);
 
     let lookups =
-        (0..5).map(|_| get_accessible_call_ids(&pool, "macro|calls-failed@example.test", &[]));
+        (0..5).map(|_| get_accessible_call_ids(&pool, "rox|calls-failed@example.test", &[]));
     for call_ids in join_all(lookups).await {
         let error = call_ids.expect_err("call_records is missing");
         assert!(error.downcast_ref::<Arc<sqlx::Error>>().is_some());
@@ -394,7 +394,7 @@ async fn a_failed_call_lookup_fails_every_waiting_caller_and_the_next_one_runs_a
         .execute(&pool)
         .await?;
 
-    let call_ids = get_accessible_call_ids(&pool, "macro|calls-failed@example.test", &[]).await?;
+    let call_ids = get_accessible_call_ids(&pool, "rox|calls-failed@example.test", &[]).await?;
     assert_eq!(
         call_ids,
         vec!["c3000000-0000-0000-0000-000000000001".parse::<Uuid>()?]

@@ -79,7 +79,7 @@ async fn upsert_fills_pending_entry_but_keeps_resolved_entry(pool: PgPool) -> an
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claim_pending_domains_is_bounded(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     insert_company(
         &pool,
         team_id,
@@ -131,8 +131,8 @@ async fn claim_pending_domains_is_bounded(pool: PgPool) -> anyhow::Result<()> {
 async fn manual_company_is_enriched_later_and_keeps_team_names(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|owner-a@test.com").await?;
-    seed_team(&pool, team_b, "macro|owner-b@test.com").await?;
+    seed_team(&pool, team_a, "rox|owner-a@test.com").await?;
+    seed_team(&pool, team_b, "rox|owner-b@test.com").await?;
     enable_crm_for_team(&pool, team_a).await?;
     enable_crm_for_team(&pool, team_b).await?;
 

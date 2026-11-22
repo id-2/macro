@@ -38,7 +38,7 @@ async fn replay_keeps_the_original_admission_decision_after_later_edits() {
     let store = store();
     let activities = [edit(
         &Uuid::now_v7().to_string(),
-        "macro|editor@example.com",
+        "rox|editor@example.com",
         None,
     )];
     let first = Uuid::now_v7();
@@ -67,8 +67,8 @@ async fn actor_subject_and_document_have_independent_sessions_in_input_order() {
     let other_document = Uuid::now_v7().to_string();
     let agent = format!("bot|{}", Uuid::now_v7());
     let other_agent = format!("bot|{}", Uuid::now_v7());
-    let alice = "macro|alice@example.com";
-    let bob = "macro|bob@example.com";
+    let alice = "rox|alice@example.com";
+    let bob = "rox|bob@example.com";
     let first = edit(&document, &agent, Some(alice));
     assert_eq!(
         store
@@ -99,7 +99,7 @@ async fn concurrent_distinct_events_admit_only_one_session_start() {
     let store = store();
     let activities = [edit(
         &Uuid::now_v7().to_string(),
-        "macro|concurrent@example.com",
+        "rox|concurrent@example.com",
         None,
     )];
     let results = futures::future::join_all(
@@ -120,7 +120,7 @@ async fn suppressed_edits_extend_expiry_until_a_full_inactivity_window() {
     let store = store();
     let activities = [edit(
         &Uuid::now_v7().to_string(),
-        "macro|sliding@example.com",
+        "rox|sliding@example.com",
         None,
     )];
     let idle = Duration::from_secs(3);
@@ -174,9 +174,9 @@ async fn an_empty_batch_does_not_connect_to_redis() {
 async fn distinct_invocations_are_not_debounced_together() {
     let store = store();
     let document = Uuid::now_v7().to_string();
-    let first = edit(&document, "macro|actor@example.com", None)
+    let first = edit(&document, "rox|actor@example.com", None)
         .with_agent_correlation(Some(Uuid::now_v7()));
-    let second = edit(&document, "macro|actor@example.com", None)
+    let second = edit(&document, "rox|actor@example.com", None)
         .with_agent_correlation(Some(Uuid::now_v7()));
     assert_eq!(
         store

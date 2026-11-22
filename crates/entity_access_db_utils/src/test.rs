@@ -547,7 +547,7 @@ async fn upsert_to_project_with_no_children_inserts_only_project_row(pool: Pool<
     fixtures(path = "../fixtures", scripts("upsert_test_data"))
 )]
 async fn remove_non_owner_user_entity_access_removes_direct_non_owner_users(pool: Pool<Postgres>) {
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     let mut tx = pool.begin().await.unwrap();
 
     insert_entity_access_for_test(
@@ -564,7 +564,7 @@ async fn remove_non_owner_user_entity_access_removes_direct_non_owner_users(pool
         &mut tx,
         &DOC_ROOT_ID,
         EntityType::Document,
-        "macro|viewer@test.com",
+        "rox|viewer@test.com",
         EntityAccessSourceType::User,
         AccessLevel::View,
         None,
@@ -574,7 +574,7 @@ async fn remove_non_owner_user_entity_access_removes_direct_non_owner_users(pool
         &mut tx,
         &DOC_ROOT_ID,
         EntityType::Document,
-        "macro|editor@test.com",
+        "rox|editor@test.com",
         EntityAccessSourceType::User,
         AccessLevel::Edit,
         None,
@@ -601,8 +601,8 @@ async fn remove_non_owner_user_entity_access_removes_direct_non_owner_users(pool
 async fn remove_non_owner_user_entity_access_preserves_non_user_inherited_and_other_entities(
     pool: Pool<Postgres>,
 ) {
-    let owner_id = "macro|owner@test.com";
-    let shared_user_id = "macro|shared@test.com";
+    let owner_id = "rox|owner@test.com";
+    let shared_user_id = "rox|shared@test.com";
     let root_project_id = ROOT_PROJECT_ID.to_string();
     let mut tx = pool.begin().await.unwrap();
 
@@ -660,7 +660,7 @@ async fn remove_non_owner_user_entity_access_preserves_non_user_inherited_and_ot
         &mut tx,
         &DOC_CHILD_ID,
         EntityType::Document,
-        "macro|other-document@test.com",
+        "rox|other-document@test.com",
         EntityAccessSourceType::User,
         AccessLevel::View,
         None,
@@ -670,7 +670,7 @@ async fn remove_non_owner_user_entity_access_preserves_non_user_inherited_and_ot
         &mut tx,
         &DOC_ROOT_ID,
         EntityType::Chat,
-        "macro|other-type@test.com",
+        "rox|other-type@test.com",
         EntityAccessSourceType::User,
         AccessLevel::View,
         None,
@@ -720,7 +720,7 @@ async fn remove_non_owner_user_entity_access_preserves_non_user_inherited_and_ot
     assert_eq!(other_entity_rows[0].source_type, "user");
     assert_eq!(
         other_entity_rows[0].source_id,
-        "macro|other-document@test.com"
+        "rox|other-document@test.com"
     );
     assert_eq!(other_entity_rows[0].access_level, AccessLevel::View);
     assert!(other_entity_rows[0].granted_from_project_id.is_none());
@@ -728,7 +728,7 @@ async fn remove_non_owner_user_entity_access_preserves_non_user_inherited_and_ot
     let other_type_rows = fetch_entity_access_rows(&pool, &DOC_ROOT_ID, EntityType::Chat).await;
     assert_eq!(other_type_rows.len(), 1);
     assert_eq!(other_type_rows[0].source_type, "user");
-    assert_eq!(other_type_rows[0].source_id, "macro|other-type@test.com");
+    assert_eq!(other_type_rows[0].source_id, "rox|other-type@test.com");
     assert_eq!(other_type_rows[0].access_level, AccessLevel::View);
     assert!(other_type_rows[0].granted_from_project_id.is_none());
 }
@@ -834,12 +834,12 @@ async fn delete_user_entity_access_rows_removes_targeted_direct_grants_only(pool
             ("team", "team-1", AccessLevel::Edit, None),
             (
                 "user",
-                "macro|bob@rox.one",
+                "rox|bob@rox.one",
                 AccessLevel::Edit,
                 Some(root_project_id.as_str()),
             ),
-            ("user", "macro|carol@rox.one", AccessLevel::View, None),
-            ("user", "macro|owner@rox.one", AccessLevel::Owner, None),
+            ("user", "rox|carol@rox.one", AccessLevel::View, None),
+            ("user", "rox|owner@rox.one", AccessLevel::Owner, None),
         ]
     );
 
@@ -847,14 +847,14 @@ async fn delete_user_entity_access_rows_removes_targeted_direct_grants_only(pool
         fetch_entity_access_rows(&pool, &other_initiative_id, EntityType::Initiative).await;
     assert_eq!(
         grants(&other_entity_rows),
-        vec![("user", "macro|alice@rox.one", AccessLevel::Edit, None)]
+        vec![("user", "rox|alice@rox.one", AccessLevel::Edit, None)]
     );
 
     let other_type_rows =
         fetch_entity_access_rows(&pool, &initiative_id, EntityType::Document).await;
     assert_eq!(
         grants(&other_type_rows),
-        vec![("user", "macro|alice@rox.one", AccessLevel::Edit, None)]
+        vec![("user", "rox|alice@rox.one", AccessLevel::Edit, None)]
     );
 }
 
@@ -887,8 +887,8 @@ async fn delete_user_entity_access_rows_without_user_ids_keeps_every_row(pool: P
     assert_eq!(
         grants(&rows),
         vec![
-            ("user", "macro|alice@rox.one", AccessLevel::Edit, None),
-            ("user", "macro|owner@rox.one", AccessLevel::Owner, None),
+            ("user", "rox|alice@rox.one", AccessLevel::Edit, None),
+            ("user", "rox|owner@rox.one", AccessLevel::Owner, None),
         ]
     );
 }
@@ -985,7 +985,7 @@ async fn owner_grant_raises_direct_edit_to_owner_and_leaves_other_principals(poo
         &mut tx,
         &entity_id,
         EntityType::Document,
-        "macro|viewer@rox.one",
+        "rox|viewer@rox.one",
         EntityAccessSourceType::User,
         AccessLevel::View,
         None,
@@ -1013,7 +1013,7 @@ async fn owner_grant_raises_direct_edit_to_owner_and_leaves_other_principals(poo
     assert!(owner_row.updated_at > before_updated_at);
     let viewer_row = rows
         .iter()
-        .find(|row| row.source_id == "macro|viewer@rox.one")
+        .find(|row| row.source_id == "rox|viewer@rox.one")
         .unwrap();
     assert_eq!(viewer_row.access_level, AccessLevel::View);
 }
@@ -1063,7 +1063,7 @@ async fn owner_grant_leaves_project_inherited_rows_untouched(pool: Pool<Postgres
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_grant_maps_user_bot_and_team_to_their_access_source(pool: Pool<Postgres>) {
     let cases = [
-        (user_owner(), "user", "macro|owner@rox.one".to_owned()),
+        (user_owner(), "user", "rox|owner@rox.one".to_owned()),
         (
             Owner::parse(OwnerType::Bot, BOT_PRINCIPAL).unwrap(),
             "bot",
@@ -1099,7 +1099,7 @@ async fn ensuring_comment_access_upgrades_view_and_preserves_stronger_grants(
     )
     .execute(&pool)
     .await?;
-    sqlx::query!("INSERT INTO calls (id, room_name, created_by, share_permission_id) VALUES ($1, 'test-room', 'macro|owner@test.com', $2)", entity, entity.to_string()).execute(&pool).await?;
+    sqlx::query!("INSERT INTO calls (id, room_name, created_by, share_permission_id) VALUES ($1, 'test-room', 'rox|owner@test.com', $2)", entity, entity.to_string()).execute(&pool).await?;
     for (email, existing) in [
         ("owner@test.com", Some(AccessLevel::Owner)),
         ("editor@test.com", Some(AccessLevel::Edit)),

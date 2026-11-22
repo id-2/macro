@@ -754,7 +754,7 @@ impl AccessRepository for MockRepo {
 }
 
 fn test_user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|test@test.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|test@test.com".to_string()).unwrap()
 }
 
 fn test_bot_id() -> BotId {
@@ -2529,8 +2529,8 @@ async fn test_generate_receipt_unsupported_type_returns_bad_request() {
 #[tokio::test]
 async fn test_get_users_by_entity_document_returns_users() {
     let users = vec![
-        user_id("macro|alice@test.com"),
-        user_id("macro|bob@test.com"),
+        user_id("rox|alice@test.com"),
+        user_id("rox|bob@test.com"),
     ];
     let repo = MockRepo::new().with_document_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2541,8 +2541,8 @@ async fn test_get_users_by_entity_document_returns_users() {
         .unwrap();
 
     assert_eq!(result.len(), 2);
-    assert_eq!(result[0].to_string(), "macro|alice@test.com");
-    assert_eq!(result[1].to_string(), "macro|bob@test.com");
+    assert_eq!(result[0].to_string(), "rox|alice@test.com");
+    assert_eq!(result[1].to_string(), "rox|bob@test.com");
 }
 
 /// Sessions grant their owner and their originating channel, both of which
@@ -2550,8 +2550,8 @@ async fn test_get_users_by_entity_document_returns_users() {
 #[tokio::test]
 async fn test_get_users_by_entity_agent_session_returns_users() {
     let users = vec![
-        user_id("macro|owner@test.com"),
-        user_id("macro|channel-member@test.com"),
+        user_id("rox|owner@test.com"),
+        user_id("rox|channel-member@test.com"),
     ];
     let repo = MockRepo::new().with_agent_session_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2582,7 +2582,7 @@ async fn test_get_users_by_entity_document_returns_empty_when_no_users() {
 
 #[tokio::test]
 async fn test_get_users_by_entity_chat_returns_users() {
-    let users = vec![user_id("macro|charlie@test.com")];
+    let users = vec![user_id("rox|charlie@test.com")];
     let repo = MockRepo::new().with_chat_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
 
@@ -2592,7 +2592,7 @@ async fn test_get_users_by_entity_chat_returns_users() {
         .unwrap();
 
     assert_eq!(result.len(), 1);
-    assert_eq!(result[0].to_string(), "macro|charlie@test.com");
+    assert_eq!(result[0].to_string(), "rox|charlie@test.com");
 }
 
 #[tokio::test]
@@ -2611,9 +2611,9 @@ async fn test_get_users_by_entity_chat_returns_empty_when_no_users() {
 #[tokio::test]
 async fn test_get_users_by_entity_project_returns_users() {
     let users = vec![
-        user_id("macro|alice@test.com"),
-        user_id("macro|bob@test.com"),
-        user_id("macro|charlie@test.com"),
+        user_id("rox|alice@test.com"),
+        user_id("rox|bob@test.com"),
+        user_id("rox|charlie@test.com"),
     ];
     let repo = MockRepo::new().with_project_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2624,9 +2624,9 @@ async fn test_get_users_by_entity_project_returns_users() {
         .unwrap();
 
     assert_eq!(result.len(), 3);
-    assert_eq!(result[0].to_string(), "macro|alice@test.com");
-    assert_eq!(result[1].to_string(), "macro|bob@test.com");
-    assert_eq!(result[2].to_string(), "macro|charlie@test.com");
+    assert_eq!(result[0].to_string(), "rox|alice@test.com");
+    assert_eq!(result[1].to_string(), "rox|bob@test.com");
+    assert_eq!(result[2].to_string(), "rox|charlie@test.com");
 }
 
 #[tokio::test]
@@ -2645,8 +2645,8 @@ async fn test_get_users_by_entity_project_returns_empty_when_no_users() {
 #[tokio::test]
 async fn test_get_users_by_entity_thread_returns_users() {
     let users = vec![
-        user_id("macro|dave@test.com"),
-        user_id("macro|eve@test.com"),
+        user_id("rox|dave@test.com"),
+        user_id("rox|eve@test.com"),
     ];
     let repo = MockRepo::new().with_thread_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2660,8 +2660,8 @@ async fn test_get_users_by_entity_thread_returns_users() {
         .unwrap();
 
     assert_eq!(result.len(), 2);
-    assert_eq!(result[0].to_string(), "macro|dave@test.com");
-    assert_eq!(result[1].to_string(), "macro|eve@test.com");
+    assert_eq!(result[0].to_string(), "rox|dave@test.com");
+    assert_eq!(result[1].to_string(), "rox|eve@test.com");
 }
 
 #[tokio::test]
@@ -2685,8 +2685,8 @@ async fn test_get_users_by_entity_thread_returns_empty_when_no_users() {
 #[tokio::test]
 async fn test_get_users_by_entity_database_row_reaches_its_databases_users() {
     let users = vec![
-        user_id("macro|owner@databases.test"),
-        user_id("macro|viewer@databases.test"),
+        user_id("rox|owner@databases.test"),
+        user_id("rox|viewer@databases.test"),
     ];
     let service = EntityAccessServiceImpl::new(
         MockRepo::new()
@@ -2719,8 +2719,8 @@ async fn test_get_users_by_entity_database_row_reaches_its_databases_users() {
 #[tokio::test]
 async fn test_get_users_by_entity_database_returns_users() {
     let users = vec![
-        user_id("macro|dana@test.com"),
-        user_id("macro|erin@test.com"),
+        user_id("rox|dana@test.com"),
+        user_id("rox|erin@test.com"),
     ];
     let repo = MockRepo::new().with_database_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2731,8 +2731,8 @@ async fn test_get_users_by_entity_database_returns_users() {
         .unwrap();
 
     assert_eq!(result.len(), 2);
-    assert_eq!(result[0].to_string(), "macro|dana@test.com");
-    assert_eq!(result[1].to_string(), "macro|erin@test.com");
+    assert_eq!(result[0].to_string(), "rox|dana@test.com");
+    assert_eq!(result[1].to_string(), "rox|erin@test.com");
 }
 
 #[tokio::test]
@@ -2750,7 +2750,7 @@ async fn test_get_users_by_entity_database_returns_empty_when_no_users() {
 
 #[tokio::test]
 async fn test_get_users_by_entity_database_rejects_invalid_uuid() {
-    let repo = MockRepo::new().with_database_users(vec![user_id("macro|dana@test.com")]);
+    let repo = MockRepo::new().with_database_users(vec![user_id("rox|dana@test.com")]);
     let service = EntityAccessServiceImpl::new(repo);
 
     let result = service
@@ -2799,7 +2799,7 @@ async fn test_get_users_by_entity_user_returns_bad_request() {
 
 #[tokio::test]
 async fn test_get_users_by_entity_document_with_single_user() {
-    let users = vec![user_id("macro|solo@test.com")];
+    let users = vec![user_id("rox|solo@test.com")];
     let repo = MockRepo::new().with_document_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
 
@@ -2809,13 +2809,13 @@ async fn test_get_users_by_entity_document_with_single_user() {
         .unwrap();
 
     assert_eq!(result.len(), 1);
-    assert_eq!(result[0].to_string(), "macro|solo@test.com");
+    assert_eq!(result[0].to_string(), "rox|solo@test.com");
 }
 
 #[tokio::test]
 async fn test_get_users_by_entity_project_with_many_users() {
     let users: Vec<RoxUserIdStr<'static>> = (0..50)
-        .map(|i| user_id(&format!("macro|user{}@test.com", i)))
+        .map(|i| user_id(&format!("rox|user{}@test.com", i)))
         .collect();
     let repo = MockRepo::new().with_project_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo);
@@ -2827,7 +2827,7 @@ async fn test_get_users_by_entity_project_with_many_users() {
 
     assert_eq!(result.len(), 50);
     for (i, u) in result.iter().enumerate() {
-        assert_eq!(u.to_string(), format!("macro|user{}@test.com", i));
+        assert_eq!(u.to_string(), format!("rox|user{}@test.com", i));
     }
 }
 
@@ -2864,7 +2864,7 @@ async fn document_session_access_tracks_current_document_permission() {
 #[tokio::test]
 async fn standalone_call_recipients_use_explicit_entity_grants() {
     let repo = MockRepo::new();
-    let granted = RoxUserIdStr::parse_from_str("macro|participant@example.com")
+    let granted = RoxUserIdStr::parse_from_str("rox|participant@example.com")
         .unwrap()
         .into_owned();
     *repo.call_channel.lock().await = Some(CallChannelInfo {
@@ -2873,7 +2873,7 @@ async fn standalone_call_recipients_use_explicit_entity_grants() {
     });
     *repo.call_users.lock().await = vec![granted.clone()];
     *repo.channel_users.lock().await = vec![
-        RoxUserIdStr::parse_from_str("macro|unrelated@example.com")
+        RoxUserIdStr::parse_from_str("rox|unrelated@example.com")
             .unwrap()
             .into_owned(),
     ];
@@ -2888,7 +2888,7 @@ async fn standalone_call_recipients_use_explicit_entity_grants() {
 #[tokio::test]
 async fn channel_call_recipients_still_use_channel_membership() {
     let repo = MockRepo::new();
-    let member = RoxUserIdStr::parse_from_str("macro|member@example.com")
+    let member = RoxUserIdStr::parse_from_str("rox|member@example.com")
         .unwrap()
         .into_owned();
     *repo.call_channel.lock().await = Some(CallChannelInfo {

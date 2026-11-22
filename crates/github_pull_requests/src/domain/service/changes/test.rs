@@ -13,7 +13,7 @@ use crate::domain::models::{
     UpsertedGithubPullRequest,
 };
 
-const USER: &str = "macro|user@example.com";
+const USER: &str = "rox|user@example.com";
 const PATCH: &str = "diff --git a/a.rs b/a.rs\n--- a/a.rs\n+++ b/a.rs\n@@ -1 +1 @@\n-old\n+new\n";
 
 #[derive(Default)]

@@ -178,7 +178,7 @@ async fn update_notifications_maps_operation_and_returns_normalized_rows_in_orde
     assert_eq!(
         service.calls.lock().unwrap().as_slice(),
         [(
-            "macro|user@example.com".to_string(),
+            "rox|user@example.com".to_string(),
             vec![second, first],
             "seen",
         ),]
@@ -243,7 +243,7 @@ async fn update_notifications_for_entity_maps_entities_and_operation() {
     assert_eq!(
         service.entity_calls.lock().unwrap().as_slice(),
         [(
-            "macro|entity-user@example.com".to_string(),
+            "rox|entity-user@example.com".to_string(),
             vec![
                 (EntityType::Document, "document-1".to_string()),
                 (EntityType::ChannelMessage, "message-1".to_string()),

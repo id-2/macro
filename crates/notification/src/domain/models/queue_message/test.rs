@@ -18,10 +18,10 @@ fn test_apns_targets_deserializes_with_per_user_endpoints() {
             "collapse_key": "test-collapse-key"
         },
         "ios_device_endpoints": {
-            "macro|alice@example.com": {
+            "rox|alice@example.com": {
                 "endpoints": ["endpoint1", "endpoint2"]
             },
-            "macro|bob@example.com": {
+            "rox|bob@example.com": {
                 "endpoints": ["endpoint3"]
             }
         }

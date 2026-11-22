@@ -17,7 +17,7 @@ const URL: &str = "https://rox.one/app/meet/join/0123456789abcdef0123456789abcde
 fn sample_event() -> CalendarEvent {
     CalendarEvent {
         id: Uuid::from_u128(7),
-        owner_id: "macro|owner@example.com".to_string(),
+        owner_id: "rox|owner@example.com".to_string(),
         ical_uid: "uid-1".to_string(),
         calendar_id: Some(Uuid::from_u128(9)),
         sources: Vec::new(),
@@ -308,7 +308,7 @@ async fn the_meeting_is_minted_as_the_requester_and_written_into_the_draft() {
     let created = create_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         None,
         Some(calendar_id),
         CalendarEventDraft {
@@ -323,7 +323,7 @@ async fn the_meeting_is_minted_as_the_requester_and_written_into_the_draft() {
 
     let requests = links.requests.lock().unwrap();
     let (requester, request) = requests.first().expect("one meeting minted");
-    assert_eq!(requester, "macro|owner@example.com");
+    assert_eq!(requester, "rox|owner@example.com");
     assert_eq!(request.title, "Design review");
     assert!(request.scheduled_start.is_some());
 
@@ -355,7 +355,7 @@ async fn a_calendar_write_refused_before_the_provider_cancels_the_fresh_meeting(
         let error = create_event_with_rox_call(
             &mutations,
             &links,
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             None,
             None,
             draft(),
@@ -365,7 +365,7 @@ async fn a_calendar_write_refused_before_the_provider_cancels_the_fresh_meeting(
         assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
-            vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
+            vec![("rox|owner@example.com".to_string(), Uuid::from_u128(42))]
         );
     }
 }
@@ -385,7 +385,7 @@ async fn an_event_that_may_have_reached_the_provider_keeps_its_meeting() {
         let error = create_event_with_rox_call(
             &mutations,
             &links,
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             None,
             None,
             draft(),
@@ -408,7 +408,7 @@ async fn a_failed_meeting_writes_nothing_to_the_calendar() {
     let error = create_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         None,
         None,
         draft(),
@@ -440,7 +440,7 @@ async fn out_of_office_and_provider_conferencing_are_refused_before_minting() {
         let error = create_event_with_rox_call(
             &mutations,
             &links,
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             None,
             None,
             draft,
@@ -463,7 +463,7 @@ async fn an_unwired_host_refuses_the_call_without_touching_the_calendar() {
     let error = create_event_with_rox_call(
         &mutations,
         &UnavailableMeetingLinks,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         None,
         None,
         draft(),
@@ -506,7 +506,7 @@ async fn switching_replaces_the_conference_with_a_call_in_one_write() {
     update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         event_id,
         Some(calendar_id),
         CalendarEventPatch::default(),
@@ -517,7 +517,7 @@ async fn switching_replaces_the_conference_with_a_call_in_one_write() {
 
     let requests = links.requests.lock().unwrap();
     let (requester, request) = requests.first().expect("one meeting minted");
-    assert_eq!(requester, "macro|owner@example.com");
+    assert_eq!(requester, "rox|owner@example.com");
     assert_eq!(request.title, "Standup");
     assert_eq!(
         request.scheduled_start,
@@ -557,7 +557,7 @@ async fn switching_applies_the_changes_the_patch_carries() {
     update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch {
@@ -604,7 +604,7 @@ async fn switching_an_event_that_holds_a_call_keeps_it_and_drops_the_conference(
     update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch::default(),
@@ -635,7 +635,7 @@ async fn retrying_a_finished_switch_writes_nothing() {
     let error = update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch::default(),
@@ -666,7 +666,7 @@ async fn a_replacement_description_keeps_the_stored_calls_join_line() {
     update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch {
@@ -702,7 +702,7 @@ async fn a_switch_refused_before_the_provider_cancels_the_fresh_meeting() {
         let error = update_event_with_rox_call(
             &mutations,
             &links,
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             Uuid::from_u128(7),
             None,
             CalendarEventPatch::default(),
@@ -714,7 +714,7 @@ async fn a_switch_refused_before_the_provider_cancels_the_fresh_meeting() {
         assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
-            vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
+            vec![("rox|owner@example.com".to_string(), Uuid::from_u128(42))]
         );
     }
 }
@@ -729,7 +729,7 @@ async fn a_switch_whose_write_may_have_landed_keeps_the_meeting() {
     update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch::default(),
@@ -752,7 +752,7 @@ async fn a_failed_mint_leaves_the_event_untouched() {
     let error = update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch::default(),
@@ -773,7 +773,7 @@ async fn switching_refuses_an_explicit_provider_conference() {
     let error = update_event_with_rox_call(
         &mutations,
         &links,
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         Uuid::from_u128(7),
         None,
         CalendarEventPatch {

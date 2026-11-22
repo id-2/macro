@@ -61,7 +61,7 @@ impl SoupNotificationEdgeReader for Reader {
                     notification_event_type: "task_assigned".into(), entity: key.clone(),
                     sent: true, state, created_at: Utc::now(), updated_at: Utc::now(),
                     viewed_at: None, deleted_at: None, sender_id: None,
-                    notification_metadata: serde_json::json!({"taskId":"task", "assignedBy":"macro|sender@example.com"}),
+                    notification_metadata: serde_json::json!({"taskId":"task", "assignedBy":"rox|sender@example.com"}),
                 }.into_tagged().deserialize_metadata().unwrap()).collect();
             (key, rows)
         }).collect())

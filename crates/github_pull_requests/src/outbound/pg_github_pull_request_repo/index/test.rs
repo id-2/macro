@@ -13,7 +13,7 @@ async fn insert_record(pool: &PgPool, key: &str, source: &str, metadata: Value) 
     sqlx::query!(
         r#"INSERT INTO foreign_entity (id, foreign_entity_id, foreign_entity_source, metadata,
             stored_for_id, stored_for_auth_entity)
-           VALUES ($1, $2, $3, $4, 'macro|test@example.com', 'user')"#,
+           VALUES ($1, $2, $3, $4, 'rox|test@example.com', 'user')"#,
         Uuid::now_v7(),
         key,
         source,

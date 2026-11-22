@@ -42,8 +42,8 @@ use std::sync::{
 };
 use tower::util::ServiceExt;
 
-const TEST_USER_ID: &str = "macro|test@example.com";
-const INTERNAL_USER_ID: &str = "macro|internal@example.com";
+const TEST_USER_ID: &str = "rox|test@example.com";
+const INTERNAL_USER_ID: &str = "rox|internal@example.com";
 const VALID_BEARER_TOKEN: &str = "valid";
 const ORGANIZATION_BEARER_TOKEN: &str = "valid-with-organization";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
@@ -309,7 +309,7 @@ impl ChannelService for MockService {
                     channel_name: Some("test-channel".to_string()),
                     message_id: Uuid::new_v4(),
                     thread_id: None,
-                    sender_id: "macro|user@example.com".to_string(),
+                    sender_id: "rox|user@example.com".to_string(),
                     message_content: "look at this".to_string(),
                     message_created_at: now,
                     attachment_created_at: now,
@@ -321,7 +321,7 @@ impl ChannelService for MockService {
                     parent_entity_id: "00000000-0000-0000-0000-0000000000a1".to_string(),
                     message_id: Uuid::new_v4(),
                     thread_id: None,
-                    sender_id: "macro|user@example.com".to_string(),
+                    sender_id: "rox|user@example.com".to_string(),
                     message_content: "discussed here".to_string(),
                     message_created_at: now,
                     attachment_created_at: now,
@@ -427,14 +427,14 @@ impl ChannelService for ParticipantsService {
         Ok(vec![
             ChannelParticipant {
                 channel_id,
-                user_id: "macro|user1@example.com".into(),
+                user_id: "rox|user1@example.com".into(),
                 role: ParticipantRole::Owner,
                 joined_at: chrono::Utc::now(),
                 left_at: None,
             },
             ChannelParticipant {
                 channel_id,
-                user_id: "macro|user2@example.com".into(),
+                user_id: "rox|user2@example.com".into(),
                 role: ParticipantRole::Member,
                 joined_at: chrono::Utc::now(),
                 left_at: None,
@@ -1175,7 +1175,7 @@ async fn authenticated_user_can_join_by_code_without_channel_access() {
     );
     let users = joined_users.lock().unwrap();
     assert_eq!(users.len(), 1);
-    assert_eq!(users[0].as_ref(), "macro|test@example.com");
+    assert_eq!(users[0].as_ref(), "rox|test@example.com");
 }
 
 #[tokio::test]
@@ -1346,7 +1346,7 @@ async fn participants_returns_data_with_correct_shape() {
     assert_eq!(arr.len(), 2);
     assert_eq!(arr[0]["role"], "owner");
     assert_eq!(arr[1]["role"], "member");
-    assert_eq!(arr[0]["user_id"], "macro|user1@example.com");
+    assert_eq!(arr[0]["user_id"], "rox|user1@example.com");
 }
 
 #[tokio::test]
@@ -1545,7 +1545,7 @@ async fn get_activity_returns_user_activities() {
     let bytes = res.into_body().collect().await.unwrap().to_bytes();
     let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
     assert!(json.is_array());
-    assert_eq!(json[0]["user_id"], "macro|test@example.com");
+    assert_eq!(json[0]["user_id"], "rox|test@example.com");
 }
 
 #[tokio::test]
@@ -1580,7 +1580,7 @@ async fn post_activity_records_and_returns_activity() {
 
     let posts = posts.lock().unwrap();
     assert_eq!(posts.len(), 1);
-    assert_eq!(posts[0].0, "macro|test@example.com");
+    assert_eq!(posts[0].0, "rox|test@example.com");
     assert_eq!(posts[0].1, channel_id);
     assert!(matches!(posts[0].2, ActivityType::View));
 }

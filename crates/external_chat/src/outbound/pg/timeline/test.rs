@@ -3,7 +3,7 @@ use crate::domain::timeline::TimelineRepository;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::Row;
 
-const OWNER: &str = "macro|external-chat-owner@example.com";
+const OWNER: &str = "rox|external-chat-owner@example.com";
 
 async fn migrate_for_test(pool: &PgPool) {
     // Keep both colliding migration bodies in the isolated test database,

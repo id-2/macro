@@ -244,7 +244,7 @@ const harness = (
         return {
           present: () => undefined,
           humans: () => humans,
-          lastSpeaker: () => ['macro|ann@example.com', 'Ann'],
+          lastSpeaker: () => ['rox|ann@example.com', 'Ann'],
           leave: async () => undefined,
         };
       },
@@ -401,8 +401,8 @@ test("a room that won't connect gives the seat back and fails at the room stage"
 const placed: Placed = {
   id: 'p1',
   channelId: 'ch-1',
-  target: 'macro|cy@example.com',
-  asker: 'macro|owner@example.com',
+  target: 'rox|cy@example.com',
+  asker: 'rox|owner@example.com',
   reason: 'Ada asked me to check on the launch.',
   rule: 'owner-order',
   at,
@@ -464,14 +464,14 @@ test("every human's microphone reaches the session's listeners, by name, uninvit
   const h = harness();
   const over = h.run({ callId: 'call-1', uninvited: 'the launch came up' });
   await h.settle();
-  h.captured.handlers?.joined('macro|ann@example.com', 'Ann');
-  h.captured.handlers?.audio('macro|ann@example.com', new Int16Array(320));
-  h.captured.handlers?.audio('macro|bo@example.com', new Int16Array(320));
-  h.captured.handlers?.left('macro|bo@example.com');
+  h.captured.handlers?.joined('rox|ann@example.com', 'Ann');
+  h.captured.handlers?.audio('rox|ann@example.com', new Int16Array(320));
+  h.captured.handlers?.audio('rox|bo@example.com', new Int16Array(320));
+  h.captured.handlers?.left('rox|bo@example.com');
   expect(h.heard).toEqual([
-    'hear:macro|ann@example.com:Ann',
-    'hear:macro|bo@example.com:macro|bo@example.com',
-    'gone:macro|bo@example.com',
+    'hear:rox|ann@example.com:Ann',
+    'hear:rox|bo@example.com:rox|bo@example.com',
+    'gone:rox|bo@example.com',
   ]);
   expect(h.recorded).toEqual([]);
   h.signals.get('SIGINT')?.();
@@ -492,7 +492,7 @@ test('uninvited: it says who it is, takes only its name, keeps no voice, and the
     (await session?.addressing.forAgent('a', 'Ann', 'so the plan is', 1, 0))
       ?.forAgent
   ).toBe(false);
-  h.captured.handlers?.audio('macro|ann@example.com', new Int16Array(320));
+  h.captured.handlers?.audio('rox|ann@example.com', new Int16Array(320));
   expect(h.recorded).toEqual([]);
   session?.emit('turn.heard', { who: 'a', text: 'private', forAgent: false });
   session?.emit('stt.final', { text: 'private' });
@@ -511,13 +511,13 @@ test("invited: every voice is recorded, and the people area gets what was said o
   const h = harness();
   const over = h.run({ callId: 'call-1' });
   await h.settle();
-  h.captured.handlers?.audio('macro|ann@example.com', new Int16Array(320));
+  h.captured.handlers?.audio('rox|ann@example.com', new Int16Array(320));
   h.captured.handlers?.audio('agent', new Int16Array(320));
-  expect(h.recorded).toEqual(['macro|ann@example.com', 'agent']);
+  expect(h.recorded).toEqual(['rox|ann@example.com', 'agent']);
   const session = h.captured.session;
-  await session?.card('macro|ann@example.com', true);
+  await session?.card('rox|ann@example.com', true);
   expect(h.cards).toEqual([
-    [['macro|ann@example.com'], 'call', { alone: true }],
+    [['rox|ann@example.com'], 'call', { alone: true }],
   ]);
   session?.emit('turn.heard', {
     who: 'a',
@@ -551,7 +551,7 @@ test('SIGUSR2: it says why to the people there, uninterruptibly, removes the lin
   const h = harness({ files: { [paths.leave(4242)]: line } });
   const over = h.run({ callId: 'call-1' });
   await h.settle();
-  h.humans.push('macro|ann@example.com');
+  h.humans.push('rox|ann@example.com');
   h.signals.get('SIGUSR2')?.();
   expect(await over).toMatchObject({ code: 0, why: `moving: ${line}` });
   expect(h.counts.interrupted).toBe(1);

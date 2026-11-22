@@ -7,10 +7,10 @@ import { z } from "zod";
  * change, e.g. when its owner gives it a name.
  */
 export const Settings = z.object({
-	/** The owner's Rox id, e.g. `macro|you@example.com`. Only this id gives orders. */
-	owner: z.string().startsWith("macro|"),
+	/** The owner's Rox id, e.g. `rox|you@example.com`. Only this id gives orders. */
+	owner: z.string().startsWith("rox|"),
 	/** The agent's own Rox id: the account its API key belongs to. */
-	me: z.string().startsWith("macro|"),
+	me: z.string().startsWith("rox|"),
 	/** The name and email the agent commits under. The name is also what it answers to on a call. */
 	name: z.string().min(1),
 	email: z.string().min(1),

@@ -118,7 +118,7 @@ mod tests {
                 users: [(
                     "12345678123412341234123456789abc".to_string(),
                     NotionSnapshotUser {
-                        user_id: "macro|teo@acme.test".to_string(),
+                        user_id: "rox|teo@acme.test".to_string(),
                         email: "teo@acme.test".to_string(),
                     },
                 )]
@@ -139,7 +139,7 @@ mod tests {
                     },
                     "users": {
                         "12345678123412341234123456789abc": {
-                            "userId": "macro|teo@acme.test",
+                            "userId": "rox|teo@acme.test",
                             "email": "teo@acme.test"
                         }
                     }

@@ -372,11 +372,11 @@ async fn a_cell_with_two_references_refuses_a_single_reference_and_keeps_both() 
                             value: CellValue::Entities(vec![
                                 EntityRef {
                                     entity_type: EntityKind::User,
-                                    entity_id: "macro|ana@rox.one".into(),
+                                    entity_id: "rox|ana@rox.one".into(),
                                 },
                                 EntityRef {
                                     entity_type: EntityKind::User,
-                                    entity_id: "macro|ben@rox.one".into(),
+                                    entity_id: "rox|ben@rox.one".into(),
                                 },
                             ]),
                         }],
@@ -415,7 +415,7 @@ async fn a_cell_with_two_references_refuses_a_single_reference_and_keeps_both() 
     assert_eq!(
         refusal.reason,
         "1 cell in \"Hosts\" has more than one value: \
-         'macro|ana@rox.one, macro|ben@rox.one'. \
+         'rox|ana@rox.one, rox|ben@rox.one'. \
          Fix it, or add a column of the new type for the values that convert."
     );
     let w = seeded.world.lock().unwrap();
@@ -429,12 +429,12 @@ async fn a_cell_with_two_references_refuses_a_single_reference_and_keeps_both() 
         w.cells[&seeded.row_id][&definition],
         PropertyValue::EntityRef(vec![
             EntityReference {
-                entity_id: "macro|ana@rox.one".into(),
+                entity_id: "rox|ana@rox.one".into(),
                 entity_type: PropertyEntityType::User,
                 specific_message_id: None,
             },
             EntityReference {
-                entity_id: "macro|ben@rox.one".into(),
+                entity_id: "rox|ben@rox.one".into(),
                 entity_type: PropertyEntityType::User,
                 specific_message_id: None,
             },

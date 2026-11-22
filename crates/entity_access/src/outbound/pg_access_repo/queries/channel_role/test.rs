@@ -107,13 +107,13 @@ async fn matching_team_member_without_participant_is_view_only(pool: PgPool) -> 
     let channel_id = Uuid::new_v4();
     insert_channel(&pool, channel_id, "team", Some(TEAM_ALPHA)).await?;
 
-    let role = get_channel_role(&pool, &channel_id, "macro|member@team.com", None).await?;
+    let role = get_channel_role(&pool, &channel_id, "rox|member@team.com", None).await?;
 
     assert_eq!(role, ChannelRoleResult::ViewOnly);
 
     #[cfg(feature = "explain_binary")]
     {
-        let grants = explain_channel_access(&pool, &channel_id, "macro|member@team.com").await?;
+        let grants = explain_channel_access(&pool, &channel_id, "rox|member@team.com").await?;
         assert_eq!(
             grants,
             vec![crate::domain::models::AccessGrant::ChannelTeamViewOnly {
@@ -130,7 +130,7 @@ async fn matching_team_member_without_participant_is_view_only(pool: PgPool) -> 
 )]
 async fn active_team_channel_participant_receives_stored_role(pool: PgPool) -> anyhow::Result<()> {
     let channel_id = Uuid::new_v4();
-    let user_id = "macro|member@team.com";
+    let user_id = "rox|member@team.com";
     insert_channel(&pool, channel_id, "team", Some(TEAM_ALPHA)).await?;
     insert_user_participant(&pool, channel_id, user_id, "admin", false).await?;
 
@@ -159,7 +159,7 @@ async fn departed_participant_is_view_only_while_team_membership_remains(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let channel_id = Uuid::new_v4();
-    let user_id = "macro|member@team.com";
+    let user_id = "rox|member@team.com";
     insert_channel(&pool, channel_id, "team", Some(TEAM_ALPHA)).await?;
     insert_user_participant(&pool, channel_id, user_id, "member", true).await?;
 
@@ -183,7 +183,7 @@ async fn unrelated_team_member_has_no_access(pool: PgPool) -> anyhow::Result<()>
     let channel_id = Uuid::new_v4();
     insert_channel(&pool, channel_id, "team", Some(TEAM_ALPHA)).await?;
 
-    let role = get_channel_role(&pool, &channel_id, "macro|multi@team.com", None).await?;
+    let role = get_channel_role(&pool, &channel_id, "rox|multi@team.com", None).await?;
 
     assert_eq!(role, ChannelRoleResult::NoAccess);
     Ok(())
@@ -194,7 +194,7 @@ async fn unrelated_team_member_has_no_access(pool: PgPool) -> anyhow::Result<()>
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn non_team_channels_do_not_grant_team_members_view_only(pool: PgPool) -> anyhow::Result<()> {
-    let user_id = "macro|member@team.com";
+    let user_id = "rox|member@team.com";
 
     for channel_type in ["private", "direct_message"] {
         let channel_id = Uuid::new_v4();

@@ -2,7 +2,7 @@ import { type RoxId, tryRoxId } from '@core/user/roxId';
 
 /**
  * Who performed an activity event, parsed once from the wire `actorId`.
- * The backend emits `macro|<email>` for users and `bot|<uuid>` for bots
+ * The backend emits `rox|<email>` for users and `bot|<uuid>` for bots
  * (first-party agents, team bots, and the system principal). Anything else
  * is preserved raw so the row can still say something honest.
  */

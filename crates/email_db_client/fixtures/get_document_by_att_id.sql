@@ -2,7 +2,7 @@
 -- One attachment per document state the attachment opener distinguishes.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-00000000b001', 'macro|user@example.com', '00000000-0000-0000-0000-00000000b001',
+VALUES ('00000000-0000-0000-0000-00000000b001', 'rox|user@example.com', '00000000-0000-0000-0000-00000000b001',
         'user@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, created_at, updated_at)

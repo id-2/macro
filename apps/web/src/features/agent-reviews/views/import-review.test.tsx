@@ -150,7 +150,7 @@ function setup(
   let record: ImportReviewRecord = {
     id: 'review',
     sessionId: 'session',
-    actingUser: 'macro|owner@rox.local',
+    actingUser: 'rox|owner@rox.local',
     executionId: null,
     kind: 'import',
     title: 'Import from Notion',

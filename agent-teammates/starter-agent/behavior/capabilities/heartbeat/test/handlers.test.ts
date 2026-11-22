@@ -22,7 +22,7 @@ import { heartbeatCapabilities } from "../index.ts";
 import { tick } from "../schedules.ts";
 
 const root = "/agent";
-const owner = "macro|owner@example.com";
+const owner = "rox|owner@example.com";
 const ok = (stdout = ""): Ran => ({ code: 0, stdout, stderr: "" });
 const no: Ran = { code: 1, stdout: "", stderr: "" };
 
@@ -36,7 +36,7 @@ const setup = () => {
 		join,
 		settings: {
 			owner,
-			me: "macro|agent@example.com",
+			me: "rox|agent@example.com",
 			name: "Agent",
 			email: "agent@example.com",
 			timeZone: "America/New_York",

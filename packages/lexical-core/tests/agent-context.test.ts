@@ -133,7 +133,7 @@ function contextMessage(
 ): AgentContextMessage {
   return {
     id,
-    senderId: `macro|${author}`,
+    senderId: `rox|${author}`,
     author,
     content,
     postedAt: '2026-09-25T10:00:00Z',
@@ -252,16 +252,16 @@ describe('composeAgentContextPrompt', () => {
         '    <note>The prompt was posted as a reply in the thread below. It is about that thread.</note>',
         '  </reply_target>',
         '  <thread root="a">',
-        '    <message id="a" author="julia@rox.one" author_id="macro|julia@rox.one" at="2026-09-25T10:00:00Z">calendar popover scrolls</message>',
-        '    <message id="a3" author="wolf@rox.one" author_id="macro|wolf@rox.one" at="2026-09-25T10:00:00Z" mentioned_you="true">please fix</message>',
+        '    <message id="a" author="julia@rox.one" author_id="rox|julia@rox.one" at="2026-09-25T10:00:00Z">calendar popover scrolls</message>',
+        '    <message id="a3" author="wolf@rox.one" author_id="rox|wolf@rox.one" at="2026-09-25T10:00:00Z" mentioned_you="true">please fix</message>',
         '  </thread>',
         '  <channel_background>',
         '    <note>Other recent messages in this channel, outside the thread above, oldest first. Background only: they are not what the prompt is about.</note>',
         '    <thread root="b">',
-        '      <message id="b" author="teo@rox.one" author_id="macro|teo@rox.one" at="2026-09-25T10:00:00Z">spinner never stops</message>',
-        '      <message id="b2" author="julia@rox.one" author_id="macro|julia@rox.one" at="2026-09-25T10:00:00Z">same on mobile</message>',
+        '      <message id="b" author="teo@rox.one" author_id="rox|teo@rox.one" at="2026-09-25T10:00:00Z">spinner never stops</message>',
+        '      <message id="b2" author="julia@rox.one" author_id="rox|julia@rox.one" at="2026-09-25T10:00:00Z">same on mobile</message>',
         '    </thread>',
-        '    <message id="c" author="jacob@rox.one" author_id="macro|jacob@rox.one" at="2026-09-25T10:00:00Z">lunch?</message>',
+        '    <message id="c" author="jacob@rox.one" author_id="rox|jacob@rox.one" at="2026-09-25T10:00:00Z">lunch?</message>',
         '  </channel_background>',
         '</conversation>',
       ].join('\n')
@@ -297,7 +297,7 @@ describe('composeAgentContextPrompt', () => {
       '    <thread root="old" messages_omitted="true">\n      <note>Some messages of this thread are not shown.</note>'
     );
     expect(text).toContain(
-      '    <message id="p" author="wolf@rox.one" author_id="macro|wolf@rox.one" at="2026-09-25T10:00:00Z" mentioned_you="true">what is broken?</message>'
+      '    <message id="p" author="wolf@rox.one" author_id="rox|wolf@rox.one" at="2026-09-25T10:00:00Z" mentioned_you="true">what is broken?</message>'
     );
   });
 
@@ -318,7 +318,7 @@ describe('composeAgentContextPrompt', () => {
         '<conversation>',
         '  <reply_target kind="quote" message="b2" thread="b">',
         '    <note>The prompt quote-replies to this message. It is what the prompt is about.</note>',
-        '    <message id="b2" author="julia@rox.one" author_id="macro|julia@rox.one" at="2026-09-25T10:00:00Z">same on mobile</message>',
+        '    <message id="b2" author="julia@rox.one" author_id="rox|julia@rox.one" at="2026-09-25T10:00:00Z">same on mobile</message>',
         '  </reply_target>',
         '</conversation>',
       ].join('\n')
@@ -370,7 +370,7 @@ describe('composeAgentContextPrompt', () => {
           channel_type: 'direct_message',
         },
         prompt_message_id: 'm-1',
-        sender: { id: 'macro|ada@example.com', name: 'Ada' },
+        sender: { id: 'rox|ada@example.com', name: 'Ada' },
         reply_target: { kind: 'none' },
       },
     });
@@ -384,14 +384,14 @@ describe('composeAgentContextPrompt', () => {
   });
 
   it('names the owner and requester and requires explicit actor selection', () => {
-    const owner = { id: 'macro|wolf@rox.one', name: 'wolf@rox.one' };
+    const owner = { id: 'rox|wolf@rox.one', name: 'wolf@rox.one' };
     const text = composedContext({
       promptMarkdown: 'hi',
       owner,
       sender: owner,
     });
     expect(text).toContain(
-      '<session owner="wolf@rox.one" owner_id="macro|wolf@rox.one">'
+      '<session owner="wolf@rox.one" owner_id="rox|wolf@rox.one">'
     );
     expect(text).toContain('is_owner="true"');
     expect(text).toContain('Choose acting_as explicitly');
@@ -402,8 +402,8 @@ describe('composeAgentContextPrompt', () => {
     const text = composedContext({
       promptMarkdown: 'read my email',
       parent: { type: 'channel', id: 'channel-1' },
-      owner: { id: 'macro|wolf@rox.one', name: 'wolf@rox.one' },
-      sender: { id: 'macro|julia@rox.one', name: 'julia@rox.one' },
+      owner: { id: 'rox|wolf@rox.one', name: 'wolf@rox.one' },
+      sender: { id: 'rox|julia@rox.one', name: 'julia@rox.one' },
     });
     expect(text).toContain(
       'julia@rox.one sent this prompt. wolf@rox.one owns this session.'
@@ -416,7 +416,7 @@ describe('composeAgentContextPrompt', () => {
   it('does not grant a requester account to a turn without a person', () => {
     const text = composedContext({
       promptMarkdown: 'run',
-      owner: { id: 'macro|wolf@rox.one', name: 'wolf@rox.one' },
+      owner: { id: 'rox|wolf@rox.one', name: 'wolf@rox.one' },
     });
     expect(text).toContain('<prompted_by is_owner="false"/>');
     expect(text).toContain('has no requester account');

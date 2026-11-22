@@ -243,7 +243,7 @@ async fn gateway_refuses_outbound_relay_and_shell() {
     //    the creation rate limit, so charge it to another account.
     let other = crate::domain::AgentIdentity {
         session: "00000000-0000-0000-0000-000000000002".parse().unwrap(),
-        owner: RoxUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap(),
+        owner: RoxUserIdStr::try_from("rox|other@example.com".to_owned()).unwrap(),
     };
     let share2 = service.share(other, 3000).await.unwrap();
     let relay = TcpListener::bind("127.0.0.1:0").await.unwrap();

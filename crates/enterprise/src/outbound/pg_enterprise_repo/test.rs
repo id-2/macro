@@ -42,7 +42,7 @@ async fn create_user(pool: &PgPool, email: &str) -> RoxUserIdStr<'static> {
     .await
     .unwrap();
     sqlx::query("INSERT INTO \"User\" (id, email, name, rox_user_id) VALUES ($1, $2, $3, $4)")
-        .bind(format!("macro|{email}"))
+        .bind(format!("rox|{email}"))
         .bind(email)
         .bind(email)
         .bind(rox_uuid)

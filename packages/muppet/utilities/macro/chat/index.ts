@@ -28,7 +28,7 @@ export type Message = {
   readonly dm: boolean;
   /** The sender's display name. Never proof of who sent it. */
   readonly from: string;
-  /** Rox's id for the sender, e.g. `macro|name@example.com`. The only thing that says who sent it. */
+  /** Rox's id for the sender, e.g. `rox|name@example.com`. The only thing that says who sent it. */
   readonly senderId: string;
   /** Whether the agent sent it. */
   readonly mine: boolean;
@@ -146,7 +146,7 @@ const directMessage = 'direct_message';
 
 /** A name for someone with no display name: the front of their id's email. */
 export const nameFromId = (id: string): string =>
-  id.replace(/^macro\|/, '').replace(/@.*/, '');
+  id.replace(/^rox\|/, '').replace(/@.*/, '');
 
 /** Chat over Rox's SDK, as the account the client is signed in as. */
 export const sdkChat = ({
@@ -445,7 +445,7 @@ export const react = async (
 
 /**
  * DMs someone in Rox, by their Rox id. The id looks like
- * `macro|name@example.com`: a message's `senderId`, or one of its `mentions`.
+ * `rox|name@example.com`: a message's `senderId`, or one of its `mentions`.
  */
 export const dmPerson = (
   { chat }: Context,

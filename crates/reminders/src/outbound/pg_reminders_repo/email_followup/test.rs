@@ -57,7 +57,7 @@ impl ReminderDispatch for PausedDelivery {
 const THREAD: Uuid = Uuid::from_u128(11);
 const LINK: Uuid = Uuid::from_u128(12);
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|followup@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|followup@test.com").unwrap()
 }
 #[derive(Clone)]
 struct FixedClock(DateTime<Utc>);
@@ -460,7 +460,7 @@ async fn archive_failure_rolls_back_and_ineligible_mail_never_returns(pool: PgPo
             .await
             .is_err()
     );
-    let other = RoxUserIdStr::parse_from_str("macro|other@test.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@test.com").unwrap();
     assert!(
         service
             .execute(

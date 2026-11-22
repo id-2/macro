@@ -69,10 +69,10 @@ describe('extractChannelMentionsFromMarkdown', () => {
 
   it('extracts user mentions and re-tags bot principals', () => {
     const markdown =
-      '<m-user-mention>{"userId":"macro|a@b.com","email":"a@b.com"}</m-user-mention> and ' +
+      '<m-user-mention>{"userId":"rox|a@b.com","email":"a@b.com"}</m-user-mention> and ' +
       '<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention>';
     expect(extractChannelMentionsFromMarkdown(markdown)).toEqual([
-      { entityType: 'user', entityId: 'macro|a@b.com' },
+      { entityType: 'user', entityId: 'rox|a@b.com' },
       {
         entityType: 'bot',
         entityId: 'bot|00000000-0000-0000-0000-00000000a1a1',
@@ -101,10 +101,10 @@ describe('extractChannelMentionsFromMarkdown', () => {
   });
 
   it('extracts mentions across multiple lines and formatting', () => {
-    const markdown = `# heading\n\n- a list item with ${documentMention('doc-9', 'email')}\n\nand a user <m-user-mention>{"userId":"macro|a@b.com","email":"a@b.com"}</m-user-mention>`;
+    const markdown = `# heading\n\n- a list item with ${documentMention('doc-9', 'email')}\n\nand a user <m-user-mention>{"userId":"rox|a@b.com","email":"a@b.com"}</m-user-mention>`;
     expect(extractChannelMentionsFromMarkdown(markdown)).toEqual([
       { entityType: 'thread', entityId: 'doc-9' },
-      { entityType: 'user', entityId: 'macro|a@b.com' },
+      { entityType: 'user', entityId: 'rox|a@b.com' },
     ]);
   });
 });

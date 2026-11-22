@@ -16,7 +16,7 @@ const saved = {
     query: 'SELECT "Party", COUNT(*) AS invites FROM "Guests" GROUP BY "Party"',
   },
   databaseId: 'db-1',
-  createdBy: 'macro|sam@example.com',
+  createdBy: 'rox|sam@example.com',
   createdAt: '2026-11-05T00:00:00Z',
 };
 

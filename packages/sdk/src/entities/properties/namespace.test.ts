@@ -104,7 +104,7 @@ describe('PropertiesNamespace.createTag', () => {
                 isMultiSelect: true,
                 isSystem: true,
                 scope: 'user',
-                user_id: 'macro|user@example.com',
+                user_id: 'rox|user@example.com',
               },
               options: [],
             } satisfies TagSetResponse,

@@ -2,7 +2,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 fn encrypted() -> EncryptedProviderApiKey {
     EncryptedProviderApiKey {

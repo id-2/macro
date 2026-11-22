@@ -336,7 +336,7 @@ fn empty_query_patch_does_not_overwrite_an_earlier_field_patch() {
                     "items": [{
                         "__typename": "GraphqlSoupDocument",
                         "id": id,
-                        "ownerId": "macro|owner@example.com",
+                        "ownerId": "rox|owner@example.com",
                         "projectId": null,
                         "fileType": "md",
                         "createdAt": "2025-01-01T00:00:00.000001Z",
@@ -368,7 +368,7 @@ fn empty_query_patch_does_not_overwrite_an_earlier_field_patch() {
     };
     assert!(exact.iter().any(|patch| {
         patch.attribute == vocabulary::owner()
-            && patch.values == vec![ExactValue::utf8("macro|owner@example.com").unwrap()]
+            && patch.values == vec![ExactValue::utf8("rox|owner@example.com").unwrap()]
     }));
     assert!(
         integers
@@ -454,7 +454,7 @@ fn selected_document(
         "id": id,
         "cacheProjection": cache_projection,
         "notifications": [],
-        "ownerId": "macro|owner@example.com",
+        "ownerId": "rox|owner@example.com",
         "projectId": null,
         "fileType": "md",
         "createdAt": "2025-01-01T00:00:00.000001Z",
@@ -494,7 +494,7 @@ fn selected_document_supplement_composes_direct_and_server_owned_facts() {
     assert_eq!(document.partition, vocabulary::document_partition());
     assert!(document.exact_facts.iter().any(|fact| {
         fact.attribute == vocabulary::owner()
-            && fact.value == ExactValue::utf8("macro|owner@example.com").unwrap()
+            && fact.value == ExactValue::utf8("rox|owner@example.com").unwrap()
     }));
     assert!(document.exact_facts.iter().any(|fact| {
         fact.attribute == vocabulary::email_attachment()
@@ -621,7 +621,7 @@ fn selected_project_and_chat_null_supplements_are_valid_direct_only_v4_hydration
                     "id": "00000000-0000-0000-0000-000000000010",
                     "cacheProjection": null,
                     "notifications": [],
-                    "ownerId": "macro|owner@example.com",
+                    "ownerId": "rox|owner@example.com",
                     "parentId": null,
                     "createdAt": "2025-01-01T00:00:00Z",
                     "updatedAt": "2025-01-02T00:00:00Z"
@@ -631,7 +631,7 @@ fn selected_project_and_chat_null_supplements_are_valid_direct_only_v4_hydration
                     "id": "00000000-0000-0000-0000-000000000011",
                     "cacheProjection": null,
                     "notifications": [],
-                    "ownerId": "macro|owner@example.com",
+                    "ownerId": "rox|owner@example.com",
                     "projectId": null,
                     "createdAt": "2025-01-01T00:00:00Z",
                     "updatedAt": "2025-01-02T00:00:00Z"
@@ -788,7 +788,7 @@ fn partial_mutation_payloads_patch_v4_without_fabricating_server_facts() {
                         "__typename": "GraphqlSoupDocument",
                         "id": "00000000-0000-0000-0000-000000000001",
                         "displayName": "Renamed",
-                        "ownerId": "macro|new-owner@example.com",
+                        "ownerId": "rox|new-owner@example.com",
                         "projectId": null,
                         "fileType": "md",
                         "subType": { "__typename": "GraphqlTaskSubType" },
@@ -864,7 +864,7 @@ fn production_documents_filters(document_filter: serde_json::Value) -> serde_jso
 }
 
 fn production_documents_filter_cases() -> Vec<(&'static str, serde_json::Value)> {
-    let owner = "macro|phase-0@example.com";
+    let owner = "rox|phase-0@example.com";
     let not_task = serde_json::json!({
         "not": { "literal": { "subType": "TASK" } }
     });
@@ -978,7 +978,7 @@ fn production_my_tasks_importance_and_status_filter_compiles_locally() {
             "left": { "literal": { "subType": "TASK" } },
             "right": {
                 "or": {
-                    "left": { "literal": { "owner": "macro|viewer@example.com" } },
+                    "left": { "literal": { "owner": "rox|viewer@example.com" } },
                     "right": { "literal": { "importance": true } }
                 }
             }
@@ -1100,7 +1100,7 @@ fn production_documents_membership_matches_postgres_fixture_reference_and_real_t
     use std::collections::BTreeSet;
 
     pollster::block_on(async {
-        let owner = "macro|phase-0@example.com";
+        let owner = "rox|phase-0@example.com";
         let documents = vec![
             differential_document(
                 "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -1118,7 +1118,7 @@ fn production_documents_membership_matches_postgres_fixture_reference_and_real_t
             ),
             differential_document(
                 "dddddddd-dddd-dddd-dddd-dddddddddddd",
-                "macro|shared@example.com",
+                "rox|shared@example.com",
                 false,
                 None,
                 3,

@@ -808,7 +808,7 @@ describe('onboarding flow', () => {
       const { fake, navigate } = setup({
         world: {
           viewer: {
-            id: `macro|${email}`,
+            id: `rox|${email}`,
             email,
             tutorialComplete: false,
             licensed: false,

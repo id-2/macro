@@ -17,9 +17,9 @@ impl RoxAuthorizationService for Authorization {
     async fn authorize(&self, token: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
             user_id: if token == "agent-session" {
-                "macro|agent@example.test"
+                "rox|agent@example.test"
             } else {
-                "macro|synthetic@example.test"
+                "rox|synthetic@example.test"
             }
             .into(),
             fusion_user_id: "fixture".into(),
@@ -81,7 +81,7 @@ fn flagged_app(
     let repository = Arc::new(FakeRepository::new());
     let provider = Arc::new(FakeProvider::new());
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
-    for user in ["macro|synthetic@example.test", "macro|agent@example.test"] {
+    for user in ["rox|synthetic@example.test", "rox|agent@example.test"] {
         use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
         flags.set(
             RoxUserIdStr::parse_from_str(user).unwrap().into_owned(),
@@ -342,11 +342,11 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
     let second = TeamId(Uuid::now_v7());
     for (user, email, team) in [
         (
-            "macro|synthetic@example.test",
+            "rox|synthetic@example.test",
             "synthetic@example.test",
             first,
         ),
-        ("macro|other@example.test", "other@example.test", second),
+        ("rox|other@example.test", "other@example.test", second),
     ] {
         let rox_user_id = Uuid::now_v7();
         sqlx::query!(
@@ -387,7 +387,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
     let repository = Arc::new(PgRepository::new(pool.clone()).expect("repository capacity"));
     let now = chrono::Utc::now();
     let record = Record {
-        user_id: RoxUserIdStr::parse_from_str("macro|synthetic@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|synthetic@example.test")
             .expect("identity")
             .into_owned(),
         grants: vec![],
@@ -621,7 +621,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
         ),
         (
             format!("/teams/{}/items/{item}/share", first.0),
-            serde_json::json!({"grants":[{"kind":"user","id":"macro|other@example.test","permission":"view"}]}),
+            serde_json::json!({"grants":[{"kind":"user","id":"rox|other@example.test","permission":"view"}]}),
             StatusCode::NOT_FOUND,
         ),
         (

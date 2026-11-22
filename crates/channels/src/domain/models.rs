@@ -625,7 +625,7 @@ pub struct CreateChannelResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "inbound", derive(utoipa::ToSchema))]
 pub struct GetOrCreateDmRequest {
-    /// Recipient user id (`macro|...`) or agent persona id (`bot|...`).
+    /// Recipient user id (`rox|...`) or agent persona id (`bot|...`).
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
     pub recipient_id: Sender,
 }

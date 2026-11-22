@@ -14,7 +14,7 @@ const record: ScheduledActionResponse = {
   enabled: true,
   run_visibility: 'unlisted',
   configuration_revision: 1,
-  owner: 'macro|owner@example.test',
+  owner: 'rox|owner@example.test',
   created_at: '2026-10-19T00:00:00Z',
   updated_at: '2026-10-19T00:00:00Z',
   trigger: { type: 'cron', schedule: '0 9 * * *', timezone: 'UTC' },

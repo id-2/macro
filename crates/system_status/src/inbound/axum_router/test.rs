@@ -22,8 +22,8 @@ use crate::inbound::axum_router::{SystemStatusRouterState, system_status_router}
 
 const STAFF_JWT: &str = "staff";
 const OUTSIDER_JWT: &str = "outsider";
-const STAFF_USER_ID: &str = "macro|oncall@rox.one";
-const OUTSIDER_USER_ID: &str = "macro|ada@example.com";
+const STAFF_USER_ID: &str = "rox|oncall@rox.one";
+const OUTSIDER_USER_ID: &str = "rox|ada@example.com";
 
 #[derive(Clone)]
 struct FakeAuthorizationService;

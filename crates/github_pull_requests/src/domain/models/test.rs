@@ -852,7 +852,7 @@ fn stored_record(pull_request: &EnrichedGithubPullRequest) -> ForeignEntity {
         foreign_entity_id: pull_request.github_key.clone(),
         foreign_entity_source: GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE.to_string(),
         metadata: pull_request.foreign_entity_metadata(None).unwrap(),
-        stored_for_id: "macro|viewer@example.com".to_string(),
+        stored_for_id: "rox|viewer@example.com".to_string(),
         stored_for_auth_entity: "user".to_string(),
         created_at: utc_datetime("2026-05-25T18:54:21Z"),
         updated_at: utc_datetime("2026-05-25T18:54:21Z"),

@@ -74,7 +74,7 @@ async fn archive_and_undo_forward_identity_and_state_to_the_service() {
         assert_eq!(
             *service.calls.lock().unwrap(),
             vec![CapturedMutation::Archive {
-                user_id: "macro|viewer@example.com".into(),
+                user_id: "rox|viewer@example.com".into(),
                 thread_id,
                 archived,
             }]
@@ -141,7 +141,7 @@ async fn bulk_archive_reports_rejected_threads_and_returns_every_loadable_thread
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::ArchiveMany {
-            user_id: "macro|viewer@example.com".into(),
+            user_id: "rox|viewer@example.com".into(),
             thread_ids: vec![accepted, TEST_THREAD_ID],
             archived: true,
         }]

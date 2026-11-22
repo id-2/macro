@@ -2442,7 +2442,7 @@ export type TeamAgent = {
      */
     teamId: string;
     /**
-     * The agent's Rox user id (`macro|<email>`).
+     * The agent's Rox user id (`rox|<email>`).
      */
     userId: string;
 };

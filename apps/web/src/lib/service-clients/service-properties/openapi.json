@@ -1937,7 +1937,7 @@
           },
           {
             "type": "object",
-            "description": "Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user/team property namespace.",
+            "description": "Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user/team property namespace.",
             "required": ["database_id", "scope"],
             "properties": {
               "database_id": {

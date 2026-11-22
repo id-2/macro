@@ -110,7 +110,7 @@ impl EntityCreator for ReservedCreator {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|left-user@test.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|left-user@test.com".to_string()).unwrap()
 }
 
 fn key() -> ImportTargetKey {
@@ -164,7 +164,7 @@ async fn channel_count(repo: &PgChannelsRepo) -> usize {
 }
 
 async fn archive(repo: &PgImportRepo, channels: &PgChannelsRepo) -> Uuid {
-    let admin = RoxUserIdStr::try_from("macro|team-owner-a@test.com".to_string()).unwrap();
+    let admin = RoxUserIdStr::try_from("rox|team-owner-a@test.com".to_string()).unwrap();
     let target = repo
         .reserve_target(&admin, &key(), ImportTargetKind::Team, None)
         .await

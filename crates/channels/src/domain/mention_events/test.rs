@@ -79,7 +79,7 @@ fn metadata_from_entity_mention_maps_fields() {
         source_entity_id: "doc-1".to_string(),
         entity_type: "bot".to_string(),
         entity_id: "bot-1".to_string(),
-        user_id: Some("macro|owner@example.com".to_string()),
+        user_id: Some("rox|owner@example.com".to_string()),
         created_at: Utc::now(),
     };
 

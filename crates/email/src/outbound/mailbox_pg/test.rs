@@ -8,7 +8,7 @@ pub(super) async fn fixture(db: &PgPool) -> (PgMailboxSync, Uuid) {
     let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"
         INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,grant_generation)
-        VALUES ($1,'macro|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
+        VALUES ($1,'rox|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
     "#,link).execute(db).await.unwrap();
     sqlx::query!(
         r#"
@@ -482,7 +482,7 @@ async fn projection_ack_keeps_version_watermark_and_exposes_normalized_state(db:
 async fn projection_crash_reclaims_work_and_old_worker_cannot_ack_successor(db: PgPool) {
     use crate::domain::mailbox::projection::MailboxProjectionRepository;
     let (repo, link) = fixture(&db).await;
-    let payload = serde_json::json!({"kind":"link_connected","actor_id":"macro|outlook-test@example.com","is_new":true});
+    let payload = serde_json::json!({"kind":"link_connected","actor_id":"rox|outlook-test@example.com","is_new":true});
     sqlx::query!(
         "INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,1,$3)",
         rox_uuid::generate_uuid_v7(),

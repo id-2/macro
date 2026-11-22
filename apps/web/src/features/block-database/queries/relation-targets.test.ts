@@ -10,7 +10,7 @@ const database = (
 ) => ({
   id,
   name,
-  owner_id: 'macro|owner',
+  owner_id: 'rox|owner',
   project_id: null,
   created_at: '2026-11-01T00:00:00Z',
   trashed_at,

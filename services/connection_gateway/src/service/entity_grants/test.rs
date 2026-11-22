@@ -13,8 +13,8 @@ use model_entity::{Entity, EntityType};
 use super::{Admission, EntityGrants, EntityViewAccess, viewable};
 use crate::model::tracking::TrackAction;
 
-const VIEWER: &str = "macro|viewer@example.com";
-const OTHER_USER: &str = "macro|other@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
+const OTHER_USER: &str = "rox|other@example.com";
 const SHARED_DOCUMENT: &str = "0198f7a2-0000-7000-8000-000000000001";
 const PRIVATE_CHANNEL: &str = "0198f7a2-0000-7000-8000-000000000002";
 const BROKEN_CHAT: &str = "0198f7a2-0000-7000-8000-000000000003";
@@ -119,7 +119,7 @@ async fn only_the_connected_user_may_track_their_user_entity() {
         grants
             .admit(
                 &access,
-                &entity(EntityType::User, "macro|Viewer@Example.com"),
+                &entity(EntityType::User, "rox|Viewer@Example.com"),
                 TrackAction::Open
             )
             .await

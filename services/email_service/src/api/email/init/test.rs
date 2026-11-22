@@ -22,7 +22,7 @@ async fn insert_email_link(pool: &PgPool) -> Uuid {
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|sso-grant@example.com",
+        "rox|sso-grant@example.com",
         email_address,
     )
     .execute(pool)
@@ -87,7 +87,7 @@ async fn missing_email_link_is_not_unrecorded(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(pool: PgPool) {
     let fusionauth_user_id = Uuid::now_v7();
-    let rox_user_id = format!("macro|init-{fusionauth_user_id}@example.com");
+    let rox_user_id = format!("rox|init-{fusionauth_user_id}@example.com");
     sqlx::query(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
     )
@@ -152,8 +152,8 @@ async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
     // domain so the source carries no address literals.
     const EXTERNAL_DOMAIN: &str = "example.com";
     let fusionauth_user_id = Uuid::now_v7().to_string();
-    let with_rox = format!("macro|rox-owner@{EXTERNAL_DOMAIN}");
-    let without_rox = format!("macro|gmail-owner@{EXTERNAL_DOMAIN}");
+    let with_rox = format!("rox|rox-owner@{EXTERNAL_DOMAIN}");
+    let without_rox = format!("rox|gmail-owner@{EXTERNAL_DOMAIN}");
     let rox_address = format!("rox-owner@{ROX_MAIL_DOMAIN}");
     let external_address = format!("rox-owner@{EXTERNAL_DOMAIN}");
     let legacy_address = format!("gmail-owner@{EXTERNAL_DOMAIN}");
@@ -242,7 +242,7 @@ async fn already_initialized_is_a_coded_400() {
 fn gmail_import_is_not_primary() {
     let link = new_gmail_link(
         Uuid::now_v7().to_string(),
-        RoxUserIdStr::try_from("macro|ada@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("rox|ada@example.com".to_owned()).unwrap(),
         "ada@gmail.example".to_owned(),
     )
     .unwrap();

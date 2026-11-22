@@ -298,7 +298,7 @@ describe("atomic document API", () => {
 			const token = jwt.sign(
 				{
 					document_id: id,
-					user_id: "macro|real-user",
+					user_id: "rox|real-user",
 					access_level: "edit",
 					actor: "bot|document-agent",
 					agent_correlation_id: correlation,
@@ -318,7 +318,7 @@ describe("atomic document API", () => {
 			expect(records).toHaveLength(1);
 			expect(JSON.parse(Buffer.from(records[0][1]).toString())).toEqual({
 				actor: "bot|document-agent",
-				on_behalf_of: "macro|real-user",
+				on_behalf_of: "rox|real-user",
 				...(correlation ? { agent_correlation_id: correlation } : {}),
 			});
 		},

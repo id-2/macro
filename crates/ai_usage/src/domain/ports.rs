@@ -23,7 +23,7 @@ use super::financial::{
 /// `const`. Deref yields a `&'static RoxUserIdStr`; clone it when an owned
 /// value is needed.
 pub static SYSTEM_USER_ID: LazyLock<RoxUserIdStr<'static>> = LazyLock::new(|| {
-    RoxUserIdStr::try_from("macro|ai-system@rox.one".to_string())
+    RoxUserIdStr::try_from("rox|ai-system@rox.one".to_string())
         .expect("system user id is valid")
 });
 

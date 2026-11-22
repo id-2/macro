@@ -215,7 +215,7 @@ fn the_recorded_sdk_is_not_configuration() {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap()
 }
 
 #[tokio::test]

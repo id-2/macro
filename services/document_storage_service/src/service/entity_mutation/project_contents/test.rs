@@ -19,7 +19,7 @@ use uuid::Uuid;
 use super::*;
 use crate::service::entity_mutation::LifecycleError;
 
-const USER: &str = "macro|owner@test.com";
+const USER: &str = "rox|owner@test.com";
 const FOLDER_COPY: &str = "10000000-0000-0000-0000-00000000000c";
 
 /// Grants owner access to everything except `denied`, and fails outright on

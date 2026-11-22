@@ -18,7 +18,7 @@ async fn exports_shared_bodies_original_authors_resolution_and_geometry(pool: Pg
     assert_eq!(thread.comments.len(), 2);
     assert_eq!(thread.comments[0].sender, "Original PDF author");
     assert_eq!(thread.comments[0].content, "Initial question on page 1");
-    assert_eq!(thread.comments[1].sender, "macro|user2@user.com");
+    assert_eq!(thread.comments[1].sender, "rox|user2@user.com");
     assert!(
         thread
             .comments

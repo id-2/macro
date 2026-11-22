@@ -8,7 +8,7 @@ async fn insert_link(pool: &Pool<Postgres>) -> Uuid {
     let link_id = Uuid::new_v4();
     sqlx::query!(
         r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
-           VALUES ($1, 'macro|owner@corp.test', 'macro|owner@corp.test', 'owner@corp.test', 'GMAIL')"#,
+           VALUES ($1, 'rox|owner@corp.test', 'rox|owner@corp.test', 'owner@corp.test', 'GMAIL')"#,
         link_id,
     )
     .execute(pool)

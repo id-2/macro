@@ -91,7 +91,7 @@ impl<R: ComposedMemoryRepo> AsyncTool<MemoryToolContext<R>> for UpdateMemory {
     description = "Read privacy-reviewed professional activity for yourself or a current teammate. Reports use UTC calendar days, Monday-start weeks, and calendar months. Empty results mean no stored activity, not no work. At most 366 days per request."
 )]
 pub struct GetUserActivity {
-    #[schemars(description = "A macro| user id, or omit for yourself.")]
+    #[schemars(description = "A rox| user id, or omit for yourself.")]
     pub user_id: Option<String>,
     #[schemars(description = "Inclusive first UTC date (YYYY-MM-DD).")]
     pub start: NaiveDate,

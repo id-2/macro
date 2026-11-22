@@ -57,7 +57,7 @@ use super::NotificationRouterState;
 const VALID_BEARER_TOKEN: &str = "valid-token";
 const VALID_AUTHORIZATION_HEADER: &str = "Bearer valid-token";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
-const VALID_USER_ID: &str = "macro|user@example.com";
+const VALID_USER_ID: &str = "rox|user@example.com";
 
 #[derive(Clone)]
 struct FakeAuthorizationService;
@@ -768,7 +768,7 @@ fn presigned_get(uri: &str, host: &str) -> Request<axum::body::Body> {
 #[tokio::test]
 async fn presigned_disable_succeeds_without_jwt() {
     let router = presigned_router();
-    let uri = signed_disable_uri("test_type", "macro|user@example.com");
+    let uri = signed_disable_uri("test_type", "rox|user@example.com");
 
     let resp = router
         .oneshot(presigned_get(&uri, "notifications.rox.one"))
@@ -787,7 +787,7 @@ async fn presigned_disable_succeeds_without_jwt() {
 #[tokio::test]
 async fn presigned_disable_succeeds_with_valid_hmac() {
     let router = presigned_router();
-    let uri = signed_disable_uri("test_type", "macro|user@example.com");
+    let uri = signed_disable_uri("test_type", "rox|user@example.com");
 
     let resp = router
         .oneshot(presigned_get(&uri, "notifications.rox.one"))
@@ -803,7 +803,7 @@ async fn presigned_disable_succeeds_on_gateway_prefix() {
     let uri = signed_disable_uri_at(
         "https://gateway.rox.one/notification",
         "test_type",
-        "macro|user@example.com",
+        "rox|user@example.com",
     );
 
     let resp = router
@@ -819,7 +819,7 @@ async fn presigned_disable_fails_with_invalid_hmac() {
     let router = presigned_router();
     // Construct a URI with a bogus signature
     let uri = "/user_notifications/preferences/test_type/disable\
-               ?id=macro|user@example.com&sig=0000000000000000000000000000000000000000000000000000000000000000";
+               ?id=rox|user@example.com&sig=0000000000000000000000000000000000000000000000000000000000000000";
 
     let resp = router
         .oneshot(

@@ -45,7 +45,7 @@ async fn deletes_every_grant_of_the_source_and_nothing_else(
                 EntityAccessSourceType::Bot
             ),
             (
-                "macro|owner@example.com".to_owned(),
+                "rox|owner@example.com".to_owned(),
                 EntityAccessSourceType::User
             ),
         ]

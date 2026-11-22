@@ -10,7 +10,7 @@ async fn configured_recorders_preserve_analytics_and_count_only_enabled_billable
     use ai_usage::{UsageApiParams, UsageContext, UsageRepo};
     use std::time::Duration;
 
-    let user = RoxUserIdStr::try_from("macro|quota@example.com".to_owned()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|quota@example.com".to_owned()).unwrap();
     let disabled =
         ai_usage::pg_recorder_with_enforcement(pool.clone(), AiUsageEnforcement::Disabled);
     let enabled = ai_usage::pg_recorder_with_enforcement(pool.clone(), AiUsageEnforcement::Enabled);
@@ -80,7 +80,7 @@ async fn configured_composition_skips_billing_only_for_disabled_or_exempt_work()
         .connect_lazy("postgres://localhost/unused")
         .unwrap();
     pool.close().await;
-    let user = RoxUserIdStr::try_from("macro|quota@example.com".to_owned()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|quota@example.com".to_owned()).unwrap();
     let disabled = pg_admission_service(
         pool.clone(),
         AiUsageEnforcement::Disabled,

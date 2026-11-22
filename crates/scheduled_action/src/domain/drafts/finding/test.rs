@@ -321,12 +321,12 @@ async fn a_draft_finds_the_items_its_words_name_before_its_session_starts() {
         (
             ItemKind::Person,
             "Jordan",
-            "macro|jordan@example.com".into(),
+            "rox|jordan@example.com".into(),
         ),
         (
             ItemKind::Person,
             "jordan",
-            "macro|jordan2@example.com".into(),
+            "rox|jordan2@example.com".into(),
         ),
     ]));
     let (drafts, sessions, _) = finding(&model, &names, checks_bug_tasks(channel));
@@ -364,12 +364,12 @@ async fn a_draft_reports_what_it_found_by_name_before_its_session_starts() {
         (
             ItemKind::Person,
             "Jordan",
-            "macro|jordan@example.com".into(),
+            "rox|jordan@example.com".into(),
         ),
         (
             ItemKind::Person,
             "jordan",
-            "macro|jordan2@example.com".into(),
+            "rox|jordan2@example.com".into(),
         ),
     ]));
     let (drafts, sessions, _) = finding(&model, &names, Box::new(|_| Vec::new()));
@@ -638,7 +638,7 @@ async fn names_of_kinds_the_lookup_doesnt_search_go_to_the_session_unreported() 
             (
                 ItemKind::Person,
                 "Jordan",
-                "macro|jordan@example.com".into(),
+                "rox|jordan@example.com".into(),
             ),
         ])
     });

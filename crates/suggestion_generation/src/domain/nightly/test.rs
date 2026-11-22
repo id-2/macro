@@ -6,7 +6,7 @@ use strum::IntoEnumIterator as _;
 use super::*;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|nightly@rox.one")
+    RoxUserIdStr::parse_from_str("rox|nightly@rox.one")
         .unwrap()
         .into_owned()
 }

@@ -5,7 +5,7 @@ use super::*;
 use crate::domain::labels::{EventLabels, EventRole};
 use crate::domain::service::CalendarService;
 
-const OWNER: &str = "macro|event-labels-owner@example.com";
+const OWNER: &str = "rox|event-labels-owner@example.com";
 const COLLEAGUE: &str = "colleague@example.com";
 
 fn calendar(provider_calendar_id: &str, name: &str, access_role: &str) -> ProviderCalendar {
@@ -221,7 +221,7 @@ async fn set_availability(pool: &PgPool, calendar_id: Uuid, counts: bool) {
 /// A hit the requester reads through a channel is someone else's copy.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_users_copy_says_nothing_about_the_requester(pool: PgPool) {
-    let sharer = "macro|event-labels-sharer@example.com";
+    let sharer = "rox|event-labels-sharer@example.com";
     let sharer_link = insert_link(&pool, sharer).await;
     insert_link(&pool, OWNER).await;
     let inbox = link_email(&pool, sharer_link).await;
@@ -255,7 +255,7 @@ async fn another_users_copy_says_nothing_about_the_requester(pool: PgPool) {
     .unwrap();
     assert!(stored_is_self, "the row the requester must not inherit");
     let no_inbox = CalendarService::new(PgCalendarRepository::new(pool.clone()))
-        .event_labels("macro|event-labels-no-inbox@example.com", &[id])
+        .event_labels("rox|event-labels-no-inbox@example.com", &[id])
         .await
         .unwrap();
     assert_eq!(no_inbox[&id], EventLabels::default());

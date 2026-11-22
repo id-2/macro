@@ -276,7 +276,7 @@ fn notification_failure_preserves_durable_update_and_allows_idempotent_retry() {
 #[test]
 fn session_attribution_uses_the_verified_human_or_agent_identity() {
     let long_user = format!(
-        "macro|{}@{}.{}.{}",
+        "rox|{}@{}.{}.{}",
         "a".repeat(64),
         "b".repeat(63),
         "c".repeat(63),
@@ -291,7 +291,7 @@ fn session_attribution_uses_the_verified_human_or_agent_identity() {
         long_user
     );
 
-    let user = "macro|editor@example.com".to_string();
+    let user = "rox|editor@example.com".to_string();
     assert_eq!(
         DocumentAttribution::from_session_claims(None, Some(user.clone()), None).unwrap(),
         Some(DocumentAttribution {
@@ -352,14 +352,14 @@ fn persisted_editor_metadata_distinguishes_invocations_by_the_same_actor() {
     let second = uuid::Uuid::from_u128(2);
     let one = DocumentAttribution::from_session_claims(
         Some("bot|agent".into()),
-        Some("macro|actor@example.com".into()),
+        Some("rox|actor@example.com".into()),
         Some(first),
     )
     .unwrap()
     .unwrap();
     let two = DocumentAttribution::from_session_claims(
         Some("bot|agent".into()),
-        Some("macro|actor@example.com".into()),
+        Some("rox|actor@example.com".into()),
         Some(second),
     )
     .unwrap()

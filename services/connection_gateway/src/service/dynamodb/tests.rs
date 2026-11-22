@@ -5,7 +5,7 @@ fn rows_missing_entry_attributes_are_left_out_beside_whole_entries() {
     let whole = HashMap::from([
         (
             "PK".to_owned(),
-            AttributeValue::S("#user#macro|user@example.com".to_owned()),
+            AttributeValue::S("#user#rox|user@example.com".to_owned()),
         ),
         ("SK".to_owned(), AttributeValue::S("live".to_owned())),
         (
@@ -14,7 +14,7 @@ fn rows_missing_entry_attributes_are_left_out_beside_whole_entries() {
         ),
         (
             "entity_id".to_owned(),
-            AttributeValue::S("macro|user@example.com".to_owned()),
+            AttributeValue::S("rox|user@example.com".to_owned()),
         ),
         (
             "connection_id".to_owned(),
@@ -26,7 +26,7 @@ fn rows_missing_entry_attributes_are_left_out_beside_whole_entries() {
         ),
         (
             "user_id".to_owned(),
-            AttributeValue::S("macro|user@example.com".to_owned()),
+            AttributeValue::S("rox|user@example.com".to_owned()),
         ),
         ("last_ping".to_owned(), AttributeValue::N("2000".to_owned())),
     ]);
@@ -34,7 +34,7 @@ fn rows_missing_entry_attributes_are_left_out_beside_whole_entries() {
     let pinged_after_close = HashMap::from([
         (
             "PK".to_owned(),
-            AttributeValue::S("#user#macro|user@example.com".to_owned()),
+            AttributeValue::S("#user#rox|user@example.com".to_owned()),
         ),
         ("SK".to_owned(), AttributeValue::S("closed".to_owned())),
         ("last_ping".to_owned(), AttributeValue::N("3000".to_owned())),
@@ -52,7 +52,7 @@ fn rows_missing_entry_attributes_are_left_out_beside_whole_entries() {
     assert_eq!(
         rows.malformed,
         vec![MalformedRow {
-            pk: "#user#macro|user@example.com".to_owned(),
+            pk: "#user#rox|user@example.com".to_owned(),
             sk: "closed".to_owned(),
             missing: vec![
                 "entity_type",
@@ -85,7 +85,7 @@ fn a_whole_row_of_an_unknown_entity_type_is_malformed_but_missing_nothing() {
         ),
         (
             "user_id".to_owned(),
-            AttributeValue::S("macro|user@example.com".to_owned()),
+            AttributeValue::S("rox|user@example.com".to_owned()),
         ),
     ]);
 

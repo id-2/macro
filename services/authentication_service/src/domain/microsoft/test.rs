@@ -264,7 +264,7 @@ async fn free_account_at_mixed_provider_limit_cannot_start_a_new_connection() {
         service
             .start_link(
                 Uuid::now_v7(),
-                &RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap(),
+                &RoxUserIdStr::parse_from_str("rox|person@example.com").unwrap(),
                 "https://macro.test/callback".into(),
                 None,
                 false,
@@ -277,7 +277,7 @@ async fn free_account_at_mixed_provider_limit_cannot_start_a_new_connection() {
 
 #[tokio::test]
 async fn new_connections_need_the_switch_and_the_users_flag() {
-    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|person@example.com".to_string()).unwrap();
     let cases = [
         // (switch, flags configured, the user's flag load, admitted)
         (
@@ -332,7 +332,7 @@ async fn new_connections_need_the_switch_and_the_users_flag() {
 
 #[tokio::test]
 async fn flagged_off_user_cannot_start_a_new_connection() {
-    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|person@example.com".to_string()).unwrap();
     for load in [
         Ok(FlagSnapshot::new([(
             OUTLOOK_FLAG.into(),
@@ -375,7 +375,7 @@ async fn flagged_off_user_cannot_start_a_new_connection() {
 
 #[tokio::test]
 async fn flagged_on_user_starts_a_new_connection() {
-    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|person@example.com".to_string()).unwrap();
     let mut repo = MockMicrosoftGrantRepository::new();
     repo.expect_connection_facts().once().returning(|_, _| {
         Ok(email::domain::inbox_entitlement::InboxConnectionFacts {
@@ -423,7 +423,7 @@ async fn flagged_on_user_starts_a_new_connection() {
 
 #[tokio::test]
 async fn reconnecting_an_inbox_never_depends_on_the_flag_or_the_switch() {
-    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|person@example.com".to_string()).unwrap();
     let reconnect = Uuid::now_v7();
     for load in [
         Ok(FlagSnapshot::new([(

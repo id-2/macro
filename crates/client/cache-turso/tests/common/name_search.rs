@@ -106,7 +106,7 @@ pub async fn contract<S: Storage>(engine: &mut Engine<S>, scope: &HydrationScope
             epoch,
             action: ContextAction::Patch {
                 updates: vec![cache_core::people::PersonFactPatch {
-                    user_id: "macro|p000001@example.com".try_into().unwrap(),
+                    user_id: "rox|p000001@example.com".try_into().unwrap(),
                     facts: cache_core::people::PersonFacts {
                         last_interaction_ms: Some(100),
                         ..Default::default()

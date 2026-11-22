@@ -23,7 +23,7 @@ const CLAUDE: AgentSessionMark = {
 };
 const CODEX: AgentSessionMark = { Icon: CodexIcon, class: 'text-ink' };
 const CURSOR: AgentSessionMark = { Icon: CursorIcon, class: 'text-ink' };
-const MACRO: AgentSessionMark = { Icon: RoxMark, class: 'text-accent' };
+const ROX: AgentSessionMark = { Icon: RoxMark, class: 'text-accent' };
 /** Harnesses Rox ships no logo for (OpenCode, OpenClaw, Hermes, ...). */
 const GENERIC: AgentSessionMark = { Icon: SparkleIcon, class: 'text-chat' };
 
@@ -37,10 +37,10 @@ const BY_HARNESS: Record<string, AgentSessionMark> = {
   codex: CODEX,
   'codex-cloud': CODEX,
   cursor: CURSOR,
-  rox: MACRO,
-  'rox-inmem': MACRO,
-  'in-memory': MACRO,
-  sandbox: MACRO,
+  rox: ROX,
+  'rox-inmem': ROX,
+  'in-memory': ROX,
+  sandbox: ROX,
 };
 
 function fromFirstParty(mark: FirstPartyBotMark): AgentSessionMark {

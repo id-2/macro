@@ -90,7 +90,7 @@ fn event_time_input_deserializes_both_shapes() {
 fn sample_event(recurrence_lines: Vec<String>) -> crate::domain::models::CalendarEvent {
     crate::domain::models::CalendarEvent {
         id: Uuid::from_u128(7),
-        owner_id: "macro|owner@example.com".to_string(),
+        owner_id: "rox|owner@example.com".to_string(),
         ical_uid: "uid-1".to_string(),
         calendar_id: Some(Uuid::from_u128(9)),
         sources: Vec::new(),
@@ -474,7 +474,7 @@ fn context_with_meeting_links(
 }
 
 fn request_context() -> RequestContext {
-    RequestContext::new(RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from("rox|test@example.com".to_string()).unwrap())
 }
 
 fn empty_occurrences() -> MockOccurrences {

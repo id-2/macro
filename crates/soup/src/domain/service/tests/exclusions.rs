@@ -44,7 +44,7 @@ async fn document_only_soup_never_calls_excluded_entity_services() {
             limit: 50,
             cursor: SoupQuery::new_sort_simple(SimpleSortMethod::UpdatedAt, filters),
             sort_direction: SoupSortDirection::Desc,
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
             email_preview_view: PreviewView::default(),
             link_ids: vec![Uuid::from_u128(2)],
         },

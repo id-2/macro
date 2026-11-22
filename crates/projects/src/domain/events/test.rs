@@ -7,7 +7,7 @@ const PROJECT_ID: &str = "11111111-1111-1111-1111-111111111111";
 fn lifecycle_events_round_trip_all_owner_kinds_with_v1_strings() {
     assert_eq!(<ProjectTopicEvent as TopicEvent>::SCHEMA_VERSION, 1);
     for principal in [
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         "bot|00000000-0000-0000-0000-000000000001",
         "01998a30-1a2b-7c3d-9e4f-5a6b7c8d9e0f",
     ] {

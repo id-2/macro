@@ -8,8 +8,8 @@ use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use sqlx::{PgPool, types::Uuid};
 
-const USER_ID: &str = "macro|webhook-owner@example.com";
-const SECOND_USER_ID: &str = "macro|webhook-reader@example.com";
+const USER_ID: &str = "rox|webhook-owner@example.com";
+const SECOND_USER_ID: &str = "rox|webhook-reader@example.com";
 const TEAM_ID: &str = "11111111-1111-1111-1111-111111111111";
 const UNRELATED_TEAM_ID: &str = "22222222-2222-2222-2222-222222222222";
 const OTHER_WORKSPACE_ID: &str = "workspace_other";

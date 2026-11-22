@@ -23,7 +23,7 @@ const api = vi.hoisted(() => ({
   remove: vi.fn(),
   refresh: vi.fn(),
 }));
-const [viewer, setViewer] = createSignal('macro|one@example.com');
+const [viewer, setViewer] = createSignal('rox|one@example.com');
 let client: QueryClient;
 vi.mock('../client', () => ({
   get queryClient() {
@@ -55,7 +55,7 @@ beforeEach(() => {
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  setViewer('macro|one@example.com');
+  setViewer('rox|one@example.com');
   client.setQueryData(authKeys.userInfo.queryKey, {
     id: viewer(),
     authenticated: true,
@@ -115,10 +115,10 @@ it('switches mounted lists without exposing legacy or previous-account rows', as
   await vi.waitFor(() => expect(api.channels).toHaveBeenCalledTimes(2));
   batch(() => {
     client.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'macro|two@example.com',
+      id: 'rox|two@example.com',
       authenticated: true,
     });
-    setViewer('macro|two@example.com');
+    setViewer('rox|two@example.com');
   });
   await view.findByText('[["two-inbox"],["two-channel"]]');
   lateLinks.resolve(ok({ links: [{ id: 'late-private-inbox' }] }));
@@ -137,7 +137,7 @@ it('drops late settings results even after the mutation observer adopts another 
     Promise.withResolvers<Ok<{ settings: { signature: string } }, unknown>>();
   api.patch.mockReturnValue(pending.promise);
   const one = viewer();
-  const two = 'macro|two@example.com';
+  const two = 'rox|two@example.com';
   client.setQueryData(emailKeys.links(one).queryKey, {
     links: [{ id: 'shared-inbox', settings: { signature: 'one' } }],
   });
@@ -198,10 +198,10 @@ it('does not roll an old inbox snapshot into a replacement account', async () =>
   await vi.waitFor(() => expect(api.remove).toHaveBeenCalledOnce());
   batch(() => {
     client.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'macro|two@example.com',
+      id: 'rox|two@example.com',
       authenticated: true,
     });
-    setViewer('macro|two@example.com');
+    setViewer('rox|two@example.com');
   });
   client.setQueryData(emailKeys.links(viewer()).queryKey, {
     links: [{ id: 'inbox', settings: { signature: 'new account' } }],
@@ -231,10 +231,10 @@ it('does not send an old removal after cancellation awaits across an account swi
   await vi.waitFor(() => expect(client.cancelQueries).toHaveBeenCalledOnce());
   batch(() => {
     client.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'macro|two@example.com',
+      id: 'rox|two@example.com',
       authenticated: true,
     });
-    setViewer('macro|two@example.com');
+    setViewer('rox|two@example.com');
   });
   canceled.resolve();
   await rejected;

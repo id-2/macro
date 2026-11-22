@@ -19,7 +19,7 @@ async fn initialization_lease_is_fenced_reclaimable_and_publishes_once(
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|calendar-init-lease@corp.test",
+        "rox|calendar-init-lease@corp.test",
         "calendar-init-lease@corp.test",
     )
     .execute(&pool)
@@ -90,7 +90,7 @@ async fn failing_an_active_scan_marks_it_terminal(pool: PgPool) -> anyhow::Resul
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|calendar-cleanup@corp.test",
+        "rox|calendar-cleanup@corp.test",
         "calendar-cleanup@corp.test",
     )
     .execute(&pool)
@@ -136,7 +136,7 @@ async fn completing_an_active_scan_runs_completion_effects_once(
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|calendar-completion@corp.test",
+        "rox|calendar-completion@corp.test",
         "calendar-completion@corp.test",
     )
     .execute(&pool)
@@ -205,7 +205,7 @@ async fn zero_thread_completion_is_fenced_by_init_lease(pool: PgPool) -> anyhow:
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|calendar-fenced-zero@corp.test",
+        "rox|calendar-fenced-zero@corp.test",
         "calendar-fenced-zero@corp.test",
     )
     .execute(&pool)
@@ -291,7 +291,7 @@ async fn failing_a_terminal_scan_is_an_idempotent_noop(pool: PgPool) -> anyhow::
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|calendar-terminal@corp.test",
+        "rox|calendar-terminal@corp.test",
         "calendar-terminal@corp.test",
     )
     .execute(&pool)

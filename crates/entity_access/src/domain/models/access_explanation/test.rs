@@ -33,7 +33,7 @@ fn strongest_access_level_wins() {
         },
         AccessGrant::EntityAccess {
             source_type: EntityAccessSourceType::User,
-            source_id: "macro|explain@example.com".to_string(),
+            source_id: "rox|explain@example.com".to_string(),
             access_level: AccessLevel::Edit,
             granted_from_project_id: None,
         },
@@ -170,7 +170,7 @@ fn display_lists_each_grant() {
     );
     let rendered = explanation.to_string();
 
-    assert!(rendered.contains("user: macro|explain@example.com"));
+    assert!(rendered.contains("user: rox|explain@example.com"));
     assert!(rendered.contains("entity: document / doc-1"));
     assert!(rendered.contains("effective: view"));
     assert!(rendered.contains("public_link view"));

@@ -45,7 +45,7 @@ wire-envelope shape (the Kafka key is not part of the JSON):
   "metadata": {
     "webhook_id": "wh_01998a2f-aaaa-7bbb-8ccc-dddddddddddd",
     "workspace_id": "team_0123",
-    "created_by_user_id": "macro|creator@example.com",
+    "created_by_user_id": "rox|creator@example.com",
     "name": "Document updates",
     "endpoint_url": "https://example.com/hooks/macro",
     "status": "active",
@@ -121,7 +121,7 @@ to which any of those people belongs. The set is deduplicated before matching,
 so one person or team is considered only once.
 
 `message.mentioned` is emitted once per distinct entity `@`-mentioned in a
-message — users (`macro|<email>`), bots (`bot|<uuid>`), documents, and
+message — users (`rox|<email>`), bots (`bot|<uuid>`), documents, and
 any future mentionable kind. Bot mentions only emit when the bot is an active
 channel participant; the author may itself be a bot. Like every message
 event, access and `ids` filtering are by the message's parent: the entity is

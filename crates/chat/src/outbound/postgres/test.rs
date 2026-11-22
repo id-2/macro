@@ -52,7 +52,7 @@ pub(super) struct SponsoredByOwner;
 impl BotFacts for SponsoredByOwner {
     async fn sponsor(&self, _bot: bot_id::BotId) -> EntityRegistryResult<Option<Owner>> {
         Ok(Some(Owner::User(
-            RoxUserIdStr::parse_from_str("macro|test@example.com")
+            RoxUserIdStr::parse_from_str("rox|test@example.com")
                 .unwrap()
                 .into_owned(),
         )))
@@ -158,7 +158,7 @@ async fn get_stored_share_permission(
 }
 
 async fn create_test_chat(repo: &TestRepo, name: &str) -> String {
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     repo.create(
@@ -178,7 +178,7 @@ async fn patch_share_permission(
     chat_id: &str,
     share_permission: UpdateSharePermissionRequestV2,
 ) {
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -196,7 +196,7 @@ async fn patch_share_permission(
 }
 
 async fn create_chat_with_message(repo: &TestRepo) -> (String, String) {
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     let chat_id = repo
@@ -240,7 +240,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
         .await
         .unwrap();
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     let mut private_permission = default_share_permission();
@@ -277,7 +277,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     assert_eq!(audits.len(), 1);
     assert_eq!(
         audits[0].get::<String, _>("actor_id"),
-        "macro|test@example.com"
+        "rox|test@example.com"
     );
     assert_eq!(audits[0].get::<String, _>("action"), "share_link_create");
     assert_eq!(audits[0].get::<String, _>("resource_id"), chat_id);
@@ -290,7 +290,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
 )]
 async fn create_chat_returns_id(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -316,7 +316,7 @@ async fn create_chat_returns_id(pool: Pool<Postgres>) {
         .unwrap();
 
     assert_eq!(row.get::<String, _>("name"), "Test Chat");
-    assert_eq!(row.get::<String, _>("userId"), "macro|test@example.com");
+    assert_eq!(row.get::<String, _>("userId"), "rox|test@example.com");
 }
 
 #[sqlx::test(
@@ -325,7 +325,7 @@ async fn create_chat_returns_id(pool: Pool<Postgres>) {
 )]
 async fn create_message_updates_chat_timestamp_and_selected_model(pool: Pool<Postgres>) {
     let repo = test_repo(pool);
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -537,7 +537,7 @@ async fn create_chat_creates_public_view_permission(pool: Pool<Postgres>) {
 )]
 async fn create_chat_creates_user_item_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -560,7 +560,7 @@ async fn create_chat_creates_user_item_access(pool: Pool<Postgres>) {
         WHERE "source_id" = $1 AND "entity_id" = $2
         "#,
     )
-    .bind("macro|test@example.com")
+    .bind("rox|test@example.com")
     .bind(rox_uuid::string_to_uuid(&chat_id).unwrap())
     .fetch_one(&pool)
     .await
@@ -596,7 +596,7 @@ async fn fetch_entity_row(pool: &Pool<Postgres>, chat_id: &str) -> PgRow {
 )]
 async fn create_chat_registers_entity_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -614,7 +614,7 @@ async fn create_chat_registers_entity_row(pool: Pool<Postgres>) {
 
     let row = fetch_entity_row(&pool, &chat_id).await;
     assert_eq!(row.get::<String, _>("owner_type"), "user");
-    assert_eq!(row.get::<String, _>("owner_id"), "macro|test@example.com");
+    assert_eq!(row.get::<String, _>("owner_id"), "rox|test@example.com");
     assert_eq!(row.get::<String, _>("entity_type"), "chat");
     assert_eq!(
         row.get::<Option<chrono::DateTime<Utc>>, _>("deleted_at"),
@@ -682,7 +682,7 @@ async fn permanently_delete_chat_removes_entity_row(pool: Pool<Postgres>) {
 )]
 async fn copy_chat_registers_entity_row_for_source_and_copy(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -721,11 +721,11 @@ async fn copy_chat_registers_entity_row_for_source_and_copy(pool: Pool<Postgres>
     assert_eq!(copy_row.get::<String, _>("owner_type"), "user");
     assert_eq!(
         source_row.get::<String, _>("owner_id"),
-        "macro|test@example.com"
+        "rox|test@example.com"
     );
     assert_eq!(
         copy_row.get::<String, _>("owner_id"),
-        "macro|test@example.com"
+        "rox|test@example.com"
     );
 }
 
@@ -769,7 +769,7 @@ async fn delete_restore_and_purge_succeed_without_entity_row(pool: Pool<Postgres
 )]
 async fn create_chat_creates_user_history(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -791,7 +791,7 @@ async fn create_chat_creates_user_history(pool: Pool<Postgres>) {
         WHERE "userId" = $1 AND "itemId" = $2
         "#,
     )
-    .bind("macro|test@example.com")
+    .bind("rox|test@example.com")
     .bind(&chat_id)
     .fetch_one(&pool)
     .await
@@ -806,7 +806,7 @@ async fn create_chat_creates_user_history(pool: Pool<Postgres>) {
 )]
 async fn create_chat_with_project_id(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -840,7 +840,7 @@ async fn create_chat_with_project_id(pool: Pool<Postgres>) {
 )]
 async fn get_chat_returns_chat(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -862,7 +862,7 @@ async fn get_chat_returns_chat(pool: Pool<Postgres>) {
     assert_eq!(chat.name, "Get Me");
     assert_eq!(
         chat.user_id,
-        Owner::from_principal_str("macro|test@example.com").unwrap()
+        Owner::from_principal_str("rox|test@example.com").unwrap()
     );
     assert!(chat.created_at.is_some());
     assert!(chat.updated_at.is_some());
@@ -907,7 +907,7 @@ async fn get_chat_not_found(pool: Pool<Postgres>) {
 )]
 async fn soft_delete_chat_sets_deleted_at(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -941,7 +941,7 @@ async fn soft_delete_chat_sets_deleted_at(pool: Pool<Postgres>) {
 )]
 async fn soft_delete_chat_removes_history(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -976,7 +976,7 @@ async fn soft_delete_chat_removes_history(pool: Pool<Postgres>) {
 )]
 async fn permanently_delete_chat_removes_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1009,7 +1009,7 @@ async fn permanently_delete_chat_removes_row(pool: Pool<Postgres>) {
 )]
 async fn permanently_delete_chat_removes_permissions(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1043,7 +1043,7 @@ async fn permanently_delete_chat_removes_permissions(pool: Pool<Postgres>) {
 )]
 async fn permanently_delete_chat_removes_user_item_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1079,7 +1079,7 @@ async fn permanently_delete_chat_removes_user_item_access(pool: Pool<Postgres>) 
 )]
 async fn patch_chat_updates_name(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1095,7 +1095,7 @@ async fn patch_chat_updates_name(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1121,7 +1121,7 @@ async fn patch_chat_updates_name(pool: Pool<Postgres>) {
 )]
 async fn patch_chat_updates_project(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1137,7 +1137,7 @@ async fn patch_chat_updates_project(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1171,7 +1171,7 @@ async fn patch_chat_updates_project(pool: Pool<Postgres>) {
 )]
 async fn patch_chat_clears_project(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1187,7 +1187,7 @@ async fn patch_chat_clears_project(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1218,7 +1218,7 @@ async fn patch_chat_clears_project(pool: Pool<Postgres>) {
 )]
 async fn get_chat_returns_full_response(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1240,7 +1240,7 @@ async fn get_chat_returns_full_response(pool: Pool<Postgres>) {
     assert_eq!(response.name, "Full Chat");
     assert_eq!(
         response.user_id,
-        Owner::from_principal_str("macro|test@example.com").unwrap()
+        Owner::from_principal_str("rox|test@example.com").unwrap()
     );
     assert!(response.model.is_some());
     assert!(response.messages.is_empty());
@@ -1263,7 +1263,7 @@ async fn get_chat_not_found_returns_error(pool: Pool<Postgres>) {
 )]
 async fn copy_chat_creates_new_chat_with_same_messages(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1327,7 +1327,7 @@ async fn copy_chat_creates_new_chat_with_same_messages(pool: Pool<Postgres>) {
 )]
 async fn revert_delete_restores_chat(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1509,7 +1509,7 @@ async fn get_permissions_reads_link_share_columns(pool: Pool<Postgres>) {
     let permission = repo.get_permissions(&chat_id).await.unwrap();
 
     assert!(!permission.id.is_empty());
-    assert_eq!(permission.owner, "macro|test@example.com");
+    assert_eq!(permission.owner, "rox|test@example.com");
     assert_eq!(permission.link_share, Some(LinkShare::Team));
     assert_eq!(permission.link_share_access_level, Some(AccessLevel::Edit));
 }
@@ -1536,7 +1536,7 @@ async fn a_scoped_session_cant_file_a_chat_in_a_shared_folder(pool: Pool<Postgre
     use agent_correlation::scope::SessionScope;
 
     sqlx::query!(
-        r#"INSERT INTO "Project" (id, name, "userId") VALUES ($1, 'Shared', 'macro|test@example.com')"#,
+        r#"INSERT INTO "Project" (id, name, "userId") VALUES ($1, 'Shared', 'rox|test@example.com')"#,
         SHARED_PROJECT_ID,
     )
     .execute(&pool)
@@ -1544,7 +1544,7 @@ async fn a_scoped_session_cant_file_a_chat_in_a_shared_folder(pool: Pool<Postgre
     .unwrap();
     sqlx::query!(
         r#"INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ($1::text::uuid, 'project', 'macro|test@example.com', 'user', 'owner'),
+        VALUES ($1::text::uuid, 'project', 'rox|test@example.com', 'user', 'owner'),
                ($1::text::uuid, 'project', $2, 'team', 'view')"#,
         SHARED_PROJECT_ID,
         PROJECT_TEAM_ID,
@@ -1554,7 +1554,7 @@ async fn a_scoped_session_cant_file_a_chat_in_a_shared_folder(pool: Pool<Postgre
     .unwrap();
     let repo = test_repo(pool.clone());
     let chat_id = create_test_chat(&repo, "Unfiled").await;
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com")
         .unwrap()
         .into_owned();
     let no_send = Attribution {

@@ -14,11 +14,11 @@ use wiremock::{
 
 use super::*;
 
-const OWNER: &str = "macro|refresh-owner@example.com";
-const DELEGATE: &str = "macro|refresh-delegate@example.com";
-const MAILBOX: &str = "macro|refresh-mailbox@example.com";
-const OTHER_DELEGATE: &str = "macro|refresh-other-delegate@example.com";
-const REQUESTER: &str = "macro|refresh-requester@example.com";
+const OWNER: &str = "rox|refresh-owner@example.com";
+const DELEGATE: &str = "rox|refresh-delegate@example.com";
+const MAILBOX: &str = "rox|refresh-mailbox@example.com";
+const OTHER_DELEGATE: &str = "rox|refresh-other-delegate@example.com";
+const REQUESTER: &str = "rox|refresh-requester@example.com";
 
 async fn insert_user(pool: &PgPool, id: &str) {
     let rox_user_id = Uuid::now_v7();

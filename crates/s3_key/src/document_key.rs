@@ -120,7 +120,7 @@ fn is_sha256_hex(s: &str) -> bool {
 /// Builds the owner segment of a document key.
 ///
 /// This is the one place that decides how an owner is spelled inside an object
-/// key. The segment is the owner's principal string verbatim: `macro|<email>`
+/// key. The segment is the owner's principal string verbatim: `rox|<email>`
 /// for a user, `bot|<uuid>` for a bot, and a hyphenated UUID for a team.
 /// Nothing is percent-encoded: every object written so far sits under the raw
 /// user principal and must stay addressable, and bot and team principals use a

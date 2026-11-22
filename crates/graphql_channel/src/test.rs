@@ -112,7 +112,7 @@ async fn record_channel_activity_authorizes_and_delegates_only_channel_activity(
     assert_eq!(
         service.calls.lock().unwrap().as_slice(),
         [(
-            "macro|user@example.com".to_string(),
+            "rox|user@example.com".to_string(),
             channel_id,
             ActivityType::View,
         ),]

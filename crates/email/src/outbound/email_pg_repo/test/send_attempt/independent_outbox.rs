@@ -160,7 +160,7 @@ async fn pending_sends_are_scoped_to_actor_inbox_and_cursor(
             .await?
             .is_empty()
     );
-    let other = RoxUserIdStr::parse_from_str("macro|other@test.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@test.com").unwrap();
     assert!(
         repo.pending_send_attempts(&other, &[link()], None)
             .await?

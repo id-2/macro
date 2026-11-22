@@ -76,7 +76,7 @@ pub(crate) async fn insert_account(pool: &Pool<Postgres>, user_id: &str) -> Uuid
 
 /// A store of a new account, at lease epoch 0.
 pub(crate) async fn open_new_store(pool: &Pool<Postgres>) -> Arc<PgWhatsAppStore> {
-    let account_id = insert_account(pool, "macro|whatsapp-store-owner").await;
+    let account_id = insert_account(pool, "rox|whatsapp-store-owner").await;
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     Arc::new(
         PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
@@ -98,7 +98,7 @@ async fn set_lease_epoch(pool: &Pool<Postgres>, account_id: Uuid, lease_epoch: i
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_data_key_is_generated_once_and_unwrapped_on_every_later_open(pool: Pool<Postgres>) {
-    let account_id = insert_account(&pool, "macro|data-key").await;
+    let account_id = insert_account(&pool, "rox|data-key").await;
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
 
     let first = PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
@@ -128,7 +128,7 @@ async fn the_data_key_is_generated_once_and_unwrapped_on_every_later_open(pool: 
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_first_opens_agree_on_one_data_key(pool: Pool<Postgres>) {
-    let account_id = insert_account(&pool, "macro|first-opens").await;
+    let account_id = insert_account(&pool, "rox|first-opens").await;
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
 
     let (first, second) = tokio::join!(
@@ -269,8 +269,8 @@ async fn a_value_moved_to_another_store_does_not_decrypt(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_value_moved_to_another_account_does_not_decrypt(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let alice_account = insert_account(&pool, "macro|alice").await;
-    let bob_account = insert_account(&pool, "macro|bob").await;
+    let alice_account = insert_account(&pool, "rox|alice").await;
+    let bob_account = insert_account(&pool, "rox|bob").await;
     let alice = PgWhatsAppStore::open(pool.clone(), alice_account, 0, &kms)
         .await
         .unwrap();
@@ -302,8 +302,8 @@ async fn a_value_moved_to_another_account_does_not_decrypt(pool: Pool<Postgres>)
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_data_key_moved_to_another_account_does_not_unwrap(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let alice_account = insert_account(&pool, "macro|alice").await;
-    let bob_account = insert_account(&pool, "macro|bob").await;
+    let alice_account = insert_account(&pool, "rox|alice").await;
+    let bob_account = insert_account(&pool, "rox|bob").await;
     PgWhatsAppStore::open(pool.clone(), alice_account, 0, &kms)
         .await
         .unwrap();
@@ -334,7 +334,7 @@ async fn a_data_key_moved_to_another_account_does_not_unwrap(pool: Pool<Postgres
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_data_key_does_not_unwrap_for_another_owner_or_kms_key(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let account_id = insert_account(&pool, "macro|owner").await;
+    let account_id = insert_account(&pool, "rox|owner").await;
     PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
         .await
         .unwrap();
@@ -347,9 +347,9 @@ async fn a_data_key_does_not_unwrap_for_another_owner_or_kms_key(pool: Pool<Post
     assert!(matches!(error, WhatsAppStoreError::Kms(_)), "{error:?}");
 
     // The account handed to another user: the context no longer matches.
-    insert_user(&pool, "macro|new-owner").await;
+    insert_user(&pool, "rox|new-owner").await;
     sqlx::query!(
-        "UPDATE whatsapp_linked_account SET user_id = 'macro|new-owner' WHERE id = $1",
+        "UPDATE whatsapp_linked_account SET user_id = 'rox|new-owner' WHERE id = $1",
         account_id,
     )
     .execute(&pool)
@@ -363,7 +363,7 @@ async fn a_data_key_does_not_unwrap_for_another_owner_or_kms_key(pool: Pool<Post
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_device_whose_key_kms_lost_is_reset_without_unwrapping_it(pool: Pool<Postgres>) {
-    let account_id = insert_account(&pool, "macro|lost-key").await;
+    let account_id = insert_account(&pool, "rox|lost-key").await;
     let lost = FakeWhatsAppKms::new(KMS_KEY_ID);
     PgWhatsAppStore::open(pool.clone(), account_id, 0, &lost)
         .await
@@ -418,7 +418,7 @@ fn only_refusals_and_undecryptable_devices_are_unreadable() {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_encryption_version_is_refused_before_calling_kms(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let account_id = insert_account(&pool, "macro|version").await;
+    let account_id = insert_account(&pool, "rox|version").await;
     PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
         .await
         .unwrap();
@@ -456,7 +456,7 @@ async fn opening_a_missing_account_fails(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_takeover_fences_out_the_previous_holder(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let account_id = insert_account(&pool, "macro|fencing").await;
+    let account_id = insert_account(&pool, "rox|fencing").await;
     let previous = PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
         .await
         .unwrap();
@@ -510,7 +510,7 @@ async fn a_takeover_fences_out_the_previous_holder(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_takeover_waits_for_an_in_flight_write(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let account_id = insert_account(&pool, "macro|in-flight").await;
+    let account_id = insert_account(&pool, "rox|in-flight").await;
     let previous = PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
         .await
         .unwrap();
@@ -565,7 +565,7 @@ async fn a_takeover_waits_for_an_in_flight_write(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_writers_do_not_lose_writes_or_reuse_prekey_ids(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let account_id = insert_account(&pool, "macro|concurrent").await;
+    let account_id = insert_account(&pool, "rox|concurrent").await;
     let first = Arc::new(
         PgWhatsAppStore::open(pool.clone(), account_id, 0, &kms)
             .await
@@ -623,8 +623,8 @@ async fn concurrent_writers_do_not_lose_writes_or_reuse_prekey_ids(pool: Pool<Po
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sealed_blobs_open_only_for_their_account_and_purpose(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
-    let alice_account = insert_account(&pool, "macro|alice").await;
-    let bob_account = insert_account(&pool, "macro|bob").await;
+    let alice_account = insert_account(&pool, "rox|alice").await;
+    let bob_account = insert_account(&pool, "rox|bob").await;
     let alice = PgWhatsAppStore::open(pool.clone(), alice_account, 0, &kms)
         .await
         .unwrap();

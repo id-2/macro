@@ -36,7 +36,7 @@ fn topic_events(
                 property_definition_id: uuid(PROPERTY_DEFINITION_ID),
                 actor_user_id: actor_user_id.clone(),
                 owner: PropertyOwner::User {
-                    user_id: "macro|owner@acme.com".to_string(),
+                    user_id: "rox|owner@acme.com".to_string(),
                 },
                 display_name: "Related task".to_string(),
                 data_type: DataType::Entity,
@@ -51,7 +51,7 @@ fn topic_events(
                     "actor_user_id": actor_json.clone(),
                     "owner": {
                         "scope": "user",
-                        "user_id": "macro|owner@acme.com"
+                        "user_id": "rox|owner@acme.com"
                     },
                     "display_name": "Related task",
                     "data_type": "ENTITY",
@@ -227,7 +227,7 @@ fn topic_events(
 }
 
 fn rox_events() -> Vec<(PropertyMacroEvent, &'static str)> {
-    topic_events(Some(user_id("macro|editor@acme.com")))
+    topic_events(Some(user_id("rox|editor@acme.com")))
         .into_iter()
         .map(|(event, _)| match event {
             PropertyTopicEvent::Created(metadata) => (
@@ -270,7 +270,7 @@ fn rox_events() -> Vec<(PropertyMacroEvent, &'static str)> {
 fn every_variant_has_exact_json_envelope() {
     let event_id = uuid(EVENT_ID);
 
-    for (event, expected_payload) in topic_events(Some(user_id("macro|editor@acme.com"))) {
+    for (event, expected_payload) in topic_events(Some(user_id("rox|editor@acme.com"))) {
         let mut expected = expected_payload;
         let object = expected.as_object_mut().expect("expected object");
         object.insert("event_id".to_string(), json!(EVENT_ID));
@@ -316,7 +316,7 @@ fn entity_property_updated_decodes_without_actor_fields() {
             "entity_id": ENTITY_ID,
             "entity_type": "DOCUMENT",
             "property_definition_id": PROPERTY_DEFINITION_ID,
-            "actor_user_id": "macro|editor@acme.com",
+            "actor_user_id": "rox|editor@acme.com",
             "value": null,
             "previous_value": null,
             "updated_at": UPDATED_AT
@@ -330,7 +330,7 @@ fn entity_property_updated_decodes_without_actor_fields() {
     assert_eq!(metadata.on_behalf_of, None);
     assert_eq!(
         metadata.actor_user_id,
-        Some(user_id("macro|editor@acme.com"))
+        Some(user_id("rox|editor@acme.com"))
     );
 }
 
@@ -353,9 +353,9 @@ fn shared_owner_and_value_types_keep_exact_wire_representations() {
     let owner_representations = [
         (
             PropertyOwner::User {
-                user_id: "macro|owner@acme.com".to_string(),
+                user_id: "rox|owner@acme.com".to_string(),
             },
-            json!({"scope": "user", "user_id": "macro|owner@acme.com"}),
+            json!({"scope": "user", "user_id": "rox|owner@acme.com"}),
         ),
         (
             PropertyOwner::Team {

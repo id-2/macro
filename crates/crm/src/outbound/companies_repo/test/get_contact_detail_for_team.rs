@@ -25,7 +25,7 @@ async fn detail_is_the_contact_read_with_the_company_named_as_the_company_read_n
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com", "acmecorp.com"]).await?;
     let contact_id = insert_contact(&pool, company_id, "ada@example.com").await?;
     sqlx::query(
@@ -90,7 +90,7 @@ async fn detail_summary_of_a_company_without_a_name_falls_back_to_its_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let unnamed = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let domainless = insert_company(&pool, team_id, true, &[]).await?;
     let in_unnamed = insert_contact(&pool, unnamed, "ada@example.com").await?;
@@ -110,7 +110,7 @@ async fn detail_summary_of_a_company_without_a_name_falls_back_to_its_domain(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_summary_breaks_a_created_at_tie_by_domain_id(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let company_id = insert_company(&pool, team_id, true, &[]).await?;
     let contact_id = insert_contact(&pool, company_id, "ada@example.com").await?;
     // The smaller id goes in second, so insertion order can't stand in for
@@ -142,7 +142,7 @@ async fn detail_summary_breaks_a_created_at_tie_by_domain_id(pool: PgPool) -> an
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_of_a_contact_without_a_company_has_no_summary(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let contact_id = Uuid::now_v7();
     sqlx::query(
         r#"INSERT INTO crm_contacts (id, team_id, email, first_interaction, last_interaction)
@@ -161,7 +161,7 @@ async fn detail_of_a_contact_without_a_company_has_no_summary(pool: PgPool) -> a
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_under_a_hidden_company_is_for_admins_only(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let contact_id = insert_contact(&pool, company_id, "ada@example.com").await?;
     sqlx::query(r#"UPDATE crm_companies SET hidden = TRUE WHERE id = $1"#)
@@ -186,8 +186,8 @@ async fn detail_under_a_hidden_company_is_for_admins_only(pool: PgPool) -> anyho
 async fn detail_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@example.com").await?;
-    seed_team(&pool, team_b, "macro|b@example.com").await?;
+    seed_team(&pool, team_a, "rox|a@example.com").await?;
+    seed_team(&pool, team_b, "rox|b@example.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
     let contact_a = insert_contact(&pool, company_a, "ada@example.com").await?;
 

@@ -102,8 +102,8 @@ fn manual_execution_documents_quota_and_retryable_validation_failures() {
     }
 }
 
-const OTHER: &str = "macro|other@rox.one";
-const VIEWER: &str = "macro|viewer@rox.one";
+const OTHER: &str = "rox|other@rox.one";
+const VIEWER: &str = "rox|viewer@rox.one";
 const BOT_TOKEN: &str = "team-bot-token";
 const TEAM_ID: rox_uuid::Uuid = rox_uuid::Uuid::from_u128(0x7EA4);
 
@@ -126,7 +126,7 @@ impl RoxAuthorizationService for FakeAuth {
                 ..Default::default()
             }),
             "stranger" => Ok(UserContext {
-                user_id: "macro|stranger@rox.one".into(),
+                user_id: "rox|stranger@rox.one".into(),
                 ..Default::default()
             }),
             _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
@@ -1163,7 +1163,7 @@ async fn reading_a_routine_answers_like_its_history() {
         assert_eq!(status, StatusCode::UNAUTHORIZED);
         assert!(body.get("task").is_none());
         assert_eq!(
-            internal_get(&app, path, Some("macro|stranger@rox.one")).await,
+            internal_get(&app, path, Some("rox|stranger@rox.one")).await,
             StatusCode::UNAUTHORIZED
         );
         assert_eq!(

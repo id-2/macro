@@ -77,7 +77,7 @@ impl<S: SystemPropertiesService> PgCallCrmLinker<S> {
                 CROSS JOIN people p
                 WHERE NOT EXISTS (
                     SELECT 1 FROM team_user tu
-                    WHERE tu.team_id = t.team_id AND LOWER(tu.user_id) = 'macro|' || p.email
+                    WHERE tu.team_id = t.team_id AND LOWER(tu.user_id) = 'rox|' || p.email
                 )
             )
             SELECT co.id AS "company_id?", NULL::uuid AS "contact_id?"

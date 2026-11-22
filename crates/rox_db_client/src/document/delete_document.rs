@@ -236,7 +236,7 @@ mod tests {
         sqlx::query(
             r#"
             INSERT INTO "Document" (id, name, "fileType", owner)
-            VALUES ($1, 'uuid-doc', 'md', 'macro|user@user.com')
+            VALUES ($1, 'uuid-doc', 'md', 'rox|user@user.com')
             "#,
         )
         .bind(document_id.to_string())
@@ -254,7 +254,7 @@ mod tests {
                 document_id,
                 entity_registry_db_utils::RegisteredEntityType::Document,
                 model_owner::Owner::User(
-                    rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+                    rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
                         .unwrap()
                         .into_owned(),
                 ),

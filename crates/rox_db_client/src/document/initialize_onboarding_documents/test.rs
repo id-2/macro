@@ -5,7 +5,7 @@ use model::document::SaveBomPart;
 use models_permissions::share_permission::SharePermissionV2;
 use sqlx::{Pool, Postgres, Row};
 
-const USER_ID: &str = "macro|user@user.com";
+const USER_ID: &str = "rox|user@user.com";
 
 async fn assert_owned_document_rows(
     pool: &Pool<Postgres>,

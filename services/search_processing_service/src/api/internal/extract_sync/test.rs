@@ -76,7 +76,7 @@ fn documents_forward_sync_attribution() {
         document_version_id: None,
         file_type: FileType::Md,
         actor: Some("bot|00000000-0000-0000-0000-00000000a1a1".to_string()),
-        on_behalf_of: Some("macro|owner@example.com".to_string()),
+        on_behalf_of: Some("rox|owner@example.com".to_string()),
     }]);
 
     let DocumentTopicEvent::SyncContentUpdated(metadata) = &events[0].event().event else {
@@ -88,6 +88,6 @@ fn documents_forward_sync_attribution() {
     );
     assert_eq!(
         metadata.on_behalf_of.as_ref().map(|user| user.as_ref()),
-        Some("macro|owner@example.com")
+        Some("rox|owner@example.com")
     );
 }

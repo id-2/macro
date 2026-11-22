@@ -82,7 +82,7 @@ impl PeopleDirectory for Directory {
         Ok(ids
             .into_iter()
             .map(|id| {
-                let email = id.strip_prefix("macro|").unwrap().to_owned();
+                let email = id.strip_prefix("rox|").unwrap().to_owned();
                 ContextPerson {
                     name: email.split('@').next().unwrap().to_owned(),
                     id,
@@ -94,7 +94,7 @@ impl PeopleDirectory for Directory {
 }
 fn person(email: &str) -> ContextPerson {
     ContextPerson {
-        id: format!("macro|{email}"),
+        id: format!("rox|{email}"),
         name: email.split('@').next().unwrap().to_owned(),
         email: Some(email.to_owned()),
     }
@@ -270,7 +270,7 @@ async fn a_document_comment_carries_its_whole_thread_through_the_prompt() {
             },
             prompt_message_id: Uuid::from_u128(2),
             sender: ContextPerson {
-                id: "macro|actor@example.com".to_owned(),
+                id: "rox|actor@example.com".to_owned(),
                 name: "actor".to_owned(),
                 email: Some("actor@example.com".to_owned()),
             },
@@ -283,7 +283,7 @@ async fn a_document_comment_carries_its_whole_thread_through_the_prompt() {
                     ContextMessage {
                         id: Uuid::from_u128(1),
                         author: ContextPerson {
-                            id: "macro|alice@example.com".to_owned(),
+                            id: "rox|alice@example.com".to_owned(),
                             name: "alice".to_owned(),
                             email: Some("alice@example.com".to_owned()),
                         },
@@ -294,7 +294,7 @@ async fn a_document_comment_carries_its_whole_thread_through_the_prompt() {
                     ContextMessage {
                         id: Uuid::from_u128(2),
                         author: ContextPerson {
-                            id: "macro|actor@example.com".to_owned(),
+                            id: "rox|actor@example.com".to_owned(),
                             name: "actor".to_owned(),
                             email: Some("actor@example.com".to_owned()),
                         },
@@ -670,7 +670,7 @@ async fn deleted_blank_imported_and_bot_messages_read_as_their_authors_wrote_the
                 messages: vec![ContextMessage {
                     id: Uuid::from_u128(22),
                     author: ContextPerson {
-                        id: "macro|importer@example.com".to_owned(),
+                        id: "rox|importer@example.com".to_owned(),
                         name: "Dana (Slack)".to_owned(),
                         email: None,
                     },
@@ -764,7 +764,7 @@ async fn a_quote_reply_carries_the_quoted_message_even_outside_the_window() {
             message: Some(ContextMessage {
                 id: quoted.id,
                 author: ContextPerson {
-                    id: "macro|teo@example.com".to_owned(),
+                    id: "rox|teo@example.com".to_owned(),
                     name: "teo".to_owned(),
                     email: Some("teo@example.com".to_owned()),
                 },
@@ -806,7 +806,7 @@ async fn a_quote_from_another_conversation_travels_as_its_preview() {
             target_message_id: Uuid::from_u128(61).to_string(),
             target_thread_id: Uuid::from_u128(61).to_string(),
             display_text: "elsewhere".to_owned(),
-            sender_id: "macro|teo@example.com".to_owned(),
+            sender_id: "rox|teo@example.com".to_owned(),
         })),
         ..Lexical::none()
     };

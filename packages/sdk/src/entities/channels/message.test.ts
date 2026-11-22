@@ -11,7 +11,7 @@ function record(id: string, threadId?: string): MessageRecord {
     id,
     thread_id: threadId ?? null,
     content: `body of ${id}`,
-    sender_id: 'macro|user@example.com',
+    sender_id: 'rox|user@example.com',
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
     mentions: [],

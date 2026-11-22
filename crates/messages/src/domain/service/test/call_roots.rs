@@ -1,7 +1,7 @@
 use super::*;
 
 const CHANNEL: Uuid = Uuid::from_u128(0xc0);
-const CALLER: &str = "macro|caller@example.com";
+const CALLER: &str = "rox|caller@example.com";
 
 fn channel_access(user: &str) -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new(
@@ -90,7 +90,7 @@ async fn nobody_can_change_a_call_root_including_its_sender_and_a_channel_owner(
     let (repo, call_id) = posted_root();
     let service = MessageService::new(repo, Events::default());
 
-    for user in [CALLER, "macro|owner@example.com"] {
+    for user in [CALLER, "rox|owner@example.com"] {
         assert!(matches!(
             service
                 .patch(
@@ -125,7 +125,7 @@ async fn a_stale_client_cannot_post_to_the_call_parent_of_a_channel_thread_call(
 
     let result = service
         .post(
-            call_receipt("macro|member@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|member@example.com", call_id, AccessLevel::Comment).unwrap(),
             post_input(),
         )
         .await;

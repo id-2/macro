@@ -9,7 +9,7 @@ struct UserFlags {
 }
 impl FeatureFlags for UserFlags {
     async fn load(&self, user: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
-        assert_eq!(user.as_ref(), "macro|human@example.test");
+        assert_eq!(user.as_ref(), "rox|human@example.test");
         self.loads.fetch_add(1, Ordering::SeqCst);
         self.result
             .clone()
@@ -48,7 +48,7 @@ async fn per_user_rollout_fails_closed_without_service_evaluation() {
                 provider_configured: configured,
             };
             let actor = Actor {
-                user_id: RoxUserIdStr::parse_from_str("macro|human@example.test")
+                user_id: RoxUserIdStr::parse_from_str("rox|human@example.test")
                     .unwrap()
                     .into_owned(),
             };

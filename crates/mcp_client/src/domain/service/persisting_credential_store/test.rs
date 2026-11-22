@@ -66,7 +66,7 @@ impl McpServerStore for FakeServerStore {
 
 fn record() -> McpServerRecord {
     McpServerRecord {
-        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|test@example.com")
             .unwrap()
             .into_owned(),
         url: "https://mcp.linear.app/mcp".to_string(),

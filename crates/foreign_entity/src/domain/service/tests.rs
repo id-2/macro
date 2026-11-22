@@ -359,9 +359,9 @@ async fn get_by_foreign_entity_id_returns_all_matching_records() {
 #[tokio::test]
 async fn get_foreign_entities_for_user_returns_matching_sources() {
     let repo = FakeForeignEntityRepository::default();
-    let matching_user = foreign_entity_for_source("macro|user@example.com", "user");
+    let matching_user = foreign_entity_for_source("rox|user@example.com", "user");
     let matching_team = foreign_entity_for_source("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "team");
-    let unrelated = foreign_entity_for_source("macro|other@example.com", "user");
+    let unrelated = foreign_entity_for_source("rox|other@example.com", "user");
 
     repo.records()
         .insert(matching_user.id, matching_user.clone());
@@ -374,7 +374,7 @@ async fn get_foreign_entities_for_user_returns_matching_sources() {
         .get_foreign_entities_for_user(
             None,
             vec![
-                SourceId::user("macro|user@example.com"),
+                SourceId::user("rox|user@example.com"),
                 SourceId::new("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "team"),
             ],
             10,
@@ -420,7 +420,7 @@ async fn get_foreign_entities_for_user_forwards_limit_and_query() {
     service
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             37,
             Query::Cursor(models_pagination::Cursor {
                 id: cursor_id,
@@ -439,7 +439,7 @@ async fn get_foreign_entities_for_user_forwards_limit_and_query() {
     assert_eq!(calls.len(), 1);
     assert_eq!(
         calls[0].source_ids,
-        vec![SourceId::user("macro|user@example.com")]
+        vec![SourceId::user("rox|user@example.com")]
     );
     assert_eq!(calls[0].limit, 37);
     assert_eq!(calls[0].sort_method, "created_at");
@@ -456,7 +456,7 @@ async fn get_foreign_entities_for_user_maps_repo_errors_to_internal() {
     let error = service
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             10,
             listing_query(SimpleSortMethod::UpdatedAt),
         )
@@ -740,7 +740,7 @@ impl EntityAccessService for FakeEntityAccessService {
     }
 }
 
-const TEST_USER_ID: &str = "macro|user@rox.one";
+const TEST_USER_ID: &str = "rox|user@rox.one";
 const PULL_REQUEST_SOURCE: &str = "github_pull_request";
 const PULL_REQUEST_KEY: &str = "macro/app/pull/42";
 

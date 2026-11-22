@@ -245,7 +245,7 @@ mod tests {
         assert_eq!(document_metadata.file_type, Some("txt".to_string()));
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
 
         Ok(())
@@ -275,7 +275,7 @@ mod tests {
         assert_eq!(document_metadata.document_version_id, 3);
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
         let bom_parts: Vec<BomPart> =
             serde_json::from_value(document_metadata.document_bom.unwrap()).unwrap();

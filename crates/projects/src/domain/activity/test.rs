@@ -26,8 +26,8 @@ fn envelope(event: ProjectTopicEvent) -> Event<ProjectTopicEvent> {
 fn attributed_delete_maps_and_unattributed_is_dropped() {
     let attributed = envelope(ProjectTopicEvent::Deleted(ProjectDeletedMetadata {
         project_id: "proj-1".to_string(),
-        owner: owner("macro|owner@example.com"),
-        actor_user_id: Some(user("macro|teo@example.com")),
+        owner: owner("rox|owner@example.com"),
+        actor_user_id: Some(user("rox|teo@example.com")),
         parent_project_id: None,
         deleted_project_ids: vec!["proj-2".to_string()],
         deleted_document_ids: vec![],
@@ -42,7 +42,7 @@ fn attributed_delete_maps_and_unattributed_is_dropped() {
 
     let unattributed = envelope(ProjectTopicEvent::Deleted(ProjectDeletedMetadata {
         project_id: "proj-1".to_string(),
-        owner: owner("macro|owner@example.com"),
+        owner: owner("rox|owner@example.com"),
         actor_user_id: None,
         parent_project_id: None,
         deleted_project_ids: vec![],
@@ -60,7 +60,7 @@ fn permanent_delete_purges_the_whole_cascade() {
     let event = envelope(ProjectTopicEvent::PermanentlyDeleted(
         ProjectPermanentlyDeletedMetadata {
             project_id: "proj-1".to_string(),
-            owner: owner("macro|owner@example.com"),
+            owner: owner("rox|owner@example.com"),
             actor_user_id: None,
             parent_project_id: None,
             purged_project_ids: vec!["proj-2".to_string()],

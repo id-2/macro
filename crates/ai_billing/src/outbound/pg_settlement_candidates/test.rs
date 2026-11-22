@@ -5,7 +5,7 @@ use chrono::Duration;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 /// One counted (or not) completion for `user`, backdated to `at`.

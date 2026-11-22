@@ -15,7 +15,7 @@
   },
   "chatFilter": {
     "not": {
-      "literal": { "owner": "macro|user@example.com" }
+      "literal": { "owner": "rox|user@example.com" }
     }
   },
   "emailFilter": {

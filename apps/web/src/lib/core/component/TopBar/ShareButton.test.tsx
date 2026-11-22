@@ -61,8 +61,8 @@ const render = (ui: () => JSX.Element) =>
     ),
   });
 
-const ME = 'macro|me@example.com';
-const SOMEONE_ELSE = 'macro|someone-else@example.com';
+const ME = 'rox|me@example.com';
+const SOMEONE_ELSE = 'rox|someone-else@example.com';
 
 const mocks = vi.hoisted(() => ({
   sendToChannel: vi.fn(),

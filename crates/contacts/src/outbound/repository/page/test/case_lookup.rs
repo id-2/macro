@@ -4,16 +4,16 @@ use super::*;
 async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2) VALUES
-         ('macro|ALPHA@EXAMPLE.COM', 'macro|m@example.com'),
-         ('macro|m@example.com', 'macro|zEta@Example.COM'),
-         ('macro|ZULU@example.com', 'macro|m@example.com'),
-         ('macro|m@example.com', 'macro|zulu@example.com'),
-         ('macro|O''NEIL%_@Example.COM', 'macro|m@example.com'),
-         ('macro|literal-macro|TAG@example.com', 'macro|m@example.com'),
-         ('MACRO|impostor@example.com', 'macro|m@example.com'),
-         ('macro|m@example.com', 'macro|Known@example.com'),
-         ('macro|M@example.com', 'macro|ghost@example.com'),
-         ('macro|foreign@example.com', 'macro|outsider@example.com')"
+         ('rox|ALPHA@EXAMPLE.COM', 'rox|m@example.com'),
+         ('rox|m@example.com', 'rox|zEta@Example.COM'),
+         ('rox|ZULU@example.com', 'rox|m@example.com'),
+         ('rox|m@example.com', 'rox|zulu@example.com'),
+         ('rox|O''NEIL%_@Example.COM', 'rox|m@example.com'),
+         ('rox|literal-rox|TAG@example.com', 'rox|m@example.com'),
+         ('ROX|impostor@example.com', 'rox|m@example.com'),
+         ('rox|m@example.com', 'rox|Known@example.com'),
+         ('rox|M@example.com', 'rox|ghost@example.com'),
+         ('rox|foreign@example.com', 'rox|outsider@example.com')"
     )
     .execute(&pool)
     .await
@@ -27,7 +27,7 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
             "alpha@example.com",
             "zulu@example.com",
             "o'neil%_@example.com",
-            "literal-macro|tag@example.com",
+            "literal-rox|tag@example.com",
             "outsider@example.com",
             "impostor@example.com",
             "known@example.com",
@@ -50,7 +50,7 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
             "alpha@example.com",
             "zulu@example.com",
             "o'neil%_@example.com",
-            "literal-macro|tag@example.com",
+            "literal-rox|tag@example.com",
         ]
     );
     assert!(
@@ -107,10 +107,10 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
 async fn case_lookup_uses_point_reads_at_100k_in_custom_and_generic_plans(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2)
-         SELECT 'macro|A' || lpad(n::text, 6, '0') || '@EXAMPLE.COM', 'macro|m@example.com'
+         SELECT 'rox|A' || lpad(n::text, 6, '0') || '@EXAMPLE.COM', 'rox|m@example.com'
          FROM generate_series(1, 50000) n
          UNION ALL
-         SELECT 'macro|m@example.com', 'macro|z' || lpad(n::text, 6, '0') || '@EXAMPLE.COM'
+         SELECT 'rox|m@example.com', 'rox|z' || lpad(n::text, 6, '0') || '@EXAMPLE.COM'
          FROM generate_series(1, 50000) n"
     )
     .execute(&pool)
@@ -188,8 +188,8 @@ async fn case_lookup_uses_point_reads_at_100k_in_custom_and_generic_plans(pool: 
                 .unwrap();
         }
         for (viewer, expected) in [
-            ("macro|m@example.com", 500.0),
-            ("macro|stranger@example.com", 0.0),
+            ("rox|m@example.com", 500.0),
+            ("rox|stranger@example.com", 0.0),
         ] {
             let explain = format!(
                 "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) EXECUTE contacts_case_lookup('{viewer}', ARRAY[{literal_ids}])"

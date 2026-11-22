@@ -10,7 +10,7 @@ fn agent() -> EntityReference {
 }
 
 fn human() -> EntityReference {
-    EntityReference::new("macro|assignee@example.com", EntityType::User)
+    EntityReference::new("rox|assignee@example.com", EntityType::User)
 }
 
 fn task_repo(task_id: Uuid) -> MockPropertiesRepo {
@@ -236,7 +236,7 @@ async fn inheritance_rejects_mismatched_actors_before_reading_or_writing() {
         .inherit_project_agent_assignees(
             &view_receipt("project", EntityType::Initiative),
             &edit_receipt_for_user(
-                "macro|other@example.com",
+                "rox|other@example.com",
                 &Uuid::from_u128(1).to_string(),
                 EntityType::Task,
             ),

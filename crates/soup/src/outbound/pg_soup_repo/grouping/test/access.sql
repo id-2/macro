@@ -1,16 +1,16 @@
 -- Test-local grants only; mixed_items_expanded supplies entities and the caller.
 INSERT INTO comms_channels (id, channel_type, name, owner_id) VALUES
-('ac000000-0000-0000-0000-000000000001', 'private', 'active', 'macro|user-1@test.com'),
-('ac000000-0000-0000-0000-000000000002', 'private', 'left', 'macro|user-1@test.com');
+('ac000000-0000-0000-0000-000000000001', 'private', 'active', 'rox|user-1@test.com'),
+('ac000000-0000-0000-0000-000000000002', 'private', 'left', 'rox|user-1@test.com');
 INSERT INTO comms_channel_participants (channel_id, role, user_id, left_at) VALUES
-('ac000000-0000-0000-0000-000000000001', 'member', 'macro|user-1@test.com', NULL),
-('ac000000-0000-0000-0000-000000000002', 'member', 'macro|user-1@test.com', now());
-INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|other@test.com', 'other@test.com', 'a1111111-1111-1111-1111-111111111111') ON CONFLICT DO NOTHING;
+('ac000000-0000-0000-0000-000000000001', 'member', 'rox|user-1@test.com', NULL),
+('ac000000-0000-0000-0000-000000000002', 'member', 'rox|user-1@test.com', now());
+INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|other@test.com', 'other@test.com', 'a1111111-1111-1111-1111-111111111111') ON CONFLICT DO NOTHING;
 INSERT INTO team (id, name, owner_id) VALUES
-('ac000000-0000-0000-0000-000000000003', 'member', 'macro|user-1@test.com'),
-('ac000000-0000-0000-0000-000000000004', 'nonmember', 'macro|other@test.com');
+('ac000000-0000-0000-0000-000000000003', 'member', 'rox|user-1@test.com'),
+('ac000000-0000-0000-0000-000000000004', 'nonmember', 'rox|other@test.com');
 INSERT INTO team_user (team_id, user_id, team_role) VALUES
-('ac000000-0000-0000-0000-000000000003', 'macro|user-1@test.com', 'member');
+('ac000000-0000-0000-0000-000000000003', 'rox|user-1@test.com', 'member');
 
 -- B is channel-only, C is team-only, for each entity kind. A retains inherited
 -- user grants; B retains direct plus inherited grants through its channel.
@@ -39,7 +39,7 @@ SELECT entity_id, entity_type, source_id, source_type::entity_access_source_type
 FROM (VALUES
 ('ac000000-0000-0000-0000-000000000002', 'channel'),
 ('ac000000-0000-0000-0000-000000000004', 'team'),
-('macro|other@test.com', 'user')
+('rox|other@test.com', 'user')
 ) sources(source_id, source_type)
 CROSS JOIN (VALUES
 ('11111111-9999-9999-9999-999999999999'::uuid, 'document'),

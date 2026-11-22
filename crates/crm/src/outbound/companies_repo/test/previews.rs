@@ -36,10 +36,10 @@ use crate::{
     },
 };
 
-const OWNER: &str = "macro|owner@previews.test";
-const ADMIN: &str = "macro|admin@previews.test";
-const MEMBER: &str = "macro|member@previews.test";
-const OUTSIDER: &str = "macro|outsider@previews.test";
+const OWNER: &str = "rox|owner@previews.test";
+const ADMIN: &str = "rox|admin@previews.test";
+const MEMBER: &str = "rox|member@previews.test";
+const OUTSIDER: &str = "rox|outsider@previews.test";
 const INTERNAL_KEY: &str = "fixture-only";
 const HARNESS_TOKEN: &str = "fixture-harness";
 

@@ -52,12 +52,12 @@ fn user_id(value: &str) -> RoxUserIdStr<'static> {
 }
 
 /// The fixed owner every [`new_session`] fixture uses.
-pub(super) const OWNER: &str = "macro|agent-session-owner@example.com";
+pub(super) const OWNER: &str = "rox|agent-session-owner@example.com";
 
 /// Insert a `"User"` row (and its `rox_user` parent) for user-owned sessions
 /// and their user history.
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
     // The no-op update makes the existing row's id come back when the user
     // was already seeded by an earlier call.
     let rox_user_id = sqlx::query_scalar!(
@@ -94,7 +94,7 @@ pub(super) async fn create_test_bot(pool: &PgPool) -> BotId {
     // Seed the shared owner here so every session-creating test has a user
     // row for history and other user-specific relations.
     insert_user(pool, OWNER).await;
-    let owner = user_id("macro|agent-session-test-bot-owner@example.com");
+    let owner = user_id("rox|agent-session-test-bot-owner@example.com");
     let bot = PgBotsRepo::new(pool.clone())
         .create_owned_bot(
             BotOwner::User {
@@ -181,7 +181,7 @@ pub(super) async fn insert_originating_thread_fixture(pool: &PgPool) -> (Uuid, U
     let channel_id = rox_uuid::generate_uuid_v7();
     let thread_id = rox_uuid::generate_uuid_v7();
     let originating_message_id = rox_uuid::generate_uuid_v7();
-    let owner_id = "macro|agent-session-thread-owner@example.com";
+    let owner_id = "rox|agent-session-thread-owner@example.com";
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         channel_id,
@@ -356,7 +356,7 @@ async fn create_rejects_an_unknown_user_owner(pool: PgPool) {
     let params = CreateAgentSessionParams {
         origin: trigger_context::TriggerOrigin::Unknown,
         purpose: crate::domain::model::SessionPurpose::Standalone,
-        owner_id: Owner::User(user_id("macro|missing@example.com")),
+        owner_id: Owner::User(user_id("rox|missing@example.com")),
         ..new_session(bot_id, None, None)
     };
     let id = params.id;
@@ -458,7 +458,7 @@ async fn create_and_get_round_trips(pool: PgPool) {
     assert_eq!(session.bot_id, bot_id);
     assert_eq!(
         session.owner_id.to_string(),
-        "macro|agent-session-owner@example.com"
+        "rox|agent-session-owner@example.com"
     );
     assert_eq!(session.thread_id, None);
     assert_eq!(session.sandbox_size, SandboxSize::Default);
@@ -956,7 +956,7 @@ async fn log_create_and_list_by_session_orders_chronologically(pool: PgPool) {
         .await
         .id;
 
-    let user = user_id("macro|agent-session-log-test@example.com");
+    let user = user_id("rox|agent-session-log-test@example.com");
 
     let _ = AgentSessionLogRepo::create(
         &repo,
@@ -1128,7 +1128,7 @@ async fn find_all_for_thread_returns_every_session_on_the_thread(pool: PgPool) {
 /// somebody else's work, nor an unbounded history.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recent_for_owner_returns_the_owners_newest_sessions(pool: PgPool) {
-    const OTHER_OWNER: &str = "macro|agent-session-other-owner@example.com";
+    const OTHER_OWNER: &str = "rox|agent-session-other-owner@example.com";
 
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1227,7 +1227,7 @@ async fn a_sessions_audience_is_its_owner(pool: PgPool) {
 
     assert_eq!(
         audience,
-        vec!["macro|agent-session-owner@example.com".to_string()],
+        vec!["rox|agent-session-owner@example.com".to_string()],
         "frames stream to the session owner"
     );
 }
@@ -1535,8 +1535,8 @@ async fn preview_answers_per_id_by_the_viewers_grants(pool: PgPool) {
     append_system_event(&repo, private.id, SystemEvent::AcpReady).await;
     let missing = AgentSessionId::new();
 
-    let member = "macro|agent-session-channel-member@example.com";
-    let stranger = "macro|agent-session-stranger@example.com";
+    let member = "rox|agent-session-channel-member@example.com";
+    let stranger = "rox|agent-session-stranger@example.com";
     sqlx::query!(
         "INSERT INTO comms_channel_participants (channel_id, user_id, role) VALUES ($1, $2, 'member')",
         channel_id,
@@ -2477,8 +2477,8 @@ async fn participants_are_the_distinct_users_the_log_attributes(pool: PgPool) {
     let session_id = create_session(&repo, new_session(bot_id, None, None))
         .await
         .id;
-    let alice = user_id("macro|alice@example.com");
-    let bob = user_id("macro|bob@example.com");
+    let alice = user_id("rox|alice@example.com");
+    let bob = user_id("rox|bob@example.com");
 
     // Two prompts from alice, one from bob, and a frame from nobody.
     for user in [
@@ -2840,7 +2840,7 @@ async fn a_document_session_preserves_its_origin_and_inherits_live_document_acce
         Some(parent.clone())
     );
 
-    let collaborator = "macro|doc-agent-collaborator@example.com";
+    let collaborator = "rox|doc-agent-collaborator@example.com";
     insert_user(&pool, collaborator).await;
     let mut transaction = pool.begin().await.unwrap();
     insert_entity_access_row(
@@ -2865,7 +2865,7 @@ async fn a_document_session_preserves_its_origin_and_inherits_live_document_acce
             document: document_id.clone(),
             candidates: [
                 collaborator.to_string(),
-                "macro|uninvited@example.com".to_string(),
+                "rox|uninvited@example.com".to_string(),
             ]
             .into_iter()
             .collect(),
@@ -2943,7 +2943,7 @@ async fn a_document_session_preserves_its_origin_and_inherits_live_document_acce
     );
     assert!(
         !view
-            .can_view(&user_id("macro|nobody@example.com"), session.id)
+            .can_view(&user_id("rox|nobody@example.com"), session.id)
             .await
             .unwrap()
     );
@@ -3226,7 +3226,7 @@ async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool
     let private_bot = create_test_bot(&pool).await;
 
     let team_id = rox_uuid::generate_uuid_v7();
-    let team_owner = "macro|agent-session-team-owner@example.com";
+    let team_owner = "rox|agent-session-team-owner@example.com";
     insert_user(&pool, team_owner).await;
     sqlx::query!(
         "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Agents', $2)",
@@ -3285,7 +3285,7 @@ async fn warm_sessions_are_hidden_and_claimed_only_once_by_the_owner(pool: PgPoo
             .unwrap()
             .is_empty()
     );
-    let other = Owner::User(user_id("macro|other@example.com"));
+    let other = Owner::User(user_id("rox|other@example.com"));
     assert_eq!(
         WarmSessionLifecycle::claim(
             &repo,
@@ -3521,7 +3521,7 @@ async fn active_execution_turn_excludes_stopped_archived_and_deleted_sessions(po
 async fn a_turn_keeps_its_prompters_tab_and_only_theirs(pool: PgPool) {
     use crate::domain::model::{PrompterKind, TurnPrompter, UiClientId};
     use agent_runtime_protocol::domain::action::AgentActionId;
-    sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
+    sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','rox|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let repo = test_repo(&pool);
     let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
@@ -3569,7 +3569,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
         action::{AgentAction, AgentActionId},
         notification::{Notification, NotificationEvent},
     };
-    sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
+    sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','rox|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let action_id = AgentActionId::mint();
     let request = AgentAction::notification(vec![Notification {

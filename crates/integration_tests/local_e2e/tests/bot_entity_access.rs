@@ -55,7 +55,7 @@ impl ScopedBotFixture {
         let rox_user_uuid = Uuid::new_v4();
         let fusion_user_id = Uuid::new_v4().to_string();
         let email = format!("bot-entity-access-{rox_user_uuid}@macro.local");
-        let acting_user_id = format!("macro|{email}");
+        let acting_user_id = format!("rox|{email}");
         let team_id = Uuid::new_v4();
         let bot_id = Uuid::new_v4();
         let bot_token_id = Uuid::new_v4();

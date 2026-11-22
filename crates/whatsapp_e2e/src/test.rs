@@ -40,8 +40,8 @@ fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
-const ALICE: &str = "macro|alice@example.com";
-const BOB: &str = "macro|bob@example.com";
+const ALICE: &str = "rox|alice@example.com";
+const BOB: &str = "rox|bob@example.com";
 
 /// Runs one scenario at a time across nextest's test processes. Each one
 /// holds a dozen or more connections (replica pools, lock connection,
@@ -389,7 +389,7 @@ impl World {
 }
 
 async fn user(pool: &PgPool, id: &str) {
-    let email = id.trim_start_matches("macro|");
+    let email = id.trim_start_matches("rox|");
     let rox_user = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",

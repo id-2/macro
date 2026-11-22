@@ -66,7 +66,7 @@ impl UsageRecorder for FakeRecorder {
 fn usage() -> UsageContext {
     UsageContext::new(
         AiFeature::Automation,
-        RoxUserIdStr::try_from("macro|jev-test@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("rox|jev-test@example.com".to_owned()).unwrap(),
     )
 }
 

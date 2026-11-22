@@ -46,7 +46,7 @@ const detail: FormDetail = {
     id: 'form-1',
     name: 'Workshop registration',
     description: '',
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     databaseId: 'database-1',
     tableId: 'table-1',
     audience: 'members',

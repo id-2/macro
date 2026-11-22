@@ -5,7 +5,7 @@ async fn sync_notifications_require_internal_auth_and_forward_only_identity_and_
     let (router, service, _, _) = test_router();
     let body = || {
         Body::from(
-            r#"{"actor":"bot|00000000-0000-0000-0000-00000000a1a1","on_behalf_of":"macro|owner@example.com"}"#,
+            r#"{"actor":"bot|00000000-0000-0000-0000-00000000a1a1","on_behalf_of":"rox|owner@example.com"}"#,
         )
     };
     let user_request = Request::post("/doc-1/sync-content-updated")
@@ -37,7 +37,7 @@ async fn sync_notifications_require_internal_auth_and_forward_only_identity_and_
                 .unwrap(),
                 on_behalf_of: Some(
                     rox_user_id::user_id::RoxUserIdStr::try_from(
-                        "macro|owner@example.com".to_owned()
+                        "rox|owner@example.com".to_owned()
                     )
                     .unwrap()
                 ),
@@ -64,7 +64,7 @@ async fn sync_notifications_forward_batched_editors() {
         .header(INTERNAL_API_KEY_HEADER, STANDARD_INTERNAL_KEY)
         .header("content-type", "application/json")
         .body(Body::from(
-            r#"{"editors":[{"actor":"macro|editor@example.com","on_behalf_of":null}]}"#,
+            r#"{"editors":[{"actor":"rox|editor@example.com","on_behalf_of":null}]}"#,
         ))
         .unwrap();
     assert_eq!(send_status(&router, request).await, StatusCode::OK);
@@ -73,7 +73,7 @@ async fn sync_notifications_forward_batched_editors() {
     assert_eq!(calls[0].editors.len(), 1);
     assert_eq!(
         calls[0].editors[0].actor.as_ref(),
-        "macro|editor@example.com"
+        "rox|editor@example.com"
     );
 }
 

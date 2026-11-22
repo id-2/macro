@@ -29,7 +29,7 @@ fn frontend_nil_exclusions_are_supported_without_indexing_deferred_entities() {
             request(),
             "INBOX",
             &[Uuid::from_u128(1)],
-            "macro|viewer@example.com"
+            "rox|viewer@example.com"
         )
         .unwrap(),
         LocalCompileOutcome::Supported(_)

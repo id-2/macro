@@ -91,7 +91,7 @@ export const listPropertiesResponseItem = zod
                 scope: zod.enum(['database']),
               })
               .describe(
-                'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
               ),
             zod
               .object({
@@ -183,7 +183,7 @@ export const listPropertiesResponseItem = zod
                     scope: zod.enum(['database']),
                   })
                   .describe(
-                    'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                    'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
                   ),
                 zod
                   .object({
@@ -433,7 +433,7 @@ export const getPropertyDefinitionResponse = zod
             scope: zod.enum(['database']),
           })
           .describe(
-            'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+            'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
           ),
         zod
           .object({
@@ -734,7 +734,7 @@ export const getBulkEntityPropertiesResponse = zod.record(
                         scope: zod.enum(['database']),
                       })
                       .describe(
-                        'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                        'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
                       ),
                     zod
                       .object({
@@ -1082,7 +1082,7 @@ export const getEntityPropertiesResponse = zod
                       scope: zod.enum(['database']),
                     })
                     .describe(
-                      'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                      'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
                     ),
                   zod
                     .object({
@@ -1804,7 +1804,7 @@ export const listTagsResponseItem = zod
                 scope: zod.enum(['database']),
               })
               .describe(
-                'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
               ),
             zod
               .object({
@@ -1959,7 +1959,7 @@ export const ensureTagSetResponse = zod
                 scope: zod.enum(['database']),
               })
               .describe(
-                'Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user\/team property namespace.'
+                'Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user\/team property namespace.'
               ),
             zod
               .object({

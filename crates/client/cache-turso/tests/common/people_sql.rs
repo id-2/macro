@@ -7,7 +7,7 @@ use cache_core::{
 use serde_json::{Value, json};
 use uuid::Uuid;
 
-pub const VIEWER: &str = "macro|viewer@example.com";
+pub const VIEWER: &str = "rox|viewer@example.com";
 const DOCUMENT: &str = include_str!(
     "../../../../../apps/web/src/lib/service-clients/service-storage/graphql/contacts.graphql"
 );
@@ -39,8 +39,8 @@ pub async fn seed<S: Storage>(engine: &mut Engine<S>, count: usize) -> Hydration
                 .fence,
         );
         let nodes: Vec<_> = (start..(start + 500).min(count + 1)).map(|index| {
-            let user = if index == 0 { VIEWER.into() } else { format!("macro|p{:06}@example.com", index - 1) };
-            json!({"id": key(VIEWER, &user), "userId": user, "email": user.strip_prefix("macro|").unwrap(), "name": if index == count { "LATE_ÉCHO%".into() } else { format!("Group{}", index % 7) }})
+            let user = if index == 0 { VIEWER.into() } else { format!("rox|p{:06}@example.com", index - 1) };
+            json!({"id": key(VIEWER, &user), "userId": user, "email": user.strip_prefix("rox|").unwrap(), "name": if index == count { "LATE_ÉCHO%".into() } else { format!("Group{}", index % 7) }})
         }).collect();
         engine
             .hydrate_query_in_scope(NetworkWrite {
@@ -196,7 +196,7 @@ pub async fn contract<S: Storage>(
         .read_people_sql(&PeopleSqlRequest {
             scope: scope.clone(),
             input: PeopleSqlInput::Identities {
-                ids: vec!["macro|p000000@example.com".into()],
+                ids: vec!["rox|p000000@example.com".into()],
             },
         })
         .await
@@ -219,7 +219,7 @@ pub async fn contract<S: Storage>(
             .is_err()
     );
     let mut foreign = scope.clone();
-    foreign.identity = "macro|other@example.com".into();
+    foreign.identity = "rox|other@example.com".into();
     assert!(
         engine
             .read_people_sql(&PeopleSqlRequest {

@@ -13,8 +13,8 @@ import {
 } from './pendingFolderUploads';
 
 const NOW = 1_800_000_000_000;
-const USER = 'macro|a@example.com';
-const OTHER_USER = 'macro|b@example.com';
+const USER = 'rox|a@example.com';
+const OTHER_USER = 'rox|b@example.com';
 
 /** What the browser fires in this tab when another tab writes storage. */
 function storageChangedInAnotherTab(userId: string) {
@@ -48,7 +48,7 @@ describe('pending folder uploads', () => {
     expect(readPendingFolderUploads(USER)).toEqual([
       { requestId: 'r1', name: 'Records', sentAt: NOW },
     ]);
-    expect(readPendingFolderUploads('macro|b@example.com')).toEqual([]);
+    expect(readPendingFolderUploads('rox|b@example.com')).toEqual([]);
   });
 
   it('keeps folders other tabs sent while forgetting one', () => {

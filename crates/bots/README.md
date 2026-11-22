@@ -44,7 +44,7 @@ A created event has this wire-envelope shape:
     "handle": "deploy-bot",
     "description": null,
     "avatar_url": null,
-    "created_by_user_id": "macro|creator@example.com",
+    "created_by_user_id": "rox|creator@example.com",
     "channel_id": null,
     "created_at": "2026-07-20T17:01:02Z"
   }

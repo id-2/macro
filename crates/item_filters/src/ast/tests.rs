@@ -31,7 +31,7 @@ fn it_expands_filters() {
             file_types: vec!["pdf".to_string(), "txt".to_string()],
             document_ids: vec![document_id.to_string()],
             project_ids: vec![project_id.to_string()],
-            owners: vec!["macro|hello@test.com".to_string()],
+            owners: vec!["rox|hello@test.com".to_string()],
             importance: Some(true),
             ..Default::default()
         },
@@ -86,7 +86,7 @@ fn it_expands_filters() {
                     },
                     {
                         "l": {
-                            "o": "macro|hello@test.com"
+                            "o": "rox|hello@test.com"
                         }
                     }
                 ]
@@ -408,8 +408,8 @@ fn it_expands_channel_thread_filters() {
         channel_thread_filters: crate::ChannelThreadFilters {
             thread_ids: vec![thread_id.to_string()],
             channel_ids: vec![channel_id.to_string()],
-            root_sender_ids: vec!["macro|hello@test.com".to_string()],
-            participant_ids: vec!["macro|participant@test.com".to_string()],
+            root_sender_ids: vec!["rox|hello@test.com".to_string()],
+            participant_ids: vec!["rox|participant@test.com".to_string()],
         },
         ..Default::default()
     };
@@ -461,7 +461,7 @@ fn it_expands_single_channel_thread_id() {
 fn it_expands_single_channel_thread_participant() {
     let f = EntityFilters {
         channel_thread_filters: crate::ChannelThreadFilters {
-            participant_ids: vec!["macro|participant@test.com".to_string()],
+            participant_ids: vec!["rox|participant@test.com".to_string()],
             ..Default::default()
         },
         ..Default::default()
@@ -479,7 +479,7 @@ fn it_expands_single_channel_thread_participant() {
     let json = serde_json::to_value(ast).unwrap();
     let exp = json!({
         "l": {
-            "Participant": "macro|participant@test.com"
+            "Participant": "rox|participant@test.com"
         }
     });
 
@@ -638,7 +638,7 @@ fn it_expands_multiple_option_ids_as_or() {
 #[test]
 fn it_expands_entity_ref_filter() {
     let prop_def_id = Uuid::new_v4();
-    let entity_id = "macro|user@test.com".to_string();
+    let entity_id = "rox|user@test.com".to_string();
     let f = EntityFilters {
         property_filters: vec![PropertyFilter {
             property_definition_id: prop_def_id.to_string(),

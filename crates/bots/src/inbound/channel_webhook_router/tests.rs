@@ -35,7 +35,7 @@ use std::sync::{
 };
 use tower::ServiceExt;
 
-const DEFAULT_BEARER_TOKEN: &str = "macro|bot-admin@example.com";
+const DEFAULT_BEARER_TOKEN: &str = "rox|bot-admin@example.com";
 
 #[derive(Clone)]
 enum TestCreateMode {
@@ -835,7 +835,7 @@ fn bot_authentication_with_acting_user(bot_id: BotId) -> BotAuthentication {
             origin: rox_authorization::CredentialOrigin::Bot,
             agent_id: None,
             agent_via: None,
-            rox_user_id: RoxUserIdStr::parse_from_str("macro|acting-bot@example.com").unwrap(),
+            rox_user_id: RoxUserIdStr::parse_from_str("rox|acting-bot@example.com").unwrap(),
             user_context: Default::default(),
         }),
     }
@@ -857,13 +857,13 @@ fn scoped_bot_response(bot_id: BotId) -> CreateChannelScopedBotResponse {
             id: bot_id,
             kind: BotKind::Owned,
             owner: Some(BotOwner::User {
-                user_id: "macro|bot-admin@example.com".to_string(),
+                user_id: "rox|bot-admin@example.com".to_string(),
             }),
             name: "Datadog Alerts".to_string(),
             handle: "datadog-alerts".to_string(),
             description: Some("Posts alarm notifications".to_string()),
             avatar_url: None,
-            created_by: Some("macro|bot-admin@example.com".to_string()),
+            created_by: Some("rox|bot-admin@example.com".to_string()),
             created_at: now,
             updated_at: now,
             deleted_at: None,
@@ -925,7 +925,7 @@ async fn channel_webhook_router_admin_can_create_scoped_bot() {
         .expect("create call mutex poisoned")
         .clone()
         .expect("create call recorded");
-    assert_eq!(call.caller.as_ref(), "macro|bot-admin@example.com");
+    assert_eq!(call.caller.as_ref(), "rox|bot-admin@example.com");
     assert_eq!(call.channel_id, channel_id);
 }
 
@@ -978,7 +978,7 @@ async fn channel_webhook_router_verified_acting_user_is_not_used_for_attribution
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
     let token = "mbot_test_acting_user";
     let claims = AuthorizationBotActingUserClaims {
-        user_id: Some("macro|acting-bot@example.com".to_string()),
+        user_id: Some("rox|acting-bot@example.com".to_string()),
         fusion_user_id: Some("fusion-acting-bot".to_string()),
         organization_id: Some(42),
     };
@@ -1042,7 +1042,7 @@ async fn channel_webhook_router_cookie_only_user_is_forbidden_without_posting() 
     let poster = TestChannelPoster::new();
     let authorizer = rejecting_bot_authorizer();
     let request = webhook_request(channel_id)
-        .header("cookie", "macro-access-token=macro|cookie-user@example.com")
+        .header("cookie", "macro-access-token=rox|cookie-user@example.com")
         .body(Body::from(
             serde_json::json!({ "content": "user request" }).to_string(),
         ))
@@ -1083,7 +1083,7 @@ async fn channel_webhook_router_bot_token_and_user_are_ambiguous_without_posting
         .header(BOT_SCOPE_HEADER, BotScope::User.as_str())
         .header(
             header::AUTHORIZATION,
-            "Bearer macro|explicit-user@example.com",
+            "Bearer rox|explicit-user@example.com",
         )
         .body(Body::from(
             serde_json::json!({ "content": "ambiguous" }).to_string(),
@@ -1232,7 +1232,7 @@ async fn channel_webhook_router_rejected_acting_user_is_forbidden_without_postin
     let request = webhook_request(channel_id)
         .header(BOT_TOKEN_HEADER, "mbot_test_forbidden_claims")
         .header(BOT_SCOPE_HEADER, BotScope::User.as_str())
-        .header(BOT_FOR_ROX_USER_ID_HEADER, "macro|forbidden@example.com")
+        .header(BOT_FOR_ROX_USER_ID_HEADER, "rox|forbidden@example.com")
         .body(Body::from(
             serde_json::json!({ "content": "forbidden" }).to_string(),
         ))

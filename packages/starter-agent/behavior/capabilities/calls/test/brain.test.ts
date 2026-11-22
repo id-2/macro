@@ -16,7 +16,7 @@ import {
   workLabel,
 } from '../brain.ts';
 
-const owner = 'macro|owner@example.com';
+const owner = 'rox|owner@example.com';
 const persona = { name: 'Agent', owner };
 
 test("askContent: the card, the cut-off note, what was said since, then the line with the speaker's id", () => {
@@ -94,13 +94,13 @@ test('the system prompt is the same for every call: what differs goes in the fir
     briefing: '',
     callId: 'call-2',
     placed: {
-      target: 'macro|cy@example.com',
+      target: 'rox|cy@example.com',
       asker: owner,
       opening: "Hi, it's Agent. About the launch.",
     },
   });
   expect(placedCall).toContain(
-    `You placed this call to macro|cy@example.com, at ${owner}'s request.`
+    `You placed this call to rox|cy@example.com, at ${owner}'s request.`
   );
   expect(placedCall).toContain(
     '"Hi, it\'s Agent. About the launch." They have heard that, so never say it again'

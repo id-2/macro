@@ -17,7 +17,7 @@ use serde_json::{Value, json};
 use super::resolve_scheduled_actions;
 use crate::ScheduledActionGraphqlContext;
 
-const VIEWER: &str = "macro|routines@example.com";
+const VIEWER: &str = "rox|routines@example.com";
 const SECRET: &str = "hidden-prompt-value";
 const QUERY: &str = r#"
 {

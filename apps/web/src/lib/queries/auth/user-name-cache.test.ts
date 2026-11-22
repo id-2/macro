@@ -11,8 +11,8 @@ import {
   type UserNameState,
 } from './user-name-cache';
 
-const VIEWER = { userId: 'macro|viewer@example.com', session: 0 };
-const PERSON = 'macro|person@example.com';
+const VIEWER = { userId: 'rox|viewer@example.com', session: 0 };
+const PERSON = 'rox|person@example.com';
 let cache: UserNameCache;
 let client: QueryClient;
 let fetch: ReturnType<typeof vi.fn<UserNameBatchReader>>;
@@ -46,7 +46,7 @@ it('serializes large active sets without a promise/ID backlog and retains their 
     cleanups.push(dispose);
     createRenderEffect(() => {
       for (let index = 0; index < 1100; index++)
-        latest = cache.read(`macro|active${index}@example.com`);
+        latest = cache.read(`rox|active${index}@example.com`);
     });
   });
   expect(cache.inspect()).toMatchObject({ active: 1100, pending: 500 });
@@ -58,14 +58,14 @@ it('serializes large active sets without a promise/ID backlog and retains their 
   expect(cache.inspect().active).toBe(1100);
   // No corpus-sized fixture: each unowned read is released before the next.
   for (let index = 0; index < 100_000; index++)
-    cache.read(`macro|browse${index}@example.com`);
+    cache.read(`rox|browse${index}@example.com`);
   expect(cache.inspect().idle).toBeLessThanOrEqual(LIMITS.idleEntries);
   expect(cache.inspect().idleBytes).toBeLessThanOrEqual(LIMITS.idleBytes);
   expect(cache.inspect().pending).toBeLessThanOrEqual(LIMITS.pending);
   expect(client.getQueryCache().getAll().length).toBeLessThanOrEqual(
     1100 + LIMITS.idleEntries
   );
-  expect(cache.read('macro|active1099@example.com').name?.first_name).toBe(
+  expect(cache.read('rox|active1099@example.com').name?.first_name).toBe(
     'Resolved'
   );
   cleanups.splice(0).forEach((dispose) => dispose());
@@ -80,7 +80,7 @@ it('keeps idle lookups bounded even before a disposed reader cleanup microtask r
   });
   dispose();
   for (let index = 0; index < 10_000; index++)
-    cache.read(`macro|untracked${index}@example.com`);
+    cache.read(`rox|untracked${index}@example.com`);
   expect(cache.inspect().entries).toBeLessThanOrEqual(LIMITS.idleEntries + 1);
   expect(cache.inspect().pending).toBeLessThanOrEqual(LIMITS.pending);
 });
@@ -88,13 +88,13 @@ it('keeps idle lookups bounded even before a disposed reader cleanup microtask r
 it('ignores invalid identities individually instead of poisoning another name request', async () => {
   for (const id of [
     '',
-    'macro|broken@@example.com',
-    'macro|bad$local@example.com',
-    'macro|bad\\0@example.com',
+    'rox|broken@@example.com',
+    'rox|bad$local@example.com',
+    'rox|bad\\0@example.com',
     ' '.repeat(2000),
   ])
     cache.read(id);
-  cache.read('  MACRO|PERSON@EXAMPLE.COM  ');
+  cache.read('  ROX|PERSON@EXAMPLE.COM  ');
   await vi.advanceTimersByTimeAsync(10);
   expect(fetch.mock.calls[0][1]).toEqual([PERSON]);
   expect(cache.inspect().entries).toBe(1);
@@ -102,7 +102,7 @@ it('ignores invalid identities individually instead of poisoning another name re
 
 it('applies retention bounds to explicit refetch and clears late work on disposal', async () => {
   for (let index = 0; index < 2000; index++)
-    cache.control(`macro|explicit${index}@example.com`).refetch();
+    cache.control(`rox|explicit${index}@example.com`).refetch();
   expect(cache.inspect().entries).toBeLessThanOrEqual(LIMITS.idleEntries);
   expect(cache.inspect().pending).toBeLessThanOrEqual(LIMITS.pending);
   const held =
@@ -129,9 +129,9 @@ it('deduplicates active labels and drops queued interests when owners disappear'
     cleanups.push(dispose);
     createRenderEffect(() => {
       for (let index = 0; index < 1500; index++)
-        cache.read(`macro|active${index}@example.com`);
+        cache.read(`rox|active${index}@example.com`);
     });
-    createRenderEffect(() => cache.read('MACRO|ACTIVE0@example.com'));
+    createRenderEffect(() => cache.read('ROX|ACTIVE0@example.com'));
   });
   await vi.advanceTimersByTimeAsync(10);
   expect(fetch).toHaveBeenCalledOnce();
@@ -184,7 +184,7 @@ it('clears immediately across account returns and rejects old replies and captur
   fetch.mockReturnValueOnce(held.promise);
   old.refetch();
   await vi.advanceTimersByTimeAsync(10);
-  setAccount({ userId: 'macro|other@example.com', session: 0 });
+  setAccount({ userId: 'rox|other@example.com', session: 0 });
   setAccount(VIEWER);
   expect(labels.at(-1)).toBeUndefined();
   old.mutate({ id: PERSON, first_name: 'Stale override' });
@@ -285,7 +285,7 @@ it('reconnect wakes only active failed names without waiting for a new render', 
       value = cache.read(PERSON);
     });
   });
-  cache.read('macro|idle@example.com');
+  cache.read('rox|idle@example.com');
   await vi.advanceTimersByTimeAsync(10);
   expect(value?.error).toBe('Names unavailable');
   onlineManager.setOnline(true);
@@ -305,7 +305,7 @@ it('authorization refusal clears prior private labels and blocks new requests un
   cache.control(PERSON).refetch();
   await vi.advanceTimersByTimeAsync(10);
   expect(labels.at(-1)).toBeUndefined();
-  cache.read('macro|another@example.com');
+  cache.read('rox|another@example.com');
   cache.control(PERSON).refetch();
   await vi.advanceTimersByTimeAsync(60_000);
   expect(fetch).toHaveBeenCalledTimes(2);
@@ -342,30 +342,30 @@ it('enforces text budgets without accepting unsolicited, duplicate or oversized 
     ...ids.map((id) => ({ id, first_name: 'x'.repeat(4096) })),
   ]);
   for (let index = 0; index < 100; index++)
-    cache.read(`macro|bytes${index}@example.com`);
+    cache.read(`rox|bytes${index}@example.com`);
   await vi.advanceTimersByTimeAsync(10);
   expect(cache.inspect().idleBytes).toBeLessThanOrEqual(LIMITS.idleBytes);
   expect(cache.inspect().idle).toBeLessThan(100);
   fetch.mockResolvedValueOnce([
     { id: PERSON, first_name: 'x'.repeat(LIMITS.entryBytes) },
-    { id: 'macro|duplicate@example.com', first_name: 'One' },
-    { id: 'macro|duplicate@example.com', first_name: 'Two' },
-    { id: 'macro|unsolicited@example.com', first_name: 'Foreign' },
-    { id: 'macro|good@example.com', first_name: 'Good' },
+    { id: 'rox|duplicate@example.com', first_name: 'One' },
+    { id: 'rox|duplicate@example.com', first_name: 'Two' },
+    { id: 'rox|unsolicited@example.com', first_name: 'Foreign' },
+    { id: 'rox|good@example.com', first_name: 'Good' },
   ]);
   cache.read(PERSON);
-  cache.read('macro|duplicate@example.com');
-  cache.read('macro|good@example.com');
+  cache.read('rox|duplicate@example.com');
+  cache.read('rox|good@example.com');
   await vi.advanceTimersByTimeAsync(10);
   expect(cache.read(PERSON).name).toBeUndefined();
-  expect(cache.read('macro|duplicate@example.com').name).toBeUndefined();
-  expect(cache.read('macro|good@example.com').name?.first_name).toBe('Good');
+  expect(cache.read('rox|duplicate@example.com').name).toBeUndefined();
+  expect(cache.read('rox|good@example.com').name?.first_name).toBe('Good');
   expect(
     client
       .getQueryCache()
       .getAll()
       .some(
-        (query) => query.queryKey.at(-1) === 'macro|unsolicited@example.com'
+        (query) => query.queryKey.at(-1) === 'rox|unsolicited@example.com'
       )
   ).toBe(false);
 });
@@ -377,7 +377,7 @@ it('evicts idle history by time and drops obsolete responses instead of repopula
   cache.read(PERSON);
   await vi.advanceTimersByTimeAsync(10);
   for (let index = 0; index < 1000; index++)
-    cache.read(`macro|other${index}@example.com`);
+    cache.read(`rox|other${index}@example.com`);
   cache.read(PERSON);
   held.resolve([{ id: PERSON, first_name: 'Obsolete slot' }]);
   await vi.advanceTimersByTimeAsync(100);
@@ -390,7 +390,7 @@ it('evicts idle history by time and drops obsolete responses instead of repopula
 it('arms one idle expiry timer for many reads and still expires each name on time', async () => {
   const timers = vi.spyOn(globalThis, 'setTimeout');
   for (let index = 0; index < 50; index++)
-    cache.read(`macro|idle${index}@example.com`);
+    cache.read(`rox|idle${index}@example.com`);
   const expiryTimers = timers.mock.calls.filter(
     ([, delay]) => delay === LIMITS.idleMs
   );
@@ -399,8 +399,8 @@ it('arms one idle expiry timer for many reads and still expires each name on tim
   expect(cache.inspect().idle).toBe(50);
 
   await vi.advanceTimersByTimeAsync(LIMITS.idleMs / 2);
-  cache.read('macro|idle0@example.com');
-  cache.read('macro|late@example.com');
+  cache.read('rox|idle0@example.com');
+  cache.read('rox|late@example.com');
   expect(cache.inspect().idle).toBe(51);
 
   await vi.advanceTimersByTimeAsync(LIMITS.idleMs / 2);

@@ -110,7 +110,7 @@ impl AiProjectionService for MockService {
 
 fn test_user_context() -> UserContext {
     UserContext {
-        user_id: "macro|test@test.com".to_string(),
+        user_id: "rox|test@test.com".to_string(),
         fusion_user_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb".to_string(),
         permissions: None,
         organization_id: None,

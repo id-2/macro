@@ -12,7 +12,7 @@ const TEAM: Uuid = Uuid::from_u128(0x7EA3);
 const GATES: [NonUserOwners; 2] = [NonUserOwners::Disabled, NonUserOwners::Enabled];
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|user@example.com".to_string()).unwrap()
 }
 
 fn user() -> RoxUserAuthentication {

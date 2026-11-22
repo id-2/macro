@@ -4,8 +4,8 @@ use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER_WITH_TEAM: &str = "macro|document-owner@team.test";
-const OWNER_WITHOUT_TEAM: &str = "macro|document-owner@personal.test";
+const OWNER_WITH_TEAM: &str = "rox|document-owner@team.test";
+const OWNER_WITHOUT_TEAM: &str = "rox|document-owner@personal.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
@@ -155,7 +155,7 @@ async fn public_link_allows_anonymous_access(pool: PgPool) -> anyhow::Result<()>
 async fn null_link_denies_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id = insert_link_shared_document(&pool, OWNER_WITHOUT_TEAM, None, None).await?;
-    let source_ids = SourceIds(vec!["macro|requester@team.test".to_string()]);
+    let source_ids = SourceIds(vec!["rox|requester@team.test".to_string()]);
 
     let access = get_document_access(&pool, &document_id, &source_ids, None).await?;
 
@@ -234,7 +234,7 @@ async fn public_link_requires_an_access_level(pool: PgPool) -> anyhow::Result<()
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn returns_highest_link_or_explicit_access_level(pool: PgPool) -> anyhow::Result<()> {
-    const REQUESTER: &str = "macro|requester@team.test";
+    const REQUESTER: &str = "rox|requester@team.test";
 
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -267,7 +267,7 @@ async fn direct_owner_grant_returns_owner(pool: PgPool) -> anyhow::Result<()> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn link_share_above_direct_grant_wins(pool: PgPool) -> anyhow::Result<()> {
-    const REQUESTER: &str = "macro|requester@team.test";
+    const REQUESTER: &str = "rox|requester@team.test";
 
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -284,7 +284,7 @@ async fn link_share_above_direct_grant_wins(pool: PgPool) -> anyhow::Result<()> 
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_sources_owner_grant_is_ignored(pool: PgPool) -> anyhow::Result<()> {
-    const REQUESTER: &str = "macro|requester@team.test";
+    const REQUESTER: &str = "rox|requester@team.test";
 
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -305,9 +305,9 @@ async fn another_sources_owner_grant_is_ignored(pool: PgPool) -> anyhow::Result<
 // (inbox owner, rox_user_links delegation, or a thread-level grant)
 // ---------------------------------------------------------------------------
 
-const INBOX_OWNER: &str = "macro|inbox-owner@corp.test";
-const DELEGATE: &str = "macro|delegate@corp.test";
-const OTHER_USER: &str = "macro|other@corp.test";
+const INBOX_OWNER: &str = "rox|inbox-owner@corp.test";
+const DELEGATE: &str = "rox|delegate@corp.test";
+const OTHER_USER: &str = "rox|other@corp.test";
 
 fn user(s: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(s.to_string()).unwrap()
@@ -579,7 +579,7 @@ async fn email_direct_document_grant_wins_over_inherited_view(pool: PgPool) -> a
 async fn explain_lists_public_and_entity_access_and_matches_effective(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    const REQUESTER: &str = "macro|requester@team.test";
+    const REQUESTER: &str = "rox|requester@team.test";
 
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -686,7 +686,7 @@ async fn explain_team_link_matches_access_level(pool: PgPool) -> anyhow::Result<
     add_owner_to_team(&pool, OWNER_WITH_TEAM, owner_team_id).await?;
     let document_id =
         insert_link_shared_document(&pool, OWNER_WITH_TEAM, Some("TEAM"), Some("comment")).await?;
-    let requester = user("macro|teammate@team.test");
+    let requester = user("rox|teammate@team.test");
     let source_ids = SourceIds(vec![owner_team_id.to_string()]);
 
     let access = get_document_access(&pool, &document_id, &source_ids, Some(&*requester)).await?;

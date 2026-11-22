@@ -6,7 +6,7 @@ import { mailProjectionCapsules } from '../../../src/lib/graphql-cache/worker/br
 import type { TagSetResponse } from '../../../src/lib/service-clients/service-properties/generated/schemas/tagSetResponse';
 import { EMAIL, fixtureMailAccount, fixtureId as id, USER_ID } from './mail';
 
-export const PEOPLE = [USER_ID, 'macro|other@example.com'];
+export const PEOPLE = [USER_ID, 'rox|other@example.com'];
 export const TAG_DEFINITION = id(7000);
 export const TAGS = [id(7001), id(7002)];
 export const LINKS = [id(1000), id(1001)];

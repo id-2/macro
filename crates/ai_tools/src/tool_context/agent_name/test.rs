@@ -18,12 +18,12 @@ async fn agents_are_named_by_their_own_bot_rows(pool: PgPool) -> anyhow::Result<
     .execute(&pool)
     .await?;
     sqlx::query(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|owner@example.com', 'owner@example.com', $1)"#,
     )
     .bind(rox_user_id)
     .execute(&pool)
     .await?;
-    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned())?;
+    let owner = RoxUserIdStr::try_from("rox|owner@example.com".to_owned())?;
 
     let bots = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),

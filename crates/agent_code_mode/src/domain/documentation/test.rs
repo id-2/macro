@@ -45,7 +45,7 @@ impl Cognition for Classifier {
     }
 }
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|fixture@example.com").unwrap()
 }
 #[tokio::test]
 async fn one_bounded_request_expands_only_selected_entities() {

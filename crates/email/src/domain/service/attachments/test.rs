@@ -156,7 +156,7 @@ impl DraftAttachmentRepo for Fake {
 fn link() -> Link {
     Link {
         id: Uuid::from_u128(0xd01),
-        rox_id: RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
+        rox_id: RoxUserIdStr::parse_from_str("rox|sender@example.com").unwrap(),
         fusionauth_user_id: String::new(),
         email_address: EmailStr::try_from("sender@example.com".to_owned()).unwrap(),
         provider: UserProvider::Gmail,
@@ -187,7 +187,7 @@ fn input() -> CreateDraftInput {
         headers_json: None,
         send_time: None,
         include_signature: None,
-        actor: Some(RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap()),
+        actor: Some(RoxUserIdStr::parse_from_str("rox|sender@example.com").unwrap()),
         draft_client_binding: None,
         thread_client_binding: None,
     }
@@ -195,7 +195,7 @@ fn input() -> CreateDraftInput {
 
 fn receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|sender@example.com").unwrap(),
         document_id,
         EntityType::Document,
     )

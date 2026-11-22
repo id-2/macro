@@ -16,13 +16,13 @@ async fn insert_agent(pool: &PgPool) -> RoxUserIdStr<'static> {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('macro|ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', $1, TRUE)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('rox|ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', $1, TRUE)"#,
         rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
-    RoxUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|ada-1@agents.macro.invalid".to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]

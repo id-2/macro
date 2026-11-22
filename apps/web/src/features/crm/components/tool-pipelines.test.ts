@@ -35,8 +35,8 @@ describe('pipeline tool values', () => {
     expect(formatFieldValue(null, 'EUR')).toBe('empty');
   });
   it('shows people by email and lists joined', () => {
-    expect(formatFieldValue('macro|sam@acme.com')).toBe('sam@acme.com');
-    expect(formatFieldValue(['macro|a@x.com', 'macro|b@x.com'])).toBe(
+    expect(formatFieldValue('rox|sam@acme.com')).toBe('sam@acme.com');
+    expect(formatFieldValue(['rox|a@x.com', 'rox|b@x.com'])).toBe(
       'a@x.com, b@x.com'
     );
     expect(formatFieldValue(null)).toBe('empty');

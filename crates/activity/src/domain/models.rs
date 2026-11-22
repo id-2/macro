@@ -487,7 +487,7 @@ pub struct ActivityRecord {
     pub id: Uuid,
     /// Who mechanically acted.
     pub actor: Actor<'static>,
-    /// Whose activity this is (a principal string: `macro|…` or `bot|…`).
+    /// Whose activity this is (a principal string: `rox|…` or `bot|…`).
     pub subject_id: String,
     /// The kind of entity acted on.
     pub entity_type: EntityType,

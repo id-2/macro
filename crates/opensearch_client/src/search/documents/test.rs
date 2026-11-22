@@ -245,7 +245,7 @@ fn test_build_bool_query_property_filters_emit_nested() -> anyhow::Result<()> {
             },
             PropertyFilterArg {
                 definition_id: "00000001-0000-0000-0000-000000000001".to_string(),
-                values: vec!["macro|alice@example.com".to_string()],
+                values: vec!["rox|alice@example.com".to_string()],
                 date_range: None,
                 has_date: None,
             },
@@ -405,7 +405,7 @@ fn document_index_deserializes_parent_shape() {
     let parent = serde_json::json!({
         "entity_id": "00000000-0000-0000-0000-000000000001",
         "document_name": "Q3 Planning",
-        "owner_id": "macro|alice@example.com",
+        "owner_id": "rox|alice@example.com",
         "file_type": "pdf",
         "updated_at_millis": 1779000000000_i64,
         "document_relation": "document",
@@ -414,7 +414,7 @@ fn document_index_deserializes_parent_shape() {
     let doc: DocumentIndex =
         serde_json::from_value(parent).expect("parent _source should deserialize");
     assert_eq!(doc.document_name, "Q3 Planning");
-    assert_eq!(doc.owner_id, "macro|alice@example.com");
+    assert_eq!(doc.owner_id, "rox|alice@example.com");
 }
 
 #[test]

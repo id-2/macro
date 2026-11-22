@@ -2,7 +2,7 @@ import type { QueryAccount } from '@queries/auth/account-scope';
 import { createSignal } from 'solid-js';
 
 export const [account, setAccount] = createSignal<QueryAccount>({
-  userId: 'macro|viewer@example.com',
+  userId: 'rox|viewer@example.com',
   session: 0,
 });
 export const useQueryAccount = () => account;

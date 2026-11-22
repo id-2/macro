@@ -37,7 +37,7 @@ pub struct OpenDirectMessageResponse {
 pub struct OpenDirectMessage {
     /// Other participants.
     #[schemars(
-        description = "The other people in the conversation, as Rox user ids (`macro|<email>`) or emails. Do not include the user."
+        description = "The other people in the conversation, as Rox user ids (`rox|<email>`) or emails. Do not include the user."
     )]
     pub participants: Vec<String>,
 }

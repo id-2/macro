@@ -11,8 +11,8 @@ use std::{
 };
 use uuid::{Uuid, uuid};
 
-const OWNER: &str = "macro|owner@example.com";
-const VIEWER: &str = "macro|viewer@example.com";
+const OWNER: &str = "rox|owner@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 const TEAM: Uuid = uuid!("11111111-1111-1111-1111-111111111111");
 
 /// Both fixture users belong to the fixture team.

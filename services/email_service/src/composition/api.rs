@@ -88,7 +88,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
-            default_user_id: Some("macro|INTERNAL@rox.one".to_string()),
+            default_user_id: Some("rox|INTERNAL@rox.one".to_string()),
         },
         rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),

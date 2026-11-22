@@ -58,7 +58,7 @@ async fn run_and_collect_ids(
         limit,
         &view,
         query,
-        "macro|alice@team.example.com",
+        "rox|alice@team.example.com",
         team_id,
     )
     .await?;
@@ -351,7 +351,7 @@ async fn crm_scope_uses_team_mailboxes_not_caller_link(pool: Pool<Postgres>) -> 
         100,
         &view,
         query,
-        "macro|carol@team.example.com",
+        "rox|carol@team.example.com",
         Some(team_id),
     )
     .await?;
@@ -656,7 +656,7 @@ async fn crm_scope_pagination_across_team_links(pool: Pool<Postgres>) -> anyhow:
         limit,
         &view,
         query_p1,
-        "macro|alice@team.example.com",
+        "rox|alice@team.example.com",
         Some(team_id),
     )
     .await?;
@@ -693,7 +693,7 @@ async fn crm_scope_pagination_across_team_links(pool: Pool<Postgres>) -> anyhow:
         limit,
         &view,
         query_p2,
-        "macro|alice@team.example.com",
+        "rox|alice@team.example.com",
         Some(team_id),
     )
     .await?;
@@ -768,7 +768,7 @@ async fn crm_scope_honors_contributor_blocks_while_ordinary_inbox_is_unchanged(
     let filter = Arc::new(Expr::Literal(EmailLiteral::Sender(Email::Domain(
         "acme.example.com".into(),
     ))));
-    sqlx::query!("INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain) VALUES ($1, 'macro|alice@team.example.com', 'acme.example.com')", team).execute(&pool).await?;
+    sqlx::query!("INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain) VALUES ($1, 'rox|alice@team.example.com', 'acme.example.com')", team).execute(&pool).await?;
     let shared = run_and_collect_ids(&pool, filter.clone(), Some(team)).await?;
     assert!(!shared.contains(TA1_ALICE_INBOX_ACME));
     assert!(shared.contains(TB1_BOB_INBOX_ACME));
@@ -880,7 +880,7 @@ async fn run_dedupe_query(
     )
 )]
 async fn crm_scope_dedupes_team_copies_own_copy_wins(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "macro|dave@beta.com").await?;
+    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "rox|dave@beta.com").await?;
 
     // Ordered by the representative's recency: Z(11) > X(10) > Y(9) > W(7).
     // X: dave's copy (own + newer). W: dave's copy despite erin's being
@@ -913,7 +913,7 @@ async fn crm_scope_dedupes_team_copies_own_copy_wins(pool: Pool<Postgres>) -> an
     )
 )]
 async fn crm_scope_dedupe_is_caller_relative(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let ids = run_dedupe_query(&pool, ERIN_LINK_ID, "macro|erin@beta.com").await?;
+    let ids = run_dedupe_query(&pool, ERIN_LINK_ID, "rox|erin@beta.com").await?;
 
     // W(12, erin's own) > Z(11, dave-only) > Y(9, own) > X(8, erin's own
     // copy even though dave's is at 10:00).
@@ -968,7 +968,7 @@ async fn crm_scope_dedupe_stable_across_cursor_pages(pool: Pool<Postgres>) -> an
             limit,
             &view,
             query,
-            "macro|dave@beta.com",
+            "rox|dave@beta.com",
             Some(team_id),
         )
         .await?;
@@ -1021,7 +1021,7 @@ async fn crm_scope_dedupe_stable_across_cursor_pages(pool: Pool<Postgres>) -> an
     )
 )]
 async fn crm_scope_dedupe_root_skips_drafts(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "macro|dave@beta.com").await?;
+    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "rox|dave@beta.com").await?;
 
     assert!(
         ids.contains(&TD1_DAVE_CONV_X.to_string()),
@@ -1077,7 +1077,7 @@ async fn crm_scope_dedupe_collapses_externally_shared_copy(
         100,
         &view,
         query,
-        "macro|dave@beta.com",
+        "rox|dave@beta.com",
         Some(team_id),
     )
     .await?;
@@ -1123,7 +1123,7 @@ async fn crm_scope_dedupe_mid_thread_join_copies_stay_separate(
     const TDV_DAVE_CONV_V: &str = "55550001-0000-0000-0000-000000000004";
     const TEV_ERIN_CONV_V: &str = "55550002-0000-0000-0000-000000000004";
 
-    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "macro|dave@beta.com").await?;
+    let ids = run_dedupe_query(&pool, DAVE_LINK_ID, "rox|dave@beta.com").await?;
 
     // Dave's V copy lacks the root '<v-1@...>' message — its key is
     // '<v-2@...>' while erin's is '<v-1@...>', so both rows survive.
@@ -1285,7 +1285,7 @@ async fn me_path_still_spans_non_primary_links(pool: Pool<Postgres>) -> anyhow::
         100,
         &view,
         query,
-        "macro|alice@team.example.com",
+        "rox|alice@team.example.com",
         None,
     )
     .await?;
@@ -1321,7 +1321,7 @@ async fn company_less_contact_email_list_rechecks_consent_and_personal_exclusion
     let allowed = run_and_collect_ids(&pool, filter.clone(), Some(team)).await?;
     assert!(allowed.contains(TA1_ALICE_INBOX_ACME));
     assert!(allowed.contains(TB1_BOB_INBOX_ACME));
-    sqlx::query!("INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain) VALUES ($1, 'macro|alice@team.example.com', 'acme.example.com')", team).execute(&pool).await?;
+    sqlx::query!("INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain) VALUES ($1, 'rox|alice@team.example.com', 'acme.example.com')", team).execute(&pool).await?;
     let excluded = run_and_collect_ids(&pool, filter.clone(), Some(team)).await?;
     assert!(!excluded.contains(TA1_ALICE_INBOX_ACME));
     assert!(excluded.contains(TB1_BOB_INBOX_ACME));

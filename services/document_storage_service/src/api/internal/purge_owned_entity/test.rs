@@ -155,7 +155,7 @@ fn user_access_token() -> String {
         iss: String::new(),
         email: "member@example.com".into(),
         fusion_user_id: "test-fusion-user".into(),
-        rox_user_id: "macro|member@example.com".into(),
+        rox_user_id: "rox|member@example.com".into(),
         rox_organization_id: None,
         root_rox_id: None,
     };

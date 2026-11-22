@@ -21,7 +21,7 @@ use serde_json::{Value, json};
 use std::sync::Arc;
 use tower::ServiceExt;
 
-const MEMBER: &str = "macro|member@example.com";
+const MEMBER: &str = "rox|member@example.com";
 #[derive(Clone)]
 struct FixtureCredential;
 impl JwtValidator for FixtureCredential {

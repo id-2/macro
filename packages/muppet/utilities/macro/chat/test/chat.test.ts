@@ -22,7 +22,7 @@ const message = (id: string, text: string): Message => ({
   thread: null,
   dm: false,
   from: 'Ada',
-  senderId: 'macro|ada@example.com',
+  senderId: 'rox|ada@example.com',
   mine: false,
   at: '2026-11-10T09:00:00Z',
   text,
@@ -34,7 +34,7 @@ const message = (id: string, text: string): Message => ({
 const fakeChat = (arriving: readonly Message[]) => {
   const did: string[] = [];
   const port: Chat = {
-    me: async () => 'macro|agent@example.com',
+    me: async () => 'rox|agent@example.com',
     channels: async () => [{ id: 'c1', name: 'general' }],
     join: async (channelId) => {
       did.push(`join ${channelId}`);

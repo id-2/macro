@@ -127,8 +127,8 @@ async fn reminder_collection_rechecks_delegation_after_receipt_minting(
     let thread = uuid::uuid!("20000201-0000-0000-0000-000000000201");
     let link = uuid::uuid!("dddddddd-dddd-dddd-dddd-dddddddddddd");
     sqlx::query!(r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ('d1000000-0000-0000-0000-000000000002', 'delegate', 'delegate@test.com', 'collection_delegate')"#).execute(&pool).await?;
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
-    sqlx::query!("INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('macro|delegate@test.com', 'macro|user1@test.com', $1)", link).execute(&pool).await?;
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
+    sqlx::query!("INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('rox|delegate@test.com', 'rox|user1@test.com', $1)", link).execute(&pool).await?;
     let user = RoxUserIdStr::try_from_email("delegate@test.com")?;
     let mailbox = service(pool.clone());
     let filters = ReminderThreadFilter {
@@ -170,7 +170,7 @@ async fn reminder_collection_excludes_shared_rows_outside_mail_inboxes(
     let thread = uuid::uuid!("20000001-0000-0000-0000-000000000001");
     let user = RoxUserIdStr::try_from_email("shared-viewer@test.com")?;
     sqlx::query!(r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ('d2000000-0000-0000-0000-000000000002', 'shared-viewer', 'shared-viewer@test.com', 'collection_shared')"#).execute(&pool).await?;
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|shared-viewer@test.com', 'shared-viewer@test.com', 'd2000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|shared-viewer@test.com', 'shared-viewer@test.com', 'd2000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
     sqlx::query!("INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) VALUES ($1, 'email_thread', $2, 'user', 'view')", thread, user.as_ref()).execute(&pool).await?;
     let mailbox = service(pool.clone());
     assert_eq!(receipts(&pool, &user, &[thread]).await.len(), 1);

@@ -3,8 +3,8 @@ import type { Entry, Incoming } from '../entry.ts';
 import { inThread, isRelevant, judge, type Probabilities } from '../listen.ts';
 import { screen } from '../screen.ts';
 
-const me = 'macro|agent@example.com';
-const owner = 'macro|owner@example.com';
+const me = 'rox|agent@example.com';
+const owner = 'rox|owner@example.com';
 
 const entry = (over: Partial<Entry> = {}): Entry => ({
   id: 'm1',
@@ -75,7 +75,7 @@ test('a mention always reaches the agent: recorded, or only in the text', async 
 test('a mention of someone else goes to the screen', async () => {
   const verdict = await judge(
     incoming({
-      text: '<m-user-mention>{"userId":"macro|bo@example.com"}</m-user-mention> hi',
+      text: '<m-user-mention>{"userId":"rox|bo@example.com"}</m-user-mention> hi',
     }),
     facts(async () => ({ addressed_to_me: 0.1 }))
   );

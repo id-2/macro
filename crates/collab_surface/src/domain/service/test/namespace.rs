@@ -10,7 +10,7 @@ async fn ensure_refuses_an_id_that_names_a_document() {
     // initialized" and let the surface adopt it; it must never be reached.
     let svc = service_with(repo.clone(), no_sessions());
     let receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Document,
         "doc-2",
         EntityPermission::AccessLevel {
@@ -21,7 +21,7 @@ async fn ensure_refuses_an_id_that_names_a_document() {
     let id = surface_id();
     for _ in 0..2 {
         let err = svc
-            .ensure_surface(&user("macro|a@b.c"), receipt.clone(), id, String::new())
+            .ensure_surface(&user("rox|a@b.c"), receipt.clone(), id, String::new())
             .await
             .unwrap_err();
         assert!(matches!(err, CollabSurfaceError::IdReserved));
@@ -46,14 +46,14 @@ async fn a_pending_surface_with_a_document_id_is_never_initialized() {
     });
     let svc = service_with(repo.clone(), MockSurfaceInitializer::new());
     let receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Document,
         "doc-1",
         edit_permission(),
     );
 
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), receipt, id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), receipt, id, String::new())
         .await
         .unwrap_err();
 
@@ -75,7 +75,7 @@ async fn a_fresh_ensure_checks_the_document_namespace_once() {
 
     let surface = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             channel_receipt(),
             surface_id(),
             String::new(),
@@ -99,7 +99,7 @@ async fn ensure_refuses_an_id_that_already_has_a_session() {
 
     let err = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             channel_receipt(),
             surface_id(),
             String::new(),
@@ -124,7 +124,7 @@ async fn mint_token_refuses_a_ready_surface_whose_id_names_a_document() {
     let svc = service_with(repo, MockSurfaceInitializer::new());
 
     let err = svc
-        .mint_token(&user("macro|a@b.c"), channel_receipt(), id)
+        .mint_token(&user("rox|a@b.c"), channel_receipt(), id)
         .await
         .unwrap_err();
 
@@ -146,7 +146,7 @@ async fn ensure_on_a_deleted_id_is_gone_even_though_its_session_remains() {
     let svc = service_with(repo, init);
 
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
         .await
         .unwrap_err();
 

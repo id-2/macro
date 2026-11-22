@@ -9,7 +9,7 @@ import {
 import { unsupportedContactSync } from './test-support';
 
 const SCOPE = {
-  identity: 'macro|viewer@example.com',
+  identity: 'rox|viewer@example.com',
   storageGeneration: '00000000-0000-4000-8000-000000000001',
 };
 const SEARCH: PeopleSearch = {
@@ -32,7 +32,7 @@ describe('person transport admission', () => {
     expect(
       isPeopleSearch({
         ...SEARCH,
-        excluded: Array(501).fill('macro|repeat@example.com'),
+        excluded: Array(501).fill('rox|repeat@example.com'),
       })
     ).toBe(false);
     expect(isPeopleSearch({ ...SEARCH, query: 'é'.repeat(257) })).toBe(false);

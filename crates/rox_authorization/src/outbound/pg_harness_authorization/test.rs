@@ -5,7 +5,7 @@ use super::*;
 use crate::domain::ports::HarnessAuthorizationRepo as _;
 
 const TOKEN: &str = "mhns_authorization_test_secret";
-const USER_ID: &str = "macro|harness-authorization@example.com";
+const USER_ID: &str = "rox|harness-authorization@example.com";
 const USER_EMAIL: &str = "harness-authorization@example.com";
 const FUSION_USER_ID: &str = "fusion-harness-authorization";
 
@@ -263,7 +263,7 @@ async fn resolves_users_by_rox_identifier(pool: PgPool) {
 
     assert!(repo.find_user("not-a-macro-id").await.unwrap().is_none());
     assert!(
-        repo.find_user("macro|missing@example.com")
+        repo.find_user("rox|missing@example.com")
             .await
             .unwrap()
             .is_none()
@@ -294,7 +294,7 @@ async fn may_use_harness_follows_its_team_grant(pool: PgPool) {
     .await
     .unwrap();
     let (harness_id, _) =
-        insert_harness_token(&pool, Some("macro|owner@example.com"), None, false).await;
+        insert_harness_token(&pool, Some("rox|owner@example.com"), None, false).await;
     let harness = HarnessId::new_from_uuid(harness_id);
     let repo = PgHarnessAuthorizationRepo::new(pool.clone());
     assert!(
@@ -323,7 +323,7 @@ async fn may_use_harness_follows_its_team_grant(pool: PgPool) {
     );
     assert!(
         !repo
-            .user_may_use_harness(harness, "macro|someone-else@example.com")
+            .user_may_use_harness(harness, "rox|someone-else@example.com")
             .await
             .unwrap()
     );

@@ -297,7 +297,7 @@ mod self_read_guard {
             Ok(model::chat::Chat {
                 id: chat_id.to_string(),
                 name: "Other Chat".to_string(),
-                user_id: model_owner::Owner::from_principal_str("macro|test@example.com").unwrap(),
+                user_id: model_owner::Owner::from_principal_str("rox|test@example.com").unwrap(),
                 model: None,
                 project_id: None,
                 created_at: None,
@@ -319,7 +319,7 @@ mod self_read_guard {
             Ok(GetChatResponse {
                 chat: ChatResponse {
                     id: chat_id,
-                    user_id: model_owner::Owner::from_principal_str("macro|test@example.com")
+                    user_id: model_owner::Owner::from_principal_str("rox|test@example.com")
                         .unwrap(),
                     project_id: None,
                     name: "Other Chat".to_string(),
@@ -449,7 +449,7 @@ mod self_read_guard {
             entity_type: EntityType,
         ) -> std::result::Result<EntityAccessReceipt<T>, AccessError> {
             EntityAccessReceipt::try_new_authenticated_user(
-                RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("rox|test@example.com".to_string()).unwrap(),
                 Entity {
                     entity_id: entity_id.to_string(),
                     entity_type,
@@ -468,7 +468,7 @@ mod self_read_guard {
             entity_type: EntityType,
         ) -> std::result::Result<EntityAccessReceipt<T>, AccessError> {
             EntityAccessReceipt::try_new_authenticated_user(
-                RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("rox|test@example.com".to_string()).unwrap(),
                 Entity {
                     entity_id: entity_id.to_string(),
                     entity_type,
@@ -559,7 +559,7 @@ mod self_read_guard {
     }
 
     fn request_context() -> RequestContext {
-        RequestContext::new(RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
+        RequestContext::new(RoxUserIdStr::try_from("rox|test@example.com".to_string()).unwrap())
     }
 
     #[tokio::test]

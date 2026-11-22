@@ -24,7 +24,7 @@ use uuid::Uuid;
 const TEAM: &str = "01900000-0000-7000-8000-000000000001";
 const JOB: &str = "01900000-0000-7000-8000-000000000002";
 const FOREIGN_JOB: &str = "01900000-0000-7000-8000-000000000003";
-const USER: &str = "macro|admin@example.com";
+const USER: &str = "rox|admin@example.com";
 
 #[derive(Clone)]
 struct Auth;

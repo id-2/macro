@@ -12,7 +12,7 @@ const client = new Proxy({} as RoxClient, {
 
 const record: CalendarEventRecord = {
   id: 'event-1',
-  ownerId: 'macro|user@example.com',
+  ownerId: 'rox|user@example.com',
   calendarId: 'calendar-1',
   icalUid: 'ical-1',
   title: 'Standup',

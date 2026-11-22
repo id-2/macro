@@ -216,7 +216,7 @@ mod test {
             .bind(&permission_id)
             .execute(&pool)
             .await?;
-        let actor = RoxUserIdStr::parse_from_str("macro|rest-thread@example.com")?;
+        let actor = RoxUserIdStr::parse_from_str("rox|rest-thread@example.com")?;
 
         edit_thread_share_permission(
             &pool,

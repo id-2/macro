@@ -75,7 +75,7 @@ impl EmailUserService for FakeEmailUserService {
 }
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap()
 }
 
 fn label() -> LinkLabel {
@@ -153,7 +153,7 @@ async fn resolves_labels_and_links_for_the_bound_authenticated_user() {
     assert_eq!(label["type"], "user");
 
     let link = &data["emailLinks"][0];
-    assert_eq!(link["macroId"], "macro|owner@example.com");
+    assert_eq!(link["macroId"], "rox|owner@example.com");
     assert_eq!(link["emailAddress"], "inbox@example.com");
     assert_eq!(link["provider"], "GMAIL");
     assert_eq!(link["syncStatus"], "NEEDS_REAUTH");

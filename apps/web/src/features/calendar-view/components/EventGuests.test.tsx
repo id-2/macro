@@ -79,12 +79,12 @@ vi.mock('@property/editors/selectors/PropertyEntitySelector', async () => {
               ...new Map(
                 [
                   {
-                    id: 'macro|ada@example.com',
+                    id: 'rox|ada@example.com',
                     email: 'ada@example.com',
                     name: 'Ada Lovelace',
                   },
                   {
-                    id: 'macro|grace@example.com',
+                    id: 'rox|grace@example.com',
                     email: 'grace@example.com',
                     name: 'Grace Hopper',
                   },
@@ -643,7 +643,7 @@ describe('forwarding the invitation from event details', () => {
       event({
         viewerCan: CANNOT_INVITE,
         teamProjection: {
-          ownerId: 'macro|teammate@example.com',
+          ownerId: 'rox|teammate@example.com',
           kind: 'details',
         },
       })

@@ -66,7 +66,7 @@ fn activity() -> Activity {
         Uuid::from_u128(7),
         0,
         Actor::new_from_user(
-            RoxUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user"),
+            RoxUserIdStr::try_from("rox|teo@example.com".to_string()).expect("valid user"),
         ),
         None,
         EntityType::Document,

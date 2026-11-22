@@ -41,7 +41,7 @@ impl McpServerStore for UntouchedStore {
 
 fn record(credentials: Option<StoredCredentials>) -> McpServerRecord {
     McpServerRecord {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.com")
             .unwrap()
             .into_owned(),
         url: "https://mcp.example.com/mcp".to_owned(),

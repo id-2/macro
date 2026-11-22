@@ -20,7 +20,7 @@ async fn sdk_verb_survives_activity_storage_and_read(pool: PgPool) {
             Activity::common(
                 Uuid::now_v7(),
                 0,
-                Actor::new_from_user(user("macro|actor@example.com")),
+                Actor::new_from_user(user("rox|actor@example.com")),
                 None,
                 EntityType::Document,
                 "verb-document",
@@ -95,7 +95,7 @@ fn seed(source_event: u128, action: CommonAction, entity_id: &str) -> Activity {
     Activity::common(
         Uuid::from_u128(source_event),
         0,
-        Actor::new_from_user(user("macro|actor@example.com")),
+        Actor::new_from_user(user("rox|actor@example.com")),
         None,
         model_entity::EntityType::Document,
         entity_id,
@@ -122,8 +122,8 @@ async fn inserts_activities_with_split_action_columns(pool: PgPool) {
     .await
     .unwrap();
 
-    assert_eq!(row.actor_id, "macro|actor@example.com");
-    assert_eq!(row.subject_id, "macro|actor@example.com");
+    assert_eq!(row.actor_id, "rox|actor@example.com");
+    assert_eq!(row.subject_id, "rox|actor@example.com");
     assert_eq!(row.action, "opened");
     assert_eq!(row.action_payload, None);
     assert_eq!(row.entity_type, "document");
@@ -180,7 +180,7 @@ fn seed_at(
     Activity::common(
         Uuid::from_u128(source_event),
         0,
-        Actor::new_from_user(user("macro|actor@example.com")),
+        Actor::new_from_user(user("rox|actor@example.com")),
         None,
         model_entity::EntityType::Document,
         entity_id,
@@ -217,7 +217,7 @@ fn seed_for_subject_at(
     Activity::common(
         Uuid::from_u128(source_event),
         0,
-        Actor::new_from_user(user("macro|actor@example.com")),
+        Actor::new_from_user(user("rox|actor@example.com")),
         Some(user(subject_id)),
         model_entity::EntityType::Document,
         entity_id,
@@ -243,7 +243,7 @@ async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     repo.insert_activities(&seeded).await.unwrap();
 
     let first = repo
-        .subject_feed("macro|actor@example.com", None, nz(2))
+        .subject_feed("rox|actor@example.com", None, nz(2))
         .await
         .unwrap();
     assert_eq!(first.records.len(), 2);
@@ -255,7 +255,7 @@ async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     );
 
     let second = repo
-        .subject_feed("macro|actor@example.com", first.next, nz(2))
+        .subject_feed("rox|actor@example.com", first.next, nz(2))
         .await
         .unwrap();
     assert_eq!(second.records.len(), 2);
@@ -263,7 +263,7 @@ async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     assert_eq!(second.records[1].entity_id, "doc-1");
 
     let last = repo
-        .subject_feed("macro|actor@example.com", second.next, nz(2))
+        .subject_feed("rox|actor@example.com", second.next, nz(2))
         .await
         .unwrap();
     assert_eq!(last.records.len(), 1);
@@ -271,7 +271,7 @@ async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     assert_eq!(last.next, None, "exhausted feed carries no cursor");
 
     let other = repo
-        .subject_feed("macro|someone-else@example.com", None, nz(10))
+        .subject_feed("rox|someone-else@example.com", None, nz(10))
         .await
         .unwrap();
     assert!(other.records.is_empty());
@@ -300,11 +300,11 @@ async fn subject_feed_breaks_timestamp_ties_by_id(pool: PgPool) {
     expected_ids.reverse();
 
     let first = repo
-        .subject_feed("macro|actor@example.com", None, nz(2))
+        .subject_feed("rox|actor@example.com", None, nz(2))
         .await
         .unwrap();
     let rest = repo
-        .subject_feed("macro|actor@example.com", first.next, nz(2))
+        .subject_feed("rox|actor@example.com", first.next, nz(2))
         .await
         .unwrap();
 
@@ -340,7 +340,7 @@ async fn subject_activity_range_filters_half_open_interval_and_subject(pool: PgP
         Activity::common(
             Uuid::from_u128(64),
             0,
-            Actor::new_from_user(user("macro|someone-else@example.com")),
+            Actor::new_from_user(user("rox|someone-else@example.com")),
             None,
             model_entity::EntityType::Document,
             "other-subject",
@@ -352,7 +352,7 @@ async fn subject_activity_range_filters_half_open_interval_and_subject(pool: PgP
     .unwrap();
 
     let range = repo
-        .subject_activity_range("macro|actor@example.com", from, to, nz(10))
+        .subject_activity_range("rox|actor@example.com", from, to, nz(10))
         .await
         .unwrap();
 
@@ -383,7 +383,7 @@ async fn subject_activity_range_reports_truncation(pool: PgPool) {
 
     let range = repo
         .subject_activity_range(
-            "macro|actor@example.com",
+            "rox|actor@example.com",
             from,
             from + chrono::Duration::seconds(10),
             nz(2),
@@ -474,7 +474,7 @@ async fn appearance_changes_remain_in_entity_history_but_not_personal_feeds(pool
         .unwrap();
     assert_eq!(history.records.len(), 1);
     let feed = repo
-        .subject_feed("macro|actor@example.com", None, nz(10))
+        .subject_feed("rox|actor@example.com", None, nz(10))
         .await
         .unwrap();
     assert!(feed.records.is_empty());
@@ -488,7 +488,7 @@ async fn rows_written_by_a_newer_vocabulary_read_as_unknown(pool: PgPool) {
         INSERT INTO activity_events
             (id, actor_id, subject_id, action, action_payload,
              entity_type, entity_id, occurred_at)
-        VALUES ($1, 'macro|actor@example.com', 'macro|actor@example.com',
+        VALUES ($1, 'rox|actor@example.com', 'rox|actor@example.com',
                 'transmogrified', '{"into": "a newt"}',
                 'document', 'doc-new', $2)
         "#,
@@ -500,7 +500,7 @@ async fn rows_written_by_a_newer_vocabulary_read_as_unknown(pool: PgPool) {
     .unwrap();
 
     let feed = repo
-        .subject_feed("macro|actor@example.com", None, nz(10))
+        .subject_feed("rox|actor@example.com", None, nz(10))
         .await
         .unwrap();
     assert_eq!(feed.records.len(), 1);
@@ -523,7 +523,7 @@ async fn corrupt_rows_are_skipped_not_page_failures(pool: PgPool) {
         INSERT INTO activity_events
             (id, actor_id, subject_id, action, action_payload,
              entity_type, entity_id, occurred_at)
-        VALUES ($1, 'garbled', 'macro|actor@example.com', 'edited', NULL,
+        VALUES ($1, 'garbled', 'rox|actor@example.com', 'edited', NULL,
                 'document', 'doc-corrupt', $2)
         "#,
         Uuid::from_u128(41),
@@ -542,7 +542,7 @@ async fn corrupt_rows_are_skipped_not_page_failures(pool: PgPool) {
     .unwrap();
 
     let feed = repo
-        .subject_feed("macro|actor@example.com", None, nz(10))
+        .subject_feed("rox|actor@example.com", None, nz(10))
         .await
         .unwrap();
     assert_eq!(feed.records.len(), 1);
@@ -571,7 +571,7 @@ async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) 
         INSERT INTO activity_events
             (id, actor_id, subject_id, action, action_payload,
              entity_type, entity_id, occurred_at)
-        VALUES ($1, 'garbled', 'macro|actor@example.com', 'edited', NULL,
+        VALUES ($1, 'garbled', 'rox|actor@example.com', 'edited', NULL,
                 'document', 'doc-corrupt', $2)
         "#,
         Uuid::from_u128(52),
@@ -582,7 +582,7 @@ async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) 
     .unwrap();
 
     let first = repo
-        .subject_feed("macro|actor@example.com", None, nz(2))
+        .subject_feed("rox|actor@example.com", None, nz(2))
         .await
         .unwrap();
     assert_eq!(first.records.len(), 1, "the corrupt row shrinks the page");
@@ -590,7 +590,7 @@ async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) 
     let next = first.next.expect("a skipped row must not end pagination");
 
     let second = repo
-        .subject_feed("macro|actor@example.com", Some(next), nz(2))
+        .subject_feed("rox|actor@example.com", Some(next), nz(2))
         .await
         .unwrap();
     assert_eq!(second.records.len(), 1);
@@ -601,7 +601,7 @@ async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregates(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
-    let subject = "macro|overview@example.com";
+    let subject = "rox|overview@example.com";
     let start = base_time();
     let mut activities = Vec::new();
     let mut source = 100_u128;
@@ -624,7 +624,7 @@ async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregate
     ));
     activities.push(seed_for_subject_at(
         source + 1,
-        "macro|someone-else@example.com",
+        "rox|someone-else@example.com",
         "doc-other-subject",
         start + chrono::Duration::days(1),
     ));
@@ -634,7 +634,7 @@ async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregate
         INSERT INTO activity_events
             (id, actor_id, subject_id, action, action_payload,
              entity_type, entity_id, occurred_at)
-        VALUES ($1, 'macro|actor@example.com', $2, 'edited', NULL,
+        VALUES ($1, 'rox|actor@example.com', $2, 'edited', NULL,
                 'future_entity', 'future-1', $3)
         "#,
         Uuid::from_u128(source + 2),
@@ -677,7 +677,7 @@ async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregate
 
     let empty = repo
         .subject_overview(
-            "macro|empty@example.com",
+            "rox|empty@example.com",
             overview_window(chrono_tz::UTC, "2026-08-01", "2026-08-04"),
         )
         .await
@@ -690,7 +690,7 @@ async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregate
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_buckets_fifteen_minute_rows_across_havana_midnights(pool: PgPool) {
     let repo = PgActivityRepo::new(pool);
-    let subject = "macro|havana@example.com";
+    let subject = "rox|havana@example.com";
     // Cuba's last spring forward was 2026-03-08 and its next fall back is
     // 2027-11-07 (IANA tzdata 2026f); both dates hold in older releases too.
     let transition_starts = [
@@ -748,7 +748,7 @@ async fn subject_overview_buckets_fifteen_minute_rows_across_havana_midnights(po
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_ranks_known_entities_when_unknown_type_outcounts_them(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
-    let subject = "macro|rank-unknown@example.com";
+    let subject = "rox|rank-unknown@example.com";
     let start = base_time();
     let mut activities = Vec::new();
     let mut source = 300_u128;
@@ -771,7 +771,7 @@ async fn subject_overview_ranks_known_entities_when_unknown_type_outcounts_them(
             INSERT INTO activity_events
                 (id, actor_id, subject_id, action, action_payload,
                  entity_type, entity_id, occurred_at)
-            VALUES ($1, 'macro|actor@example.com', $2, 'edited', NULL,
+            VALUES ($1, 'rox|actor@example.com', $2, 'edited', NULL,
                     'future_entity', 'future-top', $3)
             "#,
             Uuid::from_u128(source),
@@ -808,7 +808,7 @@ async fn subject_overview_includes_first_havana_midnight_when_window_starts_on_f
     pool: PgPool,
 ) {
     let repo = PgActivityRepo::new(pool);
-    let subject = "macro|havana-start@example.com";
+    let subject = "rox|havana-start@example.com";
     let first_midnight = chrono::DateTime::parse_from_rfc3339("2027-11-07T04:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
@@ -887,7 +887,7 @@ async fn timeline_filters_parents_actions_and_pages_both_directions(pool: PgPool
         Activity::common(
             Uuid::from_u128(id),
             0,
-            Actor::new_from_user(user("macro|actor@example.com")),
+            Actor::new_from_user(user("rox|actor@example.com")),
             None,
             EntityType::Document,
             entity,
@@ -972,7 +972,7 @@ async fn timeline_properties_narrow_property_changes_in_storage(pool: PgPool) {
         Activity::common(
             Uuid::from_u128(id),
             0,
-            Actor::new_from_user(user("macro|actor@example.com")),
+            Actor::new_from_user(user("rox|actor@example.com")),
             None,
             EntityType::Document,
             "task",
@@ -1040,7 +1040,7 @@ async fn session_activity_preserves_invocations_and_paginates_without_entity_gra
     let second_run = Uuid::now_v7();
     let foreign_run = Uuid::now_v7();
     for id in [session, other] {
-        sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ($1, 'macro|owner@example.com', $2, 'test', 'test', '/workspace')", id, Uuid::now_v7()).execute(&pool).await.unwrap();
+        sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ($1, 'rox|owner@example.com', $2, 'test', 'test', '/workspace')", id, Uuid::now_v7()).execute(&pool).await.unwrap();
     }
     for (id, parent) in [
         (first_run, session),
@@ -1071,7 +1071,7 @@ async fn session_activity_preserves_invocations_and_paginates_without_entity_gra
         Activity::common(
             Uuid::from_u128(100 + index as u128),
             0,
-            Actor::new_from_user(user("macro|actor@example.com")),
+            Actor::new_from_user(user("rox|actor@example.com")),
             None,
             EntityType::Document,
             "private-document",
@@ -1134,7 +1134,7 @@ async fn session_activity_is_stamped_on_insert_and_leaves_out_reads(pool: PgPool
     use crate::domain::ports::AgentActivityReads;
     let session = Uuid::now_v7();
     let run = Uuid::now_v7();
-    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ($1, 'macro|owner@example.com', $2, 'test', 'test', '/workspace')", session, Uuid::now_v7()).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ($1, 'rox|owner@example.com', $2, 'test', 'test', '/workspace')", session, Uuid::now_v7()).execute(&pool).await.unwrap();
     sqlx::query!(
         "INSERT INTO agent_correlations (id, agent_session_id) VALUES ($1, $2)",
         run,
@@ -1149,7 +1149,7 @@ async fn session_activity_is_stamped_on_insert_and_leaves_out_reads(pool: PgPool
         Activity::common(
             Uuid::from_u128(500),
             ordinal,
-            Actor::new_from_user(user("macro|actor@example.com")),
+            Actor::new_from_user(user("rox|actor@example.com")),
             None,
             EntityType::Document,
             "document",

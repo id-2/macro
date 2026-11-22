@@ -7,12 +7,12 @@ INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('b2222222-2222-2222-2222-222222222222', 'user2@test.com', 'user2@test.com', 'stripe_user2');
 
 INSERT INTO "User" (id, email, name, rox_user_id)
-VALUES ('macro|user2@test.com', 'user2@test.com', 'Test User 2', 'b2222222-2222-2222-2222-222222222222');
+VALUES ('rox|user2@test.com', 'user2@test.com', 'Test User 2', 'b2222222-2222-2222-2222-222222222222');
 
 -- Second user's email link
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'macro|user2@test.com', 'user2', 'user2@test.com', 'GMAIL', true, NOW(), NOW());
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'rox|user2@test.com', 'user2', 'user2@test.com', 'GMAIL', true, NOW(), NOW());
 
 -- Contacts for user2's link
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)
@@ -27,11 +27,11 @@ VALUES
 
 -- == Shared project: user1 has access to this project owned by user2 ==
 INSERT INTO "Project" (id, name, "userId", "createdAt", "updatedAt")
-VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Shared Project', 'macro|user2@test.com', NOW(), NOW());
+VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Shared Project', 'rox|user2@test.com', NOW(), NOW());
 
 -- Grant user1 access to the shared project
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'project', 'macro|user1@test.com', 'user', 'view');
+VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'project', 'rox|user1@test.com', 'user', 'view');
 
 -- == User2's email threads ==
 
@@ -68,11 +68,11 @@ VALUES
 
 -- Direct share: thread 101 shared with user1
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-VALUES ('20000101-0000-0000-0000-000000000101'::uuid, 'email_thread', 'macro|user1@test.com', 'user', 'view');
+VALUES ('20000101-0000-0000-0000-000000000101'::uuid, 'email_thread', 'rox|user1@test.com', 'user', 'view');
 
 -- Denormalized row: thread 102 inherits access from the shared project
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level, granted_from_project_id)
-VALUES ('20000102-0000-0000-0000-000000000102'::uuid, 'email_thread', 'macro|user1@test.com', 'user', 'view', 'cccccccc-cccc-cccc-cccc-cccccccccccc');
+VALUES ('20000102-0000-0000-0000-000000000102'::uuid, 'email_thread', 'rox|user1@test.com', 'user', 'view', 'cccccccc-cccc-cccc-cccc-cccccccccccc');
 
 -- == Messages for user2's threads ==
 INSERT INTO email_messages (

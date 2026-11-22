@@ -31,7 +31,7 @@ const staleTaskFreshComment = {
   id: 'task',
   type: 'document',
   name: 'Ship the tagging system',
-  ownerId: 'macro|alice@example.com',
+  ownerId: 'rox|alice@example.com',
   updatedAt: '2026-08-31T19:00:00Z',
   notifiedAt: '2026-09-02T17:00:00Z',
 } as unknown as WithNotification<EntityData>;
@@ -41,7 +41,7 @@ const freshEmail = {
   type: 'email',
   isSignal: true,
   name: 'Welcome',
-  ownerId: 'macro|alice@example.com',
+  ownerId: 'rox|alice@example.com',
   updatedAt: '2026-09-02T16:00:00Z',
   sortTs: '2026-09-02T16:00:00Z',
 } as unknown as WithNotification<EntityData>;
@@ -58,7 +58,7 @@ const context = {
   facets: {},
   facetContext: { notificationSource: undefined as never },
   capabilities,
-  userId: 'macro|alice@example.com',
+  userId: 'rox|alice@example.com',
 };
 
 const withoutNotifiedSort = {
@@ -91,7 +91,7 @@ describe('home channel thread scope', () => {
     const body = JSON.stringify(
       buildHomeQuery({ ...context, tab: 'signal' }).body.cthf
     );
-    expect(body).toContain('{"Participant":"macro|alice@example.com"}');
+    expect(body).toContain('{"Participant":"rox|alice@example.com"}');
   });
 
   it('matches no channel threads before the viewer is known', () => {

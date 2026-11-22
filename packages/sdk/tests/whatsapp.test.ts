@@ -44,7 +44,7 @@ test('the chat list shows a chat someone else shared instead of adding it again'
           shared: {
             id: 'theirs',
             name: 'Remote support',
-            ownerId: 'macro|ana@example.com',
+            ownerId: 'rox|ana@example.com',
           },
           canAdd: false,
           cannotAddReason: null,

@@ -5,18 +5,18 @@ INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('00000000-0000-0000-0000-000000000003', 'member@previews.test', 'member@previews.test', 'previews_member'),
     ('00000000-0000-0000-0000-000000000004', 'outsider@previews.test', 'outsider@previews.test', 'previews_outsider');
 INSERT INTO "User" (id, email, rox_user_id) VALUES
-    ('macro|owner@previews.test', 'owner@previews.test', '00000000-0000-0000-0000-000000000001'),
-    ('macro|admin@previews.test', 'admin@previews.test', '00000000-0000-0000-0000-000000000002'),
-    ('macro|member@previews.test', 'member@previews.test', '00000000-0000-0000-0000-000000000003'),
-    ('macro|outsider@previews.test', 'outsider@previews.test', '00000000-0000-0000-0000-000000000004');
+    ('rox|owner@previews.test', 'owner@previews.test', '00000000-0000-0000-0000-000000000001'),
+    ('rox|admin@previews.test', 'admin@previews.test', '00000000-0000-0000-0000-000000000002'),
+    ('rox|member@previews.test', 'member@previews.test', '00000000-0000-0000-0000-000000000003'),
+    ('rox|outsider@previews.test', 'outsider@previews.test', '00000000-0000-0000-0000-000000000004');
 INSERT INTO team (id, name, owner_id) VALUES
-    ('00000000-0000-0000-0000-00000000000a', 'Team 1', 'macro|owner@previews.test'),
-    ('00000000-0000-0000-0000-00000000000b', 'Team 2', 'macro|outsider@previews.test');
+    ('00000000-0000-0000-0000-00000000000a', 'Team 1', 'rox|owner@previews.test'),
+    ('00000000-0000-0000-0000-00000000000b', 'Team 2', 'rox|outsider@previews.test');
 INSERT INTO team_user (team_id, user_id, team_role) VALUES
-    ('00000000-0000-0000-0000-00000000000a', 'macro|owner@previews.test', 'owner'),
-    ('00000000-0000-0000-0000-00000000000a', 'macro|admin@previews.test', 'admin'),
-    ('00000000-0000-0000-0000-00000000000a', 'macro|member@previews.test', 'member'),
-    ('00000000-0000-0000-0000-00000000000b', 'macro|outsider@previews.test', 'owner');
+    ('00000000-0000-0000-0000-00000000000a', 'rox|owner@previews.test', 'owner'),
+    ('00000000-0000-0000-0000-00000000000a', 'rox|admin@previews.test', 'admin'),
+    ('00000000-0000-0000-0000-00000000000a', 'rox|member@previews.test', 'member'),
+    ('00000000-0000-0000-0000-00000000000b', 'rox|outsider@previews.test', 'owner');
 
 -- 101 has a name override; 102 takes its first domain's directory name; 103's
 -- domain differs in case from its directory row; 104's domain has no

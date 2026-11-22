@@ -19,7 +19,7 @@ async fn deleted_bots_keep_their_sponsor_not_their_creator(pool: PgPool) {
         ),
         (
             BotId::new_from_uuid(Uuid::from_u128(0x90000000_0000_0000_0000_000000000022)),
-            Owner::parse(OwnerType::User, "macro|sponsor@example.com").unwrap(),
+            Owner::parse(OwnerType::User, "rox|sponsor@example.com").unwrap(),
         ),
     ];
     for (bot, sponsor) in cases {

@@ -8,8 +8,8 @@
 //! ```
 //! use model_owner::{Owner, OwnerType};
 //!
-//! let owner = Owner::parse(OwnerType::User, "macro|hutch@rox.one").unwrap();
-//! assert_eq!(owner.principal_id(), "macro|hutch@rox.one");
+//! let owner = Owner::parse(OwnerType::User, "rox|hutch@rox.one").unwrap();
+//! assert_eq!(owner.principal_id(), "rox|hutch@rox.one");
 //! ```
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -29,7 +29,7 @@ pub mod team;
 
 pub use creation_principal::CreationPrincipal;
 
-const USER_PRINCIPAL_PREFIX: &str = "macro|";
+const USER_PRINCIPAL_PREFIX: &str = "rox|";
 const BOT_PRINCIPAL_PREFIX: &str = "bot|";
 const TEAM_UUID_HYPHENATED_LEN: usize = 36;
 
@@ -41,7 +41,7 @@ const OWNER_TYPE_TEAM: &str = "team";
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(into = "String", try_from = "String")]
 pub enum Owner {
-    /// A Rox user (`macro|<email>`).
+    /// A Rox user (`rox|<email>`).
     User(RoxUserIdStr<'static>),
     /// A bot (`bot|<uuid>`).
     Bot(BotId),

@@ -6,7 +6,7 @@ use model_entity::EntityType;
 
 use super::*;
 
-const USER_ID: &str = "macro|graphql-favorite-query@example.com";
+const USER_ID: &str = "rox|graphql-favorite-query@example.com";
 
 fn all_favorites() -> Vec<Favorite> {
     [

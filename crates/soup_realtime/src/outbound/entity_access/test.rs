@@ -42,7 +42,7 @@ fn user(value: &str) -> RoxUserIdStr<'static> {
 #[tokio::test]
 async fn looks_up_each_entity_type_once_and_returns_its_shared_access() {
     let calls = Arc::new(Mutex::new(Vec::new()));
-    let users = vec![user("macro|one@example.com"), user("macro|two@example.com")];
+    let users = vec![user("rox|one@example.com"), user("rox|two@example.com")];
     let adapter = EntityAccessExpander::new(RecordingLookup {
         calls: calls.clone(),
         users: users.clone(),

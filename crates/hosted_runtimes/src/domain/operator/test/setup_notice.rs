@@ -3,7 +3,7 @@ use crate::domain::lifecycle::SetupOutcome;
 use crate::domain::ports::SetupNotice;
 
 fn buyer() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]
@@ -36,7 +36,7 @@ async fn the_first_connection_tells_the_buyer_once() {
 async fn an_agent_computers_notice_names_its_agent() {
     let operator = operator(FakeFleet::default()).await;
     let id = paid_computer(&operator).await;
-    let agent = RoxUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|ada@agents.macro.invalid".to_owned()).unwrap();
     operator
         .repo
         .agents

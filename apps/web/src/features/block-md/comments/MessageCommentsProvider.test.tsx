@@ -81,7 +81,7 @@ vi.mock('../context/markdown-document-context', () => ({
   }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|reader@example.com',
+  useUserId: () => () => 'rox|reader@example.com',
 }));
 vi.mock('@core/component/LexicalMarkdown/plugins', () => ({
   autoRegister: (...disposers: (() => void)[]) => disposers.forEach(onCleanup),
@@ -112,7 +112,7 @@ vi.mock('@queries/messages/sync', () => ({
 const thread: MessageListItem = {
   id: 'root',
   parent: { type: 'document', id: 'document' },
-  sender_id: 'macro|reader@example.com',
+  sender_id: 'rox|reader@example.com',
   content: 'Root comment',
   mentions: [],
   attachments: [],
@@ -121,7 +121,7 @@ const thread: MessageListItem = {
   updated_at: '2026-09-29T00:00:00Z',
   state: {
     root_id: 'root',
-    user_id: 'macro|reader@example.com',
+    user_id: 'rox|reader@example.com',
     resolved: false,
     created_at: '2026-09-29T00:00:00Z',
     updated_at: '2026-09-29T00:00:00Z',

@@ -5,8 +5,8 @@ pub async fn remove_user_profile(
     opensearch_client: &OpensearchClient,
     user_profile_id: &str,
 ) -> anyhow::Result<()> {
-    if !user_profile_id.starts_with("macro|") {
-        anyhow::bail!("user id must start with `macro|`");
+    if !user_profile_id.starts_with("rox|") {
+        anyhow::bail!("user id must start with `rox|`");
     }
 
     // Delete documents of user

@@ -11,7 +11,7 @@ describe('initiative activity', () => {
           {
             id: '0192d1a0-0000-7000-8000-0000000000a2',
             actorId: 'bot|0192d1a0-0000-7000-8000-0000000000b1',
-            subjectId: 'macro|ada@example.com',
+            subjectId: 'rox|ada@example.com',
             action: 'task_added',
             actionPayload: { task_id: '0192d1a0-0000-7000-8000-0000000000c1' },
             occurredAt: '2026-11-04T10:00:00Z',
@@ -26,8 +26,8 @@ describe('initiative activity', () => {
         records: [
           {
             id: '0192d1a0-0000-7000-8000-0000000000a1',
-            actorId: 'macro|ada@example.com',
-            subjectId: 'macro|ada@example.com',
+            actorId: 'rox|ada@example.com',
+            subjectId: 'rox|ada@example.com',
             action: 'created',
             actionPayload: null,
             occurredAt: '2026-11-03T10:00:00Z',
@@ -84,10 +84,10 @@ describe('initiative activity', () => {
       [
         'task_added',
         'bot|0192d1a0-0000-7000-8000-0000000000b1',
-        'macro|ada@example.com',
+        'rox|ada@example.com',
         { task_id: '0192d1a0-0000-7000-8000-0000000000c1' },
       ],
-      ['created', 'macro|ada@example.com', 'macro|ada@example.com', undefined],
+      ['created', 'rox|ada@example.com', 'rox|ada@example.com', undefined],
     ]);
   });
 });

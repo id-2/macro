@@ -1,8 +1,8 @@
 use super::*;
 use sqlx::{Pool, Postgres};
 
-const OWNER: &str = "macro|alice@company.test";
-const CONNECTOR: &str = "macro|bob@company.test";
+const OWNER: &str = "rox|alice@company.test";
+const CONNECTOR: &str = "rox|bob@company.test";
 const MAILBOX_EMAIL: &str = "support@external.test";
 
 async fn insert_user(pool: &Pool<Postgres>, rox_id: &str, email: &str) {
@@ -56,7 +56,7 @@ async fn promote_dedups_to_single_link_with_two_edges(pool: Pool<Postgres>) -> a
     let result =
         promote_link_to_shared(&mut conn, link_id, OWNER, CONNECTOR, MAILBOX_EMAIL, None).await?;
 
-    let mailbox_rox_id = format!("macro|{MAILBOX_EMAIL}");
+    let mailbox_rox_id = format!("rox|{MAILBOX_EMAIL}");
     assert_eq!(result.mailbox_rox_id, mailbox_rox_id);
     // The link survives in place — single synced copy, id unchanged.
     assert_eq!(result.link_id, link_id);
@@ -125,7 +125,7 @@ async fn promote_normalizes_mailbox_email_for_fusionauth_webhook(
     )
     .await?;
 
-    assert_eq!(result.mailbox_rox_id, "macro|support@external.test");
+    assert_eq!(result.mailbox_rox_id, "rox|support@external.test");
 
     let mailbox_user = sqlx::query!(
         r#"SELECT email, rox_user_id FROM "User" WHERE id = $1"#,
@@ -164,7 +164,7 @@ async fn promote_is_atomic_on_rollback(pool: Pool<Postgres>) -> anyhow::Result<(
         .await?;
     assert_eq!(link.rox_id, OWNER);
 
-    let mailbox_rox_id = format!("macro|{MAILBOX_EMAIL}");
+    let mailbox_rox_id = format!("rox|{MAILBOX_EMAIL}");
     let mailbox_user = sqlx::query!(r#"SELECT id FROM "User" WHERE id = $1"#, mailbox_rox_id)
         .fetch_optional(&pool)
         .await?;
@@ -197,7 +197,7 @@ async fn promote_errors_when_link_missing(pool: Pool<Postgres>) -> anyhow::Resul
     );
 
     // The aborted transaction left no phantom mailbox user behind.
-    let mailbox_rox_id = format!("macro|{MAILBOX_EMAIL}");
+    let mailbox_rox_id = format!("rox|{MAILBOX_EMAIL}");
     let mailbox_user = sqlx::query!(r#"SELECT id FROM "User" WHERE id = $1"#, mailbox_rox_id)
         .fetch_optional(&pool)
         .await?;
@@ -220,7 +220,7 @@ async fn promote_marks_mailbox_and_teardown_removes_everything(
     let mut conn = pool.acquire().await?;
     let promoted =
         promote_link_to_shared(&mut conn, link_id, OWNER, CONNECTOR, MAILBOX_EMAIL, None).await?;
-    let mailbox_rox_id = format!("macro|{MAILBOX_EMAIL}");
+    let mailbox_rox_id = format!("rox|{MAILBOX_EMAIL}");
 
     // Promotion marks the mailbox; a regular rox_id is not marked.
     assert!(is_promoted_shared_mailbox(&mut conn, &mailbox_rox_id).await?);

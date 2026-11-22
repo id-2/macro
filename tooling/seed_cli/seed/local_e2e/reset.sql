@@ -1,6 +1,6 @@
 DELETE FROM activity_events
 WHERE id::text LIKE '00000000-0000-0000-0005-%'
-   OR subject_id = 'macro|e2e@macro.local';
+   OR subject_id = 'rox|e2e@macro.local';
 
 DELETE FROM notification
 WHERE id::text LIKE '00000000-0000-0000-0004-%';

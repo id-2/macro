@@ -3,7 +3,7 @@ use models_email::service::{address::ContactInfo, link::UserProvider};
 
 fn context() -> ProjectionContext {
     let link_id = Uuid::now_v7();
-    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap();
     let now = chrono::Utc::now();
     let message = serde_json::from_value(serde_json::json!({
         "db_id":Uuid::now_v7(),"thread_db_id":Uuid::now_v7(),"link_id":link_id,"provider_id":"message","provider_thread_id":"conversation",
@@ -38,7 +38,7 @@ fn context() -> ProjectionContext {
         }),
         viewers: HashSet::from([
             owner,
-            RoxUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|staff@rox.one".to_owned()).unwrap(),
         ]),
     }
 }

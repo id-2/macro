@@ -13,7 +13,7 @@ const clock = (ms: number): string =>
 
 const short = (who: unknown): string =>
 	String(who ?? "")
-		.replace(/^macro\|/, "")
+		.replace(/^rox\|/, "")
 		.replace(/@.*/, "");
 
 const line = (event: CallEvent): string | null => {

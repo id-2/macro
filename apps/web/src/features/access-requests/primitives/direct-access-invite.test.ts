@@ -30,7 +30,7 @@ it('grants view access by Rox email and preserves the address when the write fai
   });
   state.invite.setEmail('  Ana@Example.test  ');
   await state.invite.invite();
-  expect(setGrant).toHaveBeenCalledWith('macro|ana@example.test', 'view');
+  expect(setGrant).toHaveBeenCalledWith('rox|ana@example.test', 'view');
   expect(state.invite.email()).toBe('');
   expect(state.invite.notice()).toBe('View access added.');
   setGrant.mockRejectedValueOnce(new Error('not registered'));

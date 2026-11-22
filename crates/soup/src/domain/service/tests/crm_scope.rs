@@ -3,7 +3,7 @@
 //! still fail the request.
 use super::*;
 
-const USER: &str = "macro|test@example.com";
+const USER: &str = "rox|test@example.com";
 const TEAM: Uuid = Uuid::from_u128(0x7e);
 const DOCUMENT: Uuid = Uuid::from_u128(0xd0c);
 

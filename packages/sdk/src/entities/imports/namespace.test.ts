@@ -9,7 +9,7 @@ import { ImportNamespace } from './namespace';
 
 const ROW: ImportEntity = {
   id: 'row-1',
-  user_id: 'macro|teammate@example.com',
+  user_id: 'rox|teammate@example.com',
   team_id: null,
   source: 'linear',
   kind: 'issue',
@@ -77,7 +77,7 @@ describe('ImportNamespace', () => {
       ['list', { query: { source: 'linear', status: 'imported' } }],
     ]);
     expect(entry?.foreignId).toBe('ENG-142');
-    expect(entry?.importedBy().id).toBe('macro|teammate@example.com');
+    expect(entry?.importedBy().id).toBe('rox|teammate@example.com');
     const item = entry?.item();
     expect(item).toBeInstanceOf(Task);
     expect(item?.id).toBe('task-1');

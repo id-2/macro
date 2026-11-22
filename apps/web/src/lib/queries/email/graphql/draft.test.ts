@@ -121,7 +121,7 @@ async function standalone() {
   const { client, operations } = queuedClient();
   await executeGraphqlSaveEmailDraft(client, {
     ...args,
-    newThreadOwnerId: 'macro|owner@example.com',
+    newThreadOwnerId: 'rox|owner@example.com',
     senderIsSignal: false,
   });
   const response = optimisticContextOf(operations[0])!
@@ -132,7 +132,7 @@ async function standalone() {
 it('creates a complete standalone thread with the account classification and stable identity bindings', async () => {
   const { draft, thread, operations } = await standalone();
   expect(thread).toMatchObject({
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     isSignal: false,
     isRead: true,
     // A draft with no received mail belongs in Drafts, not the Inbox.
@@ -182,7 +182,7 @@ it.each(['new reply', 'existing reply', 'standalone draft'])(
       existingThread,
       // A settlement can resolve the snapshot after the caller prepared its
       // new-thread hint. The server capsule takes precedence over that hint.
-      newThreadOwnerId: 'macro|owner@example.com',
+      newThreadOwnerId: 'rox|owner@example.com',
     });
     const context = optimisticContextOf(operations[1])!;
     const response = context.optimisticResponse as SaveEmailDraftMutation;

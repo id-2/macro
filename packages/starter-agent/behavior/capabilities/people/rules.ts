@@ -18,7 +18,7 @@ export const isPerson = (
   id: string | undefined | null,
   { me }: Pick<Who, 'me'>
 ): id is string =>
-  typeof id === 'string' && id !== '' && id !== me && id.startsWith('macro|');
+  typeof id === 'string' && id !== '' && id !== me && id.startsWith('rox|');
 
 export const dimensions = ['like', 'trust', 'respect'] as const;
 export type Dimension = (typeof dimensions)[number];

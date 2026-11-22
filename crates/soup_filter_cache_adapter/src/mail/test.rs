@@ -16,7 +16,7 @@ mod reminders;
 mod retention;
 mod through;
 
-const VIEWER: &str = "macro|mail@example.com";
+const VIEWER: &str = "rox|mail@example.com";
 const QUERY: &str = r#"query MailSeed { user { id emailLinks { id } soup(input: {initial:{limit:100,emailView:ALL}}) { items { __typename id cacheProjection ... on GraphqlSoupEmailThread { linkId ownerId inboxVisible isRead isSignal latestInboundMessageTs reminderReturnedAt mailAllPreview { id } mailDraftPreview { id } mailSentPreview { id } updatedAt } } } } }"#;
 const PARTIAL: &str = r#"query Partial { user { id soup(input:{initial:{limit:1}}) { items { __typename id ... on GraphqlSoupEmailThread { isRead inboxVisible } } } } }"#;
 fn id(n: u128) -> String {
@@ -51,7 +51,7 @@ fn row(n: u128) -> Value {
     row["ownerId"] = json!(if n <= 50 {
         VIEWER
     } else {
-        "macro|other@example.com"
+        "rox|other@example.com"
     });
     row["mailAllPreview"] = if n != 7 {
         json!({"id":id(n+10000)})

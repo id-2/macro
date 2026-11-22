@@ -311,7 +311,7 @@ async fn mcp_client_post_is_named_after_the_client() {
         channel_id: Uuid::new_v4(),
         thread_id: None,
         sender_id: Sender::new_from_bot(bot_id::ROX_AI_BOT_ID),
-        triggered_by: Some("macro|alice@example.com".to_string()),
+        triggered_by: Some("rox|alice@example.com".to_string()),
         triggered_via: Some("Claude Code".to_string()),
         content: "hello".to_string(),
         created_at: now,
@@ -1219,12 +1219,12 @@ fn rox_ai_user_mention_is_not_a_user_recipient() {
     )));
     assert!(!is_bot_user_mention(&mention(
         "user",
-        "macro|teo@rox.one"
+        "rox|teo@rox.one"
     )));
     assert!(is_bot_principal(
         bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref()
     ));
-    assert!(!is_bot_principal("macro|teo@rox.one"));
+    assert!(!is_bot_principal("rox|teo@rox.one"));
 }
 
 #[derive(Clone, Default)]
@@ -1299,7 +1299,7 @@ async fn handle_publishes_channel_created_event() {
     assert_eq!(published[0].envelope["metadata"]["channel_name"], "general");
     assert_eq!(
         published[0].envelope["metadata"]["actor"],
-        "macro|alice@example.com"
+        "rox|alice@example.com"
     );
 }
 
@@ -1326,11 +1326,11 @@ async fn handle_publishes_participant_events() {
     );
     assert_eq!(
         published[0].envelope["metadata"]["removed_by"],
-        "macro|admin@example.com"
+        "rox|admin@example.com"
     );
     assert_eq!(
         published[0].envelope["metadata"]["removed_user_ids"][0],
-        "macro|bob@example.com"
+        "rox|bob@example.com"
     );
 }
 
@@ -1345,7 +1345,7 @@ async fn handle_publishes_no_channel_topic_facts_for_posted_messages() {
             channel_id,
             Uuid::new_v4(),
             None,
-            &["macro|alice@example.com"],
+            &["rox|alice@example.com"],
         ))
         .await;
 
@@ -1374,10 +1374,10 @@ fn broker_events_map_participant_joined_to_participant_added() {
     assert_eq!(events.len(), 1);
     let envelope = serde_json::to_value(events[0].event()).unwrap();
     assert_eq!(envelope["event_type"], "channel.participant_added");
-    assert_eq!(envelope["metadata"]["added_by"], "macro|alice@example.com");
+    assert_eq!(envelope["metadata"]["added_by"], "rox|alice@example.com");
     assert_eq!(
         envelope["metadata"]["added_user_ids"][0],
-        "macro|alice@example.com"
+        "rox|alice@example.com"
     );
 }
 
@@ -1408,7 +1408,7 @@ fn broker_events_carry_the_requesters_name_on_a_request_to_join() {
     assert_eq!(envelope["event_type"], "channel.access_requested");
     assert_eq!(
         envelope["metadata"]["requester_id"],
-        "macro|sarah@example.com"
+        "rox|sarah@example.com"
     );
     assert_eq!(envelope["metadata"]["requester_name"], "Sarah Lee");
 }
@@ -1438,7 +1438,7 @@ fn entity_mention(entity_type: &str, entity_id: &str) -> EntityMention {
         source_entity_id: "doc-1".to_string(),
         entity_type: entity_type.to_string(),
         entity_id: entity_id.to_string(),
-        user_id: Some("macro|alice@example.com".to_string()),
+        user_id: Some("rox|alice@example.com".to_string()),
         created_at: Utc::now(),
     }
 }

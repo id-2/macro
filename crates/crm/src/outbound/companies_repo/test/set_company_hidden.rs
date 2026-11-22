@@ -12,7 +12,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_hidden_toggles_flag(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
 
     assert_eq!(fetch_company_hidden(&pool, company_id).await?, Some(false));
@@ -32,7 +32,7 @@ async fn set_company_hidden_returns_not_found_for_unknown_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -50,8 +50,8 @@ async fn set_company_hidden_returns_not_found_for_unknown_company(
 async fn set_company_hidden_isolates_companies_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|owner_a@test.com").await?;
-    seed_team(&pool, team_b, "macro|owner_b@test.com").await?;
+    seed_team(&pool, team_a, "rox|owner_a@test.com").await?;
+    seed_team(&pool, team_b, "rox|owner_b@test.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -72,7 +72,7 @@ async fn service_set_company_hidden_true_soft_hides_contacts_and_disables_email_
     // cascades hidden = TRUE onto every contact. Contact rows AND
     // contact_sources are preserved so un-hide can restore them.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -102,7 +102,7 @@ async fn set_company_hidden_false_cascades_contacts_visible(pool: PgPool) -> any
     // including ones an admin previously hid individually. Cascade
     // overwrites individual hide state by design.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -135,7 +135,7 @@ async fn service_set_company_hidden_false_does_not_re_enable_email_sync(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     // Start with hidden=true (via service, which also flipped sync off) then un-hide.
     let company_id = insert_company(&pool, team_id, false, &["acme.com"]).await?;
     sqlx::query(r#"UPDATE crm_companies SET hidden = TRUE WHERE id = $1"#)

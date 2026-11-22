@@ -498,8 +498,8 @@ mod brain_route {
     use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
     use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
-    const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
-    const CREATOR: &str = "macro|admin@rox.one";
+    const AGENT: &str = "rox|sam-rivera-abc123@agents.macro.invalid";
+    const CREATOR: &str = "rox|admin@rox.one";
     const TEAM: uuid::Uuid = uuid::Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00aa);
 
     /// Knows exactly one agent key.

@@ -21,7 +21,7 @@ async fn gmail_folder_restore_refreshes_all_mail_before_provider_sync(
 
     let enqueuer = RecordingEnqueuer::default();
     let service = service_with_enqueuer(pool.clone(), enqueuer.clone());
-    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("rox|mail@example.com")?.into_owned();
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
     for (thread, message, provider_id, label, folder, action, date) in [
@@ -141,7 +141,7 @@ async fn provider_folders_match_messages_before_pagination(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     for (link, prefix) in [
         (uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), 100u128),
         (uuid::uuid!("0a000000-0000-0000-0000-000000000001"), 200u128),
@@ -228,7 +228,7 @@ async fn folder_candidates_respect_pending_moves_and_provider_absence(
 ) -> anyhow::Result<()> {
     let link = uuid::uuid!("0a000000-0000-0000-0000-000000000001");
     let command = Uuid::now_v7();
-    sqlx::query!("INSERT INTO email_mailbox_commands (id,link_id,generation,actor_id,intent,status) VALUES ($1,$2,1,'macro|mail@example.com','{}','pending')", command, link).execute(&pool).await?;
+    sqlx::query!("INSERT INTO email_mailbox_commands (id,link_id,generation,actor_id,intent,status) VALUES ($1,$2,1,'rox|mail@example.com','{}','pending')", command, link).execute(&pool).await?;
     // A clean message pending a move enters Trash; both raw-trash messages
     // pending restoration leave it, even before provider confirmation.
     for (message, desired) in [(201, true), (203, false), (206, false)] {
@@ -236,7 +236,7 @@ async fn folder_candidates_respect_pending_moves_and_provider_absence(
         sqlx::query!("INSERT INTO email_pending_mailbox_state (message_id,attribute,command_id,desired) VALUES ($1,'in_trash',$2,$3)", message, command, serde_json::json!(desired)).execute(&pool).await?;
     }
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     let query = || PreviewCursorQuery {
         view: PreviewView::StandardLabel(PreviewViewStandardLabel::Trash),
         link_ids: vec![link],
@@ -276,7 +276,7 @@ async fn folder_dates_and_shared_scope_use_the_selected_folder(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let thread = uuid::uuid!("0b000000-0000-0000-0000-000000000202");
-    let viewer = RoxUserIdStr::parse_from_str("macro|user1@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|user1@example.com")?;
     let repo = EmailPgRepo::new(pool.clone());
     let filter = Arc::new(Expr::and(
         Expr::val(EmailLiteral::Shared(item_filters::SharedEmailFilter::Only)),
@@ -338,7 +338,7 @@ async fn outlook_mailbox_states_report_the_messages_they_change(
 
     let service = service_with_enqueuer(pool.clone(), RecordingEnqueuer::default());
     // `email_all_mail` gives the Outlook inbox this owner.
-    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("rox|mail@example.com")?.into_owned();
     let thread = uuid::uuid!("0a000000-0000-0000-0000-0000000000a1");
     // A second received message in the same conversation, also read and in
     // the Inbox.

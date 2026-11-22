@@ -3,19 +3,19 @@ use std::sync::Mutex;
 
 fn actor() -> InboxActor {
     InboxActor {
-        rox_id: RoxUserIdStr::parse_from_str("macro|leaving@example.com").unwrap(),
+        rox_id: RoxUserIdStr::parse_from_str("rox|leaving@example.com").unwrap(),
         credential_owner: "leaving-owner".into(),
     }
 }
 fn snapshot() -> InboxLifecycleSnapshot {
     InboxLifecycleSnapshot {
         link_id: Uuid::now_v7(),
-        owner: "macro|shared@example.com".into(),
+        owner: "rox|shared@example.com".into(),
         provider: UserProvider::Outlook,
         promoted: true,
         delegates: vec![
-            "macro|leaving@example.com".into(),
-            "macro|remaining@example.com".into(),
+            "rox|leaving@example.com".into(),
+            "rox|remaining@example.com".into(),
         ],
         sync_generation: 1,
         grant_id: Some(Uuid::now_v7()),
@@ -23,7 +23,7 @@ fn snapshot() -> InboxLifecycleSnapshot {
         credential_owner: "leaving-owner".into(),
         disconnecting: false,
         custodians: vec![MailboxCustodian {
-            actor_id: "macro|remaining@example.com".into(),
+            actor_id: "rox|remaining@example.com".into(),
             credential_owner: "remaining-owner".into(),
             grant_id: Uuid::now_v7(),
             grant_generation: 1,
@@ -57,7 +57,7 @@ fn no_remaining_credential_requires_reconnect_without_destroying_shared_history(
 #[test]
 fn a_removed_delegate_is_not_an_eligible_credential_custodian() {
     let mut snapshot = snapshot();
-    snapshot.custodians[0].actor_id = "macro|former@example.com".into();
+    snapshot.custodians[0].actor_id = "rox|former@example.com".into();
     assert_eq!(
         removal(&snapshot, &actor()),
         InboxRemoval::Detach {
@@ -216,7 +216,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
     for owner_first in [true, false] {
         let mut before = snapshot();
         before.promoted = false;
-        before.owner = "macro|a-owner@example.com".into();
+        before.owner = "rox|a-owner@example.com".into();
         let replacement = with_replacement.then(|| before.custodians[0].clone());
         before.custodians = vec![MailboxCustodian {
             actor_id: actor().rox_id.to_string(),
@@ -423,27 +423,27 @@ async fn deleted_user_orders_links_then_binding_kind_then_actors() {
     let bindings = vec![
         (
             second.link_id,
-            "macro|leaving@example.com",
+            "rox|leaving@example.com",
             DeletedUserBindingKind::Custodian,
         ),
         (
             first.link_id,
-            "macro|shared@example.com",
+            "rox|shared@example.com",
             DeletedUserBindingKind::Owner,
         ),
         (
             first.link_id,
-            "macro|z-custodian@example.com",
+            "rox|z-custodian@example.com",
             DeletedUserBindingKind::Custodian,
         ),
         (
             first.link_id,
-            "macro|leaving@example.com",
+            "rox|leaving@example.com",
             DeletedUserBindingKind::Custodian,
         ),
         (
             first.link_id,
-            "macro|leaving@example.com",
+            "rox|leaving@example.com",
             DeletedUserBindingKind::Owner,
         ),
     ]
@@ -478,10 +478,10 @@ async fn deleted_user_orders_links_then_binding_kind_then_actors() {
     assert_eq!(
         order,
         vec![
-            (Uuid::from_u128(1), "macro|leaving@example.com"),
-            (Uuid::from_u128(1), "macro|z-custodian@example.com"),
-            (Uuid::from_u128(1), "macro|shared@example.com"),
-            (Uuid::from_u128(2), "macro|leaving@example.com"),
+            (Uuid::from_u128(1), "rox|leaving@example.com"),
+            (Uuid::from_u128(1), "rox|z-custodian@example.com"),
+            (Uuid::from_u128(1), "rox|shared@example.com"),
+            (Uuid::from_u128(2), "rox|leaving@example.com"),
         ]
     );
 }

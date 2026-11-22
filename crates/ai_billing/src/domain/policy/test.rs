@@ -13,8 +13,8 @@ fn authorization(enabled: bool) -> AuthorizationSnapshot {
     AuthorizationSnapshot {
         id: FundingAuthorizationId::new(),
         invocation_id: InvocationId::new(),
-        payer: RoxUserIdStr::try_from("macro|payer@example.com").unwrap(),
-        seat: RoxUserIdStr::try_from("macro|seat@example.com").unwrap(),
+        payer: RoxUserIdStr::try_from("rox|payer@example.com").unwrap(),
+        seat: RoxUserIdStr::try_from("rox|seat@example.com").unwrap(),
         period: BillingPeriod {
             start: Utc.with_ymd_and_hms(2026, 9, 1, 0, 0, 0).unwrap(),
             end: Utc.with_ymd_and_hms(2026, 10, 1, 0, 0, 0).unwrap(),
@@ -544,7 +544,7 @@ fn rounding_is_cumulative_half_up_with_signed_carry_preserved() {
 
 #[test]
 fn legacy_free_enterprise_and_exempt_features_keep_their_paths() {
-    let user = RoxUserIdStr::try_from("macro|seat@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|seat@example.com").unwrap();
     let mut entitlement = Entitlement::personal(user, PlanTier::Premium);
     assert_eq!(
         accounting_route(UsagePolicy::Legacy, AiFeature::Chat, &entitlement),

@@ -204,7 +204,7 @@ impl FavoritesMutationService for CapturingService {
 }
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|graphql-favorite@example.com").expect("valid user id")
+    RoxUserIdStr::parse_from_str("rox|graphql-favorite@example.com").expect("valid user id")
 }
 
 fn schema(
@@ -283,7 +283,7 @@ async fn set_entity_favorite_preserves_the_toggle_and_delegates_to_favorites() {
             .expect("set call lock poisoned")
             .clone(),
         Some(SetCall {
-            actor_user_id: "macro|graphql-favorite@example.com".to_string(),
+            actor_user_id: "rox|graphql-favorite@example.com".to_string(),
             organization_id: Some(42),
             entity_type: EntityType::Document,
             entity_id: "document-1".to_string(),
@@ -419,7 +419,7 @@ async fn reorder_favorites_delegates_and_returns_authoritative_order() {
             .expect("reorder call lock poisoned")
             .clone(),
         Some(ReorderCall {
-            user_id: "macro|graphql-favorite@example.com".to_string(),
+            user_id: "rox|graphql-favorite@example.com".to_string(),
             entities: vec![
                 (EntityType::Project, "project-1".to_string()),
                 (EntityType::Document, "document-1".to_string()),

@@ -17,7 +17,7 @@ const pipeline: Pipeline = {
   tableId: 'records',
   primaryColumnId: 'company',
   name: 'Sales',
-  userId: 'macro|owner@example.com',
+  userId: 'rox|owner@example.com',
   teamId: 'team',
   recordType: 'company',
   sharing: 'team',

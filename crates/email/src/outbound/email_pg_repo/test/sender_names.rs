@@ -45,7 +45,7 @@ async fn filtered_previews_preserve_message_sender_names(
         50,
         &PreviewView::StandardLabel(PreviewViewStandardLabel::All),
         query,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
         None,
     )
     .await?;
@@ -71,7 +71,7 @@ async fn cached_mail_previews_preserve_message_sender_names(
     let thread_ids = EXPECTED_SENDERS.map(|(id, _)| id);
     let rows = repo
         .thread_mail_projections_by_ids(
-            RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
+            RoxUserIdStr::parse_from_str("rox|user1@test.com")?,
             &thread_ids,
         )
         .await?;

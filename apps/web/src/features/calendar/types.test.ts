@@ -61,7 +61,7 @@ function item(sources: CalendarEventSourceContent[]): CalendarOccurrenceItem {
   return {
     event: {
       id: 'event',
-      ownerId: 'macro|teo@example.com',
+      ownerId: 'rox|teo@example.com',
       icalUid: 'uid',
       calendarId: sources[0]?.calendarId,
       sources,

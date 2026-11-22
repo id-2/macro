@@ -40,7 +40,7 @@ fn create_access_token(
         "tid": "tenant_id",
         "email": email,
         "fusion_user_id": "fusion_testing",
-        "rox_user_id": format!("macro|{email}"),
+        "rox_user_id": format!("rox|{email}"),
         "rox_organization_id": 1,
     });
 
@@ -177,11 +177,11 @@ fn valid_token_in_header_returns_decoded_jwt() {
     let token = valid_token();
     let jwt = DecodedJwt::new(extractor_from_token(&token), no_params(), &args).unwrap();
 
-    assert_eq!(jwt.user_context.user_id, "macro|user@test.com");
+    assert_eq!(jwt.user_context.user_id, "rox|user@test.com");
     assert_eq!(jwt.user_context.organization_id, Some(1));
     assert!(jwt.jwt_context.is_some());
     assert_eq!(jwt.jwt_context.unwrap().audience, TEST_AUDIENCE);
-    assert_eq!(jwt.rox_user_id.as_ref(), "macro|user@test.com");
+    assert_eq!(jwt.rox_user_id.as_ref(), "rox|user@test.com");
 }
 
 #[test]
@@ -194,7 +194,7 @@ fn valid_token_via_query_param_returns_decoded_jwt() {
     // Even with no header extractor, query param should work
     let jwt = DecodedJwt::new(no_extractor(), params, &args).unwrap();
 
-    assert_eq!(jwt.user_context.user_id, "macro|user@test.com");
+    assert_eq!(jwt.user_context.user_id, "rox|user@test.com");
 }
 
 #[test]
@@ -207,7 +207,7 @@ fn query_param_takes_precedence_over_header() {
     // Header has garbage, but query param has a valid token — query wins
     let jwt = DecodedJwt::new(extractor_from_token("garbage"), params, &args).unwrap();
 
-    assert_eq!(jwt.user_context.user_id, "macro|user@test.com");
+    assert_eq!(jwt.user_context.user_id, "rox|user@test.com");
 }
 
 #[test]
@@ -275,7 +275,7 @@ fn invalid_rox_user_id_in_token_returns_invalid_user_id() {
         .as_secs() as usize
         + 3600;
 
-    // Build a token whose rox_user_id lacks the required "macro|" prefix
+    // Build a token whose rox_user_id lacks the required "rox|" prefix
     let claims = serde_json::json!({
         "aud": TEST_AUDIENCE,
         "exp": exp,
@@ -391,7 +391,7 @@ async fn router_valid_bearer_returns_200() {
         .body(axum::body::Body::empty())
         .unwrap();
     let body = response_body(&router, req).await;
-    assert_eq!(body, "macro|user@test.com");
+    assert_eq!(body, "rox|user@test.com");
 }
 
 #[tokio::test]
@@ -403,7 +403,7 @@ async fn router_valid_cookie_returns_200() {
         .body(axum::body::Body::empty())
         .unwrap();
     let body = response_body(&router, req).await;
-    assert_eq!(body, "macro|user@test.com");
+    assert_eq!(body, "rox|user@test.com");
 }
 
 #[tokio::test]
@@ -426,7 +426,7 @@ async fn router_valid_query_param_returns_200() {
     let uri = format!("/protected?macro-api-token={token}");
     let req = Request::get(&uri).body(axum::body::Body::empty()).unwrap();
     let body = response_body(&router, req).await;
-    assert_eq!(body, "macro|user@test.com");
+    assert_eq!(body, "rox|user@test.com");
 }
 
 #[tokio::test]
@@ -452,7 +452,7 @@ async fn router_query_param_takes_precedence_over_bearer() {
         .body(axum::body::Body::empty())
         .unwrap();
     let body = response_body(&router, req).await;
-    assert_eq!(body, "macro|user@test.com");
+    assert_eq!(body, "rox|user@test.com");
 }
 
 #[tokio::test]
@@ -466,7 +466,7 @@ async fn router_bearer_takes_precedence_over_cookie() {
         .body(axum::body::Body::empty())
         .unwrap();
     let body = response_body(&router, req).await;
-    assert_eq!(body, "macro|user@test.com");
+    assert_eq!(body, "rox|user@test.com");
 }
 
 #[tokio::test]

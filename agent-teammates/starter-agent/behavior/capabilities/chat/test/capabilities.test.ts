@@ -28,7 +28,7 @@ const rig = () => {
 				return [];
 			},
 		},
-		config: { owner: "macro|owner@example.com" },
+		config: { owner: "rox|owner@example.com" },
 		typing: { stop: async () => undefined },
 		answered: new Map(),
 		clock: fixedClock("2026-11-10T01:00:00Z"),
@@ -69,7 +69,7 @@ test("an empty message or a flag is never sent", async () => {
 		],
 		[
 			await invoke(chatModule, "dmPerson", context, {
-				userId: "macro|ada@example.com",
+				userId: "rox|ada@example.com",
 				text: "",
 			}),
 			"empty message",
@@ -86,7 +86,7 @@ test("a DM goes only to a Rox id", async () => {
 		text: "hi",
 	});
 	expect(refused.kind === "failed" && refused.error).toContain(
-		'must start with "macro|"',
+		'must start with "rox|"',
 	);
 	expect(sent).toEqual([]);
 });

@@ -22,19 +22,19 @@ VALUES
 -- Create User (profile) entries
 INSERT INTO "User" (id, email, rox_user_id, "organizationId", "hasChromeExt", "tutorialComplete", "hasOnboardingDocuments")
 VALUES
-    ('macro|user_profile_1@rox.one', 'user_profile_1@rox.one', '11111111-1111-1111-1111-111111111111', NULL, false, false, false),
-    ('macro|user_profile_2@rox.one', 'user_profile_2@rox.one', '22222222-2222-2222-2222-222222222222', NULL, false, false, false),
-    ('macro|user_profile_3@rox.one', 'user_profile_3@rox.one', '33333333-3333-3333-3333-333333333333', NULL, false, false, false),
-    ('macro|user_profile_4@rox.one', 'user_profile_4@rox.one', '44444444-4444-4444-4444-444444444444', NULL, false, false, false),
-    ('macro|user_profile_5@rox.one', 'user_profile_5@rox.one', '55555555-5555-5555-5555-555555555555', NULL, false, false, false),
-    ('macro|contact@example.com', 'contact@example.com', '66666666-6666-6666-6666-666666666666', NULL, false, false, false);
+    ('rox|user_profile_1@rox.one', 'user_profile_1@rox.one', '11111111-1111-1111-1111-111111111111', NULL, false, false, false),
+    ('rox|user_profile_2@rox.one', 'user_profile_2@rox.one', '22222222-2222-2222-2222-222222222222', NULL, false, false, false),
+    ('rox|user_profile_3@rox.one', 'user_profile_3@rox.one', '33333333-3333-3333-3333-333333333333', NULL, false, false, false),
+    ('rox|user_profile_4@rox.one', 'user_profile_4@rox.one', '44444444-4444-4444-4444-444444444444', NULL, false, false, false),
+    ('rox|user_profile_5@rox.one', 'user_profile_5@rox.one', '55555555-5555-5555-5555-555555555555', NULL, false, false, false),
+    ('rox|contact@example.com', 'contact@example.com', '66666666-6666-6666-6666-666666666666', NULL, false, false, false);
 
 -- Create email link for macro user 1 (for email contacts lookup)
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active)
 VALUES
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user_profile_1@rox.one', 'fa_user_1', 'user1@example.com', 'GMAIL', true);
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'rox|user_profile_1@rox.one', 'fa_user_1', 'user1@example.com', 'GMAIL', true);
 
--- Create email contacts (including one for macro|user_profile_3@rox.one with name, and one not in User table)
+-- Create email contacts (including one for rox|user_profile_3@rox.one with name, and one not in User table)
 INSERT INTO email_contacts (id, link_id, email_address, name)
 VALUES
     ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'user_profile_3@rox.one', 'BobEmailContact JohnsonEmailContact'),

@@ -20,7 +20,7 @@ impl RoxAuthorizationService for Identity {
             return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
-            user_id: format!("macro|{jwt}@example.test"),
+            user_id: format!("rox|{jwt}@example.test"),
             fusion_user_id: jwt.into(),
             ..Default::default()
         })
@@ -50,11 +50,11 @@ impl Directory for People {
     async fn members(&self, _: Uuid) -> Result<Vec<TeamMember>, Error> {
         Ok(vec![
             TeamMember {
-                user_id: "macro|host@example.test".into(),
+                user_id: "rox|host@example.test".into(),
                 admin: true,
             },
             TeamMember {
-                user_id: "macro|member@example.test".into(),
+                user_id: "rox|member@example.test".into(),
                 admin: false,
             },
         ])
@@ -94,7 +94,7 @@ async fn http_booking_receipt_recovery_reschedule_cancel_and_team_auth(pool: sql
         .execute(&pool)
         .await
         .unwrap();
-    sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('macro|host@example.test');").execute(&pool).await.unwrap();
+    sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('rox|host@example.test');").execute(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
         "../../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
@@ -146,7 +146,7 @@ async fn http_booking_receipt_recovery_reschedule_cancel_and_team_auth(pool: sql
     let profile = serde_json::json!({
         "id":id,"name":"Integration host","description":"","revision":0,"defaultScheduleId":schedule,
         "schedules":[{"id":schedule,"name":"Work","timeZone":"UTC","overrides":[],"weekly":(0..7).map(|day| serde_json::json!({"day":day,"windows":[{"start":"09:00","end":"17:00"}]})).collect::<Vec<_>>() }],
-        "eventTypes":[{"id":event,"title":"Integration meeting","slug":"meeting","description":"","durationMinutes":30,"location":"","googleMeet":false,"enabled":true,"scheduleId":schedule,"mode":"individual","hosts":["macro|host@example.test"],"beforeMinutes":0,"afterMinutes":0,"noticeMinutes":0,"horizonDays":30,"intervalMinutes":30,"dailyLimit":null,"requiresConfirmation":false,"questions":[]}]
+        "eventTypes":[{"id":event,"title":"Integration meeting","slug":"meeting","description":"","durationMinutes":30,"location":"","googleMeet":false,"enabled":true,"scheduleId":schedule,"mode":"individual","hosts":["rox|host@example.test"],"beforeMinutes":0,"afterMinutes":0,"noticeMinutes":0,"horizonDays":30,"intervalMinutes":30,"dailyLimit":null,"requiresConfirmation":false,"questions":[]}]
     });
     let saved = client
         .put(format!("{base}/settings"))
@@ -285,7 +285,7 @@ async fn http_booking_links_require_confirmation_and_revision(pool: sqlx::PgPool
         .execute(&pool)
         .await
         .unwrap();
-    sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('macro|host@example.test');").execute(&pool).await.unwrap();
+    sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('rox|host@example.test');").execute(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
         "../../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
@@ -313,7 +313,7 @@ async fn http_booking_links_require_confirmation_and_revision(pool: sqlx::PgPool
     });
     let client = reqwest::Client::new();
     let draft = serde_json::json!({
-        "event": {"title":"Intro","slug":"intro","description":"","durationMinutes":30,"location":"Office","googleMeet":false,"enabled":true,"mode":"individual","hosts":["macro|host@example.test"],"beforeMinutes":0,"afterMinutes":0,"noticeMinutes":60,"horizonDays":30,"intervalMinutes":30,"dailyLimit":null,"requiresConfirmation":false,"questions":[]},
+        "event": {"title":"Intro","slug":"intro","description":"","durationMinutes":30,"location":"Office","googleMeet":false,"enabled":true,"mode":"individual","hosts":["rox|host@example.test"],"beforeMinutes":0,"afterMinutes":0,"noticeMinutes":60,"horizonDays":30,"intervalMinutes":30,"dailyLimit":null,"requiresConfirmation":false,"questions":[]},
         "schedule": {"name":"Working hours","timeZone":"UTC","weekly":(0..7).map(|day| serde_json::json!({"day":day,"windows":[{"start":"09:00","end":"17:00"}]})).collect::<Vec<_>>(),"overrides":[]}
     });
 
@@ -327,7 +327,7 @@ async fn http_booking_links_require_confirmation_and_revision(pool: sqlx::PgPool
         .await
         .unwrap();
     assert_eq!(empty["links"], serde_json::json!([]));
-    assert_eq!(empty["userId"], "macro|host@example.test");
+    assert_eq!(empty["userId"], "rox|host@example.test");
 
     let unconfirmed = client
         .post(format!("{base}/links"))

@@ -8,7 +8,7 @@ use crate::domain::outlook::*;
 use crate::domain::ports::CalendarProviderErrorKind;
 
 async fn mailbox(pool: &PgPool) -> (PgCalendarRepository, Uuid, String) {
-    let owner = "macro|outlook-owner@example.com".to_owned();
+    let owner = "rox|outlook-owner@example.com".to_owned();
     insert_user(pool, &owner).await;
     let link = outlook_link(pool, &owner).await;
     (PgCalendarRepository::new(pool.clone()), link, owner)
@@ -217,7 +217,7 @@ async fn outlook_projection_uses_existing_reads_and_mutation_authorization(pool:
     assert_eq!(target.token_identity.binding, Some(lease.binding));
     assert_eq!(target.email_link_id, link);
     assert!(
-        repo.get_event_mutation_target("macro|stranger@example.com", id, None)
+        repo.get_event_mutation_target("rox|stranger@example.com", id, None)
             .await
             .unwrap()
             .is_none()
@@ -392,7 +392,7 @@ async fn calendar_opt_out_purges_and_fences_without_disconnecting_mail(pool: PgP
     let lease = calendar(&repo).await;
     let id = store(&repo, &lease, "gone").await;
     assert!(
-        repo.disconnect_provider_calendar("macro|stranger@example.com", link)
+        repo.disconnect_provider_calendar("rox|stranger@example.com", link)
             .await
             .unwrap()
             .is_none()
@@ -1732,7 +1732,7 @@ async fn the_organizer_repair_stores_outlook_organizers_as_holding_their_meeting
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_cancellation_or_removal_retires_join_request_notifications(pool: PgPool) {
     let (repo, _, owner) = mailbox(&pool).await;
-    let member = "macro|outlook-member@example.com";
+    let member = "rox|outlook-member@example.com";
     insert_user(&pool, member).await;
     let lease = calendar(&repo).await;
     repo.checkpoint_outlook_calendar(

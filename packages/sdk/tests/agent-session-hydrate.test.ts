@@ -11,7 +11,7 @@ const identity = {
   session_name: 'Fix the flaky test',
   bot_id: '01a00000-0000-7000-8000-0000000000b7',
   bot_name: 'Rox Coder',
-  owner_id: 'macro|owner@example.com',
+  owner_id: 'rox|owner@example.com',
   origin: {
     parent: {
       type: 'channel' as const,
@@ -30,7 +30,7 @@ const settled: AgentSessionLifecycleEvent = {
     last_turn: {
       turn: 0,
       action_id: '01a00000-0000-7000-8000-000000000004',
-      actor: 'macro|asker@example.com',
+      actor: 'rox|asker@example.com',
       announcement_message_id: '01a00000-0000-7000-8000-000000000005',
       stop_reason: 'end_turn',
       excerpt: 'Done.',
@@ -49,7 +49,7 @@ describe('hydrateAgentSessionEvent', () => {
     expect(event.channel?.id).toBe(identity.origin.channel_id);
     expect(event.thread).toBeDefined();
     expect(event.announcement?.id).toBe('01a00000-0000-7000-8000-000000000005');
-    expect(event.actor?.id).toBe('macro|asker@example.com');
+    expect(event.actor?.id).toBe('rox|asker@example.com');
     expect(event.metadata.last_turn?.excerpt).toBe('Done.');
   });
 
@@ -79,7 +79,7 @@ describe('hydrateAgentSessionEvent', () => {
     const metadata = {
       identity,
       action_id: '01a00000-0000-7000-8000-000000000004',
-      actor: 'macro|asker@example.com',
+      actor: 'rox|asker@example.com',
       announcement_message_id: '01a00000-0000-7000-8000-000000000005',
       failure: {
         code: 'ai_allowance_exhausted',
@@ -147,18 +147,18 @@ describe('hydrateAgentSessionEvent', () => {
       metadata: {
         identity,
         action_id: '01a00000-0000-7000-8000-000000000006',
-        mentioned_by: 'macro|owner@example.com',
-        mentioned: ['macro|reviewer@example.com', 'macro|lead@example.com'],
+        mentioned_by: 'rox|owner@example.com',
+        mentioned: ['rox|reviewer@example.com', 'rox|lead@example.com'],
       },
     });
     if (event?.event_type !== 'agent_session.mentioned')
       throw new Error(event?.event_type);
 
     expect(event.session.id).toBe(identity.session_id);
-    expect(event.mentionedBy?.id).toBe('macro|owner@example.com');
+    expect(event.mentionedBy?.id).toBe('rox|owner@example.com');
     expect(event.mentioned.map((user) => user.id)).toEqual([
-      'macro|reviewer@example.com',
-      'macro|lead@example.com',
+      'rox|reviewer@example.com',
+      'rox|lead@example.com',
     ]);
   });
 

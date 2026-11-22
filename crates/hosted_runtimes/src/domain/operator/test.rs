@@ -373,7 +373,7 @@ async fn paid_computer(
                 funding: crate::domain::models::Funding::Stripe {
                     price_id: stripe::PriceId::from_str("price_standard").unwrap(),
                 },
-                created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+                created_by: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
                 extra_items: vec![],
                 provision_traceparent: None,
                 agent: None,
@@ -487,7 +487,7 @@ async fn an_agent_teammates_computer_gets_no_default_coding_agent() {
     let id = paid_computer(&operator).await;
     operator.repo.agents.lock().unwrap().insert(
         id,
-        rox_user_id::user_id::RoxUserIdStr::try_from("macro|ada-agent@rox.one".to_owned())
+        rox_user_id::user_id::RoxUserIdStr::try_from("rox|ada-agent@rox.one".to_owned())
             .unwrap(),
     );
     operator.run_fleet_effects().await.unwrap();

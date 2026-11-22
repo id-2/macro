@@ -29,8 +29,8 @@ fn in_memory_verification_preserves_empty_continuations_and_rejects_old_hydratio
             .await
             .unwrap();
         let mut engine = Engine::new(storage);
-        let viewer = "macro|viewer@example.com";
-        let user = "macro|person@example.com";
+        let viewer = "rox|viewer@example.com";
+        let user = "rox|person@example.com";
         let mut scope = HydrationScope {
             identity: viewer.into(),
             storage_generation: engine.current_storage_generation().await.unwrap(),

@@ -46,10 +46,10 @@ mod submit;
 
 use fakes::*;
 
-const OWNER: &str = "macro|owner@rox.one";
-const EDITOR: &str = "macro|editor@rox.one";
-const VIEWER: &str = "macro|viewer@rox.one";
-const STRANGER: &str = "macro|stranger@rox.one";
+const OWNER: &str = "rox|owner@rox.one";
+const EDITOR: &str = "rox|editor@rox.one";
+const VIEWER: &str = "rox|viewer@rox.one";
+const STRANGER: &str = "rox|stranger@rox.one";
 
 type Service = FormsServiceImpl<
     FakeRepo,

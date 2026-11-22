@@ -51,7 +51,7 @@ const room = (initial: readonly Present[] = []) => {
 	let at = 0;
 	let disconnects = 0;
 	const feed: RoomFeed<Track> = {
-		identity: () => "macro|agent@example.com",
+		identity: () => "rox|agent@example.com",
 		members: () => members,
 		listen: (listener) => listeners.push(listener),
 		frames: (track) => {
@@ -110,7 +110,7 @@ const room = (initial: readonly Present[] = []) => {
 test("people already in the room are reported, and their microphones are read as 20 ms frames", async () => {
 	const r = room([
 		{
-			...human("macro|ann@example.com", "Ann"),
+			...human("rox|ann@example.com", "Ann"),
 			publications: [microphone("TR1", "t1")],
 		},
 		{ ...agent("recorder"), publications: [microphone("TR2", "t2")] },
@@ -120,13 +120,13 @@ test("people already in the room are reported, and their microphones are read as
 	r.observed.present("room-1");
 	await r.drained();
 	expect(r.seen).toEqual([
-		"joined macro|ann@example.com (Ann)",
-		"ended macro|ann@example.com",
+		"joined rox|ann@example.com (Ann)",
+		"ended rox|ann@example.com",
 	]);
 	expect(r.audio).toEqual([
-		["macro|ann@example.com", 320],
-		["macro|ann@example.com", 320],
-		["macro|ann@example.com", 320],
+		["rox|ann@example.com", 320],
+		["rox|ann@example.com", 320],
+		["rox|ann@example.com", 320],
 	]);
 	expect(r.types()).toEqual([
 		"room.joined",
@@ -138,9 +138,9 @@ test("people already in the room are reported, and their microphones are read as
 	]);
 	expect(r.events[0]).toEqual([
 		"room.joined",
-		{ room: "room-1", as: "macro|agent@example.com" },
+		{ room: "room-1", as: "rox|agent@example.com" },
 	]);
-	expect(r.observed.humans()).toEqual(["macro|ann@example.com"]);
+	expect(r.observed.humans()).toEqual(["rox|ann@example.com"]);
 });
 
 test("an agent's audio is never read, and a track is read once however often it is announced", async () => {

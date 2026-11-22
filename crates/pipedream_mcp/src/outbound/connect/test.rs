@@ -127,7 +127,7 @@ async fn connect_session_redirects_back_with_the_app_slug() {
     Mock::given(method("POST"))
         .and(path("/v1/connect-sessions"))
         .and(body_json(json!({
-            "external_user_id": "macro|caller@example.com",
+            "external_user_id": "rox|caller@example.com",
             "app_id": "airtable",
             "redirect_url": "https://cognition.test/pipedream/mcp/connect/callback?app_slug=airtable_oauth"
         })))
@@ -158,7 +158,7 @@ async fn connect_session_redirects_back_with_the_app_slug() {
 async fn only_an_active_connection_to_the_app_counts_as_connected() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
-        .and(path("/v1/users/macro|caller@example.com/connections"))
+        .and(path("/v1/users/rox|caller@example.com/connections"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!([
             {"appId": "airtable", "status": "needs_reauth", "scopes": [], "createdAt": "2026-11-03T00:00:00Z"},
             {"appId": "linear", "status": "active", "scopes": [], "createdAt": "2026-11-03T00:00:00Z"}
@@ -177,7 +177,7 @@ async fn deleting_tolerates_a_connection_connect_already_dropped() {
     let server = MockServer::start().await;
     Mock::given(method("DELETE"))
         .and(path(
-            "/v1/users/macro|caller@example.com/connections/airtable",
+            "/v1/users/rox|caller@example.com/connections/airtable",
         ))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(json!({"vendorGrantRevoked": false})),
@@ -187,7 +187,7 @@ async fn deleting_tolerates_a_connection_connect_already_dropped() {
         .await;
     Mock::given(method("DELETE"))
         .and(path(
-            "/v1/users/macro|caller@example.com/connections/linear",
+            "/v1/users/rox|caller@example.com/connections/linear",
         ))
         .respond_with(ResponseTemplate::new(404).set_body_json(json!({"error": "not_found"})))
         .mount(&server)
@@ -212,7 +212,7 @@ async fn upstream_is_the_gateway_with_the_customer_key() {
 
     assert_eq!(
         call.url.as_str(),
-        "https://connect.test/v1/users/macro|caller@example.com/mcp/airtable"
+        "https://connect.test/v1/users/rox|caller@example.com/mcp/airtable"
     );
     assert_eq!(call.bearer_token, KEY);
     assert!(call.headers.is_empty());
@@ -223,7 +223,7 @@ async fn proxy_calls_the_app_with_the_exported_token() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
         .and(path(
-            "/v1/users/macro|caller@example.com/connections/airtable/token",
+            "/v1/users/rox|caller@example.com/connections/airtable/token",
         ))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(json!({"accessToken": "vendor_token"})),
@@ -264,7 +264,7 @@ async fn gateway(
     Json(body): Json<Value>,
 ) -> axum::response::Response {
     assert_eq!(headers["authorization"], format!("Bearer {KEY}"));
-    assert_eq!(user_id, "macro|caller@example.com");
+    assert_eq!(user_id, "rox|caller@example.com");
     assert_eq!(app_id, "airtable");
     let method = body["method"].as_str().unwrap().to_owned();
     calls.lock().unwrap().push(method.clone());

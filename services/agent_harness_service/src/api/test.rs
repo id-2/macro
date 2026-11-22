@@ -93,7 +93,7 @@ async fn routine_sessions_preserve_internal_auth_and_owner_at_both_mounts() {
         )),
         GATEWAY_PATH_PREFIX,
     );
-    let owner = "macro|routine-owner@example.com";
+    let owner = "rox|routine-owner@example.com";
     let selection = serde_json::json!({
         "owner": owner, "bot_id": "01900000-0000-7000-8000-000000000001", "model": null,
     });
@@ -397,7 +397,7 @@ async fn coding_agent_commands_keep_internal_auth_and_user_at_both_mounts() {
         )),
         GATEWAY_PATH_PREFIX,
     );
-    let user_id = "macro|coding-owner@example.com";
+    let user_id = "rox|coding-owner@example.com";
     for prefix in ["", GATEWAY_PATH_PREFIX] {
         for (operation, command) in [
             ("list", serde_json::json!({"user_id":user_id})),

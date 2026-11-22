@@ -53,7 +53,7 @@ pub(super) fn admission_failures() -> [ai_billing::AiAdmissionError; 2] {
 }
 
 pub(super) fn user() -> RoxUserIdStr<'static> {
-    "macro|person@example.com".to_string().try_into().unwrap()
+    "rox|person@example.com".to_string().try_into().unwrap()
 }
 pub(super) fn parent() -> MessageParent {
     MessageParent::parse("document", "discussion-document").unwrap()

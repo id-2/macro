@@ -37,10 +37,10 @@ use crate::{
     domain::ports::{MockNotificationService, MockPermissionService, MockPropertiesRepo},
 };
 
-const DEFAULT_INTERNAL_USER_ID: &str = "macro|internal@rox.one";
+const DEFAULT_INTERNAL_USER_ID: &str = "rox|internal@rox.one";
 const INTERNAL_API_KEY: &str = "test-internal-key";
 const ORGANIZATION_ID: i32 = 42;
-const VALID_USER_ID: &str = "macro|valid@example.com";
+const VALID_USER_ID: &str = "rox|valid@example.com";
 
 type TestPropertiesService =
     PropertiesServiceImpl<MockPropertiesRepo, MockPermissionService, MockNotificationService>;

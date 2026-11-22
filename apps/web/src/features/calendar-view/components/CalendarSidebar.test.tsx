@@ -26,13 +26,13 @@ const requests = vi.hoisted(() => ({
 }));
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|gab@rox.one',
+  useUserId: () => () => 'rox|gab@rox.one',
 }));
 vi.mock('@core/user', () => ({
   getDisplayName: (id: string) =>
-    id === 'macro|jackson@rox.one'
+    id === 'rox|jackson@rox.one'
       ? 'Jackson Kustec'
-      : `Teammate ${id.slice('macro|teammate-'.length, id.indexOf('@'))}`,
+      : `Teammate ${id.slice('rox|teammate-'.length, id.indexOf('@'))}`,
   tryRoxId: (id: string) => id,
 }));
 vi.mock('@core/component/UserIcon', () => ({
@@ -100,8 +100,8 @@ function teamOooItems(count = 1): TeamOutOfOfficeItem[] {
       occurrenceKey: day,
       ownerId:
         index === 0
-          ? 'macro|jackson@rox.one'
-          : `macro|teammate-${index + 1}@rox.one`,
+          ? 'rox|jackson@rox.one'
+          : `rox|teammate-${index + 1}@rox.one`,
       time: { kind: 'allDay', startDate: day, endDate: nextDay },
     };
   });

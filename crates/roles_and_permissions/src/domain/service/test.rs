@@ -75,7 +75,7 @@ async fn assert_payment_failure_status_removes_subscription_roles(
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@example.com")?,
             subscription_status,
             ProductTier::Opus,
         )
@@ -110,7 +110,7 @@ async fn active_then_paused_adds_then_removes_roles() -> anyhow::Result<()> {
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@example.com")?,
             SubscriptionStatus::Active,
             ProductTier::Haiku,
         )
@@ -123,7 +123,7 @@ async fn active_then_paused_adds_then_removes_roles() -> anyhow::Result<()> {
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@example.com")?,
             SubscriptionStatus::Paused,
             ProductTier::Haiku,
         )
@@ -147,7 +147,7 @@ async fn activating_a_tier_removes_the_other_tier_roles() -> anyhow::Result<()> 
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@example.com")?,
             SubscriptionStatus::Active,
             ProductTier::Max,
         )
@@ -176,7 +176,7 @@ async fn test_get_user_roles() -> anyhow::Result<()> {
         UserRolesAndPermissionsServiceImpl::new(mock_user_roles_and_permissions_repository);
 
     let roles = user_service
-        .get_user_roles(&RoxUserIdStr::parse_from_str("macro|user@example.com")?)
+        .get_user_roles(&RoxUserIdStr::parse_from_str("rox|user@example.com")?)
         .await?;
 
     assert_eq!(roles.len(), 2);
@@ -195,7 +195,7 @@ async fn test_get_user_roles_delegates_to_repository() -> anyhow::Result<()> {
         UserRolesAndPermissionsServiceImpl::new(mock_user_roles_and_permissions_repository);
 
     let roles = user_service
-        .get_user_roles(&RoxUserIdStr::parse_from_str("macro|other@user.com")?)
+        .get_user_roles(&RoxUserIdStr::parse_from_str("rox|other@user.com")?)
         .await?;
 
     // Mock returns the same roles regardless of user_id

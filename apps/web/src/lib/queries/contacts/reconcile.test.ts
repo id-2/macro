@@ -7,9 +7,9 @@ import { expect, it, vi } from 'vitest';
 import { contactRecordKey } from './contact-key';
 import { reconcileContactPage } from './reconcile';
 
-const viewer = 'macro|viewer@example.com';
-const one = 'macro|one@example.com';
-const two = 'macro|two@example.com';
+const viewer = 'rox|viewer@example.com';
+const one = 'rox|one@example.com';
+const two = 'rox|two@example.com';
 const scope = {
   identity: viewer,
   storageGeneration: '00000000-0000-4000-8000-000000000001',
@@ -18,7 +18,7 @@ const fence = '00000000-0000-4000-8000-000000000002';
 const person = (userId: string) => ({
   id: contactRecordKey(viewer, userId).slice('GraphqlContact:'.length),
   userId,
-  email: userId.slice(6),
+  email: userId.slice(4),
   name: null,
 });
 function fixture() {
@@ -93,11 +93,11 @@ it('does not delete for a failure or canceled response', async () => {
 });
 it('rejects foreign, unsolicited, duplicate and self-omitting evidence', async () => {
   for (const data of [
-    { user: { id: 'macro|other@example.com', contactsByUserIds: [] } },
+    { user: { id: 'rox|other@example.com', contactsByUserIds: [] } },
     {
       user: {
         id: viewer,
-        contactsByUserIds: [person('macro|extra@example.com')],
+        contactsByUserIds: [person('rox|extra@example.com')],
       },
     },
     { user: { id: viewer, contactsByUserIds: [person(one), person(one)] } },

@@ -477,7 +477,7 @@ export function describe(name: string): string {
 }
 
 /** A person's user id, as triggers and code name them. */
-export const userId = (person: string) => `macro|${email(person)}`;
+export const userId = (person: string) => `rox|${email(person)}`;
 
 export const PERSON_KEYS = Object.keys(PEOPLE);
 

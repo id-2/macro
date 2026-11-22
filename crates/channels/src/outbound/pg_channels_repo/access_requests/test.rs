@@ -45,7 +45,7 @@ fn service(pool: &PgPool) -> (Service, RecordedEvents) {
 }
 
 fn user(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{name}@join.test")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{name}@join.test")).unwrap()
 }
 
 fn participant(name: &str, channel_id: Uuid) -> EntityAccessReceipt<MemberParticipantRole> {

@@ -87,7 +87,7 @@ impl FakeMutationRepo {
                     },
                     ChannelParticipant {
                         channel_id,
-                        user_id: "macro|recipient@test.com".to_string(),
+                        user_id: "rox|recipient@test.com".to_string(),
                         role: ParticipantRole::Member,
                         joined_at: now,
                         left_at: None,
@@ -95,7 +95,7 @@ impl FakeMutationRepo {
                 ],
                 participant_additions: 0,
                 thread_participants: vec![
-                    RoxUserIdStr::try_from("macro|thread@test.com".to_string()).unwrap(),
+                    RoxUserIdStr::try_from("rox|thread@test.com".to_string()).unwrap(),
                 ],
                 activity_upserts: 0,
                 touched_channel_ids: vec![],
@@ -515,7 +515,7 @@ async fn share_referenced_items_with_channel_forwards_to_the_share_port() {
     let share = FakeReferenceSharing::default();
     let seen = share.items.clone();
     let service = mutation_service(
-        FakeMutationRepo::new(Uuid::now_v7(), "macro|owner@test.com"),
+        FakeMutationRepo::new(Uuid::now_v7(), "rox|owner@test.com"),
         FakeEvents::default(),
         share,
     );
@@ -526,7 +526,7 @@ async fn share_referenced_items_with_channel_forwards_to_the_share_port() {
     );
     let results = service
         .share_referenced_items_with_channel(
-            rox_id("macro|owner@test.com"),
+            rox_id("rox|owner@test.com"),
             channel_id,
             vec![item.clone()],
         )
@@ -611,7 +611,7 @@ fn comment_reference(
         parent_entity_id: parent_entity_id.to_string(),
         message_id: Uuid::nil(),
         thread_id: None,
-        sender_id: "macro|user-a@test.com".to_string(),
+        sender_id: "rox|user-a@test.com".to_string(),
         message_content: "see the doc".to_string(),
         message_created_at: Utc::now(),
         attachment_created_at: Utc::now(),
@@ -630,7 +630,7 @@ fn references_repo() -> MockChannelRepo {
                             channel_name: None,
                             message_id: Uuid::nil(),
                             thread_id: None,
-                            sender_id: "macro|user-a@test.com".to_string(),
+                            sender_id: "rox|user-a@test.com".to_string(),
                             message_content: "in a channel".to_string(),
                             message_created_at: Utc::now(),
                             attachment_created_at: Utc::now(),
@@ -663,7 +663,7 @@ async fn attachment_references_keep_comments_only_on_viewable_parents() {
         .get_attachment_references(
             "document".to_string(),
             "target".to_string(),
-            "macro|user-a@test.com".to_string(),
+            "rox|user-a@test.com".to_string(),
         )
         .await
         .unwrap();
@@ -684,7 +684,7 @@ async fn attachment_references_withhold_comments_without_parent_access() {
         .get_attachment_references(
             "document".to_string(),
             "target".to_string(),
-            "macro|user-a@test.com".to_string(),
+            "rox|user-a@test.com".to_string(),
         )
         .await
         .unwrap();
@@ -703,7 +703,7 @@ async fn attachment_references_withhold_comments_without_parent_access() {
 #[tokio::test]
 async fn add_participants_touches_channel_once_when_any_membership_changes() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -711,12 +711,12 @@ async fn add_participants_touches_channel_once_when_any_membership_changes() {
     );
 
     svc.add_participants(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         channel_id,
         AddParticipantsRequest {
             participants: HashSet::from([
-                rox_id("macro|recipient@test.com"),
-                rox_id("macro|new@test.com"),
+                rox_id("rox|recipient@test.com"),
+                rox_id("rox|new@test.com"),
             ]),
         },
     )
@@ -731,7 +731,7 @@ async fn add_participants_touches_channel_once_when_any_membership_changes() {
 #[tokio::test]
 async fn add_participants_does_not_touch_channel_when_memberships_are_already_active() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -739,12 +739,12 @@ async fn add_participants_does_not_touch_channel_when_memberships_are_already_ac
     );
 
     svc.add_participants(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         channel_id,
         AddParticipantsRequest {
             participants: HashSet::from([
-                rox_id("macro|sender@test.com"),
-                rox_id("macro|recipient@test.com"),
+                rox_id("rox|sender@test.com"),
+                rox_id("rox|recipient@test.com"),
             ]),
         },
     )
@@ -759,7 +759,7 @@ async fn add_participants_does_not_touch_channel_when_memberships_are_already_ac
 #[tokio::test]
 async fn add_participants_propagates_channel_touch_errors() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().fail_channel_touches = true;
     let svc = mutation_service(
         repo.clone(),
@@ -769,10 +769,10 @@ async fn add_participants_propagates_channel_touch_errors() {
 
     let error = svc
         .add_participants(
-            sender("macro|sender@test.com"),
+            sender("rox|sender@test.com"),
             channel_id,
             AddParticipantsRequest {
-                participants: HashSet::from([rox_id("macro|new@test.com")]),
+                participants: HashSet::from([rox_id("rox|new@test.com")]),
             },
         )
         .await
@@ -788,7 +788,7 @@ async fn add_participants_propagates_channel_touch_errors() {
 #[tokio::test]
 async fn remove_participants_rejects_removing_channel_owner() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -797,12 +797,12 @@ async fn remove_participants_rejects_removing_channel_owner() {
 
     let err = svc
         .remove_participants(
-            sender("macro|recipient@test.com"),
+            sender("rox|recipient@test.com"),
             channel_id,
             RemoveParticipantsRequest {
                 participants: vec![
-                    "macro|sender@test.com".to_string(),
-                    "macro|recipient@test.com".to_string(),
+                    "rox|sender@test.com".to_string(),
+                    "rox|recipient@test.com".to_string(),
                 ],
             },
         )
@@ -816,7 +816,7 @@ async fn remove_participants_rejects_removing_channel_owner() {
 #[tokio::test]
 async fn remove_participants_allows_removing_non_owner() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -824,10 +824,10 @@ async fn remove_participants_allows_removing_non_owner() {
     );
 
     svc.remove_participants(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         channel_id,
         RemoveParticipantsRequest {
-            participants: vec!["macro|recipient@test.com".to_string()],
+            participants: vec!["rox|recipient@test.com".to_string()],
         },
     )
     .await
@@ -836,7 +836,7 @@ async fn remove_participants_allows_removing_non_owner() {
     let state = repo.state.lock().unwrap();
     assert_eq!(
         state.removed_participants,
-        vec!["macro|recipient@test.com".to_string()]
+        vec!["rox|recipient@test.com".to_string()]
     );
     assert!(state.touched_channel_ids.is_empty());
 }
@@ -844,18 +844,18 @@ async fn remove_participants_allows_removing_non_owner() {
 #[tokio::test]
 async fn create_system_channel_event_uses_system_actor() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|owner@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|owner@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_system_channel(
-        rox_id("macro|owner@test.com"),
+        rox_id("rox|owner@test.com"),
         crate::domain::models::CreateChannelRequest {
             name: Some("Rox Support x owner".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
-            participants: HashSet::from([rox_id("macro|teo@rox.one")]),
+            participants: HashSet::from([rox_id("rox|teo@rox.one")]),
         },
     )
     .await
@@ -870,7 +870,7 @@ async fn create_system_channel_event_uses_system_actor() {
             channel_name: Some(name),
             ..
         }] if actor == &Sender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)
-            && owner.as_ref() == "macro|owner@test.com"
+            && owner.as_ref() == "rox|owner@test.com"
             && name == "Rox Support x owner"
     ));
 }
@@ -878,19 +878,19 @@ async fn create_system_channel_event_uses_system_actor() {
 #[tokio::test]
 async fn create_channel_on_behalf_attributes_created_to_the_bot() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|owner@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|owner@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_channel_on_behalf(
-        rox_id("macro|owner@test.com"),
+        rox_id("rox|owner@test.com"),
         bot_id::ROX_AI_BOT_ID,
         crate::domain::models::CreateChannelRequest {
             name: Some("Planning".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
-            participants: HashSet::from([rox_id("macro|teo@rox.one")]),
+            participants: HashSet::from([rox_id("rox|teo@rox.one")]),
         },
     )
     .await
@@ -905,7 +905,7 @@ async fn create_channel_on_behalf_attributes_created_to_the_bot() {
             channel_name: Some(name),
             ..
         }] if actor == &Sender::new_from_bot(bot_id::ROX_AI_BOT_ID)
-            && owner.as_ref() == "macro|owner@test.com"
+            && owner.as_ref() == "rox|owner@test.com"
             && name == "Planning"
     ));
 }
@@ -915,19 +915,19 @@ async fn create_channel_on_behalf_attributes_created_to_the_bot() {
 #[tokio::test]
 async fn signup_support_channel_via_user_create_channel_attributes_created_to_owner() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|owner@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|owner@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_channel(
-        sender("macro|owner@test.com"),
+        sender("rox|owner@test.com"),
         None,
         crate::domain::models::CreateChannelRequest {
             name: Some("Rox Support x owner".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
-            participants: HashSet::from([rox_id("macro|teo@rox.one")]),
+            participants: HashSet::from([rox_id("rox|teo@rox.one")]),
         },
     )
     .await
@@ -937,7 +937,7 @@ async fn signup_support_channel_via_user_create_channel_attributes_created_to_ow
     assert!(matches!(
         events.as_slice(),
         [ChannelEvent::ChannelCreated { actor, channel_name: Some(name), .. }]
-            if actor == &sender("macro|owner@test.com")
+            if actor == &sender("rox|owner@test.com")
                 && name == "Rox Support x owner"
     ));
 }
@@ -945,19 +945,19 @@ async fn signup_support_channel_via_user_create_channel_attributes_created_to_ow
 #[tokio::test]
 async fn create_channel_event_carries_channel_name() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_channel(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         None,
         crate::domain::models::CreateChannelRequest {
             name: Some("general".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
-            participants: HashSet::from([rox_id("macro|recipient@test.com")]),
+            participants: HashSet::from([rox_id("rox|recipient@test.com")]),
         },
     )
     .await
@@ -973,8 +973,8 @@ async fn create_channel_event_carries_channel_name() {
 #[tokio::test]
 async fn ensure_dms_dispatches_created_channel_once() {
     let channel_id = Uuid::new_v4();
-    let joiner = rox_id("macro|joiner@test.com");
-    let teammate = rox_id("macro|teammate@test.com");
+    let joiner = rox_id("rox|joiner@test.com");
+    let teammate = rox_id("rox|teammate@test.com");
     let repo = FakeMutationRepo::new(channel_id, joiner.as_ref());
     let events = FakeEvents::default();
     let service = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
@@ -1015,8 +1015,8 @@ async fn ensure_dms_dispatches_created_channel_once() {
 #[tokio::test]
 async fn ensure_dms_does_not_dispatch_for_existing_channel() {
     let channel_id = Uuid::new_v4();
-    let joiner = rox_id("macro|joiner@test.com");
-    let teammate = rox_id("macro|teammate@test.com");
+    let joiner = rox_id("rox|joiner@test.com");
+    let teammate = rox_id("rox|teammate@test.com");
     let mut repo = MockChannelRepo::new();
     repo.expect_ensure_dm().once().returning(move |_, _| {
         Box::pin(async move {
@@ -1051,7 +1051,7 @@ async fn ensure_dms_does_not_dispatch_for_existing_channel() {
 
 #[tokio::test]
 async fn get_or_create_dm_rejects_self_pair() {
-    let user = rox_id("macro|same@test.com");
+    let user = rox_id("rox|same@test.com");
     let repo = FakeMutationRepo::new(Uuid::new_v4(), user.as_ref());
     let service = mutation_service(repo, FakeEvents::default(), FakeReferenceSharing::default());
 
@@ -1075,8 +1075,8 @@ async fn get_or_create_dm_rejects_self_pair() {
 #[tokio::test]
 async fn get_or_create_dm_returns_get_for_existing_pair() {
     let channel_id = Uuid::new_v4();
-    let actor = rox_id("macro|actor@test.com");
-    let recipient = rox_id("macro|recipient@test.com");
+    let actor = rox_id("rox|actor@test.com");
+    let recipient = rox_id("rox|recipient@test.com");
     let mut repo = MockChannelRepo::new();
     repo.expect_ensure_dm().once().returning(move |_, _| {
         Box::pin(async move {
@@ -1111,12 +1111,12 @@ async fn get_or_create_dm_returns_get_for_existing_pair() {
 #[tokio::test]
 async fn create_private_channel_allows_no_invited_participants() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_channel(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         None,
         crate::domain::models::CreateChannelRequest {
             name: Some("private notes".to_string()),
@@ -1133,26 +1133,26 @@ async fn create_private_channel_allows_no_invited_participants() {
     assert!(matches!(
         events.as_slice(),
         [ChannelEvent::ChannelCreated { participant_user_ids, .. }]
-            if participant_user_ids == &[rox_id("macro|sender@test.com")]
+            if participant_user_ids == &[rox_id("rox|sender@test.com")]
     ));
 }
 
 #[tokio::test]
 async fn create_auto_join_team_channel_event_includes_current_team_members() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.create_channel(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         None,
         CreateChannelRequest {
             name: Some("general".to_string()),
             channel_type: ChannelType::Team,
             team_id: Some(Uuid::new_v4()),
             auto_join_team: true,
-            participants: HashSet::from([rox_id("macro|sender@test.com")]),
+            participants: HashSet::from([rox_id("rox|sender@test.com")]),
         },
     )
     .await
@@ -1163,8 +1163,8 @@ async fn create_auto_join_team_channel_event_includes_current_team_members() {
         events.as_slice(),
         [ChannelEvent::ChannelCreated { participant_user_ids, .. }]
             if participant_user_ids.len() == 2
-                && participant_user_ids.contains(&rox_id("macro|sender@test.com"))
-                && participant_user_ids.contains(&rox_id("macro|recipient@test.com"))
+                && participant_user_ids.contains(&rox_id("rox|sender@test.com"))
+                && participant_user_ids.contains(&rox_id("rox|recipient@test.com"))
     ));
 }
 
@@ -1184,12 +1184,12 @@ fn create_channel_request_defaults_auto_join_team_to_false() {
 #[tokio::test]
 async fn create_channel_rejects_auto_join_for_non_team_channel() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(repo, FakeEvents::default(), FakeReferenceSharing::default());
 
     let err = svc
         .create_channel(
-            sender("macro|sender@test.com"),
+            sender("rox|sender@test.com"),
             None,
             CreateChannelRequest {
                 name: Some("private notes".to_string()),
@@ -1209,8 +1209,8 @@ async fn create_channel_rejects_auto_join_for_non_team_channel() {
 async fn auto_join_by_team_id_does_not_touch_channel_recency() {
     let channel_id = Uuid::new_v4();
     let team_id = Uuid::new_v4();
-    let user_id = rox_id("macro|member@test.com");
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let user_id = rox_id("rox|member@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -1226,7 +1226,7 @@ async fn auto_join_by_team_id_does_not_touch_channel_recency() {
 async fn team_membership_operations_delegate_to_repo() {
     let team_id = Uuid::new_v4();
     let channel_ids = vec![Uuid::new_v4(), Uuid::new_v4()];
-    let user_id = rox_id("macro|member@test.com");
+    let user_id = rox_id("rox|member@test.com");
     let mut repo = MockChannelRepo::new();
     repo.expect_auto_join_by_team_id()
         .withf({
@@ -1277,7 +1277,7 @@ async fn team_membership_operations_delegate_to_repo() {
 #[tokio::test]
 async fn team_membership_operations_delegate_repo_errors() {
     let team_id = Uuid::new_v4();
-    let user_id = rox_id("macro|member@test.com");
+    let user_id = rox_id("rox|member@test.com");
     let mut repo = MockChannelRepo::new();
     repo.expect_auto_join_by_team_id()
         .once()
@@ -1308,12 +1308,12 @@ async fn team_membership_operations_delegate_repo_errors() {
 #[tokio::test]
 async fn patch_channel_dispatches_channel_updated() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Member),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Member),
         PatchChannelRequest {
             channel_name: Some("Renamed".to_string()),
             convert_to_team_channel: None,
@@ -1327,14 +1327,14 @@ async fn patch_channel_dispatches_channel_updated() {
     assert!(matches!(
         events.as_slice(),
         [ChannelEvent::ChannelUpdated { previous_name: Some(previous), channel_name: Some(new), actor, .. }]
-            if previous == "Project" && new == "Renamed" && actor == &rox_id("macro|sender@test.com")
+            if previous == "Project" && new == "Renamed" && actor == &rox_id("rox|sender@test.com")
     ));
 }
 
 #[tokio::test]
 async fn noop_patch_channel_dispatches_nothing() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(
         repo.clone(),
@@ -1343,7 +1343,7 @@ async fn noop_patch_channel_dispatches_nothing() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Member),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Member),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: None,
@@ -1363,7 +1363,7 @@ async fn noop_patch_channel_dispatches_nothing() {
 async fn patch_channel_conversion_uses_the_users_team() {
     let channel_id = Uuid::new_v4();
     let team_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().user_team_id = Some(team_id);
     let svc = mutation_service(
         repo.clone(),
@@ -1372,7 +1372,7 @@ async fn patch_channel_conversion_uses_the_users_team() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: Some(true),
@@ -1396,7 +1396,7 @@ async fn patch_channel_conversion_uses_the_users_team() {
 async fn patch_channel_conversion_names_an_unnamed_private_channel() {
     let channel_id = Uuid::new_v4();
     let team_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.channel_name = None;
@@ -1409,7 +1409,7 @@ async fn patch_channel_conversion_names_an_unnamed_private_channel() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: Some(true),
@@ -1431,7 +1431,7 @@ async fn patch_channel_conversion_names_an_unnamed_private_channel() {
 async fn patch_team_channel_conversion_to_private_clears_team_settings() {
     let channel_id = Uuid::new_v4();
     let team_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.channel_type = ChannelType::Team;
@@ -1444,7 +1444,7 @@ async fn patch_team_channel_conversion_to_private_clears_team_settings() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: Some(false),
@@ -1468,7 +1468,7 @@ async fn patch_team_channel_conversion_to_private_clears_team_settings() {
 #[tokio::test]
 async fn patch_channel_refuses_to_make_an_agent_dm_a_team_channel() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.channel_type = ChannelType::DirectMessage;
@@ -1483,7 +1483,7 @@ async fn patch_channel_refuses_to_make_an_agent_dm_a_team_channel() {
 
     let err = svc
         .patch_channel(
-            patch_receipt("macro|sender@test.com", channel_id, AccessRole::Owner),
+            patch_receipt("rox|sender@test.com", channel_id, AccessRole::Owner),
             PatchChannelRequest {
                 channel_name: None,
                 convert_to_team_channel: Some(true),
@@ -1502,7 +1502,7 @@ async fn patch_channel_refuses_to_make_an_agent_dm_a_team_channel() {
 #[tokio::test]
 async fn patch_channel_conversion_requires_the_user_to_have_a_team() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -1511,7 +1511,7 @@ async fn patch_channel_conversion_requires_the_user_to_have_a_team() {
 
     let err = svc
         .patch_channel(
-            patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+            patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
             PatchChannelRequest {
                 channel_name: None,
                 convert_to_team_channel: Some(true),
@@ -1530,7 +1530,7 @@ async fn patch_channel_conversion_requires_the_user_to_have_a_team() {
 #[tokio::test]
 async fn patch_channel_rejects_enabling_auto_join_on_a_non_team_channel() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -1539,7 +1539,7 @@ async fn patch_channel_rejects_enabling_auto_join_on_a_non_team_channel() {
 
     let err = svc
         .patch_channel(
-            patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+            patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
             PatchChannelRequest {
                 channel_name: None,
                 convert_to_team_channel: None,
@@ -1559,7 +1559,7 @@ async fn patch_channel_rejects_enabling_auto_join_on_a_non_team_channel() {
 async fn patch_team_channel_auto_join_uses_its_existing_team() {
     let channel_id = Uuid::new_v4();
     let team_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.channel_type = ChannelType::Team;
@@ -1572,7 +1572,7 @@ async fn patch_team_channel_auto_join_uses_its_existing_team() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: None,
@@ -1592,7 +1592,7 @@ async fn patch_team_channel_auto_join_uses_its_existing_team() {
 #[tokio::test]
 async fn patch_channel_allows_disabling_auto_join_without_a_team() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(
         repo.clone(),
         FakeEvents::default(),
@@ -1600,7 +1600,7 @@ async fn patch_channel_allows_disabling_auto_join_without_a_team() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Admin),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Admin),
         PatchChannelRequest {
             channel_name: None,
             convert_to_team_channel: None,
@@ -1620,7 +1620,7 @@ async fn patch_channel_allows_disabling_auto_join_without_a_team() {
 #[tokio::test]
 async fn patch_channel_member_can_rename() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(
         repo.clone(),
@@ -1629,7 +1629,7 @@ async fn patch_channel_member_can_rename() {
     );
 
     svc.patch_channel(
-        patch_receipt("macro|sender@test.com", channel_id, AccessRole::Member),
+        patch_receipt("rox|sender@test.com", channel_id, AccessRole::Member),
         PatchChannelRequest {
             channel_name: Some("Member Name".to_string()),
             convert_to_team_channel: None,
@@ -1671,7 +1671,7 @@ async fn patch_channel_member_cannot_convert_or_change_auto_join() {
     ];
     for req in requests {
         let channel_id = Uuid::new_v4();
-        let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
         repo.state.lock().unwrap().user_team_id = Some(Uuid::new_v4());
         let events = FakeEvents::default();
         let svc = mutation_service(
@@ -1682,7 +1682,7 @@ async fn patch_channel_member_cannot_convert_or_change_auto_join() {
 
         let err = svc
             .patch_channel(
-                patch_receipt("macro|sender@test.com", channel_id, AccessRole::Member),
+                patch_receipt("rox|sender@test.com", channel_id, AccessRole::Member),
                 req,
             )
             .await
@@ -1703,15 +1703,15 @@ async fn patch_channel_member_cannot_convert_or_change_auto_join() {
 #[tokio::test]
 async fn remove_participants_dispatches_participants_removed() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
     svc.remove_participants(
-        sender("macro|sender@test.com"),
+        sender("rox|sender@test.com"),
         channel_id,
         RemoveParticipantsRequest {
-            participants: vec!["macro|recipient@test.com".to_string()],
+            participants: vec!["rox|recipient@test.com".to_string()],
         },
     )
     .await
@@ -1721,15 +1721,15 @@ async fn remove_participants_dispatches_participants_removed() {
     assert!(matches!(
         events.as_slice(),
         [ChannelEvent::ParticipantsRemoved { actor, removed_user_ids, .. }]
-            if actor == &rox_id("macro|sender@test.com")
-                && removed_user_ids == &vec![rox_id("macro|recipient@test.com")]
+            if actor == &rox_id("rox|sender@test.com")
+                && removed_user_ids == &vec![rox_id("rox|recipient@test.com")]
     ));
 }
 
 #[tokio::test]
 async fn leave_channel_dispatches_participants_removed_for_self() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     // A private channel needs more than 2 participants to allow leaving.
     repo.state
         .lock()
@@ -1737,7 +1737,7 @@ async fn leave_channel_dispatches_participants_removed_for_self() {
         .participants
         .push(ChannelParticipant {
             channel_id,
-            user_id: "macro|third@test.com".to_string(),
+            user_id: "rox|third@test.com".to_string(),
             role: ParticipantRole::Member,
             joined_at: Utc::now(),
             left_at: None,
@@ -1745,7 +1745,7 @@ async fn leave_channel_dispatches_participants_removed_for_self() {
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default());
 
-    svc.leave_channel(sender("macro|recipient@test.com"), channel_id)
+    svc.leave_channel(sender("rox|recipient@test.com"), channel_id)
         .await
         .unwrap();
 
@@ -1753,15 +1753,15 @@ async fn leave_channel_dispatches_participants_removed_for_self() {
     assert!(matches!(
         events.as_slice(),
         [ChannelEvent::ParticipantsRemoved { actor, removed_user_ids, .. }]
-            if actor == &rox_id("macro|recipient@test.com")
-                && removed_user_ids == &vec![rox_id("macro|recipient@test.com")]
+            if actor == &rox_id("rox|recipient@test.com")
+                && removed_user_ids == &vec![rox_id("rox|recipient@test.com")]
     ));
 }
 
 #[tokio::test]
 async fn join_channel_touches_channel_when_membership_changes() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(
         repo.clone(),
@@ -1769,7 +1769,7 @@ async fn join_channel_touches_channel_when_membership_changes() {
         FakeReferenceSharing::default(),
     );
 
-    svc.join_channel(sender("macro|new@test.com"), channel_id)
+    svc.join_channel(sender("rox|new@test.com"), channel_id)
         .await
         .unwrap();
 
@@ -1787,7 +1787,7 @@ async fn join_channel_touches_channel_when_membership_changes() {
 #[tokio::test]
 async fn join_channel_propagates_channel_touch_errors() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().fail_channel_touches = true;
     let events = FakeEvents::default();
     let svc = mutation_service(
@@ -1797,7 +1797,7 @@ async fn join_channel_propagates_channel_touch_errors() {
     );
 
     let error = svc
-        .join_channel(sender("macro|new@test.com"), channel_id)
+        .join_channel(sender("rox|new@test.com"), channel_id)
         .await
         .unwrap_err();
 
@@ -1812,7 +1812,7 @@ async fn join_channel_propagates_channel_touch_errors() {
 #[tokio::test]
 async fn private_channel_join_code_is_reused() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(repo, FakeEvents::default(), FakeReferenceSharing::default());
 
     let first = svc.get_channel_join_code(channel_id).await.unwrap();
@@ -1829,7 +1829,7 @@ async fn join_code_generation_is_forbidden_for_non_private_channels() {
         ChannelType::Team,
     ] {
         let channel_id = Uuid::new_v4();
-        let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
         repo.state.lock().unwrap().channel_type = channel_type;
         let svc = mutation_service(
             repo.clone(),
@@ -1847,11 +1847,11 @@ async fn join_code_generation_is_forbidden_for_non_private_channels() {
 #[tokio::test]
 async fn unknown_join_code_returns_not_found() {
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = mutation_service(repo, FakeEvents::default(), FakeReferenceSharing::default());
 
     let error = svc
-        .join_channel_by_code(sender("macro|new@test.com"), Uuid::new_v4())
+        .join_channel_by_code(sender("rox|new@test.com"), Uuid::new_v4())
         .await
         .unwrap_err();
 
@@ -1862,7 +1862,7 @@ async fn unknown_join_code_returns_not_found() {
 async fn join_by_code_rejects_non_private_channel() {
     let channel_id = Uuid::new_v4();
     let join_code = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.join_code = Some(join_code);
@@ -1871,7 +1871,7 @@ async fn join_by_code_rejects_non_private_channel() {
     let svc = mutation_service(repo, FakeEvents::default(), FakeReferenceSharing::default());
 
     let error = svc
-        .join_channel_by_code(sender("macro|new@test.com"), join_code)
+        .join_channel_by_code(sender("rox|new@test.com"), join_code)
         .await
         .unwrap_err();
 
@@ -1882,7 +1882,7 @@ async fn join_by_code_rejects_non_private_channel() {
 async fn join_by_code_adds_participant_and_dispatches_event() {
     let channel_id = Uuid::new_v4();
     let join_code = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().join_code = Some(join_code);
     let events = FakeEvents::default();
     let svc = mutation_service(
@@ -1891,7 +1891,7 @@ async fn join_by_code_adds_participant_and_dispatches_event() {
         FakeReferenceSharing::default(),
     );
 
-    svc.join_channel_by_code(sender("macro|new@test.com"), join_code)
+    svc.join_channel_by_code(sender("rox|new@test.com"), join_code)
         .await
         .unwrap();
 
@@ -1902,7 +1902,7 @@ async fn join_by_code_adds_participant_and_dispatches_event() {
         state
             .participants
             .iter()
-            .any(|participant| participant.user_id == "macro|new@test.com")
+            .any(|participant| participant.user_id == "rox|new@test.com")
     );
     drop(state);
     assert!(matches!(
@@ -1916,7 +1916,7 @@ async fn join_by_code_adds_participant_and_dispatches_event() {
 async fn join_by_code_is_idempotent_for_active_participant() {
     let channel_id = Uuid::new_v4();
     let join_code = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().join_code = Some(join_code);
     let events = FakeEvents::default();
     let svc = mutation_service(
@@ -1925,7 +1925,7 @@ async fn join_by_code_is_idempotent_for_active_participant() {
         FakeReferenceSharing::default(),
     );
 
-    svc.join_channel_by_code(sender("macro|sender@test.com"), join_code)
+    svc.join_channel_by_code(sender("rox|sender@test.com"), join_code)
         .await
         .unwrap();
 
@@ -1952,7 +1952,7 @@ impl ChannelPictureFiles for FakePictureFiles {
 
 fn owned_picture_file() -> ChannelPictureFile {
     ChannelPictureFile {
-        owner_id: "macro|sender@test.com".into(),
+        owner_id: "rox|sender@test.com".into(),
         is_uploaded: true,
         content_type: "image/png".into(),
     }
@@ -1965,7 +1965,7 @@ async fn channel_picture_can_be_set_replaced_and_removed_by_any_participant() {
     };
     for role in [AccessRole::Member, AccessRole::Admin, AccessRole::Owner] {
         let channel_id = Uuid::new_v4();
-        let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
         let events = FakeEvents::default();
         let svc = mutation_service(
             repo.clone(),
@@ -1979,7 +1979,7 @@ async fn channel_picture_can_be_set_replaced_and_removed_by_any_participant() {
         let pictures = [Some(Uuid::new_v4()), Some(Uuid::new_v4()), None];
         for picture in pictures {
             let access = EntityAccessReceipt::<MemberParticipantRole>::try_new_authenticated_user(
-                rox_id("macro|sender@test.com"),
+                rox_id("rox|sender@test.com"),
                 Entity {
                     entity_id: channel_id.to_string(),
                     entity_type: EntityType::Channel,
@@ -1997,8 +1997,8 @@ async fn channel_picture_can_be_set_replaced_and_removed_by_any_participant() {
         assert_eq!(events.len(), 3);
         assert!(events.iter().all(|event| matches!(event,
             ChannelEvent::PictureChanged { channel_id: id, recipients, actor }
-                if *id == channel_id && recipients.contains(&rox_id("macro|sender@test.com"))
-                    && actor == &rox_id("macro|sender@test.com")
+                if *id == channel_id && recipients.contains(&rox_id("rox|sender@test.com"))
+                    && actor == &rox_id("rox|sender@test.com")
         )));
     }
 }
@@ -2007,7 +2007,7 @@ async fn channel_picture_can_be_set_replaced_and_removed_by_any_participant() {
 async fn repeated_channel_picture_updates_do_not_publish_false_activity() {
     use entity_access::domain::models::MemberParticipantRole;
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let events = FakeEvents::default();
     let svc = mutation_service(repo, events.clone(), FakeReferenceSharing::default())
         .with_picture_files(FakePictureFiles {
@@ -2018,7 +2018,7 @@ async fn repeated_channel_picture_updates_do_not_publish_false_activity() {
     for (value, expected_events) in [(None, 0), (picture, 1), (picture, 1), (None, 2), (None, 2)] {
         let access =
             EntityAccessReceipt::<MemberParticipantRole>::dangerously_assert_authenticated_user(
-                rox_id("macro|sender@test.com"),
+                rox_id("rox|sender@test.com"),
                 &channel_id.to_string(),
                 EntityType::Channel,
             );
@@ -2038,7 +2038,7 @@ fn channel_picture_write_access_requires_an_active_participant_role() {
     };
     assert!(
         EntityAccessReceipt::<MemberParticipantRole>::try_new_authenticated_user(
-            rox_id("macro|sender@test.com"),
+            rox_id("rox|sender@test.com"),
             entity(),
             EntityPermission::ChannelRole {
                 role: AccessRole::Member
@@ -2049,7 +2049,7 @@ fn channel_picture_write_access_requires_an_active_participant_role() {
     // A viewer of a team channel they have not joined cannot edit its picture.
     assert!(
         EntityAccessReceipt::<MemberParticipantRole>::try_new_authenticated_user(
-            rox_id("macro|sender@test.com"),
+            rox_id("rox|sender@test.com"),
             entity(),
             EntityPermission::ChannelViewOnly,
         )
@@ -2061,13 +2061,13 @@ fn channel_picture_write_access_requires_an_active_participant_role() {
 async fn channel_picture_rejects_direct_messages_and_non_channel_receipts() {
     use entity_access::domain::models::MemberParticipantRole;
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     repo.state.lock().unwrap().channel_type = ChannelType::DirectMessage;
     let svc = ChannelServiceImpl::new(repo.clone());
     for entity_type in [EntityType::Channel, EntityType::Document] {
         let access =
             EntityAccessReceipt::<MemberParticipantRole>::dangerously_assert_authenticated_user(
-                rox_id("macro|sender@test.com"),
+                rox_id("rox|sender@test.com"),
                 &channel_id.to_string(),
                 entity_type,
             );
@@ -2085,7 +2085,7 @@ async fn channel_picture_rejects_foreign_missing_pending_non_image_and_unavailab
     let files = [
         FakePictureFiles {
             file: Some(ChannelPictureFile {
-                owner_id: "macro|someone-else@test.com".into(),
+                owner_id: "rox|someone-else@test.com".into(),
                 ..owned_picture_file()
             }),
             fail: false,
@@ -2115,7 +2115,7 @@ async fn channel_picture_rejects_foreign_missing_pending_non_image_and_unavailab
     ];
     for file in files {
         let channel_id = Uuid::new_v4();
-        let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
         let events = FakeEvents::default();
         let svc = mutation_service(
             repo.clone(),
@@ -2125,7 +2125,7 @@ async fn channel_picture_rejects_foreign_missing_pending_non_image_and_unavailab
         .with_picture_files(file);
         let access =
             EntityAccessReceipt::<MemberParticipantRole>::dangerously_assert_authenticated_user(
-                rox_id("macro|sender@test.com"),
+                rox_id("rox|sender@test.com"),
                 &channel_id.to_string(),
                 EntityType::Channel,
             );
@@ -2143,11 +2143,11 @@ async fn channel_picture_rejects_foreign_missing_pending_non_image_and_unavailab
 async fn channel_picture_removal_does_not_require_static_file_availability() {
     use entity_access::domain::models::MemberParticipantRole;
     let channel_id = Uuid::new_v4();
-    let repo = FakeMutationRepo::new(channel_id, "macro|sender@test.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|sender@test.com");
     let svc = ChannelServiceImpl::new(repo.clone());
     let access =
         EntityAccessReceipt::<MemberParticipantRole>::dangerously_assert_authenticated_user(
-            rox_id("macro|sender@test.com"),
+            rox_id("rox|sender@test.com"),
             &channel_id.to_string(),
             EntityType::Channel,
         );

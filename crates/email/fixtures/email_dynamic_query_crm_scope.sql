@@ -22,19 +22,19 @@ VALUES
 
 INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
-    ('macro|alice@team.example.com', 'alice@team.example.com', 'Alice', 'a1111111-1111-1111-1111-111111111111'),
-    ('macro|bob@team.example.com',   'bob@team.example.com',   'Bob',   'b1111111-1111-1111-1111-111111111111'),
-    ('macro|carol@team.example.com', 'carol@team.example.com', 'Carol', 'c1111111-1111-1111-1111-111111111111');
+    ('rox|alice@team.example.com', 'alice@team.example.com', 'Alice', 'a1111111-1111-1111-1111-111111111111'),
+    ('rox|bob@team.example.com',   'bob@team.example.com',   'Bob',   'b1111111-1111-1111-1111-111111111111'),
+    ('rox|carol@team.example.com', 'carol@team.example.com', 'Carol', 'c1111111-1111-1111-1111-111111111111');
 
 -- == Team Alpha + memberships ==
 INSERT INTO team (id, name, owner_id, seat_count)
 VALUES
-    ('e0000001-0000-0000-0000-000000000001', 'Team Alpha', 'macro|alice@team.example.com', 2);
+    ('e0000001-0000-0000-0000-000000000001', 'Team Alpha', 'rox|alice@team.example.com', 2);
 
 INSERT INTO team_user (team_id, user_id, team_role)
 VALUES
-    ('e0000001-0000-0000-0000-000000000001', 'macro|alice@team.example.com', 'owner'),
-    ('e0000001-0000-0000-0000-000000000001', 'macro|bob@team.example.com',   'member');
+    ('e0000001-0000-0000-0000-000000000001', 'rox|alice@team.example.com', 'owner'),
+    ('e0000001-0000-0000-0000-000000000001', 'rox|bob@team.example.com',   'member');
 -- Carol is intentionally NOT a member.
 
 -- Team-level CRM killswitch ON. The candidate-source SQL joins
@@ -48,9 +48,9 @@ VALUES
 -- == Email links (one per user) ==
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('a0000001-0000-0000-0000-000000000001', 'macro|alice@team.example.com', 'fa_alice', 'alice@team.example.com', 'GMAIL', true, NOW(), NOW()),
-    ('a0000002-0000-0000-0000-000000000002', 'macro|bob@team.example.com',   'fa_bob',   'bob@team.example.com',   'GMAIL', true, NOW(), NOW()),
-    ('a0000003-0000-0000-0000-000000000003', 'macro|carol@team.example.com', 'fa_carol', 'carol@team.example.com', 'GMAIL', true, NOW(), NOW());
+    ('a0000001-0000-0000-0000-000000000001', 'rox|alice@team.example.com', 'fa_alice', 'alice@team.example.com', 'GMAIL', true, NOW(), NOW()),
+    ('a0000002-0000-0000-0000-000000000002', 'rox|bob@team.example.com',   'fa_bob',   'bob@team.example.com',   'GMAIL', true, NOW(), NOW()),
+    ('a0000003-0000-0000-0000-000000000003', 'rox|carol@team.example.com', 'fa_carol', 'carol@team.example.com', 'GMAIL', true, NOW(), NOW());
 
 -- Each team contributor has explicitly consented to this primary mailbox.
 INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
@@ -208,7 +208,7 @@ VALUES
 -- never read it: its threads, contacts, and labels stay out of CRM scope.
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('a0000004-0000-0000-0000-000000000004', 'macro|alice@team.example.com', 'fa_alice_personal', 'alice.personal@example.com', 'GMAIL', true, NOW(), NOW());
+    ('a0000004-0000-0000-0000-000000000004', 'rox|alice@team.example.com', 'fa_alice_personal', 'alice.personal@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)
 VALUES

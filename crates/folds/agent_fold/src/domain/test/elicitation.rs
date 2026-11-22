@@ -15,7 +15,7 @@ use crate::domain::model::{
 use crate::domain::ports::FoldMachine;
 use crate::testing::fixtures::ELICITATION_CLAUDE_SINGLE_SELECT;
 
-const PROMPT: &str = r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"agent_session:p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"go"}]}}}"#;
+const PROMPT: &str = r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"agent_session:p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"go"}]}}}"#;
 const END_TURN: &str = r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"agent_session:p","result":{"stopReason":"end_turn"}}}"#;
 const ACP_READY: &str =
     r#"{"direction":"to_server","content":{"type":"event","event":"acp_ready"}}"#;
@@ -26,13 +26,13 @@ const FORM: &str = r#"{"direction":"to_server","content":{"type":"acp","jsonrpc"
 
 fn accept(id: u64, content: &str) -> String {
     format!(
-        r#"{{"direction":"to_runtime","user_id":"macro|user@example.com","content":{{"type":"acp","jsonrpc":"2.0","id":{id},"result":{{"action":"accept","content":{content}}}}}}}"#
+        r#"{{"direction":"to_runtime","user_id":"rox|user@example.com","content":{{"type":"acp","jsonrpc":"2.0","id":{id},"result":{{"action":"accept","content":{content}}}}}}}"#
     )
 }
 
 fn answer(id: u64, action: &str) -> String {
     format!(
-        r#"{{"direction":"to_runtime","user_id":"macro|user@example.com","content":{{"type":"acp","jsonrpc":"2.0","id":{id},"result":{{"action":"{action}"}}}}}}"#
+        r#"{{"direction":"to_runtime","user_id":"rox|user@example.com","content":{{"type":"acp","jsonrpc":"2.0","id":{id},"result":{{"action":"{action}"}}}}}}"#
     )
 }
 

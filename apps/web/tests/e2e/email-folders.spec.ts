@@ -22,7 +22,7 @@ async function mockFolderApi(page: Page, fail = false) {
           data: {
             id,
             name: `${provider} folder message`,
-            ownerId: 'macro|fixture@example.com',
+            ownerId: 'rox|fixture@example.com',
             createdAt: '2026-10-01T12:00:00Z',
             updatedAt: '2026-10-01T12:00:00Z',
             sortTs: '2026-10-01T12:00:00Z',

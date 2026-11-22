@@ -74,7 +74,7 @@ fn configured_runtime() -> (
         }],
     }]);
     let runtime = runtime(
-        "macro|configured@example.com",
+        "rox|configured@example.com",
         connections.clone(),
         provider.clone(),
     );

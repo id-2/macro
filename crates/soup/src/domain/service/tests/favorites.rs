@@ -10,7 +10,7 @@ impl FavoriteReader for ViewerFavorites {
     ) -> std::pin::Pin<
         Box<dyn Future<Output = Result<Vec<model_entity::Entity<'static>>, SoupErr>> + Send + 'a>,
     > {
-        assert_eq!(user.as_ref(), "macro|test@example.com");
+        assert_eq!(user.as_ref(), "rox|test@example.com");
         Box::pin(async {
             Ok(vec![
                 EntityType::Document.with_entity_string(Uuid::from_u128(1).to_string()),
@@ -25,7 +25,7 @@ async fn favorites_are_scoped_before_pagination_and_cursor_keeps_the_filter() {
     repo.expect_unexpanded_generic_cursor_soup()
         .times(1)
         .returning(|request| {
-            assert_eq!(request.user_id.as_ref(), "macro|test@example.com");
+            assert_eq!(request.user_id.as_ref(), "rox|test@example.com");
             assert_eq!(request.limit, 1);
             let SimpleSortQuery::ItemsFilter(query) = request.cursor else {
                 panic!("filtered query")
@@ -65,7 +65,7 @@ async fn favorites_are_scoped_before_pagination_and_cursor_keeps_the_filter() {
                 limit: 1,
                 cursor: SoupQuery::new_sort_simple(SimpleSortMethod::UpdatedAt, filters.clone()),
                 sort_direction: SoupSortDirection::Desc,
-                user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+                user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
                 email_preview_view: PreviewView::default(),
                 link_ids: vec![],
             },
@@ -122,7 +122,7 @@ async fn grouped_without_properties_scopes_favorites() {
                     ..Default::default()
                 },
             ),
-            user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
             grouping: GroupingConfig {
                 field: GroupByField::EntityType,
                 group_key: None,

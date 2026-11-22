@@ -110,7 +110,7 @@ export const tickPrompt = ({
     diff,
   ].join('\n');
 
-const macroId = /macro\|[\w.+-]+@[\w.-]+/g;
+const macroId = /rox\|[\w.+-]+@[\w.-]+/g;
 
 /** Every Rox id a snapshot names, the owner first. */
 export const mentionedIds = (text: string, owner: string): readonly string[] =>

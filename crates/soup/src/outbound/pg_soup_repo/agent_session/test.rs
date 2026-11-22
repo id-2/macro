@@ -4,9 +4,9 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
-const OWNER: &str = "macro|agent-owner@test.com";
-const MEMBER: &str = "macro|agent-member@test.com";
-const STRANGER: &str = "macro|agent-stranger@test.com";
+const OWNER: &str = "rox|agent-owner@test.com";
+const MEMBER: &str = "rox|agent-member@test.com";
+const STRANGER: &str = "rox|agent-stranger@test.com";
 const BOT_ID: Uuid = Uuid::from_u128(0xa9e7);
 const CHANNEL_ID: Uuid = Uuid::from_u128(0xc05);
 

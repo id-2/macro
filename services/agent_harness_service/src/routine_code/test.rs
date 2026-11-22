@@ -226,7 +226,7 @@ async fn a_step_waits_for_a_free_slot_before_its_credential_and_gives_up_after_f
         )
         .with_slots(1),
     );
-    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     let step = routine_program::CodeStep {
         id: None,
         title: "Label invoices".into(),
@@ -420,7 +420,7 @@ export async function main({ macro, trigger, steps, run }: StepContext) {
     }
 
     fn owner() -> RoxUserIdStr<'static> {
-        RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+        RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap()
     }
 
     fn program(steps: serde_json::Value) -> RoutineProgram {

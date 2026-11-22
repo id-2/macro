@@ -19,7 +19,7 @@ fn user(s: &str) -> RoxUserIdStr<'static> {
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_none_when_user_has_no_team_membership(pool: PgPool) -> Result<()> {
-    let user_id = user("macro|noteam@team.com");
+    let user_id = user("rox|noteam@team.com");
 
     let result = get_user_team(&pool, &user_id).await?;
 
@@ -32,7 +32,7 @@ async fn returns_none_when_user_has_no_team_membership(pool: PgPool) -> Result<(
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_none_when_user_does_not_exist(pool: PgPool) -> Result<()> {
-    let user_id = user("macro|ghost@team.com");
+    let user_id = user("rox|ghost@team.com");
 
     let result = get_user_team(&pool, &user_id).await?;
 
@@ -45,7 +45,7 @@ async fn returns_none_when_user_does_not_exist(pool: PgPool) -> Result<()> {
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_member_role_for_member(pool: PgPool) -> Result<()> {
-    let user_id = user("macro|member@team.com");
+    let user_id = user("rox|member@team.com");
 
     let result = get_user_team(&pool, &user_id).await?.expect("team info");
 
@@ -59,7 +59,7 @@ async fn returns_member_role_for_member(pool: PgPool) -> Result<()> {
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_admin_role_for_admin(pool: PgPool) -> Result<()> {
-    let user_id = user("macro|admin@team.com");
+    let user_id = user("rox|admin@team.com");
 
     let result = get_user_team(&pool, &user_id).await?.expect("team info");
 
@@ -73,7 +73,7 @@ async fn returns_admin_role_for_admin(pool: PgPool) -> Result<()> {
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_owner_role_for_owner(pool: PgPool) -> Result<()> {
-    let user_id = user("macro|owner@team.com");
+    let user_id = user("rox|owner@team.com");
 
     let result = get_user_team(&pool, &user_id).await?.expect("team info");
 
@@ -90,7 +90,7 @@ async fn returns_team_id_of_the_users_actual_team(pool: PgPool) -> Result<()> {
     // `multi@team.com` is the sole member of Team Beta — verifies the query
     // returns the user's real team_id rather than e.g. the first team in the
     // table (Team Alpha).
-    let user_id = user("macro|multi@team.com");
+    let user_id = user("rox|multi@team.com");
 
     let result = get_user_team(&pool, &user_id).await?.expect("team info");
 
@@ -106,7 +106,7 @@ async fn returns_team_id_of_the_users_actual_team(pool: PgPool) -> Result<()> {
 async fn does_not_leak_other_users_team_memberships(pool: PgPool) -> Result<()> {
     // alpha_owner is referenced as Team Alpha's `owner_id` but has no team_user
     // row — they should not be reported as a team member.
-    let user_id = user("macro|alpha_owner@team.com");
+    let user_id = user("rox|alpha_owner@team.com");
 
     let result = get_user_team(&pool, &user_id).await?;
 

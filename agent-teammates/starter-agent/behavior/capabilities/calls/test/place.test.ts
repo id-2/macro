@@ -26,10 +26,10 @@ import {
 } from "../place.ts";
 import { type NewPlaceRow, type Placed, PlaceRow } from "../types.ts";
 
-const assistant = "macro|agent@example.com";
-const owner = "macro|owner@example.com";
-const cy = "macro|cy@example.com";
-const dee = "macro|dee@example.com";
+const assistant = "rox|agent@example.com";
+const owner = "rox|owner@example.com";
+const cy = "rox|cy@example.com";
+const dee = "rox|dee@example.com";
 const hour = 3_600_000;
 const now = Temporal.Instant.fromEpochMilliseconds(1_000 * 24 * hour);
 const ago = (ms: number) => after(now, -ms);
@@ -80,7 +80,7 @@ test("the owner's order places the call, past the limits", () => {
 test("only the owner's id counts: not a lookalike, not a group call that cannot say who spoke", () => {
 	expect(
 		mayPlace(
-			request({ asked: said("macro|owner@example.com.evil.test") }),
+			request({ asked: said("rox|owner@example.com.evil.test") }),
 			context(),
 		),
 	).toMatchObject({ ok: false, rule: "third-party" });

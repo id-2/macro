@@ -393,7 +393,7 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
         .expect("provider"),
     );
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|enrollment@example.test")
             .expect("identity")
             .into_owned(),
     };

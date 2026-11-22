@@ -15,7 +15,7 @@ fn setup(model: &str, speed: ModelSpeed) -> (PerCallUsage, Arc<Recorder>) {
     let recorder = Arc::new(Recorder::default());
     let usage = UsageContext::new(
         AiFeature::Chat,
-        "macro|speed@example.com".to_owned().try_into().unwrap(),
+        "rox|speed@example.com".to_owned().try_into().unwrap(),
     );
     (
         PerCallUsage::new(recorder.clone(), usage, model, speed),

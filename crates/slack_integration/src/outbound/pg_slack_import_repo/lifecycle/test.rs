@@ -15,14 +15,14 @@ pub(crate) async fn fixture_parts(
     let user = Uuid::now_v7();
     let team = Uuid::now_v7();
     sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'lifecycle', 'lifecycle@example.com', 'lifecycle-customer')", user).execute(pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|lifecycle@example.com', 'lifecycle@example.com', $1)"#, user).execute(pool).await.unwrap();
-    sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Lifecycle', 'macro|lifecycle@example.com')", team).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|lifecycle@example.com', 'lifecycle@example.com', $1)"#, user).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Lifecycle', 'rox|lifecycle@example.com')", team).execute(pool).await.unwrap();
     let team = team.try_into().unwrap();
     let repo = PgSlackImportRepo::new(pool.clone(), ImportLimits::default());
     let job = repo
         .create(
             team,
-            &RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("rox|lifecycle@example.com").unwrap(),
             &CreateImport {
                 idempotency_token: Uuid::now_v7().try_into().unwrap(),
                 source: SourceIdentity::ConfirmedUnknown,
@@ -125,7 +125,7 @@ async fn claim_heartbeat_reclaim_fences_stale_worker(pool: PgPool) {
             .unwrap()
             .unwrap()
             .as_ref(),
-        "macro|lifecycle@example.com",
+        "rox|lifecycle@example.com",
     );
     assert!(
         repo.requested_by(Uuid::now_v7().try_into().unwrap(), event.job_id)
@@ -346,7 +346,7 @@ async fn expiry_precedes_s3_lifecycle_and_empty_jobs_settle(pool: PgPool) {
     let empty = repo
         .create(
             team,
-            &RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("rox|lifecycle@example.com").unwrap(),
             &CreateImport {
                 idempotency_token: Uuid::now_v7().try_into().unwrap(),
                 source: SourceIdentity::ConfirmedUnknown,

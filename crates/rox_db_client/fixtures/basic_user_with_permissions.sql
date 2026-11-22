@@ -3,8 +3,8 @@ INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id") VALUES
 ('a2222222-2222-2222-2222-222222222222', 'user2@user.com', 'user2@user.com', 'cus_12345');
 
 INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "rox_user_id") VALUES
-('macro|user@user.com', 'user@user.com', 'User', 'cus_1234', 'a1111111-1111-1111-1111-111111111111'),
-('macro|user2@user.com', 'user2@user.com', 'User2', 'cus_12345', 'a2222222-2222-2222-2222-222222222222');
+('rox|user@user.com', 'user@user.com', 'User', 'cus_1234', 'a1111111-1111-1111-1111-111111111111'),
+('rox|user2@user.com', 'user2@user.com', 'User2', 'cus_12345', 'a2222222-2222-2222-2222-222222222222');
 
 INSERT INTO "Permission" ("id", "description") VALUES
 ('permission-one', 'Permission One'),
@@ -23,6 +23,6 @@ INSERT INTO "RolesOnPermissions" ("permissionId", "roleId") VALUES
 ('permission-three', 'role-three');
 
 INSERT INTO "RolesOnUsers" ("userId", "roleId") VALUES
-('macro|user@user.com', 'role-one'),
-('macro|user@user.com', 'role-three'),
-('macro|user2@user.com', 'role-two');
+('rox|user@user.com', 'role-one'),
+('rox|user@user.com', 'role-three'),
+('rox|user2@user.com', 'role-two');

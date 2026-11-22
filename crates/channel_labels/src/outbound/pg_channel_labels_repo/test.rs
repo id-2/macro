@@ -9,8 +9,8 @@ use crate::domain::ports::ChannelLabelsRepo;
 
 mod team_channels;
 
-const USER_A: &str = "macro|labels-a@rox.one";
-const USER_B: &str = "macro|labels-b@rox.one";
+const USER_A: &str = "rox|labels-a@rox.one";
+const USER_B: &str = "rox|labels-b@rox.one";
 
 fn user(id: &str) -> RoxUserIdStr<'_> {
     RoxUserIdStr::parse_from_str(id).expect("valid user id")

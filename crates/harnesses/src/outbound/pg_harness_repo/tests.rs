@@ -6,8 +6,8 @@ use crate::domain::account_logins::{AccountLoginChange, AgentProvider, ProviderA
 use crate::domain::models::ClaudeMode;
 use crate::domain::tokens;
 
-const TEAMMATE_ID: &str = "macro|teammate@example.com";
-const OWNER_ID: &str = "macro|harness-repo@example.com";
+const TEAMMATE_ID: &str = "rox|teammate@example.com";
+const OWNER_ID: &str = "rox|harness-repo@example.com";
 
 fn caller() -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(OWNER_ID.to_string()).unwrap()
@@ -211,7 +211,7 @@ async fn visibility_spans_own_and_team_harnesses(pool: PgPool) {
     .unwrap();
     let shared = sqlx::query_scalar!(
         r#"INSERT INTO harnesses (id, name, owner_user_id, created_by)
-        VALUES ($1, 'teams', 'macro|teammate@example.com', 'macro|teammate@example.com') RETURNING id"#,
+        VALUES ($1, 'teams', 'rox|teammate@example.com', 'rox|teammate@example.com') RETURNING id"#,
         Uuid::new_v4(),
     ).fetch_one(&pool).await.unwrap();
     repo.set_team_access(HarnessId::new_from_uuid(shared), team_id, true)
@@ -225,7 +225,7 @@ async fn visibility_spans_own_and_team_harnesses(pool: PgPool) {
         VALUES ($1, 'theirs', $2, $2)
         "#,
         Uuid::new_v4(),
-        "macro|stranger@example.com",
+        "rox|stranger@example.com",
     )
     .execute(&pool)
     .await
@@ -1052,7 +1052,7 @@ async fn the_directory_lists_teammates_runtimes_with_the_callers_access(pool: Pg
     let repo = PgHarnessRepo::new(pool.clone());
     team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
     let harness = private_harness(&pool, TEAMMATE_ID).await;
-    private_harness(&pool, "macro|stranger@example.com").await;
+    private_harness(&pool, "rox|stranger@example.com").await;
 
     let directory = repo.list_directory_harnesses(user(OWNER_ID)).await.unwrap();
     assert_eq!(directory.len(), 1, "a stranger's runtime stays out of it");
@@ -1430,8 +1430,8 @@ async fn bound_agents_leave_out_residents_whose_owner_lost_access(pool: PgPool) 
 /// and its buyer keeps nothing once they leave.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_computer_harness_belongs_to_its_team_not_its_buyer(pool: PgPool) {
-    const ADMIN_ID: &str = "macro|admin@example.com";
-    const MEMBER_ID: &str = "macro|member@example.com";
+    const ADMIN_ID: &str = "rox|admin@example.com";
+    const MEMBER_ID: &str = "rox|member@example.com";
     let repo = PgHarnessRepo::new(pool.clone());
     // OWNER_ID is the team's owner and buys the computer.
     let team_id = team_of(&pool, &[OWNER_ID, ADMIN_ID, MEMBER_ID]).await;

@@ -50,7 +50,7 @@ function fixture() {
     fail: (error: Error) => void;
   }[] = [];
   const [account, setAccount] = createSignal<QueryAccount>({
-    userId: 'macro|viewer@example.com',
+    userId: 'rox|viewer@example.com',
     session: 0,
   });
   const [sql, setSql] = createSignal('SELECT name FROM rox.people');
@@ -224,8 +224,8 @@ it('bounds physical work and rejects an old session even when the account return
     await vi.waitFor(() => expect(f.query.outcome()).toEqual(answer));
     const old = f.query.refresh();
     await vi.waitFor(() => expect(f.requests).toHaveLength(2));
-    f.setAccount({ userId: 'macro|other@example.com', session: 1 });
-    f.setAccount({ userId: 'macro|viewer@example.com', session: 2 });
+    f.setAccount({ userId: 'rox|other@example.com', session: 1 });
+    f.setAccount({ userId: 'rox|viewer@example.com', session: 2 });
     await vi.waitFor(() => expect(f.requests[1].signal.aborted).toBe(true));
     expect(f.requests).toHaveLength(2);
     expect(f.query.outcome()).toBeUndefined();
@@ -291,7 +291,7 @@ it('cancels disposed reads and refuses detached refreshes under another session'
   f.dispose();
   expect(f.requests[0].signal.aborted).toBe(true);
   f.requests[0].finish(answer);
-  f.setAccount({ userId: 'macro|viewer@example.com', session: 1 });
+  f.setAccount({ userId: 'rox|viewer@example.com', session: 1 });
   expect(await f.query.refresh()).toEqual(ok({ landed: false }));
   expect(f.requests).toHaveLength(1);
   expect(f.query.outcome()).toBeUndefined();

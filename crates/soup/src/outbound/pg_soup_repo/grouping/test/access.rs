@@ -4,7 +4,7 @@ async fn assert_membership(pool: &Pool<Postgres>) -> anyhow::Result<()> {
     let items = expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com")?,
             limit: 2,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -97,7 +97,7 @@ async fn source_membership_deduplicates_grants(pool: Pool<Postgres>) -> anyhow::
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
-            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com")?,
             limit: 50,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -134,9 +134,9 @@ pub(super) fn calendar_filter() -> EntityFilterAst {
 pub(super) async fn seed_calendar_access(pool: &Pool<Postgres>) -> anyhow::Result<Vec<uuid::Uuid>> {
     let mut ids = Vec::new();
     for (index, owner) in [
-        "macro|user-1@test.com",
-        "macro|other@test.com",
-        "macro|other@test.com",
+        "rox|user-1@test.com",
+        "rox|other@test.com",
+        "rox|other@test.com",
     ]
     .into_iter()
     .enumerate()
@@ -153,7 +153,7 @@ pub(super) async fn seed_calendar_access(pool: &Pool<Postgres>) -> anyhow::Resul
         ).execute(pool).await?;
         if index == 1 {
             sqlx::query!(
-                "INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('macro|user-1@test.com', 'macro|other@test.com', $1) ON CONFLICT DO NOTHING",
+                "INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('rox|user-1@test.com', 'rox|other@test.com', $1) ON CONFLICT DO NOTHING",
                 link,
             ).execute(pool).await?;
         }
@@ -176,7 +176,7 @@ async fn calendar_owner_or_linked_account_only(pool: Pool<Postgres>) -> anyhow::
         let items = expanded_dynamic_cursor_soup_grouped(
             &pool,
             GroupedDynamicCursorArgs {
-                user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
+                user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com")?,
                 limit: 50,
                 cursor: Query::Sort(SimpleSortMethod::ViewedAt.into(), filter),
                 exclude_frecency: false,

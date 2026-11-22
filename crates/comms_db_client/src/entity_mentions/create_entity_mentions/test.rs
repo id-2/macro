@@ -22,7 +22,7 @@ async fn records_mentions_against_their_source_document(
         &pool,
         "document",
         "task-1",
-        Some("macro|owner@example.com"),
+        Some("rox|owner@example.com"),
         &mentions,
     )
     .await?;
@@ -46,7 +46,7 @@ async fn records_mentions_against_their_source_document(
     for row in &rows {
         assert_eq!(row.source_entity_type, "document");
         assert_eq!(row.source_entity_id, "task-1");
-        assert_eq!(row.user_id.as_deref(), Some("macro|owner@example.com"));
+        assert_eq!(row.user_id.as_deref(), Some("rox|owner@example.com"));
     }
 
     Ok(())

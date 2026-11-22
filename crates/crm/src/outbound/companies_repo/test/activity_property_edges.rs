@@ -12,7 +12,7 @@ use sqlx::PgPool;
 use system_properties::SystemPropertyKey;
 use uuid::Uuid;
 
-const STRANGER: &str = "macro|stranger@example.com";
+const STRANGER: &str = "rox|stranger@example.com";
 /// A visible company of team 11 whose id has hex letters, so case matters.
 const LETTERED: u128 = 0xabc;
 const ALL_TYPES: [EntityType; 13] = [

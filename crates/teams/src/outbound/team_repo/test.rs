@@ -40,7 +40,7 @@ async fn test_get_stripe_customer_id(pool: Pool<Postgres>) -> anyhow::Result<()>
     let team_repo = TeamRepositoryImpl::new(pool);
 
     let stripe_customer_id = team_repo
-        .get_stripe_customer_id(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .get_stripe_customer_id(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     let expected_stripe_customer_id = stripe::CustomerId::from_str("cus_1234").unwrap();
@@ -48,7 +48,7 @@ async fn test_get_stripe_customer_id(pool: Pool<Postgres>) -> anyhow::Result<()>
     assert_eq!(stripe_customer_id, Some(expected_stripe_customer_id));
 
     let stripe_customer_id = team_repo
-        .get_stripe_customer_id(&RoxUserIdStr::parse_from_str("macro|user2@user.com")?)
+        .get_stripe_customer_id(&RoxUserIdStr::parse_from_str("rox|user2@user.com")?)
         .await?;
 
     assert!(stripe_customer_id.is_none());
@@ -68,13 +68,13 @@ async fn test_has_user_trialed(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool);
 
     let has_trialed = team_repo
-        .has_user_trialed(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .has_user_trialed(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     assert!(has_trialed);
 
     let has_trialed = team_repo
-        .has_user_trialed(&RoxUserIdStr::parse_from_str("macro|user4@user.com")?)
+        .has_user_trialed(&RoxUserIdStr::parse_from_str("rox|user4@user.com")?)
         .await?;
 
     assert!(!has_trialed);
@@ -195,7 +195,7 @@ async fn test_get_team_enterprise_status(pool: Pool<Postgres>) -> anyhow::Result
 async fn test_create_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool);
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
     let result = team_repo
         .create_team(
             &user_id,
@@ -211,7 +211,7 @@ async fn test_create_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert_eq!(result.auto_join_domain(), Some("user.com"));
     assert_eq!(result.name, "Product Team");
     assert_eq!(result.slug, "PRODUCT_TEAM");
-    assert_eq!(result.owner_id.0.as_ref(), "macro|user3@user.com");
+    assert_eq!(result.owner_id.0.as_ref(), "rox|user3@user.com");
     assert!(!result.enterprise());
 
     // Create team with too large a name
@@ -294,8 +294,8 @@ async fn test_move_github_app_installation_to_team_moves_existing_user_rows(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
-    let unrelated_user_id = "macro|user4@user.com";
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
+    let unrelated_user_id = "rox|user4@user.com";
     let existing_team_id = "22222222-2222-2222-2222-222222222222";
 
     sqlx::query(
@@ -425,8 +425,8 @@ async fn test_move_github_app_installation_to_team_noops_when_user_has_no_rows(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
-    let unrelated_user_id = "macro|user4@user.com";
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
+    let unrelated_user_id = "rox|user4@user.com";
 
     sqlx::query(
         r#"
@@ -494,7 +494,7 @@ async fn invite_persists_one_audit_and_does_not_reaudit_a_duplicate(
         .execute(&pool)
         .await?;
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
     let invites = vec![Email::parse_from_str("enterprise-audit@rox.one")?.lowercase()];
     let invites = non_empty::NonEmpty::new(invites.as_slice())?;
@@ -533,7 +533,7 @@ async fn invite_persists_one_audit_and_does_not_reaudit_a_duplicate(
 async fn test_invite_users_to_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool);
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
@@ -622,7 +622,7 @@ async fn test_get_new_invites_keeps_invites_scoped_to_team(
     sqlx::query!(
         r#"
         INSERT INTO team_invite (id, team_id, email, team_role, invited_by, created_at, last_sent_at)
-        VALUES ($1, $2, 'other-team-only@rox.one', 'member', 'macro|user4@user.com', NOW(), NOW())
+        VALUES ($1, $2, 'other-team-only@rox.one', 'member', 'rox|user4@user.com', NOW(), NOW())
         "#,
         rox_uuid::generate_uuid_v7(),
         other_team_id,
@@ -649,7 +649,7 @@ async fn test_get_new_invites_keeps_invites_scoped_to_team(
 )]
 async fn test_invite_existing_user_within_rate_limit(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool);
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // invite@rox.one already has an invite with last_sent_at = NOW() in the fixture
@@ -676,7 +676,7 @@ async fn test_invite_existing_user_inside_email_rate_limit(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     sqlx::query!(
@@ -705,7 +705,7 @@ async fn test_invite_existing_user_inside_email_rate_limit(
 )]
 async fn test_invite_existing_user_after_rate_limit(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // Push last_sent_at back past the invite email's rate-limit window
@@ -737,7 +737,7 @@ async fn test_invite_existing_user_after_rate_limit(pool: Pool<Postgres>) -> any
 )]
 async fn test_invite_mix_new_and_existing(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // Push existing invite past the rate limit window
@@ -775,7 +775,7 @@ async fn test_invite_mix_new_and_existing(pool: Pool<Postgres>) -> anyhow::Resul
 )]
 async fn test_reinvite_updates_last_sent_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // Push past rate limit
@@ -817,7 +817,7 @@ async fn test_reinvite_updates_last_sent_at(pool: Pool<Postgres>) -> anyhow::Res
 )]
 async fn test_resend_without_mark_sent_stays_eligible(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // Push past rate limit
@@ -888,7 +888,7 @@ async fn test_mark_invites_sent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert!(after.last_sent_at > before.last_sent_at);
 
     // The invite should now be rate limited
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let invites = vec![Email::parse_from_str("invite@rox.one")?.lowercase()];
     let invites = non_empty::NonEmpty::new(invites.as_slice())?;
     let invited = team_repo
@@ -908,12 +908,12 @@ async fn test_remove_user_from_team(pool: Pool<Postgres>) -> anyhow::Result<()> 
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user2@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user2@user.com")?;
 
     team_repo.remove_user_from_team(&team_id, &user_id).await?;
 
     // Try to remove user that isn't on team
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
 
     let err = team_repo
         .remove_user_from_team(&team_id, &user_id)
@@ -924,7 +924,7 @@ async fn test_remove_user_from_team(pool: Pool<Postgres>) -> anyhow::Result<()> 
     assert!(err.to_string().contains("not in the team"));
 
     // Try to remove owner
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
 
     let err = team_repo
         .remove_user_from_team(&team_id, &user_id)
@@ -1178,8 +1178,8 @@ async fn test_get_all_team_members(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert_eq!(members.len(), 2);
 
     let results = vec![
-        ("macro|user@user.com", TeamRole::Owner),
-        ("macro|user2@user.com", TeamRole::Member),
+        ("rox|user@user.com", TeamRole::Owner),
+        ("rox|user2@user.com", TeamRole::Member),
     ];
 
     assert_eq!(
@@ -1202,14 +1202,14 @@ async fn test_accept_team_invite(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
     let team_invite_id = rox_uuid::string_to_uuid("22222222-2222-2222-2222-222222222222")?;
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
 
     let accepted_invite = team_repo
         .accept_team_invite(&team_invite_id, &user_id)
         .await?;
     let team_member = accepted_invite.member;
 
-    assert_eq!(team_member.user_id.as_ref(), "macro|user3@user.com");
+    assert_eq!(team_member.user_id.as_ref(), "rox|user3@user.com");
     assert_eq!(team_member.role, TeamRole::Member);
 
     let team_invite_id = rox_uuid::string_to_uuid("33333333-3333-3333-3333-333333333333")?;
@@ -1233,7 +1233,7 @@ async fn test_rollback_accept_team_invite(pool: Pool<Postgres>) -> anyhow::Resul
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
     let team_invite_id = rox_uuid::string_to_uuid("22222222-2222-2222-2222-222222222222")?;
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
 
     // A rolled-back agent invite must stay one, or the retry never joins.
     sqlx::query!(
@@ -1298,7 +1298,7 @@ async fn test_rollback_remove_user_from_team(pool: Pool<Postgres>) -> anyhow::Re
     let team_repo = TeamRepositoryImpl::new(pool.clone());
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
-    let user_id = RoxUserIdStr::parse_from_str("macro|user2@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user2@user.com")?;
 
     team_repo
         .patch_team_user_role(&team_id, &user_id, TeamRole::Admin)
@@ -1332,17 +1332,17 @@ async fn test_is_user_member_of_team(pool: Pool<Postgres>) -> anyhow::Result<()>
     let team_repo = TeamRepositoryImpl::new(pool);
 
     // user@user.com is an owner on team1
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let is_member = team_repo.is_user_member_of_team(&user_id).await?;
     assert!(is_member);
 
     // user2@user.com is a member of team1
-    let user_id = RoxUserIdStr::parse_from_str("macro|user2@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user2@user.com")?;
     let is_member = team_repo.is_user_member_of_team(&user_id).await?;
     assert!(is_member);
 
     // user3@user.com is not in any team
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
     let is_member = team_repo.is_user_member_of_team(&user_id).await?;
     assert!(!is_member);
 
@@ -1362,7 +1362,7 @@ async fn test_get_team_members(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
     assert_eq!(members.len(), 2);
 
-    let expected = vec!["macro|user2@user.com", "macro|user@user.com"];
+    let expected = vec!["rox|user2@user.com", "rox|user@user.com"];
 
     let mut results = members
         .iter()
@@ -1542,7 +1542,7 @@ async fn test_get_user_teams_hydrates_enterprise_status(
 ) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
 
     sqlx::query!("UPDATE team SET enterprise = TRUE WHERE id = $1", &team_id)
         .execute(&pool)
@@ -1703,22 +1703,22 @@ async fn test_get_team_member(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
     // Get existing member
-    let user_id = RoxUserIdStr::parse_from_str("macro|user2@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user2@user.com")?;
     let member = team_repo.get_team_member(&team_id, &user_id).await?;
 
-    assert_eq!(member.user_id.as_ref(), "macro|user2@user.com");
+    assert_eq!(member.user_id.as_ref(), "rox|user2@user.com");
     assert_eq!(member.team_id, team_id);
     assert_eq!(member.role, TeamRole::Member);
 
     // Get owner
-    let owner_id = RoxUserIdStr::parse_from_str("macro|user@user.com")?;
+    let owner_id = RoxUserIdStr::parse_from_str("rox|user@user.com")?;
     let member = team_repo.get_team_member(&team_id, &owner_id).await?;
 
-    assert_eq!(member.user_id.as_ref(), "macro|user@user.com");
+    assert_eq!(member.user_id.as_ref(), "rox|user@user.com");
     assert_eq!(member.role, TeamRole::Owner);
 
     // Get non-existent member
-    let missing_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let missing_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
     let err = team_repo
         .get_team_member(&team_id, &missing_id)
         .await
@@ -1738,7 +1738,7 @@ async fn test_patch_team_user_role(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool);
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
-    let user_id = RoxUserIdStr::parse_from_str("macro|user2@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user2@user.com")?;
 
     // Promote to Admin
     team_repo
@@ -1757,7 +1757,7 @@ async fn test_patch_team_user_role(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert_eq!(member.role, TeamRole::Member);
 
     // Patch role for non-existent member
-    let missing_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let missing_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
     let err = team_repo
         .patch_team_user_role(&team_id, &missing_id, TeamRole::Admin)
         .await
@@ -1778,7 +1778,7 @@ async fn test_toggle_auto_join_domain(pool: Pool<Postgres>) -> anyhow::Result<()
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
 
-    // First toggle sets the domain of the team owner (macro|user@user.com).
+    // First toggle sets the domain of the team owner (rox|user@user.com).
     let domain = team_repo.toggle_auto_join_domain(&team_id).await?;
     assert_eq!(domain.as_deref(), Some("user.com"));
 
@@ -1821,12 +1821,12 @@ async fn test_toggle_auto_join_domain_rejects_generic_domain(
     .execute(&pool)
     .await?;
     sqlx::query(
-        r#"INSERT INTO "User" (id, email, name, rox_user_id) VALUES ('macro|owner@gmail.com', 'owner@gmail.com', 'Gmail Owner', 'a5555555-5555-5555-5555-555555555555')"#,
+        r#"INSERT INTO "User" (id, email, name, rox_user_id) VALUES ('rox|owner@gmail.com', 'owner@gmail.com', 'Gmail Owner', 'a5555555-5555-5555-5555-555555555555')"#,
     )
     .execute(&pool)
     .await?;
     sqlx::query(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'gmail team', 'macro|owner@gmail.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'gmail team', 'rox|owner@gmail.com')",
     )
     .bind(team_id)
     .execute(&pool)
@@ -1886,26 +1886,26 @@ async fn test_get_team_id_by_domain(pool: Pool<Postgres>) -> anyhow::Result<()> 
 
     // No team has an auto-join domain yet.
     let found = team_repo
-        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("macro|newuser@user.com")?)
+        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("rox|newuser@user.com")?)
         .await?;
     assert_eq!(found, None);
 
     team_repo.toggle_auto_join_domain(&team_id).await?;
 
     let found = team_repo
-        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("macro|newuser@user.com")?)
+        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("rox|newuser@user.com")?)
         .await?;
     assert_eq!(found, Some(team_id));
 
     // Domain matching is case-insensitive on the user's email domain.
     let found = team_repo
-        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("macro|newuser@USER.COM")?)
+        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("rox|newuser@USER.COM")?)
         .await?;
     assert_eq!(found, Some(team_id));
 
     // Unrelated domains do not match.
     let found = team_repo
-        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("macro|newuser@other.com")?)
+        .get_team_id_by_domain(&RoxUserIdStr::parse_from_str("rox|newuser@other.com")?)
         .await?;
     assert_eq!(found, None);
 
@@ -1920,7 +1920,7 @@ async fn test_add_user_to_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_repo = TeamRepositoryImpl::new(pool.clone());
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
-    let user_id = RoxUserIdStr::parse_from_str("macro|user3@user.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|user3@user.com")?;
 
     let seat_count_before = team_repo.get_team_seat_count(&team_id).await?;
     let invites_before = team_repo.get_user_team_invites(&user_id).await?;
@@ -1979,7 +1979,7 @@ async fn test_included_seat_survives_remove_and_rollback(
     .execute(&pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('macro|agent@example.com', 'agent@example.com', $1, TRUE)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('rox|agent@example.com', 'agent@example.com', $1, TRUE)"#,
         agent_rox_user_id,
     )
     .execute(&pool)
@@ -1987,8 +1987,8 @@ async fn test_included_seat_survives_remove_and_rollback(
     let team_repo = TeamRepositoryImpl::new(pool);
 
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com")?;
-    let billed_member_id = RoxUserIdStr::parse_from_str("macro|not-a-member@example.com")?;
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com")?;
+    let billed_member_id = RoxUserIdStr::parse_from_str("rox|not-a-member@example.com")?;
 
     assert!(!team_repo.is_seat_included(&team_id, &agent_id).await?);
 
@@ -2123,7 +2123,7 @@ async fn first_invite_reminder_is_due_after_three_days(pool: Pool<Postgres>) -> 
     assert_eq!(reminder.email, "invite@rox.one");
     assert_eq!(reminder.reminder_number, 1);
     assert_eq!(reminder.team_name, "team1");
-    assert_eq!(reminder.invited_by, "macro|user@user.com");
+    assert_eq!(reminder.invited_by, "rox|user@user.com");
     assert!(reminder.paying && reminder.has_subscription && !reminder.enterprise);
 
     // Claiming counted the reminder and restarted the clock.
@@ -2213,12 +2213,12 @@ async fn invite_reminders_skip_invites_that_cannot_lead_anywhere(
     sqlx::query("UPDATE team_invite SET email = 'user3@user.com' WHERE email = 'invite@rox.one'")
         .execute(&pool)
         .await?;
-    sqlx::query("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1::uuid, 'macro|user3@user.com', 'member')")
+    sqlx::query("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1::uuid, 'rox|user3@user.com', 'member')")
         .bind(TEAM_1)
         .execute(&pool)
         .await?;
     assert!(claimed_emails(&team_repo).await?.is_empty());
-    sqlx::query("DELETE FROM team_user WHERE user_id = 'macro|user3@user.com'")
+    sqlx::query("DELETE FROM team_user WHERE user_id = 'rox|user3@user.com'")
         .execute(&pool)
         .await?;
     assert_eq!(claimed_emails(&team_repo).await?.len(), 1);
@@ -2229,7 +2229,7 @@ async fn invite_reminders_skip_invites_that_cannot_lead_anywhere(
     .await?;
 
     // The inviter is no longer on the team.
-    sqlx::query("UPDATE team_invite SET invited_by = 'macro|user4@user.com'")
+    sqlx::query("UPDATE team_invite SET invited_by = 'rox|user4@user.com'")
         .execute(&pool)
         .await?;
     assert!(claimed_emails(&team_repo).await?.is_empty());
@@ -2306,14 +2306,14 @@ async fn agent_invites_are_visible_to_the_invitee(pool: Pool<Postgres>) -> anyho
     .await?;
     sqlx::query!(
         r#"INSERT INTO "User" ("id", "email", "rox_user_id")
-           VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+           VALUES ('rox|owner@example.com', 'owner@example.com', $1)"#,
         rox_user_id,
     )
     .execute(&pool)
     .await?;
 
     let team_repo = TeamRepositoryImpl::new(pool);
-    let user_id = RoxUserIdStr::parse_from_str("macro|owner@example.com")?;
+    let user_id = RoxUserIdStr::parse_from_str("rox|owner@example.com")?;
     let team_id = rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?;
     let invites = vec![Email::parse_from_str("agent@example.com")?.lowercase()];
     let invites = non_empty::NonEmpty::new(invites.as_slice())?;
@@ -2323,7 +2323,7 @@ async fn agent_invites_are_visible_to_the_invitee(pool: Pool<Postgres>) -> anyho
         .await?;
     assert!(invited[0].is_agent);
 
-    let invitee = RoxUserIdStr::parse_from_str("macro|agent@example.com")?;
+    let invitee = RoxUserIdStr::parse_from_str("rox|agent@example.com")?;
     let pending = team_repo.get_user_team_invites(&invitee).await?;
     assert_eq!(pending.len(), 1);
     assert!(pending[0].is_agent);
@@ -2342,10 +2342,10 @@ async fn get_user_display_name_joins_the_set_name_parts(
             ('b3333333-3333-3333-3333-333333333333', 'unset@example.com', 'unset@example.com', 'cus_unset'),
             ('b4444444-4444-4444-4444-444444444444', 'none@example.com', 'none@example.com', 'cus_none')"#,
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES
-            ('macro|full@example.com', 'full@example.com', 'b1111111-1111-1111-1111-111111111111'),
-            ('macro|first@example.com', 'first@example.com', 'b2222222-2222-2222-2222-222222222222'),
-            ('macro|unset@example.com', 'unset@example.com', 'b3333333-3333-3333-3333-333333333333'),
-            ('macro|none@example.com', 'none@example.com', 'b4444444-4444-4444-4444-444444444444')"#,
+            ('rox|full@example.com', 'full@example.com', 'b1111111-1111-1111-1111-111111111111'),
+            ('rox|first@example.com', 'first@example.com', 'b2222222-2222-2222-2222-222222222222'),
+            ('rox|unset@example.com', 'unset@example.com', 'b3333333-3333-3333-3333-333333333333'),
+            ('rox|none@example.com', 'none@example.com', 'b4444444-4444-4444-4444-444444444444')"#,
         r#"INSERT INTO rox_user_info (rox_user_id, first_name, last_name) VALUES
             ('b1111111-1111-1111-1111-111111111111', 'Ada', 'Lovelace'),
             ('b2222222-2222-2222-2222-222222222222', 'Grace', 'N/A'),
@@ -2357,11 +2357,11 @@ async fn get_user_display_name_joins_the_set_name_parts(
 
     let mut names = Vec::new();
     for user in [
-        "macro|full@example.com",
-        "macro|first@example.com",
-        "macro|unset@example.com",
-        "macro|none@example.com",
-        "macro|missing@example.com",
+        "rox|full@example.com",
+        "rox|first@example.com",
+        "rox|unset@example.com",
+        "rox|none@example.com",
+        "rox|missing@example.com",
     ] {
         let user = RoxUserIdStr::parse_from_str(user)?;
         names.push(team_repo.get_user_display_name(&user).await?);

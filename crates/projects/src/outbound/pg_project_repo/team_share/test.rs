@@ -20,7 +20,7 @@ use crate::domain::models::{CreateProjectArgs, EditProjectArgs, ProjectError};
 use crate::domain::ports::ProjectRepo;
 use crate::outbound::pg_project_repo::tests::{SponsoredBy, TestRepo, test_repo, test_repo_with};
 
-const OWNER: &str = "macro|test@example.com";
+const OWNER: &str = "rox|test@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 const BOT: &str = "bot|00000000-0000-0000-0000-00000000b07a";
 

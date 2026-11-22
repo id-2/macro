@@ -55,12 +55,12 @@ use crate::domain::models::{
 };
 use crate::domain::ports::InitiativeRepo;
 
-const OWNER: &str = "macro|initiative-repo-owner@corp.test";
-const MEMBER: &str = "macro|initiative-repo-member@corp.test";
-const TEAMMATE: &str = "macro|initiative-repo-teammate@corp.test";
-const CHANNEL_USER: &str = "macro|initiative-repo-channel@corp.test";
-const STRANGER: &str = "macro|initiative-repo-stranger@corp.test";
-const OTHER_OWNER: &str = "macro|initiative-repo-other-owner@corp.test";
+const OWNER: &str = "rox|initiative-repo-owner@corp.test";
+const MEMBER: &str = "rox|initiative-repo-member@corp.test";
+const TEAMMATE: &str = "rox|initiative-repo-teammate@corp.test";
+const CHANNEL_USER: &str = "rox|initiative-repo-channel@corp.test";
+const STRANGER: &str = "rox|initiative-repo-stranger@corp.test";
+const OTHER_OWNER: &str = "rox|initiative-repo-other-owner@corp.test";
 
 const INITIATIVE: &str = "initiative";
 
@@ -130,7 +130,7 @@ fn create_args(owner: &str, name: &str, members: &[&str]) -> CreateInitiativeRep
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::now_v7();
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
     sqlx::query!(
         r#"
         INSERT INTO rox_user (id, username, email, stripe_customer_id)

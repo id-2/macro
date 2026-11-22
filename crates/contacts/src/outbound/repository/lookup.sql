@@ -10,12 +10,12 @@ LEFT JOIN LATERAL (
     SELECT TRUE AS present FROM contacts_connections
     WHERE user1 = $1
       AND lower(user2 COLLATE "C") = requested.contact
-      AND user2 COLLATE "C" LIKE 'macro|%'
+      AND user2 COLLATE "C" LIKE 'rox|%'
     UNION ALL
     SELECT TRUE AS present FROM contacts_connections
     WHERE user2 = $1
       AND lower(user1 COLLATE "C") = requested.contact
-      AND user1 COLLATE "C" LIKE 'macro|%'
+      AND user1 COLLATE "C" LIKE 'rox|%'
     LIMIT 1
 ) AS membership ON TRUE
 WHERE requested.contact = $1 OR membership.present IS TRUE

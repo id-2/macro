@@ -18,7 +18,7 @@ describe('composeAgentContextPrompt with an external routine event', () => {
         kind: 'routine',
         routine_id: 'r-9',
         name: 'Fix CI',
-        owner: { id: 'macro|julia@example.com', name: 'Julia' },
+        owner: { id: 'rox|julia@example.com', name: 'Julia' },
         instructions: 'Find why CI failed.',
         triggers: [
           {
@@ -53,7 +53,7 @@ describe('composeAgentContextPrompt with an external routine event', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Fix CI, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-9" name="Fix CI" owner="Julia" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-9" name="Fix CI" owner="Julia" owner_id="rox|julia@example.com"/>',
         '  <instructions>Find why CI failed.</instructions>',
         '  <triggers>',
         '    <events names="github">',
@@ -78,7 +78,7 @@ describe('composeAgentContextPrompt with an external routine event', () => {
         kind: 'routine',
         routine_id: 'r-10',
         name: 'Pushes',
-        owner: { id: 'macro|julia@example.com', name: 'Julia' },
+        owner: { id: 'rox|julia@example.com', name: 'Julia' },
         instructions: 'Summarize the push.',
         triggers: [
           {
@@ -122,7 +122,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         },
         prompt_message_id: 'm2',
         sender: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -133,7 +133,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
             {
               id: 'm1',
               author: {
-                id: 'macro|teo@example.com',
+                id: 'rox|teo@example.com',
                 name: 'Teo',
                 email: 'teo@example.com',
               },
@@ -143,7 +143,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
             {
               id: 'm2',
               author: {
-                id: 'macro|julia@example.com',
+                id: 'rox|julia@example.com',
                 name: 'Julia',
                 email: 'julia@example.com',
               },
@@ -171,13 +171,13 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '      </anchor>',
         '    </document>',
         '    <origin>This prompt was posted in a document comment thread, not the agent session view. Your reply is posted back into that thread, and it is where the user will answer anything you ask.</origin>',
-        '    <sender name="Julia" email="julia@example.com" id="macro|julia@example.com"/>',
+        '    <sender name="Julia" email="julia@example.com" id="rox|julia@example.com"/>',
         '    <reply_target kind="thread" thread="m1">',
         '      <note>The prompt was posted as a reply in the thread below. It is about that thread.</note>',
         '    </reply_target>',
         '    <thread root="m1">',
-        '      <message id="m1" author="Teo" author_email="teo@example.com" author_id="macro|teo@example.com" at="2026-10-08T14:00:00Z">Is Monday realistic?</message>',
-        '      <message id="m2" author="Julia" author_email="julia@example.com" author_id="macro|julia@example.com" at="2026-10-08T14:02:00Z" mentioned_you="true">Cursor can you check the QA calendar?</message>',
+        '      <message id="m1" author="Teo" author_email="teo@example.com" author_id="rox|teo@example.com" at="2026-10-08T14:00:00Z">Is Monday realistic?</message>',
+        '      <message id="m2" author="Julia" author_email="julia@example.com" author_id="rox|julia@example.com" at="2026-10-08T14:02:00Z" mentioned_you="true">Cursor can you check the QA calendar?</message>',
         '    </thread>',
         '  </discussion>',
         '</trigger>',
@@ -199,7 +199,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         },
         prompt_message_id: 'm2',
         sender: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -210,7 +210,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
             {
               id: 'm1',
               author: {
-                id: 'macro|teo@example.com',
+                id: 'rox|teo@example.com',
                 name: 'Teo',
                 email: 'teo@example.com',
               },
@@ -228,7 +228,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
             {
               id: 'm2',
               author: {
-                id: 'macro|julia@example.com',
+                id: 'rox|julia@example.com',
                 name: 'Julia',
                 email: 'julia@example.com',
               },
@@ -248,17 +248,17 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '  <discussion>',
         '    <channel id="c1" name="eng" type="public"/>',
         '    <origin>This prompt was posted in a channel thread, not the agent session view. Your reply is posted back into that thread, and it is where the user will answer anything you ask.</origin>',
-        '    <sender name="Julia" email="julia@example.com" id="macro|julia@example.com"/>',
+        '    <sender name="Julia" email="julia@example.com" id="rox|julia@example.com"/>',
         '    <reply_target kind="thread" thread="m1">',
         '      <note>The prompt was posted as a reply in the thread below. It is about that thread.</note>',
         '    </reply_target>',
         '    <note>Attachments are listed on each message and can be fetched by their url.</note>',
         '    <thread root="m1">',
-        `      <message id="m1" author="Teo" author_email="teo@example.com" author_id="macro|teo@example.com" at="2026-10-08T14:00:00Z">We need agent templates`,
+        `      <message id="m1" author="Teo" author_email="teo@example.com" author_id="rox|teo@example.com" at="2026-10-08T14:00:00Z">We need agent templates`,
         `        <attachment type="static/image" id="${fileId}" url="https://static.example/file/${fileId}"/>`,
         '        <attachment type="document" id="doc-1"/>',
         '      </message>',
-        '      <message id="m2" author="Julia" author_email="julia@example.com" author_id="macro|julia@example.com" at="2026-10-08T14:02:00Z" mentioned_you="true">see screenshot and create a task</message>',
+        '      <message id="m2" author="Julia" author_email="julia@example.com" author_id="rox|julia@example.com" at="2026-10-08T14:02:00Z" mentioned_you="true">see screenshot and create a task</message>',
         '    </thread>',
         '  </discussion>',
         '</trigger>',
@@ -281,7 +281,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         sender: { id: 'bot|macro', name: 'Rox' },
         agent_request: {
           on_behalf_of: {
-            id: 'macro|julia@example.com',
+            id: 'rox|julia@example.com',
             name: 'Julia',
             email: 'julia@example.com',
           },
@@ -300,7 +300,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '    <origin>This prompt was posted in a channel thread, not the agent session view. Your reply is posted back into that thread, and it is where the user will answer anything you ask.</origin>',
         '    <sender name="Rox" id="bot|macro"/>',
         '    <agent_request hops="1">',
-        '      <on_behalf_of name="Julia" email="julia@example.com" id="macro|julia@example.com"/>',
+        '      <on_behalf_of name="Julia" email="julia@example.com" id="rox|julia@example.com"/>',
         '    </agent_request>',
         '    <reply_target kind="thread" thread="m1">',
         '      <note>The prompt was posted as a reply in the thread below. It is about that thread.</note>',
@@ -314,8 +314,8 @@ describe('composeAgentContextPrompt with a trigger', () => {
   it('renders an inferred follow-up after the session block and warns the inference can be wrong', () => {
     const markdown = composeAgentContextPrompt({
       promptMarkdown: 'and the popover one too',
-      owner: { id: 'macro|julia@example.com', name: 'Julia' },
-      sender: { id: 'macro|julia@example.com', name: 'Julia' },
+      owner: { id: 'rox|julia@example.com', name: 'Julia' },
+      sender: { id: 'rox|julia@example.com', name: 'Julia' },
       trigger: {
         kind: 'follow_up',
         addressed_by: 'inferred',
@@ -328,7 +328,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
           },
           prompt_message_id: 'p',
           sender: {
-            id: 'macro|julia@example.com',
+            id: 'rox|julia@example.com',
             name: 'Julia',
             email: 'julia@example.com',
           },
@@ -340,7 +340,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
                 {
                   id: 'old',
                   author: {
-                    id: 'macro|teo@example.com',
+                    id: 'rox|teo@example.com',
                     name: 'Teo',
                     email: 'teo@example.com',
                   },
@@ -365,7 +365,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
                 {
                   id: 'p',
                   author: {
-                    id: 'macro|julia@example.com',
+                    id: 'rox|julia@example.com',
                     name: 'Julia',
                     email: 'julia@example.com',
                   },
@@ -382,7 +382,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
 
     const context = hiddenContext(markdown);
     expect(context).toContain(
-      '<session owner="Julia" owner_id="macro|julia@example.com">'
+      '<session owner="Julia" owner_id="rox|julia@example.com">'
     );
     expect(context).toContain('Choose acting_as explicitly');
     expect(context?.slice(context.indexOf('<trigger'))).toBe(
@@ -392,17 +392,17 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '  <discussion>',
         '    <channel id="c1" name="eng" type="public"/>',
         '    <origin>This prompt was posted in a channel thread, not the agent session view. Your reply is posted back into that thread, and it is where the user will answer anything you ask.</origin>',
-        '    <sender name="Julia" email="julia@example.com" id="macro|julia@example.com"/>',
+        '    <sender name="Julia" email="julia@example.com" id="rox|julia@example.com"/>',
         '    <reply_target kind="none">',
         '      <note>The prompt was posted at the top level of the channel and replies to no particular message.</note>',
         '    </reply_target>',
         '    <channel_recent>',
         '      <note>Recent messages in this channel, grouped by thread, oldest first.</note>',
         '      <thread root="old">',
-        '        <message id="old" author="Teo" author_email="teo@example.com" author_id="macro|teo@example.com" at="2026-10-08T13:00:00Z">spinner never stops</message>',
+        '        <message id="old" author="Teo" author_email="teo@example.com" author_id="rox|teo@example.com" at="2026-10-08T13:00:00Z">spinner never stops</message>',
         '        <message id="old2" author="Cursor" author_id="bot|00000000-0000-0000-0000-00000000c5c5" at="2026-10-08T13:30:00Z">Fixed in #12.</message>',
         '      </thread>',
-        '      <message id="p" author="Julia" author_email="julia@example.com" author_id="macro|julia@example.com" at="2026-10-08T14:02:00Z" addressed_to_you="true">and the popover one too</message>',
+        '      <message id="p" author="Julia" author_email="julia@example.com" author_id="rox|julia@example.com" at="2026-10-08T14:02:00Z" addressed_to_you="true">and the popover one too</message>',
         '    </channel_recent>',
         '  </discussion>',
         '</trigger>',
@@ -419,7 +419,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
           id: 'task-1',
           title: 'Fix calendar popover scroll',
           markdown:
-            'The popover scrolls the page behind it. Ask <m-user-mention>{"userId":"macro|teo@example.com","displayName":"Teo"}</m-user-mention> for repro steps.',
+            'The popover scrolls the page behind it. Ask <m-user-mention>{"userId":"rox|teo@example.com","displayName":"Teo"}</m-user-mention> for repro steps.',
           status: 'Todo',
           priority: 'High',
           due: '2026-10-10T00:00:00Z',
@@ -429,7 +429,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
           project: { id: 'p-a1', name: 'Calendar polish' },
         },
         assigned_by: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -442,7 +442,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="task_assigned" discussion="d1">',
         '  <note>Julia assigned you this task. Your replies are posted to your own discussion on the task, where Julia and others on the task read them.</note>',
-        '  <assigned by="Julia" by_email="julia@example.com" by_id="macro|julia@example.com" at="2026-10-08T14:02:00Z"/>',
+        '  <assigned by="Julia" by_email="julia@example.com" by_id="rox|julia@example.com" at="2026-10-08T14:02:00Z"/>',
         '  <task id="task-1" title="Fix calendar popover scroll" status="Todo" priority="High" due="2026-10-10T00:00:00Z">',
         '    <project id="p-a1" name="Calendar polish"/>',
         '    <assignees>',
@@ -461,7 +461,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       trigger: {
         kind: 'requested',
         requested_by: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -474,7 +474,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="requested">',
         '  <note>Julia opened this session from the composer. Their prompt follows.</note>',
-        '  <requested by="Julia" by_email="julia@example.com" by_id="macro|julia@example.com" at="2026-10-08T14:02:00Z" repo="https://github.com/macro-inc/macro"/>',
+        '  <requested by="Julia" by_email="julia@example.com" by_id="rox|julia@example.com" at="2026-10-08T14:02:00Z" repo="https://github.com/macro-inc/macro"/>',
         '</trigger>',
       ].join('\n')
     );
@@ -486,7 +486,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       trigger: {
         kind: 'dispatched',
         dispatched_by: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -501,7 +501,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="dispatched">',
         '  <note>Another agent handed you this task on behalf of Julia. The prompt is the task it handed over.</note>',
-        '  <dispatched by="Julia" by_email="julia@example.com" by_id="macro|julia@example.com" at="2026-10-08T14:02:00Z" from_bot="00000000-0000-0000-0000-00000000a2a2" from_session="s-1" repo="https://github.com/macro-inc/macro"/>',
+        '  <dispatched by="Julia" by_email="julia@example.com" by_id="rox|julia@example.com" at="2026-10-08T14:02:00Z" from_bot="00000000-0000-0000-0000-00000000a2a2" from_session="s-1" repo="https://github.com/macro-inc/macro"/>',
         '</trigger>',
       ].join('\n')
     );
@@ -515,7 +515,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-1',
         name: 'Morning triage',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -539,7 +539,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Morning triage, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-1" name="Morning triage" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-1" name="Morning triage" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>Sort new email into Finance and Support.</instructions>',
         '  <triggers>',
         '    <schedule cron="0 0 9 * * MON-FRI" timezone="America/New_York"/>',
@@ -560,7 +560,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-3',
         name: 'Check back on the deploy',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -591,7 +591,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-2',
         name: 'Escalate blockers',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -623,7 +623,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Escalate blockers, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-2" name="Escalate blockers" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-2" name="Escalate blockers" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>Tell the team when a task gets blocked.</instructions>',
         '  <triggers>',
         '    <events names="task.status_changed">',
@@ -653,7 +653,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-3',
         name: 'Watch the fix',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -692,7 +692,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-3',
         name: 'Invoice intake',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -719,7 +719,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Invoice intake, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-3" name="Invoice intake" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-3" name="Invoice intake" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>File invoices into the Finance folder.</instructions>',
         '  <triggers>',
         '    <events names="email.message_received"/>',
@@ -742,7 +742,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-4',
         name: 'File intake',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -764,7 +764,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
               },
               prompt_message_id: 'f1',
               sender: {
-                id: 'macro|teo@example.com',
+                id: 'rox|teo@example.com',
                 name: 'Teo',
                 email: 'teo@example.com',
               },
@@ -776,7 +776,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
                 message: {
                   id: 'q',
                   author: {
-                    id: 'macro|julia@example.com',
+                    id: 'rox|julia@example.com',
                     name: 'Julia',
                     email: 'julia@example.com',
                   },
@@ -790,7 +790,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
                   {
                     id: 'f1',
                     author: {
-                      id: 'macro|teo@example.com',
+                      id: 'rox|teo@example.com',
                       name: 'Teo',
                       email: 'teo@example.com',
                     },
@@ -810,7 +810,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine File intake, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-4" name="File intake" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-4" name="File intake" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>Summarise attached reports.</instructions>',
         '  <triggers>',
         '    <events names="channel.message_attachment_created"/>',
@@ -819,14 +819,14 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '    <attachment entity_type="document" entity_id="doc-q3"/>',
         '    <discussion>',
         '      <channel id="c2" type="direct_message"/>',
-        '      <sender name="Teo" email="teo@example.com" id="macro|teo@example.com"/>',
+        '      <sender name="Teo" email="teo@example.com" id="rox|teo@example.com"/>',
         '      <reply_target kind="quote" message="q" thread="q">',
         '        <note>The triggering message quote-replies to this message. It is what the triggering message is about.</note>',
-        '        <message id="q" author="Julia" author_email="julia@example.com" author_id="macro|julia@example.com" at="2026-10-08T10:00:00Z">send the numbers</message>',
+        '        <message id="q" author="Julia" author_email="julia@example.com" author_id="rox|julia@example.com" at="2026-10-08T10:00:00Z">send the numbers</message>',
         '      </reply_target>',
         '      <thread root="q" messages_omitted="true">',
         '        <note>Some messages of this thread are not shown.</note>',
-        '        <message id="f1" author="Teo" author_email="teo@example.com" author_id="macro|teo@example.com" at="2026-10-08T10:05:00Z" fired_routine="true">here you go</message>',
+        '        <message id="f1" author="Teo" author_email="teo@example.com" author_id="rox|teo@example.com" at="2026-10-08T10:05:00Z" fired_routine="true">here you go</message>',
         '      </thread>',
         '    </discussion>',
         '  </event>',
@@ -843,7 +843,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-4',
         name: 'Call prep',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -860,13 +860,13 @@ describe('composeAgentContextPrompt with a trigger', () => {
               channel_name: 'eng',
               started_at: '2026-10-08T14:00:00Z',
               started_by: {
-                id: 'macro|julia@example.com',
+                id: 'rox|julia@example.com',
                 name: 'julia@example.com',
                 email: 'julia@example.com',
               },
               participants: [
                 {
-                  id: 'macro|julia@example.com',
+                  id: 'rox|julia@example.com',
                   name: 'julia@example.com',
                   email: 'julia@example.com',
                 },
@@ -881,16 +881,16 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Call prep, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-4" name="Call prep" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-4" name="Call prep" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>Draft talking points for this call.</instructions>',
         '  <triggers>',
         '    <events names="call.started"/>',
         '  </triggers>',
         '  <event type="call_started">',
         '    <call id="call-0" title="Standup" channel="eng" channel_id="c1" started_at="2026-10-08T14:00:00Z">',
-        '      <started_by name="julia@example.com" email="julia@example.com" id="macro|julia@example.com"/>',
+        '      <started_by name="julia@example.com" email="julia@example.com" id="rox|julia@example.com"/>',
         '      <participants>',
-        '        <participant name="julia@example.com" email="julia@example.com" id="macro|julia@example.com"/>',
+        '        <participant name="julia@example.com" email="julia@example.com" id="rox|julia@example.com"/>',
         '      </participants>',
         '    </call>',
         '  </event>',
@@ -907,7 +907,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         routine_id: 'r-5',
         name: 'Call recap',
         owner: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'Julia',
           email: 'julia@example.com',
         },
@@ -926,7 +926,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
               ended_at: '2026-10-08T14:30:00Z',
               participants: [
                 {
-                  id: 'macro|julia@example.com',
+                  id: 'rox|julia@example.com',
                   name: 'julia@example.com',
                   email: 'julia@example.com',
                 },
@@ -950,7 +950,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
       [
         '<trigger kind="routine">',
         '  <note>The routine Call recap, owned by Julia, fired. The prompt is what the routine asks you to do.</note>',
-        '  <routine id="r-5" name="Call recap" owner="Julia" owner_email="julia@example.com" owner_id="macro|julia@example.com"/>',
+        '  <routine id="r-5" name="Call recap" owner="Julia" owner_email="julia@example.com" owner_id="rox|julia@example.com"/>',
         '  <instructions>Post a recap with action items.</instructions>',
         '  <triggers>',
         '    <events names="call.ended"/>',
@@ -958,7 +958,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         '  <event type="call_ended">',
         '    <call id="call-1" title="Acme renewal" channel="sales" channel_id="c1" started_at="2026-10-08T14:00:00Z" ended_at="2026-10-08T14:30:00Z">',
         '      <participants>',
-        '        <participant name="julia@example.com" email="julia@example.com" id="macro|julia@example.com"/>',
+        '        <participant name="julia@example.com" email="julia@example.com" id="rox|julia@example.com"/>',
         '        <participant name="Sam (Acme)" id="g-1"/>',
         '      </participants>',
         '      <transcript omitted="true">',
@@ -980,7 +980,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         kind: 'routine',
         routine_id: 'r-6',
         name: 'Call recap',
-        owner: { id: 'macro|julia@example.com', name: 'Julia' },
+        owner: { id: 'rox|julia@example.com', name: 'Julia' },
         instructions: 'Post a recap.',
         triggers: [{ type: 'events', events: ['call.ended'] }],
         firing: {
@@ -1020,7 +1020,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
         parent: { type: 'channel', id: 'c1' },
         trigger: {
           kind: 'requested',
-          requested_by: { id: 'macro|julia@example.com', name: 'Julia' },
+          requested_by: { id: 'rox|julia@example.com', name: 'Julia' },
           requested_at: '2026-10-08T14:02:00Z',
         },
       })

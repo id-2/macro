@@ -18,7 +18,7 @@ import { changeViewer } from './network';
 import { account, setAccount } from './task-filter-adapters';
 
 export function LinearImportFixture() {
-  changeViewer('macro|viewer@example.com');
+  changeViewer('rox|viewer@example.com');
   return (
     <QuickAccessContextProvider value={ACCESS}>
       <main class="h-dvh overflow-auto bg-page text-ink">

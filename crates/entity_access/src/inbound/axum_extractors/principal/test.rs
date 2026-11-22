@@ -15,14 +15,14 @@ async fn signed_agent_uses_owner_scope_and_preserves_both_identities() {
             role: ParticipantRole::Member,
         });
     let agent_id = bot_id::ROX_NEW_BOT_ID;
-    let owner = "macro|owner@example.com".to_string().try_into().unwrap();
+    let owner = "rox|owner@example.com".to_string().try_into().unwrap();
     let principal = RoxAuthorization::User(RoxUserAuthentication {
         origin: rox_authorization::CredentialOrigin::RoxApiJwt,
         agent_id: Some(agent_id),
         agent_via: None,
         rox_user_id: owner,
         user_context: UserContext {
-            user_id: "macro|owner@example.com".into(),
+            user_id: "rox|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),
             organization_id: Some(42),
             permissions: None,
@@ -40,14 +40,14 @@ async fn signed_agent_uses_owner_scope_and_preserves_both_identities() {
     assert_eq!(receipt.get_authenticated_bot().unwrap().bot_id(), agent_id);
     assert_eq!(
         receipt.acting_user_id().unwrap().as_ref(),
-        "macro|owner@example.com"
+        "rox|owner@example.com"
     );
     assert_eq!(
         service.bot_calls(),
         vec![BotAccessCall {
             bot_id: agent_id,
             scope: BotAccessScope::User {
-                user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
+                user_id: "rox|owner@example.com".to_string().try_into().unwrap(),
                 user_org_id: Some(42),
             },
             entity_id: "channel-id".into(),
@@ -63,9 +63,9 @@ async fn signed_agent_cannot_send_without_owner_access() {
         origin: rox_authorization::CredentialOrigin::RoxApiJwt,
         agent_id: Some(bot_id::ROX_NEW_BOT_ID),
         agent_via: None,
-        rox_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
+        rox_user_id: "rox|owner@example.com".to_string().try_into().unwrap(),
         user_context: UserContext {
-            user_id: "macro|owner@example.com".into(),
+            user_id: "rox|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),
             organization_id: None,
             permissions: None,
@@ -90,9 +90,9 @@ async fn signed_agent_does_not_change_caller_identity_for_existing_messages() {
         origin: rox_authorization::CredentialOrigin::RoxApiJwt,
         agent_id: Some(bot_id::ROX_NEW_BOT_ID),
         agent_via: None,
-        rox_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
+        rox_user_id: "rox|owner@example.com".to_string().try_into().unwrap(),
         user_context: UserContext {
-            user_id: "macro|owner@example.com".into(),
+            user_id: "rox|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),
             organization_id: Some(42),
             permissions: None,
@@ -108,7 +108,7 @@ async fn signed_agent_does_not_change_caller_identity_for_existing_messages() {
     .unwrap();
     assert_eq!(
         receipt.get_authenticated_user().unwrap().as_ref(),
-        "macro|owner@example.com"
+        "rox|owner@example.com"
     );
     assert!(receipt.get_authenticated_bot().is_err());
     assert!(service.bot_calls().is_empty());

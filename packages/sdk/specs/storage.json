@@ -29639,7 +29639,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by session owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
+            "description": "Filter by session owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
           }
         }
       },
@@ -34978,7 +34978,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by chat owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by chat owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -38196,7 +38196,7 @@
       },
       "CustomSpeakerAssignment": {
         "type": "object",
-        "description": "One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.",
+        "description": "One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.",
         "required": ["diarizedSpeakerId", "customSpeaker"],
         "properties": {
           "customSpeaker": {
@@ -39133,7 +39133,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by document owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by document owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -43925,7 +43925,7 @@
           },
           {
             "type": "object",
-            "description": "Rox ids: people as macro| user ids, records or other items.",
+            "description": "Rox ids: people as rox| user ids, records or other items.",
             "required": ["value", "type"],
             "properties": {
               "type": {
@@ -43937,7 +43937,7 @@
                 "items": {
                   "type": "string"
                 },
-                "description": "Rox ids: people as macro| user ids, records or other items."
+                "description": "Rox ids: people as rox| user ids, records or other items."
               }
             }
           }
@@ -45559,7 +45559,7 @@
           },
           "value": {
             "type": ["string", "null"],
-            "description": "One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true/false, or a date."
+            "description": "One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true/false, or a date."
           },
           "values": {
             "type": ["array", "null"],
@@ -47834,7 +47834,7 @@
         "properties": {
           "recipient_id": {
             "type": "string",
-            "description": "Recipient user id (`macro|...`) or agent persona id (`bot|...`)."
+            "description": "Recipient user id (`rox|...`) or agent persona id (`bot|...`)."
           }
         }
       },
@@ -48706,7 +48706,7 @@
       "GuestId": {
         "type": "string",
         "format": "uuid",
-        "description": "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Rox user\nids. Only the server mints them; Rox users keep `macro|…` identities,\nso an RTC identity classifies as exactly one of the two."
+        "description": "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Rox user\nids. Only the server mints them; Rox users keep `rox|…` identities,\nso an RTC identity classifies as exactly one of the two."
       },
       "GuestJoinRequest": {
         "type": "object",
@@ -49676,7 +49676,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by initiative owner principal — a user ('macro|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
+            "description": "Filter by initiative owner principal — a user ('rox|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
           }
         }
       },
@@ -55079,7 +55079,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by project owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by project owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -56042,7 +56042,7 @@
           },
           "counterpartyId": {
             "type": "string",
-            "description": "The other account (`macro|...`)."
+            "description": "The other account (`rox|...`)."
           }
         }
       },
@@ -60377,7 +60377,7 @@
           },
           {
             "type": "string",
-            "description": "Text, or a formula starting with =, at most 10,000 characters. Rox links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}</m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}</m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}</m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9/28/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search/read results; do not invent them. Other Markdown is literal."
+            "description": "Text, or a formula starting with =, at most 10,000 characters. Rox links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}</m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}</m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}</m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9/28/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search/read results; do not invent them. Other Markdown is literal."
           },
           {
             "type": "null",

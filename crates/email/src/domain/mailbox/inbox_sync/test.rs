@@ -27,7 +27,7 @@ fn failure(outcome: InboxSyncDisposition) -> (bool, DetailedError) {
 fn link(is_sync_active: bool, needs_reauth: bool) -> Link {
     Link {
         id: Uuid::from_u128(1),
-        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fusionauth-user".to_string(),
         email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
         provider: UserProvider::Gmail,

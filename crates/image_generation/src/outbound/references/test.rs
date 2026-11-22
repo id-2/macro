@@ -100,7 +100,7 @@ impl AttachmentService for Service {
 fn principal() -> CreationPrincipal {
     CreationPrincipal::BotForUser {
         bot: bot_id::ROX_AI_BOT_ID,
-        user: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        user: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
     }
 }
 
@@ -137,14 +137,14 @@ async fn routes_references_to_the_owning_service_with_the_acting_user() {
     assert_eq!(
         *document_calls.lock().unwrap(),
         vec![(
-            "macro|owner@example.com".to_owned(),
+            "rox|owner@example.com".to_owned(),
             EntityType::Document.with_entity_string(document_id.to_string()),
         )]
     );
     assert_eq!(
         *static_calls.lock().unwrap(),
         vec![(
-            "macro|owner@example.com".to_owned(),
+            "rox|owner@example.com".to_owned(),
             EntityType::StaticFile.with_entity_string(static_id.to_string()),
         )]
     );

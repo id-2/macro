@@ -2,7 +2,7 @@ use super::*;
 use rox_user_id::cowlike::CowLike;
 
 fn user(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
+    RoxUserIdStr::parse_from_str(&format!("rox|{name}@test.com"))
         .unwrap()
         .into_owned()
 }

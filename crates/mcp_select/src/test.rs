@@ -11,7 +11,7 @@ const SLACK: ConnectorRef<'static> = ConnectorRef {
 };
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap()
 }
 
 #[derive(Default)]

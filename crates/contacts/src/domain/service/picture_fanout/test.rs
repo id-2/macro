@@ -92,15 +92,15 @@ async fn pages_through_all_contacts_one_message_per_page() {
     let (service, cursors) = fanout(
         vec![
             page(
-                &["macro|a@example.com", "macro|b@example.com"],
-                Some("macro|b@example.com"),
+                &["rox|a@example.com", "rox|b@example.com"],
+                Some("rox|b@example.com"),
             ),
-            page(&["macro|c@example.com"], None),
+            page(&["rox|c@example.com"], None),
         ],
         notifier.clone(),
     );
 
-    let summary = service.fan_out(&user("macro|a@example.com")).await.unwrap();
+    let summary = service.fan_out(&user("rox|a@example.com")).await.unwrap();
 
     assert_eq!(
         summary,
@@ -111,12 +111,12 @@ async fn pages_through_all_contacts_one_message_per_page() {
     );
     let sent = notifier.sent.lock().unwrap();
     assert_eq!(sent.len(), 2);
-    assert_eq!(sent[0].0, "macro|a@example.com");
-    assert_eq!(sent[0].1, ["macro|a@example.com", "macro|b@example.com"]);
-    assert_eq!(sent[1].1, ["macro|c@example.com"]);
+    assert_eq!(sent[0].0, "rox|a@example.com");
+    assert_eq!(sent[0].1, ["rox|a@example.com", "rox|b@example.com"]);
+    assert_eq!(sent[1].1, ["rox|c@example.com"]);
     assert_eq!(
         *cursors.lock().unwrap(),
-        [None, Some("macro|b@example.com".to_string())]
+        [None, Some("rox|b@example.com".to_string())]
     );
 }
 
@@ -125,7 +125,7 @@ async fn empty_contacts_send_nothing() {
     let notifier = RecordingNotifier::default();
     let (service, _) = fanout(vec![page(&[], None)], notifier.clone());
 
-    let summary = service.fan_out(&user("macro|a@example.com")).await.unwrap();
+    let summary = service.fan_out(&user("rox|a@example.com")).await.unwrap();
 
     assert_eq!(
         summary,
@@ -142,13 +142,13 @@ async fn empty_page_with_continuation_keeps_paging() {
     let notifier = RecordingNotifier::default();
     let (service, _) = fanout(
         vec![
-            page(&[], Some("macro|skipped")),
-            page(&["macro|b@example.com"], None),
+            page(&[], Some("rox|skipped")),
+            page(&["rox|b@example.com"], None),
         ],
         notifier.clone(),
     );
 
-    let summary = service.fan_out(&user("macro|a@example.com")).await.unwrap();
+    let summary = service.fan_out(&user("rox|a@example.com")).await.unwrap();
 
     assert_eq!(
         summary,
@@ -164,13 +164,13 @@ async fn empty_page_with_continuation_keeps_paging() {
 async fn stuck_cursor_is_an_error() {
     let (service, _) = fanout(
         vec![
-            page(&["macro|b@example.com"], Some("macro|b@example.com")),
-            page(&["macro|b@example.com"], Some("macro|b@example.com")),
+            page(&["rox|b@example.com"], Some("rox|b@example.com")),
+            page(&["rox|b@example.com"], Some("rox|b@example.com")),
         ],
         RecordingNotifier::default(),
     );
 
-    assert!(service.fan_out(&user("macro|a@example.com")).await.is_err());
+    assert!(service.fan_out(&user("rox|a@example.com")).await.is_err());
 }
 
 #[tokio::test]
@@ -179,21 +179,21 @@ async fn notifier_failure_fails_the_fan_out() {
         fail: true,
         ..Default::default()
     };
-    let (service, _) = fanout(vec![page(&["macro|a@example.com"], None)], notifier);
+    let (service, _) = fanout(vec![page(&["rox|a@example.com"], None)], notifier);
 
-    assert!(service.fan_out(&user("macro|a@example.com")).await.is_err());
+    assert!(service.fan_out(&user("rox|a@example.com")).await.is_err());
 }
 
 #[test]
 fn coalesce_keeps_one_per_user_in_first_seen_order() {
     let users = coalesce_users([
-        user("macro|a@example.com"),
-        user("macro|b@example.com"),
-        user("macro|a@example.com"),
+        user("rox|a@example.com"),
+        user("rox|b@example.com"),
+        user("rox|a@example.com"),
     ]);
     assert_eq!(
         users,
-        [user("macro|a@example.com"), user("macro|b@example.com")]
+        [user("rox|a@example.com"), user("rox|b@example.com")]
     );
     assert!(coalesce_users([]).is_empty());
 }

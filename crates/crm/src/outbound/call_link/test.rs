@@ -8,8 +8,8 @@ use uuid::Uuid;
 
 use super::*;
 
-const MEMBER: &str = "macro|rep@ours.example.com";
-const TEAMMATE: &str = "macro|teammate@acme.example.com";
+const MEMBER: &str = "rox|rep@ours.example.com";
+const TEAMMATE: &str = "rox|teammate@acme.example.com";
 
 async fn seed_team(pool: &PgPool, crm_enabled: bool) -> Uuid {
     let team_id = Uuid::now_v7();
@@ -154,7 +154,7 @@ async fn links_companies_by_domain_and_contacts_by_address(pool: PgPool) {
         .link_call_record(
             call_record_id,
             &people(
-                &[MEMBER, TEAMMATE, "macro|Ada@Acme.example.com"],
+                &[MEMBER, TEAMMATE, "rox|Ada@Acme.example.com"],
                 &[
                     "new@globex.com",
                     "x@hidden.com",
@@ -268,7 +268,7 @@ async fn matches_accounts_and_contacts_regardless_of_case(pool: PgPool) {
     linker(&pool)
         .link_call_record(
             call_record_id,
-            &people(&["macro|Rep@Ours.example.com"], &["grace@acme.example.com"]),
+            &people(&["rox|Rep@Ours.example.com"], &["grace@acme.example.com"]),
         )
         .await
         .unwrap();

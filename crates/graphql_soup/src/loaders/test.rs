@@ -193,7 +193,7 @@ fn document_named(id: Uuid, name: impl Into<String>) -> SoupItem<()> {
         appearance: None,
         id,
         document_version_id: 1,
-        owner_id: Owner::from_principal_str("macro|owner@example.com").expect("valid owner"),
+        owner_id: Owner::from_principal_str("rox|owner@example.com").expect("valid owner"),
         name: name.into(),
         file_type: None,
         sha: None,
@@ -216,7 +216,7 @@ fn email_thread(id: Uuid) -> SoupEnrichedEmailThreadPreview<()> {
         thread: SoupEmailThreadPreview {
             id,
             provider_id: None,
-            owner_id: user("macro|teammate@example.com"),
+            owner_id: user("rox|teammate@example.com"),
             inbox_visible: true,
             is_read: false,
             is_draft: false,
@@ -255,7 +255,7 @@ fn collect_ids<T>(expr: &Expr<T>, literal_id: impl Copy + Fn(&T) -> Option<Uuid>
 
 #[tokio::test]
 async fn batches_all_keys_for_one_user_into_one_soup_request() {
-    let user_id = user("macro|one@example.com");
+    let user_id = user("rox|one@example.com");
     let first_id = Uuid::from_u128(1);
     let second_id = Uuid::from_u128(2);
     let service = RecordingSoupService::default().with_response(
@@ -288,8 +288,8 @@ async fn batches_all_keys_for_one_user_into_one_soup_request() {
 
 #[tokio::test]
 async fn separates_one_soup_request_per_unique_user() {
-    let first_user = user("macro|one@example.com");
-    let second_user = user("macro|two@example.com");
+    let first_user = user("rox|one@example.com");
+    let second_user = user("rox|two@example.com");
     let first_id = Uuid::from_u128(1);
     let second_id = Uuid::from_u128(2);
     let service = RecordingSoupService::default()
@@ -327,7 +327,7 @@ async fn separates_one_soup_request_per_unique_user() {
 /// scope and without a Soup request.
 #[tokio::test]
 async fn email_threads_hydrate_through_the_access_checked_reader_not_the_viewer_inboxes() {
-    let user_id = user("macro|email@example.com");
+    let user_id = user("rox|email@example.com");
     let first_id = Uuid::from_u128(11);
     let second_id = Uuid::from_u128(12);
     let service = RecordingSoupService::default();
@@ -374,7 +374,7 @@ async fn email_threads_hydrate_through_the_access_checked_reader_not_the_viewer_
 
 #[tokio::test]
 async fn email_threads_and_other_entities_hydrate_side_by_side() {
-    let user_id = user("macro|mixed@example.com");
+    let user_id = user("rox|mixed@example.com");
     let document_id = Uuid::from_u128(14);
     let thread_id = Uuid::from_u128(15);
     let service =
@@ -412,7 +412,7 @@ async fn email_threads_and_other_entities_hydrate_side_by_side() {
 
 #[tokio::test]
 async fn a_thread_the_reader_withholds_is_absent() {
-    let user_id = user("macro|denied@example.com");
+    let user_id = user("rox|denied@example.com");
     let entity = EntityType::EmailThread.with_entity_string(Uuid::from_u128(16).to_string());
     let loader = SoupItemDataLoader::new(SoupItemLoader::new(
         RecordingSoupService::default(),
@@ -429,7 +429,7 @@ async fn a_thread_the_reader_withholds_is_absent() {
 
 #[tokio::test]
 async fn context_loader_does_not_cache_across_realtime_updates() {
-    let user_id = user("macro|fresh@example.com");
+    let user_id = user("rox|fresh@example.com");
     let document_id = Uuid::from_u128(20);
     let entity = EntityType::Document.with_entity_string(document_id.to_string());
     let service = RecordingSoupService::default()
@@ -463,7 +463,7 @@ async fn context_loader_does_not_cache_across_realtime_updates() {
 
 #[tokio::test]
 async fn context_loader_returns_none_for_a_missing_item() {
-    let user_id = user("macro|missing@example.com");
+    let user_id = user("rox|missing@example.com");
     let entity = EntityType::Document.with_entity_string(Uuid::from_u128(21).to_string());
     let loader = SoupItemDataLoader::new(SoupItemLoader::new(
         RecordingSoupService::default(),
@@ -647,7 +647,7 @@ impl SoupTeamReader for CurrentTeam {
 #[tokio::test]
 async fn pr_and_session_hydration_recheck_team_on_each_batch() {
     use entity_access::domain::models::{EntityPermission, TeamRole};
-    let viewer = user("macro|viewer@example.com");
+    let viewer = user("rox|viewer@example.com");
     let team_id = Uuid::now_v7();
     let team = Arc::new(CurrentTeam(Mutex::new(Some(
         EntityAccessReceipt::try_new_authenticated_user(
@@ -711,7 +711,7 @@ fn a_full_batch_of_ids_is_a_shallow_tree() {
 #[tokio::test]
 async fn crm_record_hydration_carries_the_viewer_team() {
     use entity_access::domain::models::{EntityPermission, TeamRole};
-    let viewer = user("macro|viewer@example.com");
+    let viewer = user("rox|viewer@example.com");
     let team_id = Uuid::now_v7();
     let team = Arc::new(CurrentTeam(Mutex::new(Some(
         EntityAccessReceipt::try_new_authenticated_user(

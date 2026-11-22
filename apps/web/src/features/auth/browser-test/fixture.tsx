@@ -57,7 +57,7 @@ const auth = createFakeAuth(
         auth.update((draft) => {
           draft.accounts[email] ??= { tutorialComplete: false };
           draft.user = {
-            id: `macro|${email}`,
+            id: `rox|${email}`,
             email,
             tutorialComplete: draft.accounts[email].tutorialComplete,
             isAgent: false,

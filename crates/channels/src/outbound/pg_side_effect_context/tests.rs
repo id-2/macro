@@ -4,11 +4,11 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-const USER_A: &str = "macro|user-a@test.com";
-const USER_B: &str = "macro|user-b@test.com";
-const USER_C: &str = "macro|user-c@test.com";
-const USER_E: &str = "macro|user-e@test.com";
-const LEFT_USER: &str = "macro|left-user@test.com";
+const USER_A: &str = "rox|user-a@test.com";
+const USER_B: &str = "rox|user-b@test.com";
+const USER_C: &str = "rox|user-c@test.com";
+const USER_E: &str = "rox|user-e@test.com";
+const LEFT_USER: &str = "rox|left-user@test.com";
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),

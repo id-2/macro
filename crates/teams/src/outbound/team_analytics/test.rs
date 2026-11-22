@@ -17,25 +17,25 @@ fn test_events() -> Vec<TeamAnalyticsEvent> {
     vec![
         TeamAnalyticsEvent::TeamCreated {
             team_id,
-            owner_id: rox_user_id("macro|owner@example.com"),
+            owner_id: rox_user_id("rox|owner@example.com"),
             team_name: "Acme".to_string(),
         },
         TeamAnalyticsEvent::TeamInvited {
             team_id,
             team_invite_id,
-            inviter_id: rox_user_id("macro|inviter@example.com"),
+            inviter_id: rox_user_id("rox|inviter@example.com"),
             team_name: Some("Acme".to_string()),
         },
         TeamAnalyticsEvent::TeamJoined {
             team_id,
             team_invite_id,
-            member_id: rox_user_id("macro|member@example.com"),
+            member_id: rox_user_id("rox|member@example.com"),
             role: TeamRole::Member,
         },
         TeamAnalyticsEvent::TeamLeft {
             team_id,
-            member_id: rox_user_id("macro|member@example.com"),
-            removed_by_id: rox_user_id("macro|admin@example.com"),
+            member_id: rox_user_id("rox|member@example.com"),
+            removed_by_id: rox_user_id("rox|admin@example.com"),
             role: TeamRole::Admin,
         },
     ]
@@ -70,19 +70,19 @@ fn maps_team_created_context() {
     let posthog_event =
         PostHogTeamAnalyticsEvent::from_team_event(TeamAnalyticsEvent::TeamCreated {
             team_id: uuid::Uuid::from_u128(1),
-            owner_id: rox_user_id("macro|owner@example.com"),
+            owner_id: rox_user_id("rox|owner@example.com"),
             team_name: "Acme".to_string(),
         });
     let properties = serde_json::to_value(&posthog_event.properties).unwrap();
 
-    assert_eq!(posthog_event.distinct_id, "macro|owner@example.com");
+    assert_eq!(posthog_event.distinct_id, "rox|owner@example.com");
     assert_eq!(
         properties,
         json!({
             "team_id": uuid::Uuid::from_u128(1),
             "$groups": { "team": uuid::Uuid::from_u128(1) },
             "team_name": "Acme",
-            "owner_id": "macro|owner@example.com",
+            "owner_id": "rox|owner@example.com",
         })
     );
 }
@@ -93,12 +93,12 @@ fn maps_team_invited_context() {
         PostHogTeamAnalyticsEvent::from_team_event(TeamAnalyticsEvent::TeamInvited {
             team_id: uuid::Uuid::from_u128(1),
             team_invite_id: uuid::Uuid::from_u128(2),
-            inviter_id: rox_user_id("macro|inviter@example.com"),
+            inviter_id: rox_user_id("rox|inviter@example.com"),
             team_name: Some("Acme".to_string()),
         });
     let properties = serde_json::to_value(&posthog_event.properties).unwrap();
 
-    assert_eq!(posthog_event.distinct_id, "macro|inviter@example.com");
+    assert_eq!(posthog_event.distinct_id, "rox|inviter@example.com");
     assert_eq!(
         properties,
         json!({
@@ -106,7 +106,7 @@ fn maps_team_invited_context() {
             "$groups": { "team": uuid::Uuid::from_u128(1) },
             "team_name": "Acme",
             "team_invite_id": uuid::Uuid::from_u128(2),
-            "inviter_id": "macro|inviter@example.com",
+            "inviter_id": "rox|inviter@example.com",
         })
     );
 }
@@ -117,19 +117,19 @@ fn maps_team_joined_context() {
         PostHogTeamAnalyticsEvent::from_team_event(TeamAnalyticsEvent::TeamJoined {
             team_id: uuid::Uuid::from_u128(1),
             team_invite_id: uuid::Uuid::from_u128(2),
-            member_id: rox_user_id("macro|member@example.com"),
+            member_id: rox_user_id("rox|member@example.com"),
             role: TeamRole::Member,
         });
     let properties = serde_json::to_value(&posthog_event.properties).unwrap();
 
-    assert_eq!(posthog_event.distinct_id, "macro|member@example.com");
+    assert_eq!(posthog_event.distinct_id, "rox|member@example.com");
     assert_eq!(
         properties,
         json!({
             "team_id": uuid::Uuid::from_u128(1),
             "$groups": { "team": uuid::Uuid::from_u128(1) },
             "team_invite_id": uuid::Uuid::from_u128(2),
-            "member_id": "macro|member@example.com",
+            "member_id": "rox|member@example.com",
             "role": "member",
         })
     );
@@ -139,20 +139,20 @@ fn maps_team_joined_context() {
 fn maps_team_left_context() {
     let posthog_event = PostHogTeamAnalyticsEvent::from_team_event(TeamAnalyticsEvent::TeamLeft {
         team_id: uuid::Uuid::from_u128(1),
-        member_id: rox_user_id("macro|member@example.com"),
-        removed_by_id: rox_user_id("macro|admin@example.com"),
+        member_id: rox_user_id("rox|member@example.com"),
+        removed_by_id: rox_user_id("rox|admin@example.com"),
         role: TeamRole::Admin,
     });
     let properties = serde_json::to_value(&posthog_event.properties).unwrap();
 
-    assert_eq!(posthog_event.distinct_id, "macro|member@example.com");
+    assert_eq!(posthog_event.distinct_id, "rox|member@example.com");
     assert_eq!(
         properties,
         json!({
             "team_id": uuid::Uuid::from_u128(1),
             "$groups": { "team": uuid::Uuid::from_u128(1) },
-            "member_id": "macro|member@example.com",
-            "removed_by_id": "macro|admin@example.com",
+            "member_id": "rox|member@example.com",
+            "removed_by_id": "rox|admin@example.com",
             "role": "admin",
         })
     );
@@ -165,7 +165,7 @@ async fn noop_analytics_client_adapter_returns_ok() {
     analytics
         .track_team_event(TeamAnalyticsEvent::TeamCreated {
             team_id: uuid::Uuid::from_u128(1),
-            owner_id: rox_user_id("macro|owner@example.com"),
+            owner_id: rox_user_id("rox|owner@example.com"),
             team_name: "Acme".to_string(),
         })
         .await

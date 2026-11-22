@@ -6,8 +6,8 @@
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
 VALUES
-    ('a4278000-0000-0000-0000-00000000000a', 'macro|viewed@example.com', 'viewed-user', 'viewed@example.com', 'GMAIL'),
-    ('a4278000-0000-0000-0000-00000000000b', 'macro|viewed@example.com', 'viewed-user', 'viewed.alt@example.com', 'GMAIL');
+    ('a4278000-0000-0000-0000-00000000000a', 'rox|viewed@example.com', 'viewed-user', 'viewed@example.com', 'GMAIL'),
+    ('a4278000-0000-0000-0000-00000000000b', 'rox|viewed@example.com', 'viewed-user', 'viewed.alt@example.com', 'GMAIL');
 
 INSERT INTO email_threads (id, link_id, inbox_visible, latest_inbound_message_ts, reminder_returned_at)
 SELECT
@@ -53,7 +53,7 @@ WHERE n % links.opened_every = 0;
 -- 20 opened longest ago are still in the inbox, so its newest views never fill
 -- a page. View times repeat in pairs.
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
-VALUES ('a4278000-0000-0000-0000-00000000000c', 'macro|archiver@example.com', 'archiver-user', 'archiver@example.com', 'GMAIL');
+VALUES ('a4278000-0000-0000-0000-00000000000c', 'rox|archiver@example.com', 'archiver-user', 'archiver@example.com', 'GMAIL');
 
 INSERT INTO email_threads (id, link_id, inbox_visible, latest_inbound_message_ts)
 SELECT

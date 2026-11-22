@@ -84,11 +84,11 @@ use crate::{
 };
 
 const JWT_TOKEN: &str = "valid-jwt";
-const JWT_USER_ID: &str = "macro|jwt-user@example.com";
+const JWT_USER_ID: &str = "rox|jwt-user@example.com";
 const STANDARD_INTERNAL_KEY: &str = "standard-internal-key";
-const STANDARD_INTERNAL_USER_ID: &str = "macro|standard-internal@example.com";
+const STANDARD_INTERNAL_USER_ID: &str = "rox|standard-internal@example.com";
 const LEGACY_INTERNAL_KEY: &str = "legacy-internal-key";
-const LEGACY_INTERNAL_USER_ID: &str = "macro|legacy-internal@example.com";
+const LEGACY_INTERNAL_USER_ID: &str = "rox|legacy-internal@example.com";
 const LEGACY_INTERNAL_API_KEY_HEADER: &str = "x-document-storage-service-auth-key";
 const LEGACY_INTERNAL_USER_ID_HEADER: &str = "x-document-storage-service-user-id";
 const TEST_ORGANIZATION_ID: i32 = 42;
@@ -1866,7 +1866,7 @@ async fn internal_create_rejects_bots() {
 async fn document_text_endpoint_uses_the_authenticated_view_capability() {
     let (router, documents, access, _) = test_router();
     *documents.document_owner.lock().unwrap() =
-        Some(Owner::from_principal_str("macro|different-owner@example.com").unwrap());
+        Some(Owner::from_principal_str("rox|different-owner@example.com").unwrap());
     let request = with_jwt(Request::get("/text-document/text-content"))
         .body(Body::empty())
         .unwrap();
@@ -1882,7 +1882,7 @@ async fn document_text_endpoint_uses_the_authenticated_view_capability() {
 async fn document_text_endpoint_does_not_read_when_view_access_is_denied() {
     let (router, documents, access, _) = test_router();
     *documents.document_owner.lock().unwrap() =
-        Some(Owner::from_principal_str("macro|different-owner@example.com").unwrap());
+        Some(Owner::from_principal_str("rox|different-owner@example.com").unwrap());
     access.deny_document_access();
     let request = with_jwt(Request::get("/text-document/text-content"))
         .body(Body::empty())

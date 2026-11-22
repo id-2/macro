@@ -28,7 +28,7 @@ impl RoxEventBroker for RecordingBroker {
 
 const ROOT: Uuid = Uuid::from_u128(1);
 const REPLY: Uuid = Uuid::from_u128(2);
-const SENDER: &str = "macro|author@example.com";
+const SENDER: &str = "rox|author@example.com";
 
 fn attachment(id: u128) -> MessageAttachment {
     MessageAttachment {
@@ -111,9 +111,9 @@ async fn a_post_publishes_posted_attachment_and_one_mention_per_entity_for_both_
                 notification_policy: Default::default(),
                 message: reply(parent.clone(), vec![attachment(5)]),
                 mentions: vec![
-                    mention("user", "macro|a@example.com"),
+                    mention("user", "rox|a@example.com"),
                     mention("document", "doc"),
-                    mention("user", "macro|a@example.com"),
+                    mention("user", "rox|a@example.com"),
                 ],
             },
         )
@@ -145,7 +145,7 @@ async fn a_post_publishes_posted_attachment_and_one_mention_per_entity_for_both_
         );
         assert_eq!(
             published[2].2["metadata"]["mentioned"]["entity_id"],
-            "macro|a@example.com"
+            "rox|a@example.com"
         );
         assert_eq!(
             published[3].2["metadata"]["mentioned"]["entity_type"],
@@ -166,7 +166,7 @@ async fn an_edit_publishes_patched_and_attachment_deltas() {
         MessageChange::Edited {
             notification_policy: Default::default(),
             message: edited,
-            mentions: vec![mention("user", "macro|a@example.com")],
+            mentions: vec![mention("user", "rox|a@example.com")],
             previous_attachments: vec![attachment(6), attachment(7)],
         },
     )

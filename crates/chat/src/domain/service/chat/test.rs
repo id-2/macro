@@ -16,8 +16,8 @@ use crate::domain::models::{ChatResponse, PatchChatMessageArgs};
 pub(super) const CHAT_ID: &str = "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90";
 const NEW_CHAT_ID: &str = "0197f776-6e7b-7c69-a251-780ae754d3e4";
 pub(super) const PROJECT_ID: &str = "c1a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d";
-const OWNER: &str = "macro|owner@example.com";
-const OTHER_USER: &str = "macro|other@example.com";
+const OWNER: &str = "rox|owner@example.com";
+const OTHER_USER: &str = "rox|other@example.com";
 pub(super) const TEAM_ID: uuid::Uuid =
     uuid::Uuid::from_u128(0x7ea3_0000_0000_0000_0000_0000_0000_0001);
 const MESSAGE_ID: &str = "message-id";

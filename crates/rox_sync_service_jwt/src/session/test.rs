@@ -18,7 +18,7 @@ fn claims() -> SurfaceClaims {
     SurfaceClaims {
         session_kind: SurfaceSessionKind::Surface,
         surface_id: ID.parse().unwrap(),
-        user_id: Some("macro|user@example.com".into()),
+        user_id: Some("rox|user@example.com".into()),
         access_level: SurfaceAccessLevel::Edit,
         actor: None,
         exp: now() + crate::TOKEN_TTL_SECS,

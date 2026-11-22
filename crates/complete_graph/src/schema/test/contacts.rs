@@ -56,7 +56,7 @@ async fn contacts_are_read_from_request_data_only_for_the_authenticated_viewer()
     let directory = Arc::new(Directory::default());
     let context = ContactsGraphqlContext::new(directory.clone());
     let query = r#"{ user { id contacts(limit: 2, search: "person", matching: EXACT) { nodes { id userId email name } nextCursor }
-        contactsByUserIds(userIds: ["macro|person@example.com"]) { id }
+        contactsByUserIds(userIds: ["rox|person@example.com"]) { id }
         contactsByEmails(emails: ["person@example.com"]) { id }
     } }"#;
     // The enclosing user authentication gate runs before the directory resolver.
@@ -91,7 +91,7 @@ async fn contacts_are_read_from_request_data_only_for_the_authenticated_viewer()
     assert_eq!(data["user"]["id"], VALID_USER_ID);
     assert_eq!(
         data["user"]["contacts"]["nodes"][0]["userId"],
-        "macro|person@example.com"
+        "rox|person@example.com"
     );
     assert_eq!(
         *directory.0.lock().unwrap(),

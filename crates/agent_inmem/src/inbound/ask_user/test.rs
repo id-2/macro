@@ -25,7 +25,7 @@ impl UserInputRequester for FakeRequester {
 
 fn request_context() -> RequestContext {
     RequestContext::new(
-        RoxUserIdStr::try_from("macro|ask-user-test@example.com".to_owned())
+        RoxUserIdStr::try_from("rox|ask-user-test@example.com".to_owned())
             .expect("test user id should be valid"),
     )
 }

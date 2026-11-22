@@ -59,7 +59,7 @@ still decode.
 the inviter; a domain auto-join is encoded as `{"type":"domain_auto_join"}` and
 a join through the team's shareable invite link as `{"type":"invite_link"}`,
 and a team agent an admin added as
-`{"type":"team_agent","added_by":"macro|admin@example.com"}`.
+`{"type":"team_agent","added_by":"rox|admin@example.com"}`.
 Consumers should ignore join methods they don't recognize.
 A complete invite-accepted membership envelope has this shape:
 
@@ -70,16 +70,16 @@ A complete invite-accepted membership envelope has this shape:
   "event_type": "team.member_joined",
   "metadata": {
     "team_id": "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90",
-    "member_id": "macro|joiner@acme.com",
+    "member_id": "rox|joiner@acme.com",
     "teammate_ids": [
-      "macro|admin@example.com",
-      "macro|owner@acme.com"
+      "rox|admin@example.com",
+      "rox|owner@acme.com"
     ],
     "role": "member",
     "join_method": {
       "type": "invite_accepted",
       "invite_id": "0197f776-6e7b-7c69-a251-780ae754d3e4",
-      "invited_by": "macro|admin@example.com"
+      "invited_by": "rox|admin@example.com"
     }
   }
 }

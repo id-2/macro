@@ -75,7 +75,7 @@ async fn authenticated_route_preserves_the_exact_owner_and_named_contract(pool: 
     );
 
     for invalid in [
-        json!({"input": null, "questions": {"q": "Valid?"}, "owner": "macro|other@example.com"}),
+        json!({"input": null, "questions": {"q": "Valid?"}, "owner": "rox|other@example.com"}),
         json!({"input": null, "questions": []}),
     ] {
         let response = router

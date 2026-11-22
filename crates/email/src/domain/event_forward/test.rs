@@ -8,7 +8,7 @@ use std::sync::Mutex;
 const EVENT_ICS: &str = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nEND:VCALENDAR\r\n";
 
 fn actor() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|guest@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|guest@example.com").unwrap()
 }
 
 fn link(address: &str) -> Link {
@@ -53,7 +53,7 @@ impl CalendarEventForwardSource for Fake {
         _event_id: Uuid,
         invitees: &[IcsParticipant],
     ) -> Result<Option<CalendarEventForward>, Report> {
-        assert_eq!(requester_id, "macro|guest@example.com");
+        assert_eq!(requester_id, "rox|guest@example.com");
         self.invitees.lock().unwrap().push(invitees.to_vec());
         Ok(self.forward.clone())
     }
@@ -202,7 +202,7 @@ async fn sends_the_event_file_from_the_inbox_holding_the_copy() {
     );
     assert_eq!(
         input.actor.as_ref().map(ToString::to_string).as_deref(),
-        Some("macro|guest@example.com")
+        Some("rox|guest@example.com")
     );
     assert_eq!(files.len(), 1);
     assert_eq!(files[0].file_name, "Office tour.ics");

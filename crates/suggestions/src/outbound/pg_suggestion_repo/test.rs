@@ -27,7 +27,7 @@ pub(crate) async fn insert_user(pool: &PgPool, id: &str) {
     .unwrap();
 }
 
-const OWNER: &str = "macro|suggestions-repo@rox.one";
+const OWNER: &str = "rox|suggestions-repo@rox.one";
 
 async fn generation(pool: &PgPool) -> Uuid {
     let id = Uuid::now_v7();

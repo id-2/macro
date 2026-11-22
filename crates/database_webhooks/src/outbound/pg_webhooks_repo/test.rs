@@ -2,10 +2,10 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
-const ALICE: &str = "macro|alice@webhooks-repo.test";
+const ALICE: &str = "rox|alice@webhooks-repo.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,

@@ -34,7 +34,7 @@ use crate::domain::{
     service::{MessageView, MessageWrite},
 };
 
-const USER: &str = "macro|commenter@example.com";
+const USER: &str = "rox|commenter@example.com";
 const INITIATIVE: Uuid = Uuid::from_u128(0x019fd3b9_3c6c_7c05_89c2_a27f0121813b);
 const THREAD: Uuid = Uuid::from_u128(7);
 const REPLY: Uuid = Uuid::from_u128(8);

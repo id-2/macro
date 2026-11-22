@@ -58,7 +58,7 @@ impl SoupRealtimePublisher for RecordingPublisher {
 }
 
 fn person(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{name}@example.com")).expect("valid user id")
+    RoxUserIdStr::try_from(format!("rox|{name}@example.com")).expect("valid user id")
 }
 
 struct Folder {

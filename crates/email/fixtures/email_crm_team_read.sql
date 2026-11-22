@@ -31,20 +31,20 @@ SELECT md5('user' || i)::uuid, 'u' || i || '@gamma.test', 'u' || i || '@gamma.te
 FROM generate_series(0, 9) i;
 
 INSERT INTO "User" (id, email, name, rox_user_id)
-SELECT 'macro|u' || i || '@gamma.test', 'u' || i || '@gamma.test', 'U' || i, md5('user' || i)::uuid
+SELECT 'rox|u' || i || '@gamma.test', 'u' || i || '@gamma.test', 'U' || i, md5('user' || i)::uuid
 FROM generate_series(0, 9) i;
 
 INSERT INTO team (id, name, owner_id, seat_count)
-VALUES ('e0000003-0000-0000-0000-000000000003', 'Team Gamma', 'macro|u0@gamma.test', 8),
-       ('e0000004-0000-0000-0000-000000000004', 'Team Delta', 'macro|u9@gamma.test', 1);
+VALUES ('e0000003-0000-0000-0000-000000000003', 'Team Gamma', 'rox|u0@gamma.test', 8),
+       ('e0000004-0000-0000-0000-000000000004', 'Team Delta', 'rox|u9@gamma.test', 1);
 
 INSERT INTO team_user (team_id, user_id, team_role)
-SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, 'macro|u' || i || '@gamma.test',
+SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, 'rox|u' || i || '@gamma.test',
        CASE WHEN i = 0 THEN 'owner' ELSE 'member' END::team_role
 FROM generate_series(0, 8) i
 WHERE i <> 4
 UNION ALL
-SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, 'macro|u9@gamma.test', 'owner'::team_role;
+SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, 'rox|u9@gamma.test', 'owner'::team_role;
 
 INSERT INTO team_crm_settings (team_id, crm_enabled)
 VALUES ('e0000003-0000-0000-0000-000000000003', TRUE), ('e0000004-0000-0000-0000-000000000004', TRUE);
@@ -55,7 +55,7 @@ VALUES ('e0000003-0000-0000-0000-000000000003', TRUE), ('e0000004-0000-0000-0000
 -- when its address is its owner's.
 CREATE TEMP TABLE gamma_link AS
 SELECT i, ('f0000000-0000-0000-0000-' || lpad(to_hex(i), 12, '0'))::uuid AS id,
-       'macro|u' || u || '@gamma.test' AS rox_id, email
+       'rox|u' || u || '@gamma.test' AS rox_id, email
 FROM (VALUES (0, 0, 'u0@gamma.test'), (1, 1, 'u1@gamma.test'), (2, 2, 'u2@gamma.test'),
              (3, 3, 'u3@gamma.test'), (4, 4, 'u4@gamma.test'), (5, 0, 'u0.personal@else.test'),
              (6, 5, 'u5@gamma.test'), (7, 5, 'u5.second@else.test'), (8, 6, 'u6@gamma.test'),
@@ -74,7 +74,7 @@ UNION ALL
 SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, rox_id, id, i <> 9
 FROM gamma_link WHERE i IN (7, 8, 9)
 UNION ALL
-SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, 'macro|u8@gamma.test', id, TRUE
+SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, 'rox|u8@gamma.test', id, TRUE
 FROM gamma_link WHERE i = 3
 UNION ALL
 SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, rox_id, id, TRUE FROM gamma_link WHERE i = 10;
@@ -82,7 +82,7 @@ SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, rox_id, id, TRUE FROM gamma
 INSERT INTO crm_blocked_domains (team_id, domain)
 VALUES ('e0000003-0000-0000-0000-000000000003', 'blocked.test');
 INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain)
-VALUES ('e0000003-0000-0000-0000-000000000003', 'macro|u1@gamma.test', 'personal.test');
+VALUES ('e0000003-0000-0000-0000-000000000003', 'rox|u1@gamma.test', 'personal.test');
 INSERT INTO crm_companies (id, team_id, email_sync, first_interaction, last_interaction)
 VALUES ('c3000000-0000-0000-0000-000000000001', 'e0000003-0000-0000-0000-000000000003', false, NOW(), NOW()),
        ('c3000000-0000-0000-0000-000000000002', 'e0000003-0000-0000-0000-000000000003', true, NOW(), NOW());

@@ -41,7 +41,7 @@ impl MessageRepository for Repo {
         _: &[String],
     ) -> Result<HashMap<String, String>, MessageError> {
         Ok(HashMap::from([(
-            "macro|author@example.com".into(),
+            "rox|author@example.com".into(),
             "Author Example".into(),
         )]))
     }
@@ -277,7 +277,7 @@ impl MessageEventPublisher for Events {
 
 fn fixture() -> Repo {
     let id = Uuid::from_u128(1);
-    let user = "macro|author@example.com";
+    let user = "rox|author@example.com";
     Repo {
         message: Message {
             kind: MessageKind::Message,
@@ -361,7 +361,7 @@ async fn document_editor_can_detach_another_authors_mark_without_deleting_the_th
     let service = MessageService::new(repo.clone(), events.clone());
     let state = service
         .patch_thread(
-            access("macro|editor@example.com", "doc", AccessLevel::Edit),
+            access("rox|editor@example.com", "doc", AccessLevel::Edit),
             repo.state.root_id,
             ThreadPatch {
                 detach_anchor: true,
@@ -390,7 +390,7 @@ async fn commenters_can_resolve_but_cannot_detach_document_text() {
     let service = MessageService::new(repo.clone(), events.clone());
     let result = service
         .patch_thread(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.state.root_id,
             ThreadPatch {
                 detach_anchor: true,
@@ -402,7 +402,7 @@ async fn commenters_can_resolve_but_cannot_detach_document_text() {
     assert!(events.0.lock().unwrap().is_empty());
     let state = service
         .patch_thread(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.state.root_id,
             ThreadPatch {
                 resolved: Some(true),
@@ -440,7 +440,7 @@ async fn thread_patch_cannot_detach_non_markdown_anchors() {
         let service = MessageService::new(repo.clone(), events.clone());
         let result = service
             .patch_thread(
-                access("macro|editor@example.com", "doc", AccessLevel::Edit),
+                access("rox|editor@example.com", "doc", AccessLevel::Edit),
                 repo.state.root_id,
                 ThreadPatch {
                     detach_anchor: true,
@@ -456,12 +456,12 @@ async fn thread_patch_cannot_detach_non_markdown_anchors() {
 #[tokio::test]
 async fn deleting_a_document_root_deletes_the_whole_discussion() {
     let mut repo = fixture();
-    repo.replies = vec![reply_from(&repo.message, 7, "macro|other@example.com")];
+    repo.replies = vec![reply_from(&repo.message, 7, "rox|other@example.com")];
     let events = Events::default();
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .delete(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             Some("nonce".into()),
         )
@@ -481,7 +481,7 @@ async fn deleting_a_document_root_deletes_the_whole_discussion() {
         );
     }
     // Another author's replies go with the discussion instead of outliving it.
-    let view = access("macro|other@example.com", "doc", AccessLevel::Comment)
+    let view = access("rox|other@example.com", "doc", AccessLevel::Comment)
         .try_into_requirement()
         .unwrap();
     assert!(matches!(
@@ -493,7 +493,7 @@ async fn deleting_a_document_root_deletes_the_whole_discussion() {
     assert!(matches!(
         service
             .post(
-                access("macro|other@example.com", "doc", AccessLevel::Comment),
+                access("rox|other@example.com", "doc", AccessLevel::Comment),
                 input
             )
             .await,
@@ -504,12 +504,12 @@ async fn deleting_a_document_root_deletes_the_whole_discussion() {
 #[tokio::test]
 async fn a_reply_author_can_delete_their_reply_but_not_the_root_above_it() {
     let mut repo = fixture();
-    repo.replies = vec![reply_from(&repo.message, 7, "macro|other@example.com")];
+    repo.replies = vec![reply_from(&repo.message, 7, "rox|other@example.com")];
     let events = Events::default();
     let service = MessageService::new(repo.clone(), events.clone());
     let denied = service
         .delete(
-            access("macro|other@example.com", "doc", AccessLevel::Comment),
+            access("rox|other@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             None,
         )
@@ -519,7 +519,7 @@ async fn a_reply_author_can_delete_their_reply_but_not_the_root_above_it() {
     assert!(events.0.lock().unwrap().is_empty());
     let tombstone = service
         .delete(
-            access("macro|other@example.com", "doc", AccessLevel::Comment),
+            access("rox|other@example.com", "doc", AccessLevel::Comment),
             repo.replies[0].id,
             None,
         )
@@ -538,11 +538,11 @@ async fn a_reply_author_can_delete_their_reply_but_not_the_root_above_it() {
 #[tokio::test]
 async fn document_owner_can_delete_another_authors_reply() {
     let mut repo = fixture();
-    repo.replies = vec![reply_from(&repo.message, 7, "macro|other@example.com")];
+    repo.replies = vec![reply_from(&repo.message, 7, "rox|other@example.com")];
     let service = MessageService::new(repo.clone(), Events::default());
     let denied = service
         .delete(
-            access("macro|editor@example.com", "doc", AccessLevel::Edit),
+            access("rox|editor@example.com", "doc", AccessLevel::Edit),
             repo.replies[0].id,
             None,
         )
@@ -551,7 +551,7 @@ async fn document_owner_can_delete_another_authors_reply() {
     assert!(repo.deletes.lock().unwrap().is_empty());
     service
         .delete(
-            access("macro|owner@example.com", "doc", AccessLevel::Owner),
+            access("rox|owner@example.com", "doc", AccessLevel::Owner),
             repo.replies[0].id,
             None,
         )
@@ -567,7 +567,7 @@ async fn other_commenter_cannot_delete_but_parent_owner_can_moderate() {
     let service = MessageService::new(repo.clone(), Events::default());
     let denied = service
         .delete(
-            access("macro|other@example.com", "doc", AccessLevel::Comment),
+            access("rox|other@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             None,
         )
@@ -577,7 +577,7 @@ async fn other_commenter_cannot_delete_but_parent_owner_can_moderate() {
     assert!(repo.thread_deletes.lock().unwrap().is_empty());
     service
         .delete(
-            access("macro|owner@example.com", "doc", AccessLevel::Owner),
+            access("rox|owner@example.com", "doc", AccessLevel::Owner),
             repo.message.id,
             None,
         )
@@ -591,7 +591,7 @@ async fn a_channel_root_keeps_its_thread_and_its_tombstone() {
     let mut repo = fixture();
     // The fixture's author is the principal `channel_access` authenticates.
     repo.message.parent = MessageParent::Channel(Uuid::from_u128(20));
-    repo.replies = vec![reply_from(&repo.message, 7, "macro|other@example.com")];
+    repo.replies = vec![reply_from(&repo.message, 7, "rox|other@example.com")];
     let events = Events::default();
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
@@ -621,7 +621,7 @@ async fn receipt_for_another_parent_cannot_authorize_a_message() {
     let service = MessageService::new(repo.clone(), Events::default());
     let denied = service
         .delete(
-            access("macro|author@example.com", "different", AccessLevel::Owner),
+            access("rox|author@example.com", "different", AccessLevel::Owner),
             repo.message.id,
             None,
         )
@@ -633,7 +633,7 @@ async fn receipt_for_another_parent_cannot_authorize_a_message() {
 #[test]
 fn email_access_cannot_authorize_message_operations() {
     let receipt = EntityAccessReceipt::<MessageWrite>::try_new(
-        EntityAccessAuth::Authenticated("macro|author@example.com".to_owned().try_into().unwrap()),
+        EntityAccessAuth::Authenticated("rox|author@example.com".to_owned().try_into().unwrap()),
         entity_access::domain::models::Entity {
             entity_id: Uuid::from_u128(1).to_string(),
             entity_type: EntityType::EmailThread,
@@ -711,7 +711,7 @@ async fn inaccessible_references_are_rejected_before_persistence() {
     assert!(matches!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input
             )
             .await,
@@ -725,7 +725,7 @@ async fn inaccessible_references_are_rejected_before_persistence() {
     assert!(matches!(
         service
             .patch(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 Uuid::from_u128(1),
                 edit
             )
@@ -739,13 +739,13 @@ async fn user_mentions_do_not_require_or_grant_parent_sharing() {
     let service = MessageService::new(fixture(), Events::default());
     let mentions = vec![SimpleMention {
         entity_type: "user".into(),
-        entity_id: "macro|unshared@example.com".into(),
+        entity_id: "rox|unshared@example.com".into(),
     }];
     // Mention identity validation is separate from delivery authorization. The
     // delivery tests prove this recipient is excluded without parent access.
     service
         .validate_references(
-            &access("macro|author@example.com", "doc", AccessLevel::Comment),
+            &access("rox|author@example.com", "doc", AccessLevel::Comment),
             mentions.clone(),
             &[],
         )
@@ -758,7 +758,7 @@ async fn user_mentions_do_not_require_or_grant_parent_sharing() {
     assert!(matches!(
         service
             .validate_references(
-                &access("macro|author@example.com", "doc", AccessLevel::Comment),
+                &access("rox|author@example.com", "doc", AccessLevel::Comment),
                 invalid,
                 &[]
             )
@@ -772,7 +772,7 @@ async fn user_mentions_do_not_require_or_grant_parent_sharing() {
         assert!(matches!(
             service
                 .validate_references(
-                    &access("macro|author@example.com", "doc", AccessLevel::Comment),
+                    &access("rox|author@example.com", "doc", AccessLevel::Comment),
                     vec![SimpleMention {
                         entity_type: "user".into(),
                         entity_id: sender.into(),
@@ -801,7 +801,7 @@ fn post_input() -> PostMessage {
 
 fn channel_access() -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new_authenticated_user(
-        "macro|author@example.com".to_string().try_into().unwrap(),
+        "rox|author@example.com".to_string().try_into().unwrap(),
         entity_access::domain::models::Entity {
             entity_type: EntityType::Channel,
             entity_id: Uuid::from_u128(20).to_string(),
@@ -932,7 +932,7 @@ async fn a_group_remains_one_authored_reference_and_resolves_current_recipients_
         },
         SimpleMention {
             entity_type: "user".into(),
-            entity_id: "macro|participant-0@example.com".into(),
+            entity_id: "rox|participant-0@example.com".into(),
         },
     ];
     let posted = service.post(channel_access(), input.clone()).await.unwrap();
@@ -980,7 +980,7 @@ async fn a_group_remains_one_authored_reference_and_resolves_current_recipients_
     input.mentions = vec![
         SimpleMention {
             entity_type: "user".into(),
-            entity_id: "macro|person@example.com".into()
+            entity_id: "rox|person@example.com".into()
         };
         101
     ];
@@ -1003,7 +1003,7 @@ async fn document_and_unknown_group_mentions_are_rejected_before_persistence() {
     assert!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input.clone()
             )
             .await
@@ -1038,7 +1038,7 @@ async fn partial_attachment_changes_preserve_unreplaced_body_mentions_and_attach
         });
     service
         .patch(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             repo.message.id,
             MessagePatch {
                 attachments: AttachmentChange::Delta {
@@ -1109,7 +1109,7 @@ async fn human_can_post_canonical_agent_mentions_on_documents_and_channels() {
         };
         let receipt = || {
             EntityAccessReceipt::try_new_authenticated_user(
-                "macro|author@example.com".to_string().try_into().unwrap(),
+                "rox|author@example.com".to_string().try_into().unwrap(),
                 Entity {
                     entity_type,
                     entity_id: parent.entity_id(),
@@ -1156,7 +1156,7 @@ impl MessageMentionExtractor for RawBotMentions {
         Box::pin(async {
             Ok(vec![SimpleMention {
                 entity_type: "user".into(),
-                entity_id: "macro|mentioned@example.com".into(),
+                entity_id: "rox|mentioned@example.com".into(),
             }])
         })
     }
@@ -1173,7 +1173,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
             EntityAccessReceipt::try_new_bot(
                 bot_id::ROX_AI_BOT_ID.into_storage_id(),
                 BotReceiptScope::User {
-                    acting_user: "macro|author@example.com".to_string().try_into().unwrap(),
+                    acting_user: "rox|author@example.com".to_string().try_into().unwrap(),
                 },
                 Entity {
                     entity_type: parent.access_entity_type(),
@@ -1196,7 +1196,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
         let posted = service.post(receipt(), input.clone()).await.unwrap();
         assert_eq!(
             posted.triggered_by.as_deref(),
-            Some("macro|author@example.com")
+            Some("rox|author@example.com")
         );
         assert_eq!(posted.mentions.len(), 1);
         assert_eq!(posted.parent, parent);
@@ -1226,7 +1226,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
             let via = creates.last().unwrap();
             assert_eq!(
                 via.triggered_by.as_deref(),
-                Some("macro|author@example.com")
+                Some("rox|author@example.com")
             );
             assert_eq!(via.triggered_via.as_deref(), Some("Claude Code"));
             assert!(creates[0].triggered_via.is_none());
@@ -1271,9 +1271,9 @@ async fn reconciling_an_unchanged_bot_reply_does_not_publish_a_second_completion
     let receipt = EntityAccessReceipt::try_new_bot(
         bot.into_storage_id(),
         entity_access::domain::models::BotReceiptScope::User {
-            acting_user: "macro|author@example.com".to_string().try_into().unwrap(),
+            acting_user: "rox|author@example.com".to_string().try_into().unwrap(),
         },
-        access("macro|author@example.com", "doc", AccessLevel::Comment)
+        access("rox|author@example.com", "doc", AccessLevel::Comment)
             .entity()
             .clone(),
         EntityPermission::AccessLevel {
@@ -1304,9 +1304,9 @@ fn bot_receipt() -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new_bot(
         bot_id::ROX_AI_BOT_ID.into_storage_id(),
         entity_access::domain::models::BotReceiptScope::User {
-            acting_user: "macro|author@example.com".to_string().try_into().unwrap(),
+            acting_user: "rox|author@example.com".to_string().try_into().unwrap(),
         },
-        access("macro|author@example.com", "doc", AccessLevel::Comment)
+        access("rox|author@example.com", "doc", AccessLevel::Comment)
             .entity()
             .clone(),
         EntityPermission::AccessLevel {
@@ -1350,7 +1350,7 @@ async fn a_person_cannot_say_an_agent_session_is_typing() {
     let service = MessageService::new(repo, events.clone());
     let result = service
         .agent_typing(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             None,
             true,
             AgentTyping {
@@ -1495,7 +1495,7 @@ async fn a_missing_parent_is_rejected_by_the_service_before_persistence() {
     let service = MessageService::new(repo.clone(), events.clone());
     let result = service
         .post(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             post_input(),
         )
         .await;
@@ -1517,7 +1517,7 @@ async fn replies_must_target_a_live_root_in_the_same_parent() {
         service
             .post(
                 access(
-                    "macro|author@example.com",
+                    "rox|author@example.com",
                     "other-doc",
                     AccessLevel::Comment
                 ),
@@ -1536,7 +1536,7 @@ async fn replies_must_target_a_live_root_in_the_same_parent() {
     assert!(matches!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 nested,
             )
             .await,
@@ -1566,7 +1566,7 @@ async fn anchors_are_only_accepted_on_document_roots() {
     assert!(matches!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 anchored.clone(),
             )
             .await,
@@ -1584,7 +1584,7 @@ async fn anchors_are_only_accepted_on_document_roots() {
     assert!(matches!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 anchored,
             )
             .await,
@@ -1598,7 +1598,7 @@ async fn tombstoned_messages_are_immutable() {
     let mut repo = fixture();
     repo.message.deleted_at = Some(Utc::now());
     let service = MessageService::new(repo.clone(), Events::default());
-    let receipt = || access("macro|author@example.com", "doc", AccessLevel::Comment);
+    let receipt = || access("rox|author@example.com", "doc", AccessLevel::Comment);
     assert!(matches!(
         service
             .patch(
@@ -1657,7 +1657,7 @@ async fn display_only_mention_kinds_are_stored_without_authorization() {
     ];
     let posted = service
         .post(
-            access("macro|author@example.com", "doc", AccessLevel::Comment),
+            access("rox|author@example.com", "doc", AccessLevel::Comment),
             input.clone(),
         )
         .await
@@ -1671,7 +1671,7 @@ async fn display_only_mention_kinds_are_stored_without_authorization() {
     assert_eq!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input.clone(),
             )
             .await
@@ -1767,7 +1767,7 @@ fn centered_channel(
         .map(
             |(id, seconds)| activity::domain::timeline::TimelineActivity {
                 id: Uuid::from_u128(1_000 + id as u128),
-                actor_id: "macro|author@example.com".into(),
+                actor_id: "rox|author@example.com".into(),
                 occurred_at: repo.message.created_at + chrono::Duration::seconds(seconds),
                 action: "picture_changed".into(),
                 payload: None,
@@ -1856,7 +1856,7 @@ async fn centered_mixed_timeline_preserves_anchor_and_pages_to_both_ends() {
         .map(
             |(id, seconds)| activity::domain::timeline::TimelineActivity {
                 id: Uuid::from_u128(100 + id as u128),
-                actor_id: "macro|author@example.com".into(),
+                actor_id: "rox|author@example.com".into(),
                 occurred_at: repo.message.created_at + chrono::Duration::seconds(seconds),
                 action: "picture_changed".into(),
                 payload: None,
@@ -1966,7 +1966,7 @@ async fn system_timeline_rejects_message_filters_and_keeps_discussions_message_o
     assert!(result.is_ok());
     let result = service
         .timeline_entries(
-            access("macro|author@example.com", "doc", AccessLevel::Comment)
+            access("rox|author@example.com", "doc", AccessLevel::Comment)
                 .try_into_requirement::<MessageView>()
                 .unwrap(),
             MessageTimelineQuery::default(),
@@ -2016,7 +2016,7 @@ async fn reaction_retries_return_the_message_without_publishing_another_change()
             let service = MessageService::new(repo.clone(), events.clone());
             let message = service
                 .react(
-                    access("macro|author@example.com", "doc", AccessLevel::Comment),
+                    access("rox|author@example.com", "doc", AccessLevel::Comment),
                     repo.message.id,
                     "👍".into(),
                     add,
@@ -2057,7 +2057,7 @@ async fn spreadsheet_anchors_require_a_spreadsheet_root_and_valid_range() {
         });
         let result = service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input.clone(),
             )
             .await;
@@ -2070,7 +2070,7 @@ async fn spreadsheet_anchors_require_a_spreadsheet_root_and_valid_range() {
         assert!(
             service
                 .post(
-                    access("macro|author@example.com", "doc", AccessLevel::Comment),
+                    access("rox|author@example.com", "doc", AccessLevel::Comment),
                     input.clone()
                 )
                 .await
@@ -2134,7 +2134,7 @@ async fn fig_anchors_require_a_design_root() {
             input.anchor = Some(fig_anchor(node_id));
             let result = service
                 .post(
-                    access("macro|author@example.com", "doc", AccessLevel::Comment),
+                    access("rox|author@example.com", "doc", AccessLevel::Comment),
                     input.clone(),
                 )
                 .await;
@@ -2147,7 +2147,7 @@ async fn fig_anchors_require_a_design_root() {
             assert!(
                 service
                     .post(
-                        access("macro|author@example.com", "doc", AccessLevel::Comment),
+                        access("rox|author@example.com", "doc", AccessLevel::Comment),
                         input.clone()
                     )
                     .await
@@ -2167,7 +2167,7 @@ async fn fig_anchors_require_a_design_root() {
     assert!(
         service
             .post(
-                access("macro|author@example.com", "doc", AccessLevel::Comment),
+                access("rox|author@example.com", "doc", AccessLevel::Comment),
                 input
             )
             .await
@@ -2243,7 +2243,7 @@ async fn call_posts_use_the_canonical_thread_and_reject_another_root() {
         input.thread_id = thread_id;
         service
             .post(
-                call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+                call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
                 input,
             )
             .await
@@ -2262,7 +2262,7 @@ async fn call_posts_use_the_canonical_thread_and_reject_another_root() {
     assert!(matches!(
         service
             .post(
-                call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+                call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
                 input,
             )
             .await,
@@ -2275,14 +2275,14 @@ async fn call_posts_use_the_canonical_thread_and_reject_another_root() {
 fn call_viewers_can_read_but_cannot_post() {
     let call_id = Uuid::from_u128(10);
     assert!(
-        call_receipt::<MessageView>("macro|viewer@example.com", call_id, AccessLevel::View).is_ok()
+        call_receipt::<MessageView>("rox|viewer@example.com", call_id, AccessLevel::View).is_ok()
     );
     assert!(
-        call_receipt::<MessageWrite>("macro|viewer@example.com", call_id, AccessLevel::View)
+        call_receipt::<MessageWrite>("rox|viewer@example.com", call_id, AccessLevel::View)
             .is_err()
     );
     assert!(
-        call_receipt::<MessageWrite>("macro|member@example.com", call_id, AccessLevel::Comment)
+        call_receipt::<MessageWrite>("rox|member@example.com", call_id, AccessLevel::Comment)
             .is_ok()
     );
 }
@@ -2297,7 +2297,7 @@ async fn call_root_deletion_preserves_chat_and_cannot_delete_other_authors() {
     assert!(matches!(
         service
             .delete(
-                call_receipt("macro|other@example.com", call_id, AccessLevel::Edit).unwrap(),
+                call_receipt("rox|other@example.com", call_id, AccessLevel::Edit).unwrap(),
                 call_id,
                 None,
             )
@@ -2306,7 +2306,7 @@ async fn call_root_deletion_preserves_chat_and_cannot_delete_other_authors() {
     ));
     service
         .delete(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             call_id,
             None,
         )
@@ -2316,7 +2316,7 @@ async fn call_root_deletion_preserves_chat_and_cannot_delete_other_authors() {
     assert!(repo.thread_deletes.lock().unwrap().is_empty());
     service
         .post(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             post_input(),
         )
         .await
@@ -2324,7 +2324,7 @@ async fn call_root_deletion_preserves_chat_and_cannot_delete_other_authors() {
     assert!(matches!(
         service
             .delete_thread(
-                call_receipt("macro|author@example.com", call_id, AccessLevel::Owner).unwrap(),
+                call_receipt("rox|author@example.com", call_id, AccessLevel::Owner).unwrap(),
                 call_id,
                 None,
             )
@@ -2334,7 +2334,7 @@ async fn call_root_deletion_preserves_chat_and_cannot_delete_other_authors() {
     assert!(matches!(
         service
             .patch_thread(
-                call_receipt("macro|author@example.com", call_id, AccessLevel::Owner).unwrap(),
+                call_receipt("rox|author@example.com", call_id, AccessLevel::Owner).unwrap(),
                 call_id,
                 ThreadPatch {
                     resolved: Some(true),

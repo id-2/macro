@@ -79,7 +79,7 @@ async fn admit(pool: &PgPool) -> anyhow::Result<SendAttemptId> {
     let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     EmailPgRepo::new(pool.clone())
         .admit_send(
-            &RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap(),
             link(),
             attempt,
             PreparedSend {

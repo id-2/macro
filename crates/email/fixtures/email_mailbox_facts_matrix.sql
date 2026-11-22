@@ -40,7 +40,7 @@ JOIN (VALUES
 ) labels(bit, label_id) ON mask & bit <> 0;
 
 INSERT INTO email_mailbox_commands (id, link_id, generation, actor_id, intent, status)
-VALUES ('cccccccc-0000-0000-0000-0000000000fa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 1, 'macro|user1@test.com', '{}'::jsonb, 'pending');
+VALUES ('cccccccc-0000-0000-0000-0000000000fa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 1, 'rox|user1@test.com', '{}'::jsonb, 'pending');
 
 INSERT INTO email_pending_mailbox_state (message_id, attribute, command_id, desired)
 SELECT md5('facts-message-' || n)::uuid, 'in_trash', 'cccccccc-0000-0000-0000-0000000000fa'::uuid, pending_trash

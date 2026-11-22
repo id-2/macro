@@ -6,7 +6,7 @@ describe('peerAuthorId', () => {
   it('attributes a peer an agent registered to the agent', () => {
     expect(
       peerAuthorId('11646767255883251712', {
-        userId: 'macro|wolf@rox.one',
+        userId: 'rox|wolf@rox.one',
         actor: 'bot|0198c1a2-7b3c-7d4e-8f90-123456789abc',
       })
     ).toBe('bot|0198c1a2-7b3c-7d4e-8f90-123456789abc');
@@ -15,29 +15,29 @@ describe('peerAuthorId', () => {
   it('attributes an AI peer without an agent to the user, marked as AI', () => {
     expect(
       peerAuthorId('11646767255883251712', {
-        userId: 'macro|wolf@rox.one',
+        userId: 'rox|wolf@rox.one',
         actor: null,
       })
-    ).toBe('ai|macro|wolf@rox.one');
-    expect(userLabel('ai|macro|wolf@rox.one')).toBe('wolf@rox.one (AI)');
+    ).toBe('ai|rox|wolf@rox.one');
+    expect(userLabel('ai|rox|wolf@rox.one')).toBe('wolf@rox.one (AI)');
   });
 
   it('still recognizes AI peers from the legacy reserved block', () => {
     expect(
       peerAuthorId('999999999999999000', {
-        userId: 'macro|wolf@rox.one',
+        userId: 'rox|wolf@rox.one',
         actor: null,
       })
-    ).toBe('ai|macro|wolf@rox.one');
+    ).toBe('ai|rox|wolf@rox.one');
   });
 
   it('attributes a human peer to its user', () => {
     expect(
       peerAuthorId('4242424242', {
-        userId: 'macro|wolf@rox.one',
+        userId: 'rox|wolf@rox.one',
         actor: null,
       })
-    ).toBe('macro|wolf@rox.one');
+    ).toBe('rox|wolf@rox.one');
     expect(peerAuthorId('4242424242', undefined)).toBe('unknown');
   });
 

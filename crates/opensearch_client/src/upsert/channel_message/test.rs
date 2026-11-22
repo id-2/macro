@@ -9,7 +9,7 @@ fn message_args() -> UpsertChannelMessageArgs {
         org_id: None,
         message_id: message_id.clone(),
         thread_id: message_id,
-        sender_id: "macro|system@rox.one".into(),
+        sender_id: "rox|system@rox.one".into(),
         imported_author: Some("quartzarchivebot".into()),
         mentions: vec![],
         content: "Historical message body".into(),
@@ -26,7 +26,7 @@ fn author_is_text_not_content_or_sender() {
         let value = serde_json::to_value(&args).unwrap();
         assert_eq!(value["imported_author"], json!(author));
         assert_eq!(value["content"], "Historical message body");
-        assert_eq!(value["sender_id"], "macro|system@rox.one");
+        assert_eq!(value["sender_id"], "rox|system@rox.one");
         assert_eq!(value["entity_id"], args.channel_id);
         assert_eq!(value["message_id"], args.message_id);
     }
@@ -93,7 +93,7 @@ async fn imported_author_search_preserves_body_highlights_and_channel_access() {
         ] {
             let builder = ChannelMessageQueryBuilder::new(terms.into_iter().map(str::to_owned).collect())
                 .match_type(mode)
-                .user_id("macro|viewer@example.com")
+                .user_id("rox|viewer@example.com")
                 .ids_only(true).ids(vec![channel_id]).sender_ids(sender_ids);
             let mut query = builder.build_bool_query()?.build().to_json();
             // Only redirect the production index constraint to our isolated scratch index.

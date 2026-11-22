@@ -60,9 +60,9 @@ mod views;
 
 use fakes::*;
 
-const OWNER: &str = "macro|owner@rox.one";
-const VIEWER: &str = "macro|viewer@rox.one";
-const STRANGER: &str = "macro|stranger@rox.one";
+const OWNER: &str = "rox|owner@rox.one";
+const VIEWER: &str = "rox|viewer@rox.one";
+const STRANGER: &str = "rox|stranger@rox.one";
 
 fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).expect("valid user id")

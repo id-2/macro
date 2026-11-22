@@ -139,7 +139,7 @@ pub struct UpdateExplicitMemoryRequest {
 #[derive(Deserialize, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct UserActivityParams {
-    /// A `macro|` user id; omit for the caller.
+    /// A `rox|` user id; omit for the caller.
     pub user: Option<String>,
     /// Inclusive first UTC date.
     pub start: NaiveDate,

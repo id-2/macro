@@ -15,7 +15,7 @@
 -- Link A: user email is user@rox.one
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at,
                          updated_at)
-VALUES ('00000000-0000-0000-0000-00000000001a', 'macro|user@rox.one', '00000000-0000-0000-0000-00000000001a',
+VALUES ('00000000-0000-0000-0000-00000000001a', 'rox|user@rox.one', '00000000-0000-0000-0000-00000000001a',
         'user@rox.one', 'GMAIL', true, '2025-11-11 17:48:26.664688 +00:00',
         '2025-11-11 17:48:26.664688 +00:00');
 

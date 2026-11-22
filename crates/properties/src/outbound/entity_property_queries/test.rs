@@ -78,7 +78,7 @@ async fn inherited_agents_preserve_assignees_and_dedupe_retries(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let task_id = Uuid::now_v7().to_string();
-    let human = EntityReference::new("macro|owner@example.com", EntityType::User);
+    let human = EntityReference::new("rox|owner@example.com", EntityType::User);
     let codex = EntityReference::new(
         bot_id::CODEX_BOT_ID.into_storage_id().as_ref(),
         EntityType::User,
@@ -135,7 +135,7 @@ async fn inherited_agents_merge_with_a_concurrent_assignment(
     let blocker = sqlx::query_scalar!("SELECT pg_backend_pid() AS \"pid!\"")
         .fetch_one(&mut *tx)
         .await?;
-    let human = EntityReference::new("macro|owner@example.com", EntityType::User);
+    let human = EntityReference::new("rox|owner@example.com", EntityType::User);
     let existing = PropertyValue::EntityRef(vec![human.clone()]);
     upsert_entity_property_in_transaction(
         &mut tx,

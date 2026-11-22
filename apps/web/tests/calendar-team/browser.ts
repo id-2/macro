@@ -36,7 +36,7 @@ page.on('requestfailed', (request) => {
 await context.addCookies([{ name: 'login', value: 'true', url: origin }]);
 await page.addInitScript(() =>
   localStorage.setItem(
-    'macro:pref:calendar:settings',
+    'rox:pref:calendar:settings',
     JSON.stringify({
       periodView: 'timeGridWeek',
       hiddenSourceIds: [],
@@ -49,8 +49,8 @@ await page.addInitScript(() =>
   )
 );
 await page.routeWebSocket('**/*', (socket) => socket.close());
-const ALICE = 'macro|alice@example.com';
-const BOB = 'macro|bob@example.com';
+const ALICE = 'rox|alice@example.com';
+const BOB = 'rox|bob@example.com';
 const TEAM = '00000000-0000-0000-0000-000000001111';
 let sharing = 'busy_only';
 const included: Record<string, boolean> = { primary: true, followed: false };
@@ -383,7 +383,7 @@ try {
   assert.deepEqual(
     await page.evaluate(
       () =>
-        JSON.parse(localStorage.getItem('macro:pref:calendar:settings') ?? '{}')
+        JSON.parse(localStorage.getItem('rox:pref:calendar:settings') ?? '{}')
           .hiddenSourceIds
     ),
     ['team-ooo'],

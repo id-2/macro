@@ -34,8 +34,8 @@ impl AccountManagerRepo for FakeRepo {
 
     async fn is_agent(&self, user: &RoxUserIdStr<'_>) -> Result<Option<bool>, FakeError> {
         Ok(match user.as_ref() {
-            "macro|agent@example.com" | "macro|agent2@example.com" => Some(true),
-            "macro|person@example.com" | "macro|person2@example.com" => Some(false),
+            "rox|agent@example.com" | "rox|agent2@example.com" => Some(true),
+            "rox|person@example.com" | "rox|person2@example.com" => Some(false),
             _ => None,
         })
     }
@@ -232,10 +232,10 @@ fn service() -> (
     )
 }
 
-const AGENT: &str = "macro|agent@example.com";
-const AGENT_2: &str = "macro|agent2@example.com";
-const PERSON: &str = "macro|person@example.com";
-const PERSON_2: &str = "macro|person2@example.com";
+const AGENT: &str = "rox|agent@example.com";
+const AGENT_2: &str = "rox|agent2@example.com";
+const PERSON: &str = "rox|person@example.com";
+const PERSON_2: &str = "rox|person2@example.com";
 
 #[tokio::test]
 async fn an_agent_can_ask_to_manage_a_person() {

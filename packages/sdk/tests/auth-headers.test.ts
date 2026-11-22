@@ -60,7 +60,7 @@ describe('requestedAs', () => {
       () =>
         new Rox({
           auth: { type: 'user', apiKey: 'mak_abc' },
-          requestedAs: 'macro|w@x.com',
+          requestedAs: 'rox|w@x.com',
         }),
     ).toThrow(
       'requestedAs() requires bot auth — a user token always acts as its own user',

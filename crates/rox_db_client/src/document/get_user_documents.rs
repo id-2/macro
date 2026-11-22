@@ -218,7 +218,7 @@ mod tests {
         .execute(&pool)
         .await
         .unwrap();
-        let documents = get_user_documents(&pool, &"macro|user@user.com", 3, 0, None)
+        let documents = get_user_documents(&pool, &"rox|user@user.com", 3, 0, None)
             .await
             .unwrap();
 
@@ -241,7 +241,7 @@ mod tests {
             ]
         );
 
-        let documents = get_user_documents(&pool, &"macro|user@user.com", 3, 3, None)
+        let documents = get_user_documents(&pool, &"rox|user@user.com", 3, 3, None)
             .await
             .unwrap();
 
@@ -261,7 +261,7 @@ mod tests {
                 ("document-two".to_string(), 2),
             ]
         );
-        let documents = get_user_documents(&pool, &"macro|user@user.com", 3, 6, None)
+        let documents = get_user_documents(&pool, &"rox|user@user.com", 3, 6, None)
             .await
             .unwrap();
 
@@ -273,7 +273,7 @@ mod tests {
     async fn test_get_user_documents_with_filters(pool: Pool<Postgres>) {
         let documents = get_user_documents(
             &pool,
-            &"macro|user@user.com",
+            &"rox|user@user.com",
             3,
             0,
             Some("docx".to_string()),
@@ -285,7 +285,7 @@ mod tests {
         assert_eq!(documents.1, 1);
 
         let documents =
-            get_user_documents(&pool, &"macro|user@user.com", 3, 0, Some("pdf".to_string()))
+            get_user_documents(&pool, &"rox|user@user.com", 3, 0, Some("pdf".to_string()))
                 .await
                 .unwrap();
 

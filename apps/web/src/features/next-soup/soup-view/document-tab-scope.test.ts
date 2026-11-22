@@ -15,8 +15,8 @@ import {
   withDocumentTabItemScope,
 } from './document-tab-scope';
 
-const ME = 'macro|me@example.com';
-const OTHER = 'macro|other@example.com';
+const ME = 'rox|me@example.com';
+const OTHER = 'rox|other@example.com';
 const NIL = '00000000-0000-0000-0000-000000000000';
 const params = { limit: 100, sort_method: 'updated_at' as const };
 

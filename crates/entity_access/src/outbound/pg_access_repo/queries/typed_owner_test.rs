@@ -15,7 +15,7 @@ async fn discussion_attachments_use_the_parents_typed_owner_audience(
     let child = fixture_entity_id(40);
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner)
-        VALUES ($1, 'Attachment', 'macro|typed-teamless@example.com')"#,
+        VALUES ($1, 'Attachment', 'rox|typed-teamless@example.com')"#,
         child.to_string()
     )
     .execute(&pool)
@@ -35,7 +35,7 @@ async fn discussion_attachments_use_the_parents_typed_owner_audience(
         let attachment = Uuid::now_v7();
         sqlx::query!(
             r#"INSERT INTO comms_messages (id, sender_id, content, parent_entity_type, parent_entity_id)
-            VALUES ($1, 'macro|typed-teamless@example.com', 'attachment', 'document', $2)"#,
+            VALUES ($1, 'rox|typed-teamless@example.com', 'attachment', 'document', $2)"#,
             message,
             fixture_entity_id(suffix).to_string()
         )
@@ -97,7 +97,7 @@ async fn typed_owner_team_links_allow_only_the_resolved_audience(
                 vec!["90000000-0000-0000-0000-000000000012".to_string()],
                 false,
             ),
-            (vec!["macro|typed-teamless@example.com".to_string()], false),
+            (vec!["rox|typed-teamless@example.com".to_string()], false),
             (vec![], false),
         ] {
             let sources = SourceIds(sources);

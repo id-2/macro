@@ -5,7 +5,7 @@ fn fixtures() -> (
     VerifiedMailboxGrant,
     InitializationSnapshot,
 ) {
-    let actor = RoxUserIdStr::try_from("macro|actor@example.com".to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from("rox|actor@example.com".to_owned()).unwrap();
     let owner = Uuid::now_v7();
     (
         InitializeMailbox {
@@ -36,7 +36,7 @@ fn fixtures() -> (
             },
             existing: Some(ExistingMailbox {
                 id: Uuid::now_v7(),
-                owner: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+                owner: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
                 grant_id: Some(Uuid::now_v7()),
                 grant_generation: 1,
                 sync_generation: 1,
@@ -88,7 +88,7 @@ fn existing_delegate_can_reconnect_without_promoting_the_owner() {
 fn verified_mailbox_account_uses_existing_scoped_delegation() {
     let (request, grant, mut snapshot) = fixtures();
     snapshot.existing.as_mut().unwrap().owner =
-        RoxUserIdStr::try_from("macro|mailbox@example.com".to_owned()).unwrap();
+        RoxUserIdStr::try_from("rox|mailbox@example.com".to_owned()).unwrap();
     assert_eq!(
         decide(&request, &grant, &snapshot).unwrap(),
         InitializationDecision::Delegate
@@ -99,7 +99,7 @@ fn verified_mailbox_account_uses_existing_scoped_delegation() {
 fn new_mailbox_uses_existing_rox_identity_without_moving_the_oauth_owner() {
     let (request, grant, mut snapshot) = fixtures();
     snapshot.existing = None;
-    let owner = RoxUserIdStr::try_from("macro|mailbox@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("rox|mailbox@example.com".to_owned()).unwrap();
     snapshot.account_for_email = Some(owner.clone());
     assert_eq!(
         decide(&request, &grant, &snapshot).unwrap(),

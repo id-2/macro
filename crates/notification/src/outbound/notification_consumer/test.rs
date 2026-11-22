@@ -63,7 +63,7 @@ fn declared_topic_decoder_rejects_unsupported_schema_versions() {
 
 fn row() -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
-        owner_id: RoxUserIdStr::try_from("macro|recipient@example.com".to_string())
+        owner_id: RoxUserIdStr::try_from("rox|recipient@example.com".to_string())
             .expect("valid user ID"),
         notification_id: Uuid::nil(),
         notification_event_type: "test".to_string(),

@@ -9,11 +9,11 @@ mod case_lookup;
 async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2) VALUES
-         ('macro|a@example.com', 'macro|m@example.com'),
-         ('macro|b@example.com', 'macro|m@example.com'),
-         ('macro|m@example.com', 'macro|y@example.com'),
-         ('macro|m@example.com', 'macro|z@example.com'),
-         ('macro|c@example.com', 'macro|x@example.com')"
+         ('rox|a@example.com', 'rox|m@example.com'),
+         ('rox|b@example.com', 'rox|m@example.com'),
+         ('rox|m@example.com', 'rox|y@example.com'),
+         ('rox|m@example.com', 'rox|z@example.com'),
+         ('rox|c@example.com', 'rox|x@example.com')"
     )
     .execute(&pool)
     .await
@@ -28,9 +28,9 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
     let mut found = Vec::new();
     // The fourth request also proves that resuming past the end is empty.
     for expected in [
-        vec!["macro|a@example.com", "macro|b@example.com"],
-        vec!["macro|m@example.com", "macro|y@example.com"],
-        vec!["macro|z@example.com"],
+        vec!["rox|a@example.com", "rox|b@example.com"],
+        vec!["rox|m@example.com", "rox|y@example.com"],
+        vec!["rox|z@example.com"],
     ] {
         let page = service
             .contact_id_page(viewer.clone(), after.as_ref(), limit)
@@ -47,7 +47,7 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
     }
     assert!(after.is_none());
     assert_eq!(found.len(), 5);
-    let last = ContactCursor::from_position("macro|z@example.com".into()).unwrap();
+    let last = ContactCursor::from_position("rox|z@example.com".into()).unwrap();
     let end = service
         .contact_id_page(viewer, Some(&last), limit)
         .await
@@ -56,7 +56,7 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
     assert!(end.next_cursor.is_none());
     // A cursor from another listing is just a position, never access to its rows.
     let unrelated = RoxUserIdStr::try_from_email("nobody@example.com").unwrap();
-    let foreign_cursor = ContactCursor::from_position("macro|a@example.com".into()).unwrap();
+    let foreign_cursor = ContactCursor::from_position("rox|a@example.com".into()).unwrap();
     let own = service
         .contact_id_page(unrelated.clone(), Some(&foreign_cursor), limit)
         .await
@@ -75,8 +75,8 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
 async fn full_final_page_has_no_cursor_and_bad_rows_do_not_strand_pagination(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2) VALUES
-         ('broken-id', 'macro|m@example.com'),
-         ('macro|a@example.com', 'macro|m@example.com')"
+         ('broken-id', 'rox|m@example.com'),
+         ('rox|a@example.com', 'rox|m@example.com')"
     )
     .execute(&pool)
     .await
@@ -105,7 +105,7 @@ async fn full_final_page_has_no_cursor_and_bad_rows_do_not_strand_pagination(poo
             .iter()
             .map(|row| row.user_id.as_ref())
             .collect::<Vec<_>>(),
-        ["macro|a@example.com", "macro|m@example.com"]
+        ["rox|a@example.com", "rox|m@example.com"]
     );
     assert!(rest.next_cursor.is_none());
 }
@@ -114,9 +114,9 @@ async fn full_final_page_has_no_cursor_and_bad_rows_do_not_strand_pagination(poo
 async fn exact_lookup_checks_membership_and_preserves_requested_order(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2) VALUES
-        ('macro|a@example.com', 'macro|m@example.com'),
-        ('macro|m@example.com', 'macro|z@example.com'),
-        ('macro|b@example.com', 'macro|c@example.com')"
+        ('rox|a@example.com', 'rox|m@example.com'),
+        ('rox|m@example.com', 'rox|z@example.com'),
+        ('rox|b@example.com', 'rox|c@example.com')"
     )
     .execute(&pool)
     .await
@@ -164,10 +164,10 @@ async fn exact_lookup_checks_membership_and_preserves_requested_order(pool: PgPo
 async fn deep_pages_seek_both_directions_without_scanning_the_directory(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2)
-         SELECT 'macro|a' || lpad(n::text, 6, '0') || '@example.com', 'macro|m@example.com'
+         SELECT 'rox|a' || lpad(n::text, 6, '0') || '@example.com', 'rox|m@example.com'
          FROM generate_series(1, 50000) n
          UNION ALL
-         SELECT 'macro|m@example.com', 'macro|z' || lpad(n::text, 6, '0') || '@example.com'
+         SELECT 'rox|m@example.com', 'rox|z' || lpad(n::text, 6, '0') || '@example.com'
          FROM generate_series(1, 50000) n"
     )
     .execute(&pool)
@@ -178,7 +178,7 @@ async fn deep_pages_seek_both_directions_without_scanning_the_directory(pool: Pg
         .await
         .unwrap();
     let requested: Vec<_> = (1..=500)
-        .map(|i| format!("macro|z{i:06}@example.com"))
+        .map(|i| format!("rox|z{i:06}@example.com"))
         .collect();
     let explain = format!(
         "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {}",
@@ -189,7 +189,7 @@ async fn deep_pages_seek_both_directions_without_scanning_the_directory(pool: Pg
         reason = "EXPLAIN wraps the production lookup SQL and returns planner JSON"
     )]
     let (lookup_plan,): (serde_json::Value,) = sqlx::query_as(&explain)
-        .bind("macro|m@example.com")
+        .bind("rox|m@example.com")
         .bind(&requested)
         .fetch_one(&pool)
         .await
@@ -233,11 +233,11 @@ async fn deep_pages_seek_both_directions_without_scanning_the_directory(pool: Pg
         // Only fixed fixture literals enter diagnostic EXECUTE; production uses binds.
         for after in [
             "NULL",
-            "'macro|a049990@example.com'",
-            "'macro|z049990@example.com'",
+            "'rox|a049990@example.com'",
+            "'rox|z049990@example.com'",
         ] {
             let explain = format!(
-                "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) EXECUTE contacts_page('macro|m@example.com', {after}, 3)"
+                "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) EXECUTE contacts_page('rox|m@example.com', {after}, 3)"
             );
             #[expect(
                 clippy::disallowed_methods,

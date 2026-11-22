@@ -346,7 +346,7 @@ async fn records_provider_counts_before_image_decoding_or_refusal() {
             .await;
         let recorder = RecordingUsage::default();
         let user = rox_user_id::user_id::RoxUserIdStr::try_from(
-            "macro|artist@example.com".to_string(),
+            "rox|artist@example.com".to_string(),
         )
         .unwrap();
         let usage = UsageContext::new(ai_usage::AiFeature::ImageGeneration, user.clone());

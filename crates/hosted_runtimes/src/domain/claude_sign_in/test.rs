@@ -26,7 +26,7 @@ fn signed_in_on_the_first() -> ClaudeSignIn {
         team_id: TEAM,
         computer_name: "Build box".to_owned(),
         signed_in_by: Some(
-            RoxUserIdStr::try_from("macro|signer@example.com".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|signer@example.com".to_owned()).unwrap(),
         ),
         signed_in_at: at(1, 12),
         expires_at: Some(at(20, 12)),
@@ -204,8 +204,8 @@ impl ClaudeSignInNotices for FakeNotices {
     async fn team_admins(&self, team_id: Uuid) -> Result<Vec<RoxUserIdStr<'static>>, FakeError> {
         assert_eq!(team_id, TEAM);
         Ok(vec![
-            RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
-            RoxUserIdStr::try_from("macro|signer@example.com".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|signer@example.com".to_owned()).unwrap(),
         ])
     }
 
@@ -275,8 +275,8 @@ async fn a_pass_tells_the_signer_and_admins_and_one_failure_spares_the_rest() {
                 notice,
             },
             HashSet::from([
-                RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
-                RoxUserIdStr::try_from("macro|signer@example.com".to_owned()).unwrap(),
+                RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
+                RoxUserIdStr::try_from("rox|signer@example.com".to_owned()).unwrap(),
             ]),
         )]
     );

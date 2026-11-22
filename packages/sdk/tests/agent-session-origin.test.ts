@@ -5,7 +5,7 @@ import type { RoxClient } from '../src/utils/client';
 // Handles are lazy, so mapping never touches the network.
 const client = {} as RoxClient;
 
-const user = 'macro|user@example.com';
+const user = 'rox|user@example.com';
 const bot = '01a00000-0000-7000-8000-0000000000b7';
 const routine = '01a00000-0000-7000-8000-00000000000c';
 const channel = '01a00000-0000-7000-8000-000000000001';

@@ -10,7 +10,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_team_settings_missing_row_returns_defaults(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let settings = repo.get_team_settings(&team_id).await?;
@@ -28,7 +28,7 @@ async fn get_team_settings_missing_row_returns_defaults(pool: PgPool) -> anyhow:
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_round_trips_legacy_stage_ids(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
 
     let legacy = std::collections::BTreeMap::from([(Uuid::now_v7(), Uuid::now_v7())]);
@@ -68,7 +68,7 @@ async fn get_team_settings_row_from_enable_flow_returns_defaults(
     // A row created by the enable-CRM flow (crm_enabled only) must read
     // back the config column defaults.
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     sqlx::query(r#"INSERT INTO team_crm_settings (team_id, crm_enabled) VALUES ($1, TRUE)"#)
         .bind(team_id)
         .execute(&pool)
@@ -89,7 +89,7 @@ async fn update_team_settings_inserts_and_preserves_crm_enabled(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let patch = CrmTeamSettingsPatch {
@@ -116,7 +116,7 @@ async fn update_team_settings_partial_changes_only_provided_fields(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let stage_id = Uuid::now_v7();
@@ -158,7 +158,7 @@ async fn update_team_settings_partial_changes_only_provided_fields(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_tristate_clears_nullable_fields(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let set = CrmTeamSettingsPatch {
@@ -190,7 +190,7 @@ async fn update_team_settings_tristate_clears_nullable_fields(pool: PgPool) -> a
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_replaces_team_views_whole(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let first = CrmTeamSettingsPatch {

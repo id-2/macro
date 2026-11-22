@@ -1099,7 +1099,7 @@ export function createQuickAccessValue(): QuickAccessContextValue {
         yield* options?.excludedPeople?.() ?? [];
         for (const link of emailLinks()) {
           if (!link.is_primary)
-            yield `macro|${link.email_address.toLowerCase()}`;
+            yield `rox|${link.email_address.toLowerCase()}`;
         }
       },
       () => (options?.excludeSelf ? directoryScope().userId : undefined)

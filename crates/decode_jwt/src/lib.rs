@@ -89,7 +89,7 @@ impl DecodedJwt {
         #[expect(clippy::disallowed_methods, reason = "Only used when running locally")]
         if cfg!(feature = "local_auth") && std::env::var("LOCAL_USER_ID").is_ok() {
             let user_id =
-                std::env::var("LOCAL_USER_ID").unwrap_or("macro|orguser@org.com".to_string());
+                std::env::var("LOCAL_USER_ID").unwrap_or("rox|orguser@org.com".to_string());
             let Ok(rox_user_id) =
                 RoxUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)
             else {

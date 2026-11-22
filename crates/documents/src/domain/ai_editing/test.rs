@@ -11,7 +11,7 @@ use std::sync::{
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
 fn user() -> RoxUserIdStr<'static> {
-    "macro|editor@example.com".to_owned().try_into().unwrap()
+    "rox|editor@example.com".to_owned().try_into().unwrap()
 }
 fn receipt() -> EntityAccessReceipt<EditAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(

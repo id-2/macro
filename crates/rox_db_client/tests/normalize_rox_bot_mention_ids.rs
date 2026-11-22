@@ -144,7 +144,7 @@ async fn migration_normalizes_bare_uuid_message_senders(
             ('bare-uuid-bot', 'hello', '11111111-1111-1111-1111-111111111111'),
             ('bare-uuid-bot-uppercase', 'hello', '22222222-2222-2222-2222-22222222AAAA'),
             ('already-normalized-bot', 'hello', 'bot|00000000-0000-0000-0000-00000000a1a1'),
-            ('user-sender', 'hello', 'macro|alice@example.com'),
+            ('user-sender', 'hello', 'rox|alice@example.com'),
             ('dirty-sender', 'hello', 'not-a-principal')
         "#,
     )
@@ -176,7 +176,7 @@ async fn migration_normalizes_bare_uuid_message_senders(
             ("dirty-sender".to_owned(), "not-a-principal".to_owned()),
             (
                 "user-sender".to_owned(),
-                "macro|alice@example.com".to_owned(),
+                "rox|alice@example.com".to_owned(),
             ),
         ]
     );
@@ -191,7 +191,7 @@ async fn create_minimal_tables(pool: &Pool<Postgres>) -> anyhow::Result<()> {
         CREATE TABLE comms_messages (
             id text PRIMARY KEY,
             content text NOT NULL,
-            sender_id text NOT NULL DEFAULT 'macro|someone@example.com'
+            sender_id text NOT NULL DEFAULT 'rox|someone@example.com'
         );
 
         CREATE TABLE comms_entity_mentions (

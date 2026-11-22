@@ -30,7 +30,7 @@ enum Command {
     /// markup; it does not reset the allowance. Prints a dry run unless
     /// `--execute` is passed.
     GrantCredits {
-        /// The user, as `macro|<email>`. A team member's grant lands on the
+        /// The user, as `rox|<email>`. A team member's grant lands on the
         /// team owner's balance.
         #[arg(long)]
         user: String,

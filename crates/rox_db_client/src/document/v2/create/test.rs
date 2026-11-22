@@ -5,7 +5,7 @@ use super::*;
 #[sqlx::test]
 async fn document_row_does_not_require_a_user_owner(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let mut transaction = pool.begin().await?;
-    let owner = RoxUserIdStr::parse_from_str("macro|non-existent-user@fake.com")?;
+    let owner = RoxUserIdStr::parse_from_str("rox|non-existent-user@fake.com")?;
     let now = chrono::Utc::now();
 
     let document = insert_document_no_id(

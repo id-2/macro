@@ -5,7 +5,7 @@ use models_permissions::share_permission::access_level::AccessLevel;
 
 fn receipt(entity_type: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(
-        RoxUserIdStr::try_from("macro|docx-test@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("rox|docx-test@example.com".to_owned()).unwrap(),
         Entity {
             entity_type,
             entity_id: "document-id".to_owned(),

@@ -15,19 +15,19 @@ test('person search makes one ranked server search and keeps its order', async (
       return Response.json({
         people: [
           {
-            userId: 'macro|alice@example.com',
+            userId: 'rox|alice@example.com',
             name: 'Alice One',
             isTeammate: true,
             isAgent: false,
           },
           {
-            userId: 'macro|alice-bot@example.com',
+            userId: 'rox|alice-bot@example.com',
             name: null,
             isTeammate: true,
             isAgent: true,
           },
           {
-            userId: 'macro|alice.other@example.com',
+            userId: 'rox|alice.other@example.com',
             name: 'Alice Two',
             isTeammate: false,
             isAgent: false,
@@ -46,9 +46,9 @@ test('person search makes one ranked server search and keeps its order', async (
 
   expect(matches.map((user) => ({ id: user.id, email: user.email() }))).toEqual(
     [
-      { id: 'macro|alice@example.com', email: 'alice@example.com' },
-      { id: 'macro|alice-bot@example.com', email: 'alice-bot@example.com' },
-      { id: 'macro|alice.other@example.com', email: 'alice.other@example.com' },
+      { id: 'rox|alice@example.com', email: 'alice@example.com' },
+      { id: 'rox|alice-bot@example.com', email: 'alice-bot@example.com' },
+      { id: 'rox|alice.other@example.com', email: 'alice.other@example.com' },
     ],
   );
   expect(await Promise.all(matches.map((user) => user.name()))).toEqual([

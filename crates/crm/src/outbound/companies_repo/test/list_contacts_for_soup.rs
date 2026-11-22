@@ -9,7 +9,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const VIEWER: &str = "macro|viewer@test.com";
+const VIEWER: &str = "rox|viewer@test.com";
 fn id(value: u128) -> Uuid {
     Uuid::from_u128(value)
 }

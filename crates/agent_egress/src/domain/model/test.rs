@@ -157,7 +157,7 @@ fn keeps_the_upstreams_session_id_on_the_way_back() {
 #[test]
 fn echoed_scoping_headers_never_reach_the_sandbox() {
     let mut headers = header_map(&[
-        ("x-pd-external-user-id", "macro|owner@rox.one"),
+        ("x-pd-external-user-id", "rox|owner@rox.one"),
         ("x-pd-project-id", "proj_abc"),
         ("content-type", "application/json"),
     ]);

@@ -12,7 +12,7 @@ import { emailKeys } from '../email/keys';
 import { useContactContextPublisher } from './use-context-publisher';
 
 let client: QueryClient;
-const [viewer, setViewer] = createSignal('macro|one@example.com');
+const [viewer, setViewer] = createSignal('rox|one@example.com');
 vi.mock('../client', () => ({
   get queryClient() {
     return client;
@@ -37,7 +37,7 @@ beforeEach(() => {
   client = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   });
-  setViewer('macro|one@example.com');
+  setViewer('rox|one@example.com');
   client.setQueryData(authKeys.userInfo.queryKey, {
     id: viewer(),
     authenticated: true,
@@ -104,7 +104,7 @@ it('waits for all owned inputs, shares the supplied leader, publishes deltas and
     kind: 'patch',
     updates: [
       {
-        userId: 'macro|second@example.com',
+        userId: 'rox|second@example.com',
         facts: {
           lastInteractionMs: null,
           directMessage: null,
@@ -119,7 +119,7 @@ it('waits for all owned inputs, shares the supplied leader, publishes deltas and
     kind: 'patch',
     updates: [
       {
-        userId: 'macro|second@example.com',
+        userId: 'rox|second@example.com',
         facts: {
           lastInteractionMs: null,
           directMessage: null,
@@ -185,15 +185,15 @@ it('cannot relabel retained old-account rows and stops late work after ownership
   await entered.promise;
   batch(() => {
     client.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'macro|two@example.com',
+      id: 'rox|two@example.com',
       authenticated: true,
     });
-    setViewer('macro|two@example.com');
+    setViewer('rox|two@example.com');
   });
   release.resolve();
   await vi.advanceTimersByTimeAsync(30_000);
   expect(writes.map((write) => write.action.kind)).toEqual(['begin']);
-  expect(writes[0].scope.identity).toBe('macro|one@example.com');
+  expect(writes[0].scope.identity).toBe('rox|one@example.com');
 });
 
 it('releases its source and stays unsupported without retrying or writing', async () => {

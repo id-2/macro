@@ -20,7 +20,7 @@ impl DomainActivity for ChannelFact {
 }
 
 fn actor() -> Actor<'static> {
-    Actor::new_from_user("macro|test@example.com".to_owned().try_into().unwrap())
+    Actor::new_from_user("rox|test@example.com".to_owned().try_into().unwrap())
 }
 
 fn channel_fact(channel: &str, action: Action) -> Activity {

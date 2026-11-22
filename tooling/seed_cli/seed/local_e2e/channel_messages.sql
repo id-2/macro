@@ -39,7 +39,7 @@ VALUES (
     '00000000-0000-0000-0003-000000000001'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000001',
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     'Deep thread navigation fixture parent',
     now() - interval '1 day',
     now() - interval '1 day'
@@ -93,8 +93,8 @@ SELECT
     'channel',
     '00000000-0000-0000-0000-000000000001',
     CASE
-        WHEN reply_number % 2 = 0 THEN 'macro|charlie@example.com'
-        ELSE 'macro|bob@example.com'
+        WHEN reply_number % 2 = 0 THEN 'rox|charlie@example.com'
+        ELSE 'rox|bob@example.com'
     END,
     content,
     '00000000-0000-0000-0003-000000000001'::uuid,
@@ -115,7 +115,7 @@ VALUES (
     '00000000-0000-0000-0003-000000000010'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000001',
-    'macro|charlie@example.com',
+    'rox|charlie@example.com',
     'Alternate deep thread navigation fixture parent. Navigate elsewhere: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{"channel_message_id":"00000000-0000-0000-0003-000000000006","channel_thread_id":"00000000-0000-0000-0003-000000000001"},"collapsed":false}</m-document-mention>',
     now() - interval '2 days',
     now() - interval '2 days'
@@ -159,8 +159,8 @@ SELECT
     'channel',
     '00000000-0000-0000-0000-000000000001',
     CASE
-        WHEN reply_number % 2 = 0 THEN 'macro|bob@example.com'
-        ELSE 'macro|charlie@example.com'
+        WHEN reply_number % 2 = 0 THEN 'rox|bob@example.com'
+        ELSE 'rox|charlie@example.com'
     END,
     content,
     '00000000-0000-0000-0003-000000000010'::uuid,
@@ -181,7 +181,7 @@ VALUES (
     '00000000-0000-0000-0003-000000000040'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000001',
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     'Unread navigation fixture parent',
     now() - interval '3 days',
     now() - interval '3 days'
@@ -244,8 +244,8 @@ SELECT
     'channel',
     '00000000-0000-0000-0000-000000000001',
     CASE
-        WHEN reply_number % 2 = 0 THEN 'macro|charlie@example.com'
-        ELSE 'macro|bob@example.com'
+        WHEN reply_number % 2 = 0 THEN 'rox|charlie@example.com'
+        ELSE 'rox|bob@example.com'
     END,
     content,
     '00000000-0000-0000-0003-000000000040'::uuid,
@@ -266,7 +266,7 @@ VALUES (
     '00000000-0000-0000-0003-000000000020'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000001',
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     'Navigation race A: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{"channel_message_id":"00000000-0000-0000-0003-000000000014","channel_thread_id":"00000000-0000-0000-0003-000000000010"},"collapsed":false}</m-document-mention> Navigation target B: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{"channel_message_id":"00000000-0000-0000-0003-000000000006","channel_thread_id":"00000000-0000-0000-0003-000000000001"},"collapsed":false}</m-document-mention>',
     now() + interval '2 hours',
     now() + interval '2 hours'
@@ -286,7 +286,7 @@ VALUES
     '00000000-0000-0000-0003-000000000030'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000002',
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     'Open general at its latest message: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{},"collapsed":false}</m-document-mention>',
     now() + interval '3 hours',
     now() + interval '3 hours'
@@ -295,7 +295,7 @@ VALUES
     '00000000-0000-0000-0003-000000000031'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000003',
-    'macro|charlie@example.com',
+    'rox|charlie@example.com',
     'Open a specific reply in general: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{"channel_message_id":"00000000-0000-0000-0003-000000000006","channel_thread_id":"00000000-0000-0000-0003-000000000001"},"collapsed":false}</m-document-mention>',
     now() + interval '3 hours',
     now() + interval '3 hours'
@@ -304,7 +304,7 @@ VALUES
     '00000000-0000-0000-0003-000000000032'::uuid,
     'channel',
     '00000000-0000-0000-0000-000000000003',
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     'Warm the unread target in general: <m-document-mention>{"documentId":"00000000-0000-0000-0000-000000000001","blockName":"channel","documentName":"general","blockParams":{"channel_message_id":"00000000-0000-0000-0003-000000000044","channel_thread_id":"00000000-0000-0000-0003-000000000040"},"collapsed":false}</m-document-mention>',
     now() + interval '3 hours 1 minute',
     now() + interval '3 hours 1 minute'
@@ -334,7 +334,7 @@ VALUES (
         'threadId', '00000000-0000-0000-0003-000000000040',
         'senderDisplayName', 'Bob'
     ),
-    'macro|bob@example.com',
+    'rox|bob@example.com',
     now() + interval '4 hours'
 );
 
@@ -347,7 +347,7 @@ INSERT INTO user_notification (
     notification_event_type
 )
 VALUES (
-    'macro|e2e@macro.local',
+    'rox|e2e@macro.local',
     '00000000-0000-0000-0004-000000000001'::uuid,
     now() + interval '4 hours',
     'channel',

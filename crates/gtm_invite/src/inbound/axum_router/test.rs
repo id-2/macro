@@ -35,8 +35,8 @@ use crate::inbound::axum_router::{GtmInviteRouterState, gtm_invite_router};
 
 const STAFF_JWT: &str = "staff";
 const OUTSIDER_JWT: &str = "outsider";
-const STAFF_USER_ID: &str = "macro|valentina@rox.one";
-const OUTSIDER_USER_ID: &str = "macro|ada@startup.io";
+const STAFF_USER_ID: &str = "rox|valentina@rox.one";
+const OUTSIDER_USER_ID: &str = "rox|ada@startup.io";
 
 #[derive(Clone)]
 struct FakeAuthorizationService;

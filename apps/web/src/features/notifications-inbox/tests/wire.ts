@@ -34,11 +34,11 @@ export function commentNotification(
     createdAt,
     viewedAt: null,
     updatedAt: createdAt,
-    senderId: 'macro|colleague@example.com',
+    senderId: 'rox|colleague@example.com',
     metadata: {
       __typename: 'GraphqlCommentedOnDocumentMetadata',
       commentedOnDocumentDocumentName: 'Plan',
-      commentedOnDocumentOwner: 'macro|viewer@example.com',
+      commentedOnDocumentOwner: 'rox|viewer@example.com',
       commentedOnDocumentFileType: 'md',
       commentedOnDocumentSubType: null,
       commentedOnDocumentCommentId: id,
@@ -64,7 +64,7 @@ export function inboxEntry(fixture: {
       entityType: 'DOCUMENT',
       displayName: 'Plan',
       documentName: 'Plan',
-      ownerId: 'macro|viewer@example.com',
+      ownerId: 'rox|viewer@example.com',
       fileType: 'md',
       projectId: null,
       createdAt: '2026-01-01T00:00:00Z',
@@ -87,7 +87,7 @@ export function inboxEntry(fixture: {
         row.actor === undefined
           ? {
               kind: 'USER',
-              principalId: 'macro|colleague@example.com',
+              principalId: 'rox|colleague@example.com',
               name: null,
             }
           : row.actor,
@@ -124,7 +124,7 @@ export function inboxPage(
 ) {
   return {
     user: {
-      id: 'macro|viewer@example.com',
+      id: 'rox|viewer@example.com',
       notificationInbox: { entries, nextCursor, nextPosition },
     },
   };

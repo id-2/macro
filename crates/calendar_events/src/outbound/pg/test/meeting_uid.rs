@@ -62,8 +62,8 @@ async fn the_meeting_uid_unwraps_only_an_imported_exchange_uid(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_copy_pairs_with_the_meetings_google_copies(pool: PgPool) {
-    let author_id = "macro|uid-author@example.com";
-    let viewer_id = "macro|uid-viewer@example.com";
+    let author_id = "rox|uid-author@example.com";
+    let viewer_id = "rox|uid-viewer@example.com";
     let author_link = insert_link(&pool, author_id).await;
     let google_link = insert_link(&pool, viewer_id).await;
     let outlook_link = insert_link(&pool, viewer_id).await;
@@ -114,7 +114,7 @@ async fn an_outlook_copy_pairs_with_the_meetings_google_copies(pool: PgPool) {
 
     // Someone holding only an Outlook copy of the author's Google meeting
     // sees it as their own: the mention and the export resolve to that copy.
-    let outlook_only_id = "macro|uid-outlook-only@example.com";
+    let outlook_only_id = "rox|uid-outlook-only@example.com";
     let outlook_only_link = insert_link(&pool, outlook_only_id).await;
     let lone_copy = timed_upsert(
         outlook_only_id,

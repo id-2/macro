@@ -9,10 +9,10 @@ use crate::domain::{
 // Ordered maps, so a failed comparison lists documents in order.
 use std::collections::BTreeMap;
 
-const VIEWER: &str = "macro|viewer@batch.test";
-const TEAMMATE: &str = "macro|teammate@batch.test";
-const STRANGER: &str = "macro|stranger@batch.test";
-const OUTSIDER: &str = "macro|outsider@batch.test";
+const VIEWER: &str = "rox|viewer@batch.test";
+const TEAMMATE: &str = "rox|teammate@batch.test";
+const STRANGER: &str = "rox|stranger@batch.test";
+const OUTSIDER: &str = "rox|outsider@batch.test";
 const READERS: [&str; 4] = [VIEWER, TEAMMATE, STRANGER, OUTSIDER];
 
 fn document(n: u8) -> String {

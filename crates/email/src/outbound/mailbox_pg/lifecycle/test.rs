@@ -69,7 +69,7 @@ impl InboxLifecycleRepository for CountingRemovals {
 }
 fn actor(name: &str) -> InboxActor {
     InboxActor {
-        rox_id: RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap(),
+        rox_id: RoxUserIdStr::try_from(format!("rox|{name}@example.com")).unwrap(),
         credential_owner: format!("{name}-owner"),
     }
 }
@@ -103,16 +103,16 @@ async fn shared(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     }
     let old = rox_uuid::generate_uuid_v7();
     let replacement = rox_uuid::generate_uuid_v7();
-    sqlx::query!("UPDATE email_links SET rox_id = 'macro|shared@example.com',fusionauth_user_id = 'leaving-owner',grant_id = $2 WHERE id = $1",link,old).execute(db).await.unwrap();
+    sqlx::query!("UPDATE email_links SET rox_id = 'rox|shared@example.com',fusionauth_user_id = 'leaving-owner',grant_id = $2 WHERE id = $1",link,old).execute(db).await.unwrap();
     sqlx::query!(
-        "INSERT INTO promoted_shared_mailboxes(rox_id) VALUES ('macro|shared@example.com')"
+        "INSERT INTO promoted_shared_mailboxes(rox_id) VALUES ('rox|shared@example.com')"
     )
     .execute(db)
     .await
     .unwrap();
     for (name, grant) in [("leaving", old), ("remaining", replacement)] {
         let actor = actor(name);
-        sqlx::query!("INSERT INTO rox_user_links(primary_rox_id,child_rox_id,link_id) VALUES ($1,'macro|shared@example.com',$2)",actor.rox_id.as_ref(),link).execute(db).await.unwrap();
+        sqlx::query!("INSERT INTO rox_user_links(primary_rox_id,child_rox_id,link_id) VALUES ($1,'rox|shared@example.com',$2)",actor.rox_id.as_ref(),link).execute(db).await.unwrap();
         sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES ($1,$2,$3,$4,1,'{User.Read,Mail.ReadWrite,Mail.Send}')",link,actor.rox_id.as_ref(),actor.credential_owner,grant).execute(db).await.unwrap();
     }
     (repo, link, replacement)
@@ -121,7 +121,7 @@ async fn shared(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
 async fn double_match(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     let fixture = shared(db).await;
     sqlx::query!(
-        "DELETE FROM promoted_shared_mailboxes WHERE rox_id = 'macro|shared@example.com'"
+        "DELETE FROM promoted_shared_mailboxes WHERE rox_id = 'rox|shared@example.com'"
     )
     .execute(db)
     .await
@@ -146,13 +146,13 @@ async fn deleted_user_bindings_identify_custodian_and_owner_on_the_same_link(db:
         bindings
             .iter()
             .any(|binding| binding.kind == DeletedUserBindingKind::Custodian
-                && binding.actor.rox_id.as_ref() == "macro|leaving@example.com")
+                && binding.actor.rox_id.as_ref() == "rox|leaving@example.com")
     );
     assert!(
         bindings
             .iter()
             .any(|binding| binding.kind == DeletedUserBindingKind::Owner
-                && binding.actor.rox_id.as_ref() == "macro|shared@example.com")
+                && binding.actor.rox_id.as_ref() == "rox|shared@example.com")
     );
 }
 
@@ -164,7 +164,7 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
         .unwrap()
         .unwrap();
     if !with_replacement {
-        sqlx::query!("DELETE FROM email_mailbox_custodians WHERE link_id = $1 AND actor_id = 'macro|remaining@example.com'",link)
+        sqlx::query!("DELETE FROM email_mailbox_custodians WHERE link_id = $1 AND actor_id = 'rox|remaining@example.com'",link)
             .execute(db).await.unwrap();
     }
 
@@ -177,7 +177,7 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
         "SELECT rox_id,is_sync_active,disconnect_requested_at,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",
         link
     ).fetch_one(db).await.unwrap();
-    assert_eq!(row.rox_id, "macro|shared@example.com");
+    assert_eq!(row.rox_id, "rox|shared@example.com");
     assert!(!row.is_sync_active);
     assert!(row.disconnect_requested_at.is_some());
     assert_eq!(row.needs_reauth, !with_replacement);
@@ -210,7 +210,7 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
         .fetch_all(db)
         .await
         .unwrap(),
-        vec!["macro|remaining@example.com"]
+        vec!["rox|remaining@example.com"]
     );
 
     let projections = sqlx::query!(
@@ -241,9 +241,9 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
     .collect::<Vec<_>>();
     assert_eq!(effects.len(), if with_replacement { 6 } else { 5 });
     for viewer in [
-        "macro|leaving@example.com",
-        "macro|shared@example.com",
-        "macro|remaining@example.com",
+        "rox|leaving@example.com",
+        "rox|shared@example.com",
+        "rox|remaining@example.com",
     ] {
         assert_eq!(effects.iter().filter(|effect| matches!(effect, InboxLifecycleEffect::AccessRemoved { viewer: removed } if removed == viewer)).count(), 1);
     }
@@ -279,19 +279,19 @@ async fn deleted_user_self_custodian_is_removed_once_with_unchanged_state(db: Pg
     user(&db, "self").await;
     let grant = Uuid::now_v7();
     sqlx::query!(
-        "UPDATE email_links SET rox_id = 'macro|self@example.com',fusionauth_user_id = 'self-owner',grant_id = $2 WHERE id = $1",
+        "UPDATE email_links SET rox_id = 'rox|self@example.com',fusionauth_user_id = 'self-owner',grant_id = $2 WHERE id = $1",
         link,
         grant
     ).execute(&db).await.unwrap();
     sqlx::query!(
-        "INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES ($1,'macro|self@example.com','self-owner',$2,1,'{}')",
+        "INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES ($1,'rox|self@example.com','self-owner',$2,1,'{}')",
         link,
         grant
     ).execute(&db).await.unwrap();
     let bindings = repo.bindings_for_deleted_user("self-owner").await.unwrap();
     assert_eq!(bindings.len(), 2);
     assert!(bindings.iter().all(|binding| binding.link_id == link
-        && binding.actor.rox_id.as_ref() == "macro|self@example.com"));
+        && binding.actor.rox_id.as_ref() == "rox|self@example.com"));
     let mut kinds: Vec<_> = bindings.iter().map(|binding| binding.kind).collect();
     kinds.sort();
     assert_eq!(
@@ -349,7 +349,7 @@ async fn deleted_user_self_custodian_is_removed_once_with_unchanged_state(db: Pg
     .map(|payload| serde_json::from_value(payload).unwrap())
     .collect();
     assert_eq!(effects.len(), 3);
-    assert_eq!(effects.iter().filter(|effect| matches!(effect, InboxLifecycleEffect::AccessRemoved { viewer } if viewer == "macro|self@example.com")).count(), 1);
+    assert_eq!(effects.iter().filter(|effect| matches!(effect, InboxLifecycleEffect::AccessRemoved { viewer } if viewer == "rox|self@example.com")).count(), 1);
     assert_eq!(effects.iter().filter(|effect| matches!(effect, InboxLifecycleEffect::RevokeMicrosoftGrant { grant_id, generation: 1, owner } if *grant_id == grant && owner == "self-owner")).count(), 1);
     assert_eq!(
         effects
@@ -380,7 +380,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     let command = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO email_mailbox_commands(id,link_id,generation,actor_id,intent,status)
-        VALUES ($1,$2,1,'macro|shared@example.com','{"kind":"read","value":true}','confirming')"#,
+        VALUES ($1,$2,1,'rox|shared@example.com','{"kind":"read","value":true}','confirming')"#,
         command,
         link
     )
@@ -390,7 +390,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     let service = InboxLifecycleService::new(repo.clone(), Effects);
     service.remove(&actor("leaving"), link).await.unwrap();
     let row=sqlx::query!("SELECT rox_id,is_sync_active,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",link).fetch_one(&db).await.unwrap();
-    assert_eq!(row.rox_id, "macro|shared@example.com");
+    assert_eq!(row.rox_id, "rox|shared@example.com");
     assert!(row.is_sync_active);
     assert!(!row.needs_reauth);
     assert_eq!(row.grant_id, Some(replacement));
@@ -447,7 +447,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
         .fetch_one(&db)
         .await
         .unwrap(),
-        "macro|remaining@example.com"
+        "rox|remaining@example.com"
     );
     assert_eq!(sqlx::query_scalar!("SELECT count(*) FROM email_mailbox_lifecycle_outbox WHERE link_id = $1 AND payload->>'kind' = 'delete_mailbox'",link).fetch_one(&db).await.unwrap(),Some(0));
 }
@@ -513,7 +513,7 @@ async fn no_replacement_preserves_the_inbox_and_notifies_remaining_viewers_to_re
     db: PgPool,
 ) {
     let (repo, link, _) = shared(&db).await;
-    sqlx::query!("DELETE FROM email_mailbox_custodians WHERE link_id = $1 AND actor_id = 'macro|remaining@example.com'",link).execute(&db).await.unwrap();
+    sqlx::query!("DELETE FROM email_mailbox_custodians WHERE link_id = $1 AND actor_id = 'rox|remaining@example.com'",link).execute(&db).await.unwrap();
     InboxLifecycleService::new(repo, Effects)
         .remove(&actor("leaving"), link)
         .await
@@ -562,7 +562,7 @@ async fn final_shared_disconnect_freezes_ingestion_and_keeps_revocation_after_ca
 async fn deleting_a_rox_account_releases_only_its_shared_participation(db: PgPool) {
     let (repo, link, replacement) = shared(&db).await;
     // The authentication account deletion may already have cascaded its edge.
-    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'macro|leaving@example.com'"#)
+    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'rox|leaving@example.com'"#)
         .execute(&db)
         .await
         .unwrap();

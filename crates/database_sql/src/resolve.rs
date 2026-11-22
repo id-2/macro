@@ -244,7 +244,7 @@ pub enum Value {
     DateRange(DateRange),
     /// A select option, resolved from its label.
     Option(OptionId),
-    /// An entity id such as `macro|sam@example.com`.
+    /// An entity id such as `rox|sam@example.com`.
     Entity(String),
     /// Every option of a multi-select cell being written.
     Options(Vec<OptionId>),

@@ -5,7 +5,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|agent-dm@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|agent-dm@example.com".to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
@@ -17,7 +17,7 @@ async fn other_people_and_bots_cannot_be_added_to_a_persona_dm(pool: PgPool) {
         .unwrap()
         .dm;
     for principal in [
-        "macro|teammate@example.com".to_owned(),
+        "rox|teammate@example.com".to_owned(),
         bot_id::ROX_CODER_BOT_ID.into_storage_id().to_string(),
     ] {
         let error = sqlx::query!(
@@ -89,7 +89,7 @@ async fn concurrent_opens_create_one_channel_and_two_memberships(pool: PgPool) {
 async fn conversations_are_isolated_by_both_user_and_persona(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool);
     let first = repo.ensure(user(), bot_id::ROX_NEW_BOT_ID).await.unwrap();
-    let other_user = RoxUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
+    let other_user = RoxUserIdStr::try_from("rox|someone-else@example.com".to_owned()).unwrap();
     let second = repo
         .ensure(other_user, bot_id::ROX_NEW_BOT_ID)
         .await

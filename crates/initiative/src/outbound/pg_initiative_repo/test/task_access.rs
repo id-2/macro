@@ -123,8 +123,8 @@ async fn reading_a_project_checks_its_tasks_together(pool: PgPool) -> anyhow::Re
     let _guard = tracing::subscriber::set_default(statements.clone());
     // Separate owners: the access service caches each user's sources briefly,
     // so neither read finds the other's lookup cached.
-    let small_owner = "macro|task-access-small@corp.test";
-    let large_owner = "macro|task-access-large@corp.test";
+    let small_owner = "rox|task-access-small@corp.test";
+    let large_owner = "rox|task-access-large@corp.test";
     let (small, small_tasks) = project_with_tasks(&pool, small_owner, 3).await?;
     let (large, large_tasks) = project_with_tasks(&pool, large_owner, 40).await?;
     // Statements ran above, so sqlx's callsites exist; recompute their interest

@@ -8,7 +8,7 @@ use super::*;
 
 fn actor() -> activity::Actor<'static> {
     activity::Actor::new_from_user(
-        RoxUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user id"),
+        RoxUserIdStr::try_from("rox|teo@example.com".to_string()).expect("valid user id"),
     )
 }
 
@@ -18,7 +18,7 @@ fn record(action: RecordedAction) -> ActivityRecord {
         agent_verb: None,
         id: Uuid::from_u128(1),
         actor: actor(),
-        subject_id: "macro|teo@example.com".to_string(),
+        subject_id: "rox|teo@example.com".to_string(),
         entity_type: activity::EntityType::Document,
         entity_id: "doc-1".to_string(),
         action,
@@ -31,8 +31,8 @@ fn records_map_to_reference_fields() {
     let event = GraphqlActivityEvent::from(record(RecordedAction::Known(Action::Edited)));
 
     assert_eq!(event.id.as_str(), Uuid::from_u128(1).to_string());
-    assert_eq!(event.actor_id, "macro|teo@example.com");
-    assert_eq!(event.subject_id, "macro|teo@example.com");
+    assert_eq!(event.actor_id, "rox|teo@example.com");
+    assert_eq!(event.subject_id, "rox|teo@example.com");
     assert!(event.entity_type == GraphqlEntityType::Document);
     assert_eq!(event.entity_id.as_str(), "doc-1");
     assert!(matches!(event.action, GraphqlActivityAction::Edited(_)));

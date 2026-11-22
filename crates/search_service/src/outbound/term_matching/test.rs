@@ -59,8 +59,8 @@ async fn refresh_finishes() {
     tokio::time::sleep(PROVIDER_DELAY + Duration::from_millis(1)).await;
 }
 
-const PERSON: &str = "macro|person@example.com";
-const COLLEAGUE: &str = "macro|colleague@example.com";
+const PERSON: &str = "rox|person@example.com";
+const COLLEAGUE: &str = "rox|colleague@example.com";
 
 #[tokio::test(start_paused = true)]
 async fn a_search_never_waits_on_a_slow_provider() {

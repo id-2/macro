@@ -42,7 +42,7 @@ impl EventPublisher for RecordingPublisher {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|recipient@example.com".to_string()).expect("valid user id")
+    RoxUserIdStr::try_from("rox|recipient@example.com".to_string()).expect("valid user id")
 }
 
 fn document() -> Entity<'static> {
@@ -71,13 +71,13 @@ async fn publishes_recipient_and_entity_patch_in_the_soup_topic_payload() {
     let record = records.pop().expect("one record");
     assert!(records.is_empty());
     assert_eq!(record.topic, "rox.soup");
-    assert_eq!(record.key, "macro|recipient@example.com");
+    assert_eq!(record.key, "rox|recipient@example.com");
 
     let json: serde_json::Value = serde_json::from_slice(&record.payload).expect("payload is JSON");
     assert!(json["event_id"].is_string());
     assert_eq!(json["schema_version"], 2);
     assert_eq!(json["event_type"], "soup.updated");
-    assert_eq!(json["metadata"][0], "macro|recipient@example.com");
+    assert_eq!(json["metadata"][0], "rox|recipient@example.com");
     assert_eq!(json["metadata"][1]["entity_type"], "document");
     assert_eq!(json["metadata"][1]["entity_id"], DOCUMENT_ID);
     assert!(json.to_string().find("document_version_id").is_none());

@@ -70,8 +70,8 @@ const participants = Array.from(
   (_, index) => {
     const identity =
       index === 0
-        ? 'macro|member@example.com'
-        : `macro|member${index + 1}@example.com`;
+        ? 'rox|member@example.com'
+        : `rox|member${index + 1}@example.com`;
     const name = params.has('count')
       ? `Participant ${index + 1}`
       : 'Call participant';
@@ -119,7 +119,7 @@ if (params.get('cameraPreview') === 'true') {
   );
 }
 const localParticipant = {
-  identity: 'macro|me@example.com',
+  identity: 'rox|me@example.com',
   getTrackPublication(source: string) {
     if (source === 'camera' && !videoMuted())
       return {
@@ -163,7 +163,7 @@ window.addEventListener('fixture-reaction', () => {
   for (const listener of listeners.get('dataReceived') ?? [])
     listener(
       payload,
-      participants[0] ?? { identity: 'macro|member@example.com' },
+      participants[0] ?? { identity: 'rox|member@example.com' },
       undefined,
       'rox.call.reaction.v1'
     );

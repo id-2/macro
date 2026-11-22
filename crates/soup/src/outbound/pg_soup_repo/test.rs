@@ -51,7 +51,7 @@ fn request(filter: EntityFilterAst, follow_up: bool) -> SimpleSortRequest<'stati
     SimpleSortRequest {
         limit: 50,
         cursor: SimpleSortQuery::ItemsFilter(query),
-        user_id: RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap(),
     }
 }
 

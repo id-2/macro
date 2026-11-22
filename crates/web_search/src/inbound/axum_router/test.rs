@@ -29,7 +29,7 @@ use crate::domain::models::{
 use crate::domain::ports::SearchProvider;
 use crate::domain::service::WebSearchService;
 
-const USER_ID: &str = "macro|web-router@example.com";
+const USER_ID: &str = "rox|web-router@example.com";
 
 #[derive(Default)]
 struct FakeProvider {

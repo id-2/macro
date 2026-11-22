@@ -12,7 +12,7 @@ async fn standalone_highlight_remains_unthreaded_until_a_message_attaches_it(poo
     .unwrap();
     let response = create_unthreaded_anchor(
         &pool,
-        "macro|user@user.com",
+        "rox|user@user.com",
         "document-with-comments",
         request,
     )
@@ -32,7 +32,7 @@ async fn standalone_highlight_remains_unthreaded_until_a_message_attaches_it(poo
             guest_name: None,
             canonical_root_id: None,
             parent: MessageParent::parse("document", "document-with-comments").unwrap(),
-            actor: "macro|user@user.com".to_owned().try_into().unwrap(),
+            actor: "rox|user@user.com".to_owned().try_into().unwrap(),
             triggered_via: None,
             triggered_by: None,
             input: PostMessage {

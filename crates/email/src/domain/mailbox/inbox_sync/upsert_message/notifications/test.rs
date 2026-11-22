@@ -4,12 +4,12 @@ fn id(s: &str) -> RoxUserIdStr<'static> {
 }
 #[test]
 fn includes_owner_and_all_delegated_primaries() {
-    let owner = id("macro|owner@example.com");
+    let owner = id("rox|owner@example.com");
     let recipients = build_notification_recipients(
         &owner,
         vec![
-            "macro|primary-a@example.com".to_string(),
-            "macro|primary-b@example.com".to_string(),
+            "rox|primary-a@example.com".to_string(),
+            "rox|primary-b@example.com".to_string(),
         ],
     );
 
@@ -17,15 +17,15 @@ fn includes_owner_and_all_delegated_primaries() {
         recipients,
         HashSet::from([
             owner,
-            id("macro|primary-a@example.com"),
-            id("macro|primary-b@example.com"),
+            id("rox|primary-a@example.com"),
+            id("rox|primary-b@example.com"),
         ])
     );
 }
 
 #[test]
 fn returns_only_owner_when_no_primaries() {
-    let owner = id("macro|owner@example.com");
+    let owner = id("rox|owner@example.com");
     let recipients = build_notification_recipients(&owner, vec![]);
 
     assert_eq!(recipients, HashSet::from([owner]));
@@ -33,46 +33,46 @@ fn returns_only_owner_when_no_primaries() {
 
 #[test]
 fn skips_unparseable_primaries_keeping_valid_ones() {
-    let owner = id("macro|owner@example.com");
+    let owner = id("rox|owner@example.com");
     let recipients = build_notification_recipients(
         &owner,
         vec![
-            "macro|primary-a@example.com".to_string(),
+            "rox|primary-a@example.com".to_string(),
             "not-a-valid-id".to_string(),
         ],
     );
 
     assert_eq!(
         recipients,
-        HashSet::from([owner, id("macro|primary-a@example.com")])
+        HashSet::from([owner, id("rox|primary-a@example.com")])
     );
 }
 
 #[test]
 fn staff_recipients_are_split_onto_the_apns_path() {
     let (staff, customers) = partition_email_push_recipients(HashSet::from([
-        id("macro|staff@rox.one"),
-        id("macro|staff+notify@rox.one"),
-        id("macro|user@example.com"),
+        id("rox|staff@rox.one"),
+        id("rox|staff+notify@rox.one"),
+        id("rox|user@example.com"),
     ]));
 
     assert_eq!(
         staff,
         HashSet::from([
-            id("macro|staff@rox.one"),
-            id("macro|staff+notify@rox.one"),
+            id("rox|staff@rox.one"),
+            id("rox|staff+notify@rox.one"),
         ])
     );
-    assert_eq!(customers, HashSet::from([id("macro|user@example.com")]));
+    assert_eq!(customers, HashSet::from([id("rox|user@example.com")]));
 }
 
 #[test]
 fn customer_only_recipients_do_not_take_the_apns_path() {
     let (staff, customers) =
-        partition_email_push_recipients(HashSet::from([id("macro|user@example.com")]));
+        partition_email_push_recipients(HashSet::from([id("rox|user@example.com")]));
 
     assert!(staff.is_empty());
-    assert_eq!(customers, HashSet::from([id("macro|user@example.com")]));
+    assert_eq!(customers, HashSet::from([id("rox|user@example.com")]));
 }
 
 #[test]

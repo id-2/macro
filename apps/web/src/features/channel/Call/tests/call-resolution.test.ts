@@ -40,7 +40,7 @@ describe('call resolution signaling', () => {
     const resolution = {
       type: 'answered' as const,
       callId: 'call-1',
-      answeredBy: 'macro|person@example.com',
+      answeredBy: 'rox|person@example.com',
     };
 
     publishCallResolution(resolution);
@@ -73,7 +73,7 @@ describe('call resolution signaling', () => {
     const answered = {
       type: 'answered',
       callId: 'call-1',
-      answeredBy: 'macro|person@example.com',
+      answeredBy: 'rox|person@example.com',
     };
     const ended = {
       type: 'ended',
@@ -83,7 +83,7 @@ describe('call resolution signaling', () => {
     const declined = {
       type: 'declined',
       callId: 'call-3',
-      declinedBy: 'macro|person@example.com',
+      declinedBy: 'rox|person@example.com',
     };
 
     MockBroadcastChannel.instance?.emit(answered);
@@ -131,8 +131,8 @@ describe('call resolution signaling', () => {
 describe('resolvesRingFor', () => {
   it('scopes answered and declined to the acting user and ended to everyone', async () => {
     const { resolvesRingFor } = await import('../call-resolution');
-    const me = 'macro|person@example.com';
-    const other = 'macro|someone-else@example.com';
+    const me = 'rox|person@example.com';
+    const other = 'rox|someone-else@example.com';
 
     expect(
       resolvesRingFor({ type: 'answered', callId: 'c', answeredBy: me }, me)
@@ -167,7 +167,7 @@ describe('getCallRecordResolution', () => {
           participants: [],
           viewerHasDeclined: false,
         },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toBeNull();
   });
@@ -182,19 +182,19 @@ describe('getCallRecordResolution', () => {
           isActive: true,
           participants: [
             {
-              userId: 'macro|person@example.com',
+              userId: 'rox|person@example.com',
               joinedAt: '2026-08-10T10:00:00.000Z',
               leftAt: '2026-08-10T10:01:00.000Z',
             },
           ],
           viewerHasDeclined: false,
         },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toEqual({
       type: 'answered',
       callId: 'call-1',
-      answeredBy: 'macro|person@example.com',
+      answeredBy: 'rox|person@example.com',
     });
   });
 
@@ -209,14 +209,14 @@ describe('getCallRecordResolution', () => {
           isActive: true,
           participants: [
             {
-              userId: 'macro|someone-else@example.com',
+              userId: 'rox|someone-else@example.com',
               joinedAt: '2026-08-10T10:00:00.000Z',
               leftAt: '2026-08-10T10:01:00.000Z',
             },
           ],
           viewerHasDeclined: false,
         },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toBeNull();
   });
@@ -233,12 +233,12 @@ describe('getCallRecordResolution', () => {
           participants: [],
           viewerHasDeclined: true,
         },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toEqual({
       type: 'declined',
       callId: 'call-1',
-      declinedBy: 'macro|person@example.com',
+      declinedBy: 'rox|person@example.com',
     });
   });
 
@@ -253,19 +253,19 @@ describe('getCallRecordResolution', () => {
           isActive: true,
           participants: [
             {
-              userId: 'macro|person@example.com',
+              userId: 'rox|person@example.com',
               joinedAt: '2026-08-10T10:00:00.000Z',
               leftAt: null,
             },
           ],
           viewerHasDeclined: true,
         },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toEqual({
       type: 'answered',
       callId: 'call-1',
-      answeredBy: 'macro|person@example.com',
+      answeredBy: 'rox|person@example.com',
     });
   });
 
@@ -280,12 +280,12 @@ describe('getCallRecordResolution', () => {
     };
 
     expect(
-      getCallRecordResolution(unansweredRecord, 'macro|person@example.com')
+      getCallRecordResolution(unansweredRecord, 'rox|person@example.com')
     ).toBeNull();
     expect(
       getCallRecordResolution(
         { ...unansweredRecord, isActive: false },
-        'macro|person@example.com'
+        'rox|person@example.com'
       )
     ).toEqual({
       type: 'ended',

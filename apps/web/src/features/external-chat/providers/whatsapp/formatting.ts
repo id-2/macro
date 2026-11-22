@@ -101,10 +101,10 @@ function urlLink(url: string): string {
 }
 const MARKDOWN_FOR: Record<string, string> = { '*': '**', _: '*', '~': '~~' };
 
-/** `macro|ana@example.com` → its email; the mention chip resolves the name. */
+/** `rox|ana@example.com` → its email; the mention chip resolves the name. */
 function roxEmail(userId: string): string | undefined {
-  return userId.startsWith('macro|')
-    ? userId.slice('macro|'.length)
+  return userId.startsWith('rox|')
+    ? userId.slice('rox|'.length)
     : undefined;
 }
 

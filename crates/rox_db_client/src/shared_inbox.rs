@@ -38,7 +38,7 @@ pub async fn promote_link_to_shared(
     organization_id: Option<i32>,
 ) -> anyhow::Result<PromotedSharedInbox> {
     let mailbox_email = mailbox_email.to_lowercase();
-    let mailbox_rox_id = format!("macro|{mailbox_email}");
+    let mailbox_rox_id = format!("rox|{mailbox_email}");
     let fusionauth_user_id = rox_uuid::generate_uuid_v7();
     let stripe_customer_id = format!("cus_shared_{fusionauth_user_id}");
 

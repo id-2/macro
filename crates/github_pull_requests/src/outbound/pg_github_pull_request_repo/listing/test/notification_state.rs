@@ -5,7 +5,7 @@ use item_filters::NotificationState::{Done, Seen, Unseen};
 async fn notification_boolean_filters_match_every_present_state_set(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
     let listing = PgGithubPullRequestRepo::new(pool.clone());
-    let user = "macro|user@example.com";
+    let user = "rox|user@example.com";
     let mut ids = Vec::new();
     for present in 0..8 {
         let entity = insert_foreign_entity_for_source(
@@ -24,7 +24,7 @@ async fn notification_boolean_filters_match_every_present_state_set(pool: PgPool
         }
     }
     // Neither another user's notification nor a deleted row may affect our set.
-    insert_foreign_entity_notification(&pool, ids[0], "macro|other@example.com", true, true).await;
+    insert_foreign_entity_notification(&pool, ids[0], "rox|other@example.com", true, true).await;
     insert_foreign_entity_notification(&pool, ids[0], user, false, true).await;
     sqlx::query!(
         "UPDATE user_notification un SET deleted_at = NOW() FROM notification n

@@ -74,9 +74,9 @@ fn invalid_recipients_are_left_out_of_attachment_properties() {
 
     assert_eq!(
         property.sender.as_ref().map(|id| id.as_ref()),
-        Some("macro|sender@example.com")
+        Some("rox|sender@example.com")
     );
-    assert_eq!(recipients(&property), ["macro|ann@example.com"]);
+    assert_eq!(recipients(&property), ["rox|ann@example.com"]);
     assert_eq!(property.subject.as_deref(), Some("Quarterly report"));
     let source = property.source.expect("source is set");
     assert_eq!(source.entity_id, Uuid::from_u128(1).to_string());
@@ -89,7 +89,7 @@ fn invalid_sender_keeps_the_other_attachment_properties() {
         email_attachment_property(&upload_args("'sender@example.com'", &["ann@example.com"]));
 
     assert!(property.sender.is_none());
-    assert_eq!(recipients(&property), ["macro|ann@example.com"]);
+    assert_eq!(recipients(&property), ["rox|ann@example.com"]);
     assert_eq!(property.subject.as_deref(), Some("Quarterly report"));
     assert!(property.source.is_some());
 }

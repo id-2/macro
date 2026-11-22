@@ -23,7 +23,7 @@ impl BotFacts for NoLookup {
 }
 
 fn user() -> Owner {
-    Owner::parse(OwnerType::User, "macro|sponsor@example.com").unwrap()
+    Owner::parse(OwnerType::User, "rox|sponsor@example.com").unwrap()
 }
 
 #[tokio::test]

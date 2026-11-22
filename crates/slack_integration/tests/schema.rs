@@ -47,17 +47,17 @@ async fn fixture_with_history(pool: &PgPool, history: bool) -> Transaction<'_, P
         INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ('{TEAM}', 'schema', 'schema@example.com', 'schema-customer');
         INSERT INTO "User" (id, email, rox_user_id)
-        VALUES ('macro|schema@example.com', 'schema@example.com', '{TEAM}');
-        INSERT INTO team (id, name, owner_id) VALUES ('{TEAM}', 'Schema', 'macro|schema@example.com');
+        VALUES ('rox|schema@example.com', 'schema@example.com', '{TEAM}');
+        INSERT INTO team (id, name, owner_id) VALUES ('{TEAM}', 'Schema', 'rox|schema@example.com');
         INSERT INTO import_source_binding (team_id, confirmed_unknown_at) VALUES ('{TEAM}', now());
         INSERT INTO slack_import_job
             (id, team_id, user_id, idempotency_token, request_sha256, confirmed_unknown, include_message_history)
-        VALUES ('{JOB}', '{TEAM}', 'macro|schema@example.com', '{JOB}', repeat('a', 64), true, {history});
+        VALUES ('{JOB}', '{TEAM}', 'rox|schema@example.com', '{JOB}', repeat('a', 64), true, {history});
         INSERT INTO slack_import_conversation
             (job_id, slack_channel_id, kind, name, folder, member_ids, archived)
         VALUES ('{JOB}', 'C123', 'public_channel', 'general', 'general', ARRAY['U123'], false);
         INSERT INTO comms_channels (id, name, channel_type, owner_id)
-        VALUES ('{CHANNEL}', 'Imported private', 'private', 'macro|schema@example.com');
+        VALUES ('{CHANNEL}', 'Imported private', 'private', 'rox|schema@example.com');
         INSERT INTO import_target_reservation (team_id, source, foreign_id, candidate_channel_id)
         VALUES ('{TEAM}', 'slack', 'C123', '{CANDIDATE}');
         "#
@@ -86,7 +86,7 @@ fn mapping() -> String {
 fn message() -> String {
     format!(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
-             VALUES ('{MESSAGE}', 'channel', '{CHANNEL}', 'macro|schema@example.com', 'Historical message')"
+             VALUES ('{MESSAGE}', 'channel', '{CHANNEL}', 'rox|schema@example.com', 'Historical message')"
     )
 }
 
@@ -98,7 +98,7 @@ async fn natural_keys_and_old_ledger_writers_remain_compatible(pool: PgPool) {
             &mut tx,
             &format!(
                 "INSERT INTO import_entity (user_id, source, foreign_id, initiator)
-             VALUES ('macro|schema@example.com', 'slack', '{initiator}', '{initiator}')"
+             VALUES ('rox|schema@example.com', 'slack', '{initiator}', '{initiator}')"
             ),
         )
         .await;
@@ -109,7 +109,7 @@ async fn natural_keys_and_old_ledger_writers_remain_compatible(pool: PgPool) {
                  VALUES ('{TEAM}', 'slack', 'C123', '{CHANNEL}')"),
         format!("INSERT INTO slack_import_job
                  (id, team_id, user_id, idempotency_token, request_sha256, confirmed_unknown, include_message_history)
-                 VALUES ('{MESSAGE}', '{TEAM}', 'macro|schema@example.com', '{JOB}', repeat('a', 64), true, true)"),
+                 VALUES ('{MESSAGE}', '{TEAM}', 'rox|schema@example.com', '{JOB}', repeat('a', 64), true, true)"),
         format!("INSERT INTO slack_import_conversation
                  (job_id, slack_channel_id, kind, name, folder, member_ids, archived)
                  VALUES ('{JOB}', 'C123', 'public_channel', 'other', 'other', '{{}}', false)"),

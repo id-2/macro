@@ -16,7 +16,7 @@ function record(
 ): SavedViewDefinition {
   return {
     id: VIEW,
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     name: 'Invoices',
     config: { kind: 'email', version: 1, filters: {} },
     sharedTeamId: null,

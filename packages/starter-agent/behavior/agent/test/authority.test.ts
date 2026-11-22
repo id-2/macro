@@ -3,8 +3,8 @@ import type { Agent, WakeContext, Woke } from '@rox-one/muppet/core/agent';
 import { memoryDisk } from '../../context/test/fakes.ts';
 import { authority, authorized, type Team } from '../authority.ts';
 
-const creator = 'macro|creator@example.com';
-const teamOwner = 'macro|team-owner@example.com';
+const creator = 'rox|creator@example.com';
+const teamOwner = 'rox|team-owner@example.com';
 const files = {
   current: '/run/authority/owner',
   told: '/memory/authority/told',

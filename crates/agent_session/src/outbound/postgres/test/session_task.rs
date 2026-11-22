@@ -60,7 +60,7 @@ async fn stores_one_task_per_session_and_returns_the_pull_request(pool: PgPool) 
         Some(second.as_str())
     );
 
-    let other = user_id("macro|someone-else@example.com");
+    let other = user_id("rox|someone-else@example.com");
     assert!(matches!(
         repo.set_task(session.id, &other, &first).await,
         Err(AgentSessionError::Forbidden)

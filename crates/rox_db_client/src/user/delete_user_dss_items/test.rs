@@ -4,7 +4,7 @@ use super::{
 };
 use sqlx::{PgConnection, PgPool};
 
-const USER_ID: &str = "macro|cleanup@example.com";
+const USER_ID: &str = "rox|cleanup@example.com";
 const DOCUMENT_ID: &str = "01900000-0000-7000-8000-000000000101";
 const CHAT_ID: &str = "01900000-0000-7000-8000-000000000102";
 const PROJECT_ID: &str = "01900000-0000-7000-8000-000000000103";
@@ -106,7 +106,7 @@ async fn quota_counts_only_live_user_owned_documents(pool: PgPool) -> anyhow::Re
 ))]
 async fn legacy_non_uuid_items_are_still_deleted(pool: PgPool) -> anyhow::Result<()> {
     let mut transaction = pool.begin().await?;
-    let mut documents = delete_user_documents(&mut transaction, "macro|user@user.com").await?;
+    let mut documents = delete_user_documents(&mut transaction, "rox|user@user.com").await?;
     documents.sort();
     assert_eq!(
         documents,
@@ -121,9 +121,9 @@ async fn legacy_non_uuid_items_are_still_deleted(pool: PgPool) -> anyhow::Result
             "document-two",
         ]
     );
-    delete_user_chats(&mut transaction, "macro|user@user.com").await?;
+    delete_user_chats(&mut transaction, "rox|user@user.com").await?;
     assert_eq!(
-        delete_user_projects(&mut transaction, "macro|user@user.com").await?,
+        delete_user_projects(&mut transaction, "rox|user@user.com").await?,
         ["project-one"]
     );
     transaction.commit().await?;

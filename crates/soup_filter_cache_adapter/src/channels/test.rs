@@ -28,13 +28,13 @@ fn key(n: u128) -> RecordKey {
 }
 fn row(n: u128) -> Value {
     json!({"__typename":"GraphqlSoupChannel", "id":id(n), "cacheProjection":null,
-        "ownerId":"macro|viewer@example.com", "channelType":"team", "channelTeamId":id(10),
+        "ownerId":"rox|viewer@example.com", "channelType":"team", "channelTeamId":id(10),
         "organizationId":"20", "isParticipant":n != 3, "createdAt":"2025-01-01T00:00:00Z", "updatedAt":"2025-01-02T00:00:00.000001Z",
         "notifications":[{"id":id(n+100),"entityId":id(n),"entityType":"CHANNEL","state":"UNSEEN"}]
     })
 }
 fn data(rows: Vec<Value>) -> Value {
-    json!({"user":{"id":"macro|viewer@example.com","soup":{"items":rows}}})
+    json!({"user":{"id":"rox|viewer@example.com","soup":{"items":rows}}})
 }
 fn filters(channel: Value) -> Value {
     let nil = id(0);
@@ -57,7 +57,7 @@ async fn write<S: PredicateIndexStorage>(engine: &mut Engine<S>, query: &str, da
                 operation_name: None,
                 variables: &Default::default(),
                 data,
-                identity: Some("macro|viewer@example.com"),
+                identity: Some("rox|viewer@example.com"),
             },
             projections,
         )
@@ -304,7 +304,7 @@ fn full_channel_optimism_does_not_create_authoritative_access() {
 async fn lifecycle<S: PredicateIndexStorage>(storage: S) {
     let mut engine = Engine::new(storage);
     let project = json!({"__typename":"GraphqlSoupProject","id":id(7),"cacheProjection":null,
-        "ownerId":"macro|viewer@example.com","parentId":null,"createdAt":"2025-01-01T00:00:00Z","updatedAt":"2025-01-02T00:00:00.000001Z",
+        "ownerId":"rox|viewer@example.com","parentId":null,"createdAt":"2025-01-01T00:00:00Z","updatedAt":"2025-01-02T00:00:00.000001Z",
         "notifications":[{"id":id(107),"entityId":id(7),"entityType":"PROJECT","state":"UNSEEN"}]
     });
     write(
@@ -405,7 +405,7 @@ async fn lifecycle<S: PredicateIndexStorage>(storage: S) {
                 operation_name: None,
                 variables: &Default::default(),
                 data: &notification,
-                identity: Some("macro|viewer@example.com"),
+                identity: Some("rox|viewer@example.com"),
             },
             updates,
         )

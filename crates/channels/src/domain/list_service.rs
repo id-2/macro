@@ -283,7 +283,7 @@ mod tests {
         let name_lookup = HashMap::new();
 
         let user_id =
-            RoxUserIdStr::try_from("macro|shepherd.hatton@gmail.com".to_string()).unwrap();
+            RoxUserIdStr::try_from("rox|shepherd.hatton@gmail.com".to_string()).unwrap();
 
         assert_eq!(
             id_to_display_name(&user_id, &name_lookup),

@@ -7,7 +7,7 @@ use rootcause::Report;
 use std::sync::Mutex;
 use tower::ServiceExt;
 
-const CALLER: &str = "macro|caller@example.com";
+const CALLER: &str = "rox|caller@example.com";
 
 #[derive(Clone)]
 struct FakeAuthorization;
@@ -178,9 +178,9 @@ async fn explicit_memory_is_read_and_edited_as_the_caller() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![
-            "explicit macro|caller@example.com",
-            "update macro|caller@example.com 7",
-            "update macro|caller@example.com 6",
+            "explicit rox|caller@example.com",
+            "update rox|caller@example.com 7",
+            "update rox|caller@example.com 6",
         ]
     );
 }
@@ -200,7 +200,7 @@ async fn user_activity_defaults_to_the_caller_and_forbids_strangers() {
     let stranger = send(
         &service,
         Request::get(
-            "/memory/activity?user=macro%7Cstranger%40example.com&start=2026-10-01&end=2026-10-31",
+            "/memory/activity?user=rox%7Cstranger%40example.com&start=2026-10-01&end=2026-10-31",
         )
         .header("authorization", "Bearer valid")
         .body(Body::empty())
@@ -222,8 +222,8 @@ async fn user_activity_defaults_to_the_caller_and_forbids_strangers() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![
-            "activity macro|caller@example.com macro|caller@example.com 2026-10-01 2026-10-31",
-            "activity macro|caller@example.com macro|stranger@example.com 2026-10-01 2026-10-31",
+            "activity rox|caller@example.com rox|caller@example.com 2026-10-01 2026-10-31",
+            "activity rox|caller@example.com rox|stranger@example.com 2026-10-01 2026-10-31",
         ]
     );
 }

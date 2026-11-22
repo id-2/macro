@@ -7,8 +7,8 @@ const CHANNEL: Uuid = Uuid::from_u128(100);
 const THREAD_ROOT: Uuid = Uuid::from_u128(1);
 const REPLYING_BOT: BotId = BotId::TEST_A;
 const OTHER_BOT: BotId = BotId::TEST_B;
-const PERSON: &str = "macro|person@example.com";
-const SOMEONE_ELSE: &str = "macro|someone-else@example.com";
+const PERSON: &str = "rox|person@example.com";
+const SOMEONE_ELSE: &str = "rox|someone-else@example.com";
 
 fn person() -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(PERSON.to_owned()).unwrap()

@@ -34,8 +34,8 @@ fn meeting_copy(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn meeting_copies_list_each_of_the_requesters_inboxes(pool: PgPool) {
-    let owner_id = "macro|copies-owner@example.com";
-    let other_id = "macro|copies-other@example.com";
+    let owner_id = "rox|copies-owner@example.com";
+    let other_id = "rox|copies-other@example.com";
     let organizing_link = insert_link(&pool, owner_id).await;
     let invited_link = insert_link(&pool, owner_id).await;
     let cancelled_link = insert_link(&pool, owner_id).await;

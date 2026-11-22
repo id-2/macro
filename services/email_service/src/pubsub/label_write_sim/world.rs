@@ -374,7 +374,7 @@ impl World {
         let link = self.link_id;
         sqlx::query(
             "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-             VALUES ($1, 'macro|sim@example.com', $2, $3, 'GMAIL', true, NOW(), NOW())",
+             VALUES ($1, 'rox|sim@example.com', $2, $3, 'GMAIL', true, NOW(), NOW())",
         )
         .bind(link)
         .bind(format!("sim-user-{shard}"))

@@ -4,7 +4,7 @@ use serde_json::{Value, json};
 const ENTITY_ID: &str = "01900000-0000-7000-8000-000000000001";
 const OTHER_ID: &str = "01900000-0000-7000-8000-000000000002";
 const EVENT_ID: &str = "01900000-0000-7000-8000-000000000003";
-const HUMAN: &str = "macro|human@example.com";
+const HUMAN: &str = "rox|human@example.com";
 const BOT: &str = "bot|01900000-0000-7000-8000-000000000004";
 
 fn metadata() -> Value {
@@ -210,7 +210,7 @@ fn update_prefers_explicit_actor_and_requires_a_fallback_when_absent() {
         Err(EventRejection::UnsafeAttribution)
     );
     let mut data = metadata();
-    data["actor_user_id"] = json!("macro|other@example.com");
+    data["actor_user_id"] = json!("rox|other@example.com");
     assert!(incoming("document.updated", data).normalize().is_ok());
 }
 
@@ -655,7 +655,7 @@ fn a_source_does_not_admit_a_change_made_by_a_bot_or_for_someone_else() {
 #[test]
 fn mention_trigger_is_only_for_the_mentioned_user() {
     let owner = RoxUserIdStr::parse_from_str(HUMAN).unwrap();
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     let event = incoming("channel.mentioned", metadata());
     assert!(event.is_for_owner(&owner));
     assert!(!event.is_for_owner(&other));
@@ -702,13 +702,13 @@ fn started_calls_keep_only_ids_and_belong_to_who_created_them() {
 
     assert!(event.is_for_owner(&RoxUserIdStr::parse_from_str(HUMAN).unwrap()));
     assert!(
-        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap())
     );
 }
 
 #[test]
 fn ended_calls_keep_only_ids_and_belong_to_the_people_who_joined() {
-    let event = call_event("call.record_archived", &[HUMAN, "macro|guest@example.com"]);
+    let event = call_event("call.record_archived", &[HUMAN, "rox|guest@example.com"]);
     let normalized = event.normalize().unwrap();
     assert_eq!(normalized.event_name(), EventName::CallEnded);
     assert_eq!(normalized.entity_type(), EventEntityType::Call);
@@ -720,7 +720,7 @@ fn ended_calls_keep_only_ids_and_belong_to_the_people_who_joined() {
 
     assert!(event.is_for_owner(&RoxUserIdStr::parse_from_str(HUMAN).unwrap()));
     assert!(
-        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap())
     );
     assert_eq!(
         call_event("call.record_archived", &[]).normalize(),
@@ -763,7 +763,7 @@ fn email_receipts_keep_only_ids_and_exclude_spam_and_backfills() {
     assert!(!stored.contains("provider"));
     assert!(event.is_for_owner(&owner));
     assert!(
-        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap())
     );
     if let EventPayload::Email(EmailTopicEvent::MessageReceived(ref mut data)) = event.payload {
         data.is_spam_or_trash = true;
@@ -939,8 +939,8 @@ fn property_selector_matches_the_value_a_change_adds() {
 
 #[test]
 fn property_selector_matches_only_people_newly_assigned() {
-    let alice = "macro|alice@example.com";
-    let bob = "macro|bob@example.com";
+    let alice = "rox|alice@example.com";
+    let bob = "rox|bob@example.com";
     let assignees = |ids: &[&str]| {
         let references: Vec<Value> = ids
             .iter()

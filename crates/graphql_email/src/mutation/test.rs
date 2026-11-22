@@ -428,7 +428,7 @@ async fn mark_seen_calls_the_email_service_and_returns_the_reloaded_thread() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::Seen {
-            user_id: "macro|viewer@example.com".to_string(),
+            user_id: "rox|viewer@example.com".to_string(),
             thread_id,
         }]
     );
@@ -454,7 +454,7 @@ async fn mark_unread_calls_the_service_and_returns_authoritative_state_not_a_har
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::Unread {
-            user_id: "macro|viewer@example.com".to_string(),
+            user_id: "rox|viewer@example.com".to_string(),
             thread_id,
         }]
     );
@@ -529,7 +529,7 @@ async fn update_label_calls_the_email_service_and_returns_the_reloaded_thread() 
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::Label {
-            user_id: "macro|viewer@example.com".to_string(),
+            user_id: "rox|viewer@example.com".to_string(),
             thread_id,
             label_id,
             value: false,
@@ -581,7 +581,7 @@ async fn save_email_draft_calls_the_service_and_returns_the_payload() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::Draft {
-            user_id: "macro|viewer@example.com".to_string(),
+            user_id: "rox|viewer@example.com".to_string(),
             link_id: Some(link_id),
             db_id: Some(draft_id),
             replying_to_id: Some(replying_to_id),
@@ -839,7 +839,7 @@ async fn delete_email_draft_calls_the_service_and_returns_the_payload() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::DeleteDraft {
-            user_id: "macro|viewer@example.com".to_string(),
+            user_id: "rox|viewer@example.com".to_string(),
             draft_id,
         }]
     );
@@ -910,7 +910,7 @@ async fn semantic_mailbox_action_needs_no_provider_label_id() {
     assert_eq!(
         *service.calls.lock().unwrap(),
         vec![CapturedMutation::State {
-            user_id: "macro|viewer@example.com".into(),
+            user_id: "rox|viewer@example.com".into(),
             thread_id: TEST_THREAD_ID,
             action: email::domain::models::mailbox_action::MailboxAction::Trashed(true)
         }]

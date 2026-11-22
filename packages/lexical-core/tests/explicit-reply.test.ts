@@ -7,7 +7,7 @@ const target = {
   targetMessageId: 'reply-1',
   targetThreadId: 'thread-1',
   displayText: 'please fix this',
-  senderId: 'macro|sender@example.com',
+  senderId: 'rox|sender@example.com',
 };
 
 describe('extractExplicitReply', () => {

@@ -30,7 +30,7 @@ fn android_alert_uses_sns_fcm_v1_with_string_data() {
     assert!(data.as_object().unwrap().values().all(Value::is_string));
     assert_eq!(data["type"], "notification");
     assert_eq!(data["identifier"], "stable-identifier");
-    assert_eq!(data["recipientId"], "macro|alice@example.com");
+    assert_eq!(data["recipientId"], "rox|alice@example.com");
     assert_eq!(data["body"], "A message with \"quotes\" and 🦀");
     let metadata: Value = serde_json::from_str(data["payload"].as_str().unwrap()).unwrap();
     assert_eq!(metadata["notificationId"], id.to_string());
@@ -106,7 +106,7 @@ fn android_call_push_is_short_lived_data_only_and_recipient_scoped() {
         livekit_token: Some("recipient-token".into()),
         ring_status_url: Some("https://dev.rox.one/call/ring-status/call-1".into()),
     };
-    let target: SnsTarget<'_, ()> = SnsTarget::AndroidCall(&payload, "macro|bob@example.com");
+    let target: SnsTarget<'_, ()> = SnsTarget::AndroidCall(&payload, "rox|bob@example.com");
     let sns: Value = serde_json::from_str(&target.as_json().unwrap()).unwrap();
     assert!(sns.get("APNS_VOIP").is_none());
     let fcm: Value = serde_json::from_str(sns["GCM"].as_str().unwrap()).unwrap();
@@ -115,7 +115,7 @@ fn android_call_push_is_short_lived_data_only_and_recipient_scoped() {
     assert_eq!(message["android"]["ttl"], "60s");
     assert!(message.get("notification").is_none());
     assert_eq!(message["data"]["type"], "call");
-    assert_eq!(message["data"]["recipientId"], "macro|bob@example.com");
+    assert_eq!(message["data"]["recipientId"], "rox|bob@example.com");
     assert!(
         message["data"]
             .as_object()

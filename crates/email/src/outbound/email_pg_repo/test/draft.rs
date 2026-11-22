@@ -1227,7 +1227,7 @@ async fn test_client_handle_replay_cannot_replace_a_scheduled_or_sent_winner(
     let repo = EmailPgRepo::new(pool.clone());
     let link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")?;
     let handle = rox_uuid::generate_uuid_v7();
-    let actor = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let actor = RoxUserIdStr::parse_from_str("rox|user1@test.com")?;
     let contacts = UpsertedContacts {
         from_contact_id: None,
         recipients: vec![],

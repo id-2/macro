@@ -10,7 +10,7 @@ import { callRecordingDownloadSource } from './recording-download';
 const record = (recordingUrl?: string): CallRecord => ({
   callId: 'call-1',
   discussion: { kind: 'call_chat', call_id: 'call-1' },
-  createdBy: 'macro|owner@rox.one',
+  createdBy: 'rox|owner@rox.one',
   guests: [],
   isActive: false,
   participants: [],

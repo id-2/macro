@@ -65,7 +65,7 @@ pub struct SeedUser {
     pub rox_user_id: String,
     /// Stable FusionAuth id used in locally generated JWTs.
     pub fusion_user_id: String,
-    /// Rox auth user id, e.g. `macro|e2e@macro.local`.
+    /// Rox auth user id, e.g. `rox|e2e@macro.local`.
     pub user_id: String,
     /// Display username.
     pub username: String,

@@ -19,7 +19,7 @@ use rootcause::Report;
 use super::*;
 use crate::GraphqlRequestParts;
 
-const VALID_USER_ID: &str = "macro|user@example.com";
+const VALID_USER_ID: &str = "rox|user@example.com";
 const VALID_BOT_TOKEN: &str = "valid-bot";
 
 #[derive(Clone, Default)]
@@ -165,7 +165,7 @@ async fn valid_bearer_returns_rox_user_id() {
     assert!(response.errors.is_empty(), "{:?}", response.errors);
     assert_eq!(
         response.data.to_string(),
-        r#"{userId: "macro|user@example.com"}"#
+        r#"{userId: "rox|user@example.com"}"#
     );
 }
 
@@ -226,7 +226,7 @@ async fn repeated_helper_calls_share_cached_authorization() {
     assert!(response.errors.is_empty(), "{:?}", response.errors);
     assert_eq!(
         response.data.to_string(),
-        r#"{repeatedUserIds: ["macro|user@example.com", "macro|user@example.com"]}"#
+        r#"{repeatedUserIds: ["rox|user@example.com", "rox|user@example.com"]}"#
     );
     assert_eq!(service.authorization_calls(), 1);
 }

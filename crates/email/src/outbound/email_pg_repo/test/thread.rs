@@ -12,7 +12,7 @@ async fn mail_projection_excludes_trashed_messages(pool: Pool<Postgres>) -> anyh
     let trash = uuid::uuid!("20000009-0000-0000-0000-000000000009");
     let rows = repo
         .thread_mail_projections_by_ids(
-            rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
+            rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user1@test.com")?,
             &[draft, trash],
         )
         .await?;
@@ -133,7 +133,7 @@ async fn mail_archive_filters_do_not_require_notifications(
                 models_pagination::SimpleSortMethod::UpdatedAt,
                 std::sync::Arc::new(filter),
             ),
-            "macro|user1@test.com",
+            "rox|user1@test.com",
             None,
         )
         .await?;
@@ -831,14 +831,14 @@ async fn a_scoped_session_cant_move_a_thread_into_a_shared_folder(
     let thread_id = Uuid::parse_str("20000001-0000-0000-0000-000000000001")?;
     let shared_project = Uuid::from_u128(0x5c0);
     sqlx::query!(
-        r#"INSERT INTO "Project" (id, name, "userId") VALUES ($1, 'Shared', 'macro|owner@example.com')"#,
+        r#"INSERT INTO "Project" (id, name, "userId") VALUES ($1, 'Shared', 'rox|owner@example.com')"#,
         shared_project.to_string(),
     )
     .execute(&pool)
     .await?;
     sqlx::query!(
         r#"INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ($1, 'project', 'macro|owner@example.com', 'user', 'owner'),
+        VALUES ($1, 'project', 'rox|owner@example.com', 'user', 'owner'),
                ($1, 'project', $2, 'team', 'view')"#,
         shared_project,
         Uuid::from_u128(0x7ea).to_string(),

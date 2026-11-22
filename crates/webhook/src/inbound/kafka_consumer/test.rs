@@ -52,8 +52,8 @@ fn document_event() -> Event<DocumentTopicEvent> {
 fn webhook_event() -> Event<WebhookTopicEvent> {
     Event::new(WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
         webhook_id: "wh_1".to_string(),
-        workspace_id: "macro|owner@example.com".to_string(),
-        actor_user_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string())
+        workspace_id: "rox|owner@example.com".to_string(),
+        actor_user_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string())
             .expect("valid user id"),
     }))
 }
@@ -113,7 +113,7 @@ fn decodes_document_events() {
 fn decodes_channel_events() {
     let event = Event::new(ChannelTopicEvent::Deleted(ChannelDeletedMetadata {
         channel_id: Uuid::nil(),
-        actor: ChannelSender::try_from("macro|owner@example.com".to_string())
+        actor: ChannelSender::try_from("rox|owner@example.com".to_string())
             .expect("valid channel sender"),
     }));
     let payload = serde_json::to_vec(&event).expect("serializable");

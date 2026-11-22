@@ -82,14 +82,14 @@ async fn meeting_preview_only_exposes_connected_humans_display_data() {
                     id: call_id,
                     channel_id: None,
                     room_name: "preview-room".to_string(),
-                    created_by: "macro|owner@example.com".to_string(),
+                    created_by: "rox|owner@example.com".to_string(),
                     created_at: Utc::now(),
                     egress_id: None,
                 }))
             })
         });
         repo.expect_get_user_display_name()
-            .withf(|id| id.as_ref() == "macro|member@example.com")
+            .withf(|id| id.as_ref() == "rox|member@example.com")
             .times(1)
             .returning(|_| Box::pin(async { Ok(Some("Member Name".to_string())) }));
         repo.expect_get_user_profile_picture()
@@ -105,7 +105,7 @@ async fn meeting_preview_only_exposes_connected_humans_display_data() {
                 Box::pin(async {
                     Ok(Some(vec![
                         MeetingRtcParticipant {
-                            identity: "macro|member@example.com".to_string(),
+                            identity: "rox|member@example.com".to_string(),
                             name: String::new(),
                         },
                         MeetingRtcParticipant {

@@ -6,7 +6,7 @@ import { foldPanel } from './fold-panel';
 function single(id: string): FeedEntry {
   const event: ActivityEvent = {
     id,
-    actorId: 'macro|sarah@example.com',
+    actorId: 'rox|sarah@example.com',
     entityId: 'doc-1',
     entityType: 'document',
     occurredAt: '2026-08-21T12:00:00.000Z',

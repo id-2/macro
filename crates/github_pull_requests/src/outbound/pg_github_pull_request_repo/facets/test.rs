@@ -20,7 +20,7 @@ use crate::domain::{
     ports::{GithubPullRequestFacetRepository, GithubPullRequestRepository},
 };
 
-const USER: &str = "macro|user@example.com";
+const USER: &str = "rox|user@example.com";
 const TEAM: &str = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
 async fn store_for(pool: &PgPool, github_key: &str, stored_for_id: &str, auth_entity: &str) {
@@ -102,7 +102,7 @@ async fn facets_count_each_visible_pull_request_once_by_repository_and_author(po
     store_for(
         &pool,
         "macro/other/pull/1",
-        "macro|other@example.com",
+        "rox|other@example.com",
         "user",
     )
     .await;
@@ -188,7 +188,7 @@ async fn facets_count_assignees_and_labels_once_per_visible_pull_request(pool: P
     store_for(
         &pool,
         "macro/other/pull/1",
-        "macro|other@example.com",
+        "rox|other@example.com",
         "user",
     )
     .await;

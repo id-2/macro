@@ -15,13 +15,13 @@ async fn test_add_roles_to_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
     rox_db
         .add_roles_to_user(
-            &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
             &roles,
         )
         .await?;
 
     let permissions = rox_db
-        .get_user_permissions(&RoxUserIdStr::parse_from_str("macro|user2@user.com")?)
+        .get_user_permissions(&RoxUserIdStr::parse_from_str("rox|user2@user.com")?)
         .await?;
 
     let permissions = permissions
@@ -35,13 +35,13 @@ async fn test_add_roles_to_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // add role to user that already has role
     rox_db
         .add_roles_to_user(
-            &RoxUserIdStr::parse_from_str("macro|user@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@user.com")?,
             &roles,
         )
         .await?;
 
     let permissions = rox_db
-        .get_user_permissions(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .get_user_permissions(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     let permissions = permissions
@@ -54,7 +54,7 @@ async fn test_add_roles_to_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // add role to user that doesn't exist
     let err = rox_db
         .add_roles_to_user(
-            &RoxUserIdStr::parse_from_str("macro|user3@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user3@user.com")?,
             &roles,
         )
         .await
@@ -78,13 +78,13 @@ async fn test_remove_roles_from_user(pool: Pool<Postgres>) -> anyhow::Result<()>
     // Remove role
     rox_db
         .remove_roles_from_user(
-            &RoxUserIdStr::parse_from_str("macro|user@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user@user.com")?,
             &roles,
         )
         .await?;
 
     let permissions = rox_db
-        .get_user_permissions(&RoxUserIdStr::parse_from_str("macro|user@user.com")?)
+        .get_user_permissions(&RoxUserIdStr::parse_from_str("rox|user@user.com")?)
         .await?;
 
     let permissions = permissions
@@ -98,13 +98,13 @@ async fn test_remove_roles_from_user(pool: Pool<Postgres>) -> anyhow::Result<()>
     // Remove role that doesn't exist
     rox_db
         .remove_roles_from_user(
-            &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
             &roles,
         )
         .await?;
 
     let permissions = rox_db
-        .get_user_permissions(&RoxUserIdStr::parse_from_str("macro|user2@user.com")?)
+        .get_user_permissions(&RoxUserIdStr::parse_from_str("rox|user2@user.com")?)
         .await?;
 
     let permissions = permissions
@@ -128,7 +128,7 @@ async fn test_get_user_roles(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // user@user.com has professional_subscriber and corporate
     let roles = UserRolesAndPermissionsRepository::get_user_roles(
         &rox_db,
-        &RoxUserIdStr::parse_from_str("macro|user@user.com")?,
+        &RoxUserIdStr::parse_from_str("rox|user@user.com")?,
     )
     .await?;
 
@@ -139,7 +139,7 @@ async fn test_get_user_roles(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // user2@user.com has only corporate
     let roles = UserRolesAndPermissionsRepository::get_user_roles(
         &rox_db,
-        &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+        &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
     )
     .await?;
 
@@ -149,7 +149,7 @@ async fn test_get_user_roles(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // user that doesn't exist returns empty set
     let roles = UserRolesAndPermissionsRepository::get_user_roles(
         &rox_db,
-        &RoxUserIdStr::parse_from_str("macro|user3@user.com")?,
+        &RoxUserIdStr::parse_from_str("rox|user3@user.com")?,
     )
     .await?;
 
@@ -168,14 +168,14 @@ async fn test_get_user_roles_after_add_and_remove(pool: Pool<Postgres>) -> anyho
     // Add a role and verify it shows up
     rox_db
         .add_roles_to_user(
-            &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
             &["self_serve".to_string()],
         )
         .await?;
 
     let roles = UserRolesAndPermissionsRepository::get_user_roles(
         &rox_db,
-        &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+        &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
     )
     .await?;
 
@@ -186,14 +186,14 @@ async fn test_get_user_roles_after_add_and_remove(pool: Pool<Postgres>) -> anyho
     // Remove the role and verify it's gone
     rox_db
         .remove_roles_from_user(
-            &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+            &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
             &["self_serve".to_string()],
         )
         .await?;
 
     let roles = UserRolesAndPermissionsRepository::get_user_roles(
         &rox_db,
-        &RoxUserIdStr::parse_from_str("macro|user2@user.com")?,
+        &RoxUserIdStr::parse_from_str("rox|user2@user.com")?,
     )
     .await?;
 

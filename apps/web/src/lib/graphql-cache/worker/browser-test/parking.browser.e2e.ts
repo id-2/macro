@@ -70,7 +70,7 @@ test('delivers a query admitted while parked across replacement without API fall
   expect(
     await page.evaluate(() => window.cacheParkingHarness.readResult())
   ).toEqual({
-    data: { user: { id: 'macro|parking-fixture' } },
+    data: { user: { id: 'rox|parking-fixture' } },
     error: false,
   });
   const after = await page.evaluate(() =>

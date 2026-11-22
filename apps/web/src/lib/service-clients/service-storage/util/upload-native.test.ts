@@ -80,7 +80,7 @@ import {
 } from './pendingFolderUploads';
 import { resumePendingFolderUploads, upload } from './upload';
 
-const USER_ID = 'macro|user@example.com';
+const USER_ID = 'rox|user@example.com';
 
 function stagedPdf() {
   const file = createNativeStagedUploadFile('share', {

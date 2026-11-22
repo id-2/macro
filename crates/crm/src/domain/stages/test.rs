@@ -196,7 +196,7 @@ fn service(
 }
 
 fn receipt_with_role(role: TeamRole) -> CrmTeamReceipt<MemberTeamRole> {
-    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("rox|user@example.com")
         .unwrap()
         .into_owned();
     CrmTeamReceipt::from_team_receipt(

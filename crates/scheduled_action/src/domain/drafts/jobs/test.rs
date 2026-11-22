@@ -369,7 +369,7 @@ impl Replica {
 const TRACEPARENT: &str = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01";
 
 fn stranger() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|stranger@example.com").unwrap()
 }
 
 /// A session whose turn checks `steps` once, then keeps running.

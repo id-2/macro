@@ -32,7 +32,7 @@ test('a child gets only where to export, never anything else of this process', (
 });
 
 test("the agent's account, an email, is recorded only as an opaque id", () => {
-  const id = agentTelemetryId('macro|sam@agents.example.com');
+  const id = agentTelemetryId('rox|sam@agents.example.com');
   expect(id).toMatch(/^[0-9a-f]{16}$/);
   expect(id).not.toContain('sam');
 });

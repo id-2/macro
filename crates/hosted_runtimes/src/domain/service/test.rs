@@ -268,7 +268,7 @@ impl Billing for FakeBilling {
 }
 
 pub(crate) fn admin() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap()
 }
 
 pub(crate) fn key(value: &str) -> PurchaseKey {

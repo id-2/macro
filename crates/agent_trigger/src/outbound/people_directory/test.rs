@@ -23,12 +23,12 @@ async fn names_each_id_in_order(pool: PgPool) {
 
     let people = directory
         .people(vec![
-            "macro|julia@example.com".to_owned(),
+            "rox|julia@example.com".to_owned(),
             "bot|00000000-0000-0000-0000-000000000001".to_owned(),
-            "macro|teo@example.com".to_owned(),
-            "macro|nameless@example.com".to_owned(),
+            "rox|teo@example.com".to_owned(),
+            "rox|nameless@example.com".to_owned(),
             "bot|00000000-0000-0000-0000-000000000002".to_owned(),
-            "macro|julia@example.com".to_owned(),
+            "rox|julia@example.com".to_owned(),
         ])
         .await
         .unwrap();
@@ -37,7 +37,7 @@ async fn names_each_id_in_order(pool: PgPool) {
         people,
         [
             ContextPerson {
-                id: "macro|julia@example.com".to_owned(),
+                id: "rox|julia@example.com".to_owned(),
                 name: "Julia Rivera".to_owned(),
                 email: Some("julia@example.com".to_owned()),
             },
@@ -47,12 +47,12 @@ async fn names_each_id_in_order(pool: PgPool) {
                 email: None,
             },
             ContextPerson {
-                id: "macro|teo@example.com".to_owned(),
+                id: "rox|teo@example.com".to_owned(),
                 name: "Teo".to_owned(),
                 email: Some("teo@example.com".to_owned()),
             },
             ContextPerson {
-                id: "macro|nameless@example.com".to_owned(),
+                id: "rox|nameless@example.com".to_owned(),
                 name: "nameless@example.com".to_owned(),
                 email: Some("nameless@example.com".to_owned()),
             },
@@ -62,7 +62,7 @@ async fn names_each_id_in_order(pool: PgPool) {
                 email: None,
             },
             ContextPerson {
-                id: "macro|julia@example.com".to_owned(),
+                id: "rox|julia@example.com".to_owned(),
                 name: "Julia Rivera".to_owned(),
                 email: Some("julia@example.com".to_owned()),
             },

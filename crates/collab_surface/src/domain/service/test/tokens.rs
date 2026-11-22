@@ -13,10 +13,10 @@ async fn mint_token_maps_channel_role_to_edit() {
     let channel_role = EntityPermission::ChannelRole {
         role: ParticipantRole::Member,
     };
-    let create_receipt = receipt_for("macro|a@b.c", EntityType::Channel, "chan-1", channel_role);
+    let create_receipt = receipt_for("rox|a@b.c", EntityType::Channel, "chan-1", channel_role);
     let surface = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             create_receipt,
             surface_id(),
             String::new(),
@@ -24,9 +24,9 @@ async fn mint_token_maps_channel_role_to_edit() {
         .await
         .unwrap();
 
-    let mint_receipt = receipt_for("macro|a@b.c", EntityType::Channel, "chan-1", channel_role);
+    let mint_receipt = receipt_for("rox|a@b.c", EntityType::Channel, "chan-1", channel_role);
     let token = svc
-        .mint_token(&user("macro|a@b.c"), mint_receipt, surface.id)
+        .mint_token(&user("rox|a@b.c"), mint_receipt, surface.id)
         .await
         .unwrap();
 
@@ -45,14 +45,14 @@ async fn mint_token_rejects_receipt_for_wrong_parent() {
     let svc = service_with(repo, init);
 
     let create_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
     );
     let surface = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             create_receipt,
             surface_id(),
             String::new(),
@@ -62,13 +62,13 @@ async fn mint_token_rejects_receipt_for_wrong_parent() {
 
     // Receipt proves access to a different channel than the surface's parent.
     let wrong_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-2",
         edit_permission(),
     );
     let err = svc
-        .mint_token(&user("macro|a@b.c"), wrong_receipt, surface.id)
+        .mint_token(&user("rox|a@b.c"), wrong_receipt, surface.id)
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::AccessDenied));
@@ -83,14 +83,14 @@ async fn delete_requires_edit_capable_permission() {
     let svc = service_with(repo.clone(), init);
 
     let create_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
     );
     let surface = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             create_receipt,
             surface_id(),
             String::new(),
@@ -100,27 +100,27 @@ async fn delete_requires_edit_capable_permission() {
 
     // View-only presence cannot delete.
     let view_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         EntityPermission::ChannelViewOnly,
     );
     let err = svc
-        .delete_surface(&user("macro|a@b.c"), view_receipt, surface.id)
+        .delete_surface(&user("rox|a@b.c"), view_receipt, surface.id)
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::AccessDenied));
 
     // Member can.
     let member_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         EntityPermission::ChannelRole {
             role: ParticipantRole::Member,
         },
     );
-    svc.delete_surface(&user("macro|a@b.c"), member_receipt, surface.id)
+    svc.delete_surface(&user("rox|a@b.c"), member_receipt, surface.id)
         .await
         .unwrap();
 
@@ -144,14 +144,14 @@ async fn mint_token_refuses_a_pending_surface() {
     let id = surface_id();
     let receipt = || {
         receipt_for(
-            "macro|a@b.c",
+            "rox|a@b.c",
             EntityType::Channel,
             "chan-1",
             edit_permission(),
         )
     };
 
-    svc.ensure_surface(&user("macro|a@b.c"), receipt(), id, String::new())
+    svc.ensure_surface(&user("rox|a@b.c"), receipt(), id, String::new())
         .await
         .unwrap_err();
     assert_eq!(
@@ -161,7 +161,7 @@ async fn mint_token_refuses_a_pending_surface() {
 
     // A pending row has not proven its session is its own.
     let err = svc
-        .mint_token(&user("macro|a@b.c"), receipt(), id)
+        .mint_token(&user("rox|a@b.c"), receipt(), id)
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::NotReady));
@@ -177,14 +177,14 @@ async fn parent_comment_access_mints_a_read_only_token() {
     let id = surface_id();
     let receipt = |access_level| {
         receipt_for(
-            "macro|a@b.c",
+            "rox|a@b.c",
             EntityType::Document,
             "doc-1",
             EntityPermission::AccessLevel { access_level },
         )
     };
     svc.ensure_surface(
-        &user("macro|a@b.c"),
+        &user("rox|a@b.c"),
         receipt(AccessLevel::Edit),
         id,
         String::new(),
@@ -199,7 +199,7 @@ async fn parent_comment_access_mints_a_read_only_token() {
         (AccessLevel::Owner, AccessLevel::Owner),
     ] {
         let token = svc
-            .mint_token(&user("macro|a@b.c"), receipt(parent), id)
+            .mint_token(&user("rox|a@b.c"), receipt(parent), id)
             .await
             .unwrap();
         let claims: model::document::DocumentPermissionsToken =

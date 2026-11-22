@@ -66,7 +66,7 @@ async fn permission_failures_precede_admission(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool.clone()).await;
     let chat_id = uuid::Uuid::now_v7().to_string();
     sqlx::query!(
-        r#"INSERT INTO "Chat" (id, "userId", name) VALUES ($1, 'macro|other@example.com', 'Private chat')"#,
+        r#"INSERT INTO "Chat" (id, "userId", name) VALUES ($1, 'rox|other@example.com', 'Private chat')"#,
         chat_id
     ).execute(&pool).await.unwrap();
 

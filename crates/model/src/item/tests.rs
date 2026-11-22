@@ -111,7 +111,7 @@ fn test_document_serde() {
     let doc = BasicDocument {
         document_id: "doc123".to_string(),
         document_version_id: 1,
-        owner: Owner::from_principal_str("macro|test@example.com").unwrap(),
+        owner: Owner::from_principal_str("rox|test@example.com").unwrap(),
         document_name: "Test Document".to_string(),
         file_type: Some("pdf".to_string()),
         sha: Some("abc123".to_string()),
@@ -145,7 +145,7 @@ fn test_chat_serde() {
     let chat = Chat {
         id: "chat123".to_string(),
         name: "Test Chat".to_string(),
-        user_id: Owner::from_principal_str("macro|user1@example.com").unwrap(),
+        user_id: Owner::from_principal_str("rox|user1@example.com").unwrap(),
         model: Some("claude-3".to_string()),
         project_id: None,
         created_at: Some(chrono::Utc::now()),
@@ -177,7 +177,7 @@ fn test_project_serde() {
     let project = Project {
         id: "proj123".to_string(),
         name: "Test Project".to_string(),
-        user_id: Owner::from_principal_str("macro|user@example.com").unwrap(),
+        user_id: Owner::from_principal_str("rox|user@example.com").unwrap(),
         parent_id: None,
         created_at: Some(chrono::Utc::now()),
         updated_at: Some(chrono::Utc::now()),

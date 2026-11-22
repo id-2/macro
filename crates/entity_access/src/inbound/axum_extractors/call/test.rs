@@ -39,9 +39,9 @@ use crate::{
 const CALL_ID: &str = "9e8e56e7-97e8-4148-9618-a63dacabf104";
 const CHANNEL_ID: &str = "a1240db2-43c2-4974-92ad-70534f5f2ae8";
 const SHARE_PERMISSION_ID: &str = "share-permission-1";
-const USER_ID: &str = "macro|user@example.com";
-const ACT_AS_ID: &str = "macro|act-as@example.com";
-const DEFAULT_INTERNAL_ID: &str = "macro|default-internal@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const ACT_AS_ID: &str = "rox|act-as@example.com";
+const DEFAULT_INTERNAL_ID: &str = "rox|default-internal@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const ORGANIZATION_ID: i64 = 42;
 

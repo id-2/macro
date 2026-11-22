@@ -59,7 +59,7 @@ use crate::domain::{
 const TOKEN: &str = "valid-token";
 const INTERNAL_KEY: &str = "internal-key";
 const BOT_TOKEN: &str = "valid-bot-token";
-const USER_ID: &str = "macro|router@example.com";
+const USER_ID: &str = "rox|router@example.com";
 const PROJECT_ID: &str = "project-1";
 const TEAM_ID: Uuid = Uuid::from_u128(0x7ea4);
 
@@ -749,7 +749,7 @@ async fn middleware_returns_generic_404_envelope() {
 #[tokio::test]
 async fn access_extractor_denial_prevents_handler() {
     let response = router(
-        FakeProjectService::with_project("macro|owner@example.com", false),
+        FakeProjectService::with_project("rox|owner@example.com", false),
         None,
     )
     .oneshot(authenticated_request(&format!("/{PROJECT_ID}")))
@@ -854,7 +854,7 @@ async fn create_rejects_callers_that_cannot_create_before_reading_the_body() {
 #[tokio::test]
 async fn edit_permission_denial_prevents_mutation() {
     let response = router(
-        FakeProjectService::with_project("macro|owner@example.com", false),
+        FakeProjectService::with_project("rox|owner@example.com", false),
         Some(AccessLevel::View),
     )
     .oneshot(authenticated_json_request(
@@ -1001,7 +1001,7 @@ async fn deleted_project_creator_can_revert() {
 #[tokio::test]
 async fn internal_actor_can_revert_deleted_project() {
     let response = router(
-        FakeProjectService::with_project("macro|owner@example.com", true),
+        FakeProjectService::with_project("rox|owner@example.com", true),
         None,
     )
     .oneshot(internal_json_request(
@@ -1022,7 +1022,7 @@ async fn internal_actor_can_revert_deleted_project() {
 #[tokio::test]
 async fn soft_deleted_project_rejects_non_owner_even_with_shared_access() {
     let response = router(
-        FakeProjectService::with_project("macro|owner@example.com", true),
+        FakeProjectService::with_project("rox|owner@example.com", true),
         Some(AccessLevel::View),
     )
     .oneshot(authenticated_request(&format!(
@@ -1316,7 +1316,7 @@ async fn run_on_own_task_keeps_the_agent_attribution() {
 
 #[tokio::test]
 async fn permanent_delete_requires_owner_access() {
-    let service = FakeProjectService::with_project("macro|owner@example.com", true);
+    let service = FakeProjectService::with_project("rox|owner@example.com", true);
     let mutations = service.mutations.clone();
     let response = router(service, Some(AccessLevel::Edit))
         .oneshot(

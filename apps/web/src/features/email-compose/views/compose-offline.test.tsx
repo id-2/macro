@@ -56,7 +56,7 @@ vi.mock('@core/hotkey/hotkeys', () => ({
 }));
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'me@example.com',
-  useUserId: () => () => 'macro|me@example.com',
+  useUserId: () => () => 'rox|me@example.com',
 }));
 vi.mock('@core/user/dmActivity', () => ({
   useAugmentUserWithDmActivity: () => (user: unknown) => user,

@@ -8,7 +8,7 @@ const FOREIGN: Uuid = Uuid::from_u128(4);
 const MESSAGE: Uuid = Uuid::from_u128(10);
 const OTHER: Uuid = Uuid::from_u128(11);
 const THREAD: Uuid = Uuid::from_u128(20);
-const CALLER: &str = "macro|reader@example.com";
+const CALLER: &str = "rox|reader@example.com";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Operation {

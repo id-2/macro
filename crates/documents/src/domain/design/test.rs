@@ -13,7 +13,7 @@ const VARIABLES: &[u8] = include_bytes!("../../../../fig_engine/tests/fixtures/v
 
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
-        RoxUserIdStr::try_from("macro|designs@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("rox|designs@rox.one".to_owned()).unwrap(),
         Entity {
             entity_id: DOCUMENT.to_owned(),
             entity_type: EntityType::Document,

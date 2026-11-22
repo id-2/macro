@@ -645,7 +645,7 @@
     "/email/contacts/unblock": {
       "post": {
         "tags": ["Contacts"],
-        "summary": "Durably remove Macro-managed sender blocking in the selected inbox.",
+        "summary": "Durably remove Rox-managed sender blocking in the selected inbox.",
         "operationId": "unblock_sender",
         "requestBody": {
           "content": {
@@ -5924,7 +5924,7 @@
         "properties": {
           "method": {
             "type": "string",
-            "description": "Provider method, stored verbatim; only `popup` fires Macro\nnotifications."
+            "description": "Provider method, stored verbatim; only `popup` fires Rox\nnotifications."
           },
           "minutes": {
             "type": "integer",

@@ -72,7 +72,7 @@ pub async fn fetch_link_by_rox_id(
 
 /// Fetches the link for a `rox_id` whose `email_address` matches the given
 /// address. Used by the CRM backfill/teardown path, where the address is
-/// derived from the rox_id itself (`macro|<email>`) — this resolves the
+/// derived from the rox_id itself (`rox|<email>`) — this resolves the
 /// inbox that *is* the user rather than the most-recently-connected one that
 /// [`fetch_link_by_rox_id`] would return. The comparison is
 /// case-insensitive: the rox_id email part is always lowercased, but
@@ -114,7 +114,7 @@ pub async fn fetch_link_by_rox_id_and_email_address(
 
 /// Fetches the mailbox the user owns as their primary workspace identity.
 /// CRM population and teardown both use this explicit fact rather than
-/// deriving ownership from the legacy `macro|{email}` user id.
+/// deriving ownership from the legacy `rox|{email}` user id.
 #[tracing::instrument(skip(pool, rox_id), err)]
 pub async fn fetch_primary_link_by_rox_id(
     pool: &PgPool,

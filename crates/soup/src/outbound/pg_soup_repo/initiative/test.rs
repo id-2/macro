@@ -33,7 +33,7 @@ fn filters() -> EntityFilterAst {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap()
 }
 
 #[sqlx::test(
@@ -311,7 +311,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
     // another entity type (15) and no grant (18) stay out.
     let cases = [
         (
-            "macro|viewer@paths.test",
+            "rox|viewer@paths.test",
             vec![
                 Uuid::from_u128(0xa7000000000000000000000000000017),
                 Uuid::from_u128(0xa7000000000000000000000000000016),
@@ -324,7 +324,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
             ],
         ),
         (
-            "macro|teammate@paths.test",
+            "rox|teammate@paths.test",
             vec![
                 Uuid::from_u128(0xa7000000000000000000000000000017),
                 Uuid::from_u128(0xa7000000000000000000000000000016),
@@ -333,7 +333,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
             ],
         ),
         (
-            "macro|outsider@paths.test",
+            "rox|outsider@paths.test",
             vec![
                 Uuid::from_u128(0xa7000000000000000000000000000010),
                 Uuid::from_u128(0xa7000000000000000000000000000008),
@@ -341,7 +341,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
             ],
         ),
         (
-            "macro|loner@paths.test",
+            "rox|loner@paths.test",
             vec![Uuid::from_u128(0xa7000000000000000000000000000010)],
         ),
     ];

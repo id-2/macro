@@ -80,7 +80,7 @@ fn every_planned_page_gets_a_document_id_before_anything_is_written() {
             Person {
                 email: Some("teo@acme.test".to_string()),
                 rox_user: Some(
-                    RoxUserIdStr::parse_from_str("macro|teo@acme.test")
+                    RoxUserIdStr::parse_from_str("rox|teo@acme.test")
                         .unwrap()
                         .into_owned(),
                 ),

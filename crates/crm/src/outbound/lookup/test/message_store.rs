@@ -17,7 +17,7 @@ use uuid::Uuid;
 
 use super::super::PgCrmParentReader;
 
-const USER: &str = "macro|message-test@example.com";
+const USER: &str = "rox|message-test@example.com";
 
 async fn setup(pool: &PgPool) {
     let user_id = Uuid::now_v7();

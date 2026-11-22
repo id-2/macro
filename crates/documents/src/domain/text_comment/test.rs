@@ -9,14 +9,14 @@ use messages::domain::{api::MockMessageCommands, models::MessageParent};
 use model_owner::Owner;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
-const USER: &str = "macro|commenter@example.com";
+const USER: &str = "rox|commenter@example.com";
 const SECRET: &str = "text-comment-secret";
 
 fn document(file_type: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: DOCUMENT.into(),
         document_name: "Launch plan".into(),
-        owner: Owner::from_principal_str("macro|owner@example.com").unwrap(),
+        owner: Owner::from_principal_str("rox|owner@example.com").unwrap(),
         file_type: Some(file_type.into()),
         sub_type: None,
         branched_from_id: None,

@@ -29,7 +29,7 @@ async fn test_sent_view_without_filter_routes_to_dynamic_multi_inbox(
     let results = repo
         .previews_for_view_cursor(
             query,
-            RoxUserIdStr::parse_from_str("macro|user1@test.com")?.to_owned(),
+            RoxUserIdStr::parse_from_str("rox|user1@test.com")?.to_owned(),
         )
         .await?;
 

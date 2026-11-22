@@ -17,6 +17,6 @@ VALUES
     'document',
     'test-service',
     '{}',
-    'macro|user@user.com',
+    'rox|user@user.com',
     NULL
   );

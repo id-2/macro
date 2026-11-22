@@ -11,11 +11,11 @@ fn user(id: &str) -> RoxUserIdStr<'static> {
 }
 
 fn agent() -> RoxUserIdStr<'static> {
-    user("macro|sam-rivera-abc123@agents.macro.invalid")
+    user("rox|sam-rivera-abc123@agents.macro.invalid")
 }
 
 fn admin() -> RoxUserIdStr<'static> {
-    user("macro|admin@example.com")
+    user("rox|admin@example.com")
 }
 
 fn facts() -> AgentAccountFacts {

@@ -20,7 +20,7 @@
 //!     {
 //!       "id":        "019f…",
 //!       "createdAt": "2026-08-13T12:34:56.789Z",
-//!       "userId":    "macro|someone@example.com",
+//!       "userId":    "rox|someone@example.com",
 //!       "direction": "to_server",
 //!       "content":   { "type": "acp", "jsonrpc": "2.0", … }
 //!     }

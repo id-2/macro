@@ -8,5 +8,5 @@ VALUES ('11111111-1111-1111-1111-111111111111', 'test@rox.one', true),
 
 
 INSERT INTO "User" ("id", "email", "rox_user_id")
-VALUES ('macro|test@rox.one', 'test@rox.one', '11111111-1111-1111-1111-111111111111'),
-       ('macro|test2@rox.one', 'test2@rox.one', '22222222-2222-2222-2222-222222222222');
+VALUES ('rox|test@rox.one', 'test@rox.one', '11111111-1111-1111-1111-111111111111'),
+       ('rox|test2@rox.one', 'test2@rox.one', '22222222-2222-2222-2222-222222222222');

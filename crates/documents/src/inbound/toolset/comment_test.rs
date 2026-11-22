@@ -27,7 +27,7 @@ use super::{
     edit_document::test::{FakeDocumentService, FakeEditingWorker, FakeEntityAccessService},
 };
 
-const USER: &str = "macro|commenter@example.com";
+const USER: &str = "rox|commenter@example.com";
 const DOCUMENT: Uuid = Uuid::from_u128(0x019fd3b9_3c6c_7c05_89c2_a27f0121813b);
 
 /// Records the comment threads the tool posts.

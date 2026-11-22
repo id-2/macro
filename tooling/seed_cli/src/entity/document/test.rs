@@ -23,7 +23,7 @@ fn parse_document_create_minimal() {
         "document",
         "create",
         "--owner",
-        "macro|alice@example.com",
+        "rox|alice@example.com",
         "--file-path",
         "/tmp/test.pdf",
         "--document-name",
@@ -36,7 +36,7 @@ fn parse_document_create_minimal() {
             let DocumentCommand::Create(create) = args.command else {
                 panic!("expected Create");
             };
-            assert_eq!(create.owner, "macro|alice@example.com");
+            assert_eq!(create.owner, "rox|alice@example.com");
             assert_eq!(create.file_path, "/tmp/test.pdf");
             assert_eq!(create.document_name, "My Document");
             assert!(create.link_share.is_none());
@@ -55,7 +55,7 @@ fn parse_document_create_full() {
         "document",
         "create",
         "--owner",
-        "macro|alice@example.com",
+        "rox|alice@example.com",
         "--file-path",
         "/tmp/test.pdf",
         "--document-name",
@@ -75,7 +75,7 @@ fn parse_document_create_full() {
             let DocumentCommand::Create(create) = args.command else {
                 panic!("expected Create");
             };
-            assert_eq!(create.owner, "macro|alice@example.com");
+            assert_eq!(create.owner, "rox|alice@example.com");
             assert_eq!(create.file_path, "/tmp/test.pdf");
             assert_eq!(create.document_name, "My Document");
             assert_eq!(create.link_share, Some(LinkShare::Public));
@@ -108,7 +108,7 @@ fn parse_document_create_missing_file_path_fails() {
         "document",
         "create",
         "--owner",
-        "macro|alice@example.com",
+        "rox|alice@example.com",
         "--document-name",
         "My Document",
     ]);
@@ -122,7 +122,7 @@ fn parse_document_create_missing_name_fails() {
         "document",
         "create",
         "--owner",
-        "macro|alice@example.com",
+        "rox|alice@example.com",
         "--file-path",
         "/tmp/test.pdf",
     ]);
@@ -138,14 +138,14 @@ fn parse_document_seed() {
         "document",
         "seed",
         "--user-id",
-        "macro|alice@example.com",
+        "rox|alice@example.com",
     ])
     .unwrap();
 
     match cli.command {
         crate::entity::EntityCommand::Document(args) => match args.command {
             DocumentCommand::Seed(seed) => {
-                assert_eq!(seed.user_id, "macro|alice@example.com");
+                assert_eq!(seed.user_id, "rox|alice@example.com");
             }
             other => panic!("expected Seed, got {other:?}"),
         },
@@ -178,7 +178,7 @@ fn write_temp_json(content: &str) -> NamedTempFile {
 }
 
 fn test_document_metadata() -> DocumentMetadata {
-    let owner = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap();
     DocumentMetadata::new_document(
         "doc-123",
         1,
@@ -198,7 +198,7 @@ fn test_document_metadata() -> DocumentMetadata {
 }
 
 fn test_document_metadata_with_type(file_type: FileType) -> DocumentMetadata {
-    let owner = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap();
     DocumentMetadata::new_document(
         "doc-123",
         1,
@@ -244,7 +244,7 @@ async fn create_document_success() {
 
     let args = DocumentArgs {
         command: DocumentCommand::Create(CreateArgs {
-            owner: "macro|alice@example.com".to_string(),
+            owner: "rox|alice@example.com".to_string(),
             file_path: file.path().to_str().unwrap().to_string(),
             document_name: "My Document".to_string(),
             link_share: None,
@@ -272,7 +272,7 @@ async fn create_document_db_failure_propagates() {
 
     let args = DocumentArgs {
         command: DocumentCommand::Create(CreateArgs {
-            owner: "macro|alice@example.com".to_string(),
+            owner: "rox|alice@example.com".to_string(),
             file_path: file.path().to_str().unwrap().to_string(),
             document_name: "My Document".to_string(),
             link_share: None,
@@ -305,7 +305,7 @@ async fn create_document_s3_failure_propagates() {
 
     let args = DocumentArgs {
         command: DocumentCommand::Create(CreateArgs {
-            owner: "macro|alice@example.com".to_string(),
+            owner: "rox|alice@example.com".to_string(),
             file_path: file.path().to_str().unwrap().to_string(),
             document_name: "My Document".to_string(),
             link_share: None,
@@ -360,7 +360,7 @@ async fn seed_creates_all_documents() {
         .returning(|_, _| Ok(()));
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
 
@@ -380,7 +380,7 @@ async fn seed_rejects_legacy_public_field() {
     let file = write_temp_json(&json);
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
     let result = seed_from_file(args, mock_ctx(Db::default(), S3::default()), file.path()).await;
@@ -398,7 +398,7 @@ async fn seed_empty_json_fails() {
     let mock_s3 = S3::default();
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
 
@@ -441,7 +441,7 @@ async fn seed_continues_on_db_failure() {
         .returning(|_, _| Ok(()));
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
 
@@ -481,7 +481,7 @@ async fn seed_continues_on_s3_failure() {
         });
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
 
@@ -515,7 +515,7 @@ async fn seed_handles_all_file_types() {
         .returning(|_, _| Ok(()));
 
     let args = SeedArgs {
-        user_id: "macro|alice@example.com".to_string(),
+        user_id: "rox|alice@example.com".to_string(),
         file_path: None,
     };
 

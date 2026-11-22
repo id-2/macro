@@ -1,7 +1,7 @@
 use super::*;
 
 async fn enabled(gate: &LocalProgrammaticCalls) -> bool {
-    gate.enabled_for(RoxUserIdStr::try_from("macro|local@example.com").unwrap())
+    gate.enabled_for(RoxUserIdStr::try_from("rox|local@example.com").unwrap())
         .await
 }
 

@@ -50,8 +50,8 @@ function userMentionIndexedText(data: UserMentionData) {
   if (userId.startsWith('bot|')) {
     return data.displayName || data.email || 'Bot';
   }
-  if (userId.startsWith('macro|')) {
-    return userId.slice('macro|'.length) || 'Guest';
+  if (userId.startsWith('rox|')) {
+    return userId.slice('rox|'.length) || 'Guest';
   }
   return 'Guest';
 }

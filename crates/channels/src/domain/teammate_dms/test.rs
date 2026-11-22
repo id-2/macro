@@ -30,7 +30,7 @@ impl TeammateDirectMessages for RecordingChannels {
 }
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 #[tokio::test]

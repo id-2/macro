@@ -102,7 +102,7 @@ pub(super) fn setup() -> (CrmCleanupService<Fake, Fake, Fake, Fake>, Fake) {
         claimed: true,
         link: Some(Link {
             id: LINK,
-            rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,

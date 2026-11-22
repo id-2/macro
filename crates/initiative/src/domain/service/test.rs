@@ -29,9 +29,9 @@ use crate::domain::ports::{
     InitiativeService, MockInitiativeDescriptionSurfaces, MockInitiativeRepo,
 };
 
-const OWNER: &str = "macro|owner@rox.one";
-const MEMBER: &str = "macro|member@rox.one";
-const OTHER: &str = "macro|other@rox.one";
+const OWNER: &str = "rox|owner@rox.one";
+const MEMBER: &str = "rox|member@rox.one";
+const OTHER: &str = "rox|other@rox.one";
 
 fn user(id: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id)

@@ -1,6 +1,6 @@
 use super::*;
 
-const PROMPTER: &str = "macro|agent-session-prompter@example.com";
+const PROMPTER: &str = "rox|agent-session-prompter@example.com";
 
 /// Following a session records each person once, whoever owns it, and
 /// touches neither access nor history: listing it is Soup's job, and who may

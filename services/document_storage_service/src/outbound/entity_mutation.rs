@@ -199,7 +199,7 @@ mod test {
         )
         .bind(thread_id.to_string())
         .bind(&permission_id)
-        .bind("macro|entity-mutation@example.com")
+        .bind("rox|entity-mutation@example.com")
         .execute(&pool)
         .await?;
 
@@ -213,7 +213,7 @@ mod test {
         let adapter =
             DssEntityLifecycleAdapter::new(pool.clone(), redis, sqs, NoopMacroEventBroker);
         let actor = EntityMutationActor {
-            user_id: RoxUserIdStr::try_from("macro|entity-mutation@example.com")?,
+            user_id: RoxUserIdStr::try_from("rox|entity-mutation@example.com")?,
             organization_id: None,
         };
         let entity = EntityType::EmailThread.with_entity_string(thread_id.to_string());

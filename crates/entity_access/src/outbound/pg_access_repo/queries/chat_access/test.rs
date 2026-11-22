@@ -3,9 +3,9 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER_WITH_TEAM: &str = "macro|chat-owner@corp.test";
-const OWNER_WITHOUT_TEAM: &str = "macro|chat-owner-no-team@corp.test";
-const REQUESTER: &str = "macro|chat-requester@corp.test";
+const OWNER_WITH_TEAM: &str = "rox|chat-owner@corp.test";
+const OWNER_WITHOUT_TEAM: &str = "rox|chat-owner-no-team@corp.test";
+const REQUESTER: &str = "rox|chat-requester@corp.test";
 const OWNER_TEAM: Uuid = Uuid::from_u128(0x000000000000000000000000000c4a01);
 const OTHER_TEAM: Uuid = Uuid::from_u128(0x000000000000000000000000000c4a02);
 
@@ -45,7 +45,7 @@ const LINK_ACCESS_CASES: [LinkAccessCase; 3] = [
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
 
     sqlx::query!(
         r#"

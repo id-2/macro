@@ -4,8 +4,8 @@ use chrono::{Duration, TimeZone};
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 mod email_collection;
-const USER_A: &str = "macro|reminders-a@rox.one";
-const USER_B: &str = "macro|reminders-b@rox.one";
+const USER_A: &str = "rox|reminders-a@rox.one";
+const USER_B: &str = "rox|reminders-b@rox.one";
 fn user(id: &str) -> RoxUserIdStr<'_> {
     RoxUserIdStr::parse_from_str(id).unwrap()
 }

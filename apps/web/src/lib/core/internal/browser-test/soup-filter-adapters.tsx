@@ -46,7 +46,7 @@ export const [SoupFilterFixtureProvider, useSoupView] =
                   team: { id: 'fixture-team', crm_enabled: true },
                   members: [
                     { user_id: VIEWER, role: 'member' },
-                    { user_id: 'macro|teammate@example.com', role: 'member' },
+                    { user_id: 'rox|teammate@example.com', role: 'member' },
                   ],
                 },
                 isPending: false,
@@ -132,7 +132,7 @@ export function makeFlaggedPersisted<T>(state: Signal<T>) {
 export function idToDisplayName(id: string) {
   if (id === VIEWER) return 'Viewer';
   if (id === SELECTED) return 'Selected Person';
-  return id.slice(6);
+  return id.slice(4);
 }
 
 export function useTagFilter() {

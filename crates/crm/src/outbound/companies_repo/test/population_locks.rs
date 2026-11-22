@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Duration;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 /// Whether another transaction holds the advisory lock on `key`.
 async fn advisory_lock_held(pool: &PgPool, key: &str) -> anyhow::Result<bool> {

@@ -64,7 +64,7 @@ fn decode_payload(payload: Vec<u8>) -> Result<DeclaredMacroEvent, EventBrokerErr
 const DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000001";
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn updated_event() -> Event<DocumentTopicEvent> {

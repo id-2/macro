@@ -7,7 +7,7 @@ test("report shows the timeline and answer latency", () => {
 		...[1, 2, 3, 4, 5].map((second) => ({
 			t: second * 1000,
 			type: "audio.level",
-			who: "macro|owner@x",
+			who: "rox|owner@x",
 			dbfs: -60,
 		})),
 		{ t: 3500, type: "user.state", from: "listening", to: "speaking" },
@@ -30,7 +30,7 @@ test("report shows the timeline and answer latency", () => {
 
 test("interim transcripts only when asked for", () => {
 	const events = [
-		{ t: 100, type: "stt.interim", who: "macro|owner@x", text: "Hel" },
+		{ t: 100, type: "stt.interim", who: "rox|owner@x", text: "Hel" },
 	];
 	expect(formatReport(events)).not.toContain("Hel");
 	expect(formatReport(events, { all: true })).toContain(

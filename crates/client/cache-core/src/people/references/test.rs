@@ -6,7 +6,7 @@ fn request(labels: &[&str], matching: ReferenceMatchMode) -> PeopleReferenceRequ
         scope: HydrationScope {
             contact_fence: None,
             storage_generation: Uuid::from_u128(1),
-            identity: "macro|viewer@example.com".into(),
+            identity: "rox|viewer@example.com".into(),
         },
         labels: labels.iter().map(|label| (*label).into()).collect(),
         matching,
@@ -19,7 +19,7 @@ fn record(email: &str, name: Option<&str>) -> Record {
         fields: [
             (
                 "userId".into(),
-                CacheValue::String(format!("macro|{email}")),
+                CacheValue::String(format!("rox|{email}")),
             ),
             ("email".into(), CacheValue::String(email.into())),
             (
@@ -101,7 +101,7 @@ fn canonical_duplicates_do_not_create_ambiguity_and_missing_names_do_not_invent_
     let request = request(
         &[
             "known@example.com",
-            "macro|known@example.com",
+            "rox|known@example.com",
             "Known",
             "noname",
             "noname@example.com",
@@ -125,8 +125,8 @@ fn foreign_rows_cannot_change_reference_evidence_or_completeness() {
     push(&mut collector, "sam@example.com", Some("Sam"));
     collector.push(
         &contact_key(
-            "macro|other-viewer@example.com",
-            "macro|foreign@example.com",
+            "rox|other-viewer@example.com",
+            "rox|foreign@example.com",
         ),
         &record("foreign@example.com", Some("Sam")),
     );
@@ -153,7 +153,7 @@ fn unreadable_owned_names_make_uniqueness_evidence_incomplete() {
             unknown.fields.remove("name");
         }
         collector.push(
-            &contact_key(&request.scope.identity, "macro|unknown@example.com"),
+            &contact_key(&request.scope.identity, "rox|unknown@example.com"),
             &unknown,
         );
         let result = matches(collector);
@@ -183,7 +183,7 @@ fn exclusions_use_the_committed_epoch_and_corrupt_flags_remain_unknown() {
         ),
     );
     collector.push(
-        &contact_key(&request.scope.identity, "macro|secondary@example.com"),
+        &contact_key(&request.scope.identity, "rox|secondary@example.com"),
         &inbox,
     );
     push(&mut collector, "sam@example.com", Some("Sam"));
@@ -192,7 +192,7 @@ fn exclusions_use_the_committed_epoch_and_corrupt_flags_remain_unknown() {
         .fields
         .insert(CONTEXT_FIELD.into(), CacheValue::String("corrupt".into()));
     collector.push(
-        &contact_key(&request.scope.identity, "macro|broken@example.com"),
+        &contact_key(&request.scope.identity, "rox|broken@example.com"),
         &broken,
     );
     let result = matches(collector);

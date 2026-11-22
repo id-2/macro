@@ -182,7 +182,7 @@ async fn accepted_create_survives_postwrite_lookup_interruption_and_same_operati
             .success()
     );
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|enrollment@example.test")
             .expect("synthetic identity")
             .into_owned(),
     };

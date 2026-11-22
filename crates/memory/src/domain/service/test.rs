@@ -159,7 +159,7 @@ async fn rejected_preferences_never_write_but_forgetting_is_allowed() {
         }),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     assert!(matches!(
         service
             .update_memory(
@@ -193,22 +193,22 @@ async fn current_membership_controls_profiles_and_activity() {
     let repo = Repo::default();
     repo.0.lock().unwrap().profiles = vec![
         (
-            "macro|teammate@example.com".into(),
+            "rox|teammate@example.com".into(),
             "Teammate profile".into(),
         ),
         (
-            "macro|stranger@example.com".into(),
+            "rox|stranger@example.com".into(),
             "Must stay hidden".into(),
         ),
     ];
     let teams = Arc::new(Teams(Mutex::new(vec![(
         Uuid::now_v7(),
-        vec!["macro|teammate@example.com".into()],
+        vec!["rox|teammate@example.com".into()],
     )])));
     let generator = Arc::new(Generator::default());
     let service = MemoryServiceImpl::new(repo, generator.clone(), teams.clone());
-    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
-    let teammate = RoxUserIdStr::parse_from_str("macro|teammate@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
+    let teammate = RoxUserIdStr::parse_from_str("rox|teammate@example.com").unwrap();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     let memory = service.get_memory(owner.clone()).await.unwrap().unwrap();
     assert!(memory.contains("Teammate profile"));
@@ -240,7 +240,7 @@ async fn failed_day_is_retried_before_later_days_and_completed_day_is_noop() {
         generator.clone(),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     assert!(matches!(
         service
             .refresh(user.clone(), date + Duration::days(1))
@@ -265,7 +265,7 @@ async fn refresh_through_fills_every_missing_day_and_rejections_write_nothing() 
     let repo = Repo::default();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     repo.0.lock().unwrap().snapshot.through_date = Some(date - Duration::days(3));
-    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     let rejected = MemoryServiceImpl::new(
         repo.clone(),
         Arc::new(Generator {
@@ -301,7 +301,7 @@ async fn first_failed_generation_catches_up_from_enrollment() {
         Arc::new(Generator::default()),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     assert!(matches!(
         service.refresh(user.clone(), date).await,
         Err(MemoryError::InvalidDate)

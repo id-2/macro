@@ -6,7 +6,7 @@ use crate::domain::service::guest_chat::{
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::Arc;
 
-const USER: &str = "macro|message-test@example.com";
+const USER: &str = "rox|message-test@example.com";
 
 mod initiative;
 mod schema_drop;
@@ -1811,7 +1811,7 @@ async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
         ),
         (
             parent.clone(),
-            "macro|other@example.com".to_owned().try_into().unwrap(),
+            "rox|other@example.com".to_owned().try_into().unwrap(),
         ),
     ] {
         assert!(

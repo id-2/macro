@@ -64,8 +64,8 @@ mod stale_client;
 mod team_activity;
 mod work_feed;
 
-const VALID_USER_ID: &str = "macro|user@example.com";
-const INTERNAL_USER_ID: &str = "macro|internal@example.com";
+const VALID_USER_ID: &str = "rox|user@example.com";
+const INTERNAL_USER_ID: &str = "rox|internal@example.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 
 #[derive(Clone)]
@@ -2266,7 +2266,7 @@ async fn user_id_resolves_without_touching_services() {
     assert!(response.errors.is_empty(), "{:?}", response.errors);
     assert_eq!(
         response.data.to_string(),
-        r#"{user: {id: "macro|user@example.com"}}"#
+        r#"{user: {id: "rox|user@example.com"}}"#
     );
     assert_eq!(harness.authorization_calls.load(Ordering::SeqCst), 1);
     assert_eq!(harness.inbox_calls.load(Ordering::SeqCst), 0);
@@ -2365,7 +2365,7 @@ async fn internal_authorization_uses_the_acting_user_claim() {
     assert!(response.errors.is_empty(), "{:?}", response.errors);
     assert_eq!(
         response.data.to_string(),
-        r#"{user: {id: "macro|internal@example.com"}}"#
+        r#"{user: {id: "rox|internal@example.com"}}"#
     );
     assert_eq!(harness.authorization_calls.load(Ordering::SeqCst), 1);
     assert_eq!(harness.inbox_calls.load(Ordering::SeqCst), 0);

@@ -12,7 +12,7 @@
       "customer": null,
       "payment_status": "paid",
       "amount_total": 2500,
-      "metadata": {"rox_purpose": "ai_credits", "macro_user_id": "macro|buyer@example.com"}
+      "metadata": {"rox_purpose": "ai_credits", "macro_user_id": "rox|buyer@example.com"}
     }
   }
 }

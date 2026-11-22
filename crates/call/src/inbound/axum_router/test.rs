@@ -266,8 +266,8 @@ mod authenticated_join_routes {
             jwt: &str,
         ) -> Result<UserContext, Report<RoxAuthorizationError>> {
             let user_id = match jwt {
-                "member" | "program" | "api-jwt" | "agent-session" => "macro|member@example.com",
-                "viewer" => "macro|viewer@example.com",
+                "member" | "program" | "api-jwt" | "agent-session" => "rox|member@example.com",
+                "viewer" => "rox|viewer@example.com",
                 _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
             };
             Ok(UserContext {
@@ -421,13 +421,13 @@ mod authenticated_join_routes {
             .times(1)
             .returning(move |id, user, request, is_program| {
                 assert_eq!(*id, call_id);
-                assert_eq!(user.as_ref(), "macro|member@example.com");
+                assert_eq!(user.as_ref(), "rox|member@example.com");
                 assert!(!request.replace);
                 assert!(!is_program);
                 Box::pin(async move {
                     Ok(CallTokenResponse {
                         started: false,
-                        participant_id: "macro|member@example.com".to_string(),
+                        participant_id: "rox|member@example.com".to_string(),
                         share_token: None,
                         call_id,
                         channel_id: None,
@@ -481,7 +481,7 @@ mod authenticated_join_routes {
                             Box::pin(async move {
                                 Ok(CallTokenResponse {
                                     started: false,
-                                    participant_id: "macro|member@example.com".to_string(),
+                                    participant_id: "rox|member@example.com".to_string(),
                                     share_token: None,
                                     call_id,
                                     channel_id: None,
@@ -620,7 +620,7 @@ mod scoped_edits {
     use crate::domain::ports::MockCallService;
     use crate::inbound::axum_router::{CallRouterState, call_router};
 
-    const OWNER: &str = "macro|owner@example.com";
+    const OWNER: &str = "rox|owner@example.com";
 
     #[derive(Clone)]
     struct Auth;

@@ -17,7 +17,7 @@ vi.mock('@core/context/channels', () => ({
 }));
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'person@example.com',
-  useUserId: () => () => 'macro|person@example.com',
+  useUserId: () => () => 'rox|person@example.com',
 }));
 vi.mock('@core/email-link', () => ({
   useEmailLinks: () => ({

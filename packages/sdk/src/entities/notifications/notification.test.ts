@@ -17,11 +17,11 @@ describe('notification lifecycle state', () => {
           id: 'notification-1',
           entity_id: 'channel-1',
           entity_type: 'channel',
-          owner_id: 'macro|user@example.com',
+          owner_id: 'rox|user@example.com',
           notification_event_type: 'channel_invite',
           notification_metadata: {
             tag: 'channel_invite',
-            content: { invitedBy: 'macro|other@example.com' },
+            content: { invitedBy: 'rox|other@example.com' },
           },
           created_at: '2020-01-01T00:00:00Z',
           updated_at: '2020-01-01T00:00:00Z',

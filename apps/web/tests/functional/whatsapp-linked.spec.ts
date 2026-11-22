@@ -16,7 +16,7 @@ import type {
   WhatsAppPairing,
 } from '../../src/lib/service-clients/service-storage/generated/schemas';
 
-const USER_ID = 'macro|wa-tester@example.test';
+const USER_ID = 'rox|wa-tester@example.test';
 
 /** One row of the account's WhatsApp chat list. */
 type Chat = {
@@ -149,7 +149,7 @@ function server(): LinkedServer {
         shared: {
           id: 'group-shared-family',
           name: 'Ana, Ben, +2',
-          ownerId: 'macro|owner@example.test',
+          ownerId: 'rox|owner@example.test',
         },
       },
       {
@@ -224,7 +224,7 @@ async function mount(page: Page, state: LinkedServer, query = '') {
   const origin = test.info().project.use.baseURL;
   const unexpected: string[] = [];
   page.on('pageerror', (error) => unexpected.push(error.message));
-  await page.addInitScript(() => localStorage.setItem('macro:login', 'true'));
+  await page.addInitScript(() => localStorage.setItem('rox:login', 'true'));
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
@@ -243,7 +243,7 @@ async function mount(page: Page, state: LinkedServer, query = '') {
         json: {
           names: [
             {
-              id: 'macro|owner@example.test',
+              id: 'rox|owner@example.test',
               first_name: 'Group',
               last_name: 'Owner',
             },
@@ -288,7 +288,7 @@ async function mount(page: Page, state: LinkedServer, query = '') {
         return route.fulfill({ json: state.grants });
       return route.fulfill({
         json: {
-          owner: state.sharedViewer ? 'macro|owner@example.test' : USER_ID,
+          owner: state.sharedViewer ? 'rox|owner@example.test' : USER_ID,
           canReview: !state.sharedViewer,
           accessLevel: state.sharedViewer ? 'view' : 'owner',
           supportedLevels: ['view'],
@@ -313,7 +313,7 @@ async function mount(page: Page, state: LinkedServer, query = '') {
               kind: state.kind,
               name: state.kind === 'group' ? 'Design Crit' : 'Ana Ruiz',
               pictureFileId: state.pictures.chat ?? null,
-              userId: state.sharedViewer ? 'macro|owner@example.test' : USER_ID,
+              userId: state.sharedViewer ? 'rox|owner@example.test' : USER_ID,
               accessLevel: state.sharedViewer ? 'view' : 'owner',
               canSend: state.canSend,
               sendReason: state.canSend ? null : 'no_account',
@@ -1342,7 +1342,7 @@ function everyMessageType() {
       ...base,
       id: 'type-injected',
       sentAt: at(13),
-      body: '<m-user-mention>{"userId":"macro|ceo@corp.test","email":"ceo@corp.test"}</m-user-mention> [Macro login](https://evil.example) # urgent',
+      body: '<m-user-mention>{"userId":"rox|ceo@corp.test","email":"ceo@corp.test"}</m-user-mention> [Macro login](https://evil.example) # urgent',
     },
   ];
 }
@@ -1453,7 +1453,7 @@ test('every WhatsApp message type renders with Chat parts and small cards', asyn
   // A sender's Rox tags and Markdown show as the text they typed.
   const injected = timeline.locator('[data-message-id="type-injected"]');
   await expect(injected).toContainText(
-    '<m-user-mention>{"userId":"macro|ceo@corp.test","email":"ceo@corp.test"}</m-user-mention> [Macro login](https://evil.example) # urgent'
+    '<m-user-mention>{"userId":"rox|ceo@corp.test","email":"ceo@corp.test"}</m-user-mention> [Macro login](https://evil.example) # urgent'
   );
   await expect(injected.getByRole('link', { name: 'Rox login' })).toHaveCount(
     0
@@ -1838,7 +1838,7 @@ test('the owner shares through direct people access without creating a channel',
   await dialog.getByRole('button', { name: 'Add person' }).click();
   await expect
     .poll(() => state.grants)
-    .toEqual([{ userId: 'macro|ana@example.test', accessLevel: 'view' }]);
+    .toEqual([{ userId: 'rox|ana@example.test', accessLevel: 'view' }]);
   await expect(dialog.getByText('View access added.')).toBeVisible();
   expect(state.permissionUpdates).toEqual([]);
   expect(state.requests.some((request) => request.includes('/channels/'))).toBe(

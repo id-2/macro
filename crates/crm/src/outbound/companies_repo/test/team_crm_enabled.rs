@@ -9,7 +9,7 @@ async fn writer_protects_parent_without_requiring_email_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let mut writer = pool.begin().await?;
     assert!(CompaniesRepositoryImpl::team_exists(&mut writer, &team_id).await?);
     let error = sqlx::query!(

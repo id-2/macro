@@ -28,9 +28,9 @@ async fn preview(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_channel_share_previews_the_meeting_without_its_rox_call(pool: PgPool) {
-    let organizer_id = "macro|call-organizer@example.com";
-    let guest_id = "macro|call-guest@example.com";
-    let member_id = "macro|call-member@example.com";
+    let organizer_id = "rox|call-organizer@example.com";
+    let guest_id = "rox|call-guest@example.com";
+    let member_id = "rox|call-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let guest_link = insert_link(&pool, guest_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -90,8 +90,8 @@ async fn a_channel_share_previews_the_meeting_without_its_rox_call(pool: PgPool)
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_channel_share_keeps_a_room_beside_the_rox_call(pool: PgPool) {
-    let organizer_id = "macro|room-organizer@example.com";
-    let member_id = "macro|room-member@example.com";
+    let organizer_id = "rox|room-organizer@example.com";
+    let member_id = "rox|room-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, organizer_link).await;
@@ -118,8 +118,8 @@ async fn a_channel_share_keeps_a_room_beside_the_rox_call(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_channel_share_previews_an_occurrence_without_its_rox_call(pool: PgPool) {
-    let organizer_id = "macro|exception-organizer@example.com";
-    let member_id = "macro|exception-member@example.com";
+    let organizer_id = "rox|exception-organizer@example.com";
+    let member_id = "rox|exception-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, organizer_link).await;
@@ -174,8 +174,8 @@ async fn a_channel_share_previews_an_occurrence_without_its_rox_call(pool: PgPoo
 /// cut inside it: past its link, inside its link, and before it.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_rox_call_leaves_a_shared_description_whole_before_the_cap(pool: PgPool) {
-    let organizer_id = "macro|cap-organizer@example.com";
-    let member_id = "macro|cap-member@example.com";
+    let organizer_id = "rox|cap-organizer@example.com";
+    let member_id = "rox|cap-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, organizer_link).await;

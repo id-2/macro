@@ -348,11 +348,11 @@ vi.mock('../FormatButtons', () => ({
 }));
 
 const CONTACT = {
-  id: 'macro|ann@rox.test',
+  id: 'rox|ann@rox.test',
   name: 'Ann',
   email: 'ann@rox.test',
 };
-const CHANNEL_MEMBER = { user_id: 'macro|bo@rox.test' };
+const CHANNEL_MEMBER = { user_id: 'rox|bo@rox.test' };
 
 vi.mock('@queries/channel/channel-participants', () => ({
   useChannelParticipantsQuery: (channelId: () => string) => ({
@@ -364,7 +364,7 @@ vi.mock('@queries/channel/channel-participants', () => ({
 }));
 vi.mock('@core/context/user', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@core/context/user')>()),
-  useUserId: () => () => 'macro|me@rox.test',
+  useUserId: () => () => 'rox|me@rox.test',
   useIsAuthenticated: () => () => true,
 }));
 vi.mock('@queries/messages/mutations', () => ({

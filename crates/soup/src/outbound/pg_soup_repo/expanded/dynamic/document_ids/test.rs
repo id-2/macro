@@ -92,7 +92,7 @@ fn status(entity_type: Option<&str>) -> GroupByField {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap()
 }
 
 #[test]

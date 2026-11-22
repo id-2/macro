@@ -117,7 +117,7 @@ impl StubDocumentService {
             appearance: None,
             document_id: document_id.to_string(),
             document_version_id: 1,
-            owner: "macro|test@example.com".to_string().try_into().unwrap(),
+            owner: "rox|test@example.com".to_string().try_into().unwrap(),
             document_name: "My Task".to_string(),
             file_type: Some("md".to_string()),
             sha: None,
@@ -739,7 +739,7 @@ impl GithubSyncRepo for StubSyncRepo {
 async fn test_get_team_member_ids_stub_returns_fixture_members() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
-        .with_team_members(team_id, vec!["macro|zeta@user.com", "macro|alpha@user.com"]);
+        .with_team_members(team_id, vec!["rox|zeta@user.com", "rox|alpha@user.com"]);
 
     let member_ids = repo.get_team_member_ids(team_id).await.unwrap();
     let member_ids: Vec<String> = member_ids.into_iter().map(String::from).collect();
@@ -747,8 +747,8 @@ async fn test_get_team_member_ids_stub_returns_fixture_members() {
     assert_eq!(
         member_ids,
         vec![
-            "macro|alpha@user.com".to_string(),
-            "macro|zeta@user.com".to_string(),
+            "rox|alpha@user.com".to_string(),
+            "rox|zeta@user.com".to_string(),
         ]
     );
     assert!(
@@ -2369,7 +2369,7 @@ async fn pr_merged_sets_task_status_completed() {
 #[tokio::test]
 async fn pr_merged_credits_the_linked_rox_user_who_merged() {
     let (service, doc_service) = make_sync_service_with_repo_and_doc_service(
-        StubSyncRepo::new().with_github_link("333", "macro|merger@example.com"),
+        StubSyncRepo::new().with_github_link("333", "rox|merger@example.com"),
     );
     let event = ValidatedGithubWebhookEvent::new(
         "pull_request".to_string(),
@@ -2401,14 +2401,14 @@ async fn pr_merged_credits_the_linked_rox_user_who_merged() {
             .credited_user
             .as_ref()
             .map(ToString::to_string),
-        Some("macro|merger@example.com".to_string())
+        Some("rox|merger@example.com".to_string())
     );
 }
 
 #[tokio::test]
 async fn pr_merged_by_an_unlinked_github_account_is_not_credited() {
     let (service, doc_service) = make_sync_service_with_repo_and_doc_service(
-        StubSyncRepo::new().with_github_link("333", "macro|merger@example.com"),
+        StubSyncRepo::new().with_github_link("333", "rox|merger@example.com"),
     );
     let event = ValidatedGithubWebhookEvent::new(
         "pull_request".to_string(),
@@ -2752,7 +2752,7 @@ async fn pr_opened_upserts_foreign_entity_for_user_installation_source() {
     let repo = StubSyncRepo::new().with_installation_sources(
         "77777",
         vec![GithubAppInstallationSource::User(
-            "macro|solo@user.com".to_string(),
+            "rox|solo@user.com".to_string(),
         )],
     );
     let service = make_sync_service_with_repo(repo);
@@ -2783,7 +2783,7 @@ async fn pr_opened_upserts_foreign_entity_for_user_installation_source() {
 
     let foreign_entities = foreign_entity_service.foreign_entities();
     assert_eq!(foreign_entities.len(), 1);
-    assert_eq!(foreign_entities[0].stored_for_id, "macro|solo@user.com");
+    assert_eq!(foreign_entities[0].stored_for_id, "rox|solo@user.com");
     assert_eq!(foreign_entities[0].stored_for_auth_entity, "user");
 }
 
@@ -2795,15 +2795,15 @@ async fn github_pr_status_changed_opened_team_source_notifies_participant_team_m
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|bob@user.com",
-                "macro|carol@user.com",
+                "rox|alice@user.com",
+                "rox|bob@user.com",
+                "rox|carol@user.com",
             ],
         )
-        .with_github_link("111", "macro|external@user.com")
-        .with_github_link("222", "macro|alice@user.com")
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("444", "macro|carol@user.com");
+        .with_github_link("111", "rox|external@user.com")
+        .with_github_link("222", "rox|alice@user.com")
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("444", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event_with_participants(
         "opened",
@@ -2844,12 +2844,12 @@ async fn github_pr_status_changed_opened_team_source_notifies_participant_team_m
         request
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|alice@user.com")
+        Some("rox|alice@user.com")
     );
     // Alice triggered the event, so she is not notified about her own activity.
     assert_eq!(
         notification_request_recipients(request),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
 
     let content = notification_request_content(request);
@@ -2931,11 +2931,11 @@ async fn github_pr_status_changed_merged_user_source_notifies_participant_user()
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|reviewer@user.com".to_string(),
+                "rox|reviewer@user.com".to_string(),
             )],
         )
-        .with_github_link("333", "macro|merger@user.com")
-        .with_github_link("444", "macro|reviewer@user.com");
+        .with_github_link("333", "rox|merger@user.com")
+        .with_github_link("444", "rox|reviewer@user.com");
     let service = make_sync_service_with_repo(repo);
     let opened_event = notification_pull_request_event_with_participants(
         "opened",
@@ -2978,13 +2978,13 @@ async fn github_pr_status_changed_merged_user_source_notifies_participant_user()
     assert_github_pr_notification_realtime_enabled_apns_disabled(request);
     assert_eq!(
         notification_request_recipients(request),
-        vec!["macro|reviewer@user.com".to_string()]
+        vec!["rox|reviewer@user.com".to_string()]
     );
     assert_eq!(
         request
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|merger@user.com")
+        Some("rox|merger@user.com")
     );
     assert_eq!(
         request
@@ -3032,11 +3032,11 @@ async fn github_pr_status_changed_user_source_does_not_notify_nonparticipant() {
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|reviewer@user.com".to_string(),
+                "rox|reviewer@user.com".to_string(),
             )],
         )
-        .with_github_link("222", "macro|author@user.com")
-        .with_github_link("333", "macro|reviewer@user.com");
+        .with_github_link("222", "rox|author@user.com")
+        .with_github_link("333", "rox|reviewer@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event_with_participants(
         "opened",
@@ -3067,14 +3067,14 @@ async fn github_pr_status_changed_does_not_notify_any_rox_user_linked_to_actor()
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|alice-work@user.com",
-                "macro|bob@user.com",
+                "rox|alice@user.com",
+                "rox|alice-work@user.com",
+                "rox|bob@user.com",
             ],
         )
-        .with_github_link("222", "macro|alice@user.com")
-        .with_github_link("222", "macro|alice-work@user.com")
-        .with_github_link("333", "macro|bob@user.com");
+        .with_github_link("222", "rox|alice@user.com")
+        .with_github_link("222", "rox|alice-work@user.com")
+        .with_github_link("333", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event_with_participants(
         "opened",
@@ -3101,11 +3101,11 @@ async fn github_pr_status_changed_does_not_notify_any_rox_user_linked_to_actor()
         requests[0]
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|alice@user.com")
+        Some("rox|alice@user.com")
     );
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
 }
 
@@ -3115,10 +3115,10 @@ async fn github_pr_status_changed_actor_as_only_participant_does_not_notify() {
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|author@user.com".to_string(),
+                "rox|author@user.com".to_string(),
             )],
         )
-        .with_github_link("222", "macro|author@user.com");
+        .with_github_link("222", "rox|author@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event_with_participants(
         "opened",
@@ -3146,8 +3146,8 @@ async fn github_pr_status_changed_missing_participants_does_not_notify_team_memb
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com", "macro|bob@user.com"])
-        .with_github_link("222", "macro|alice@user.com");
+        .with_team_members(team_id, vec!["rox|alice@user.com", "rox|bob@user.com"])
+        .with_github_link("222", "rox|alice@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event(
         "opened",
@@ -3170,7 +3170,7 @@ async fn github_pr_status_changed_edited_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com"]);
+        .with_team_members(team_id, vec!["rox|alice@user.com"]);
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event(
         "edited",
@@ -3215,7 +3215,7 @@ async fn github_pr_status_changed_unchanged_status_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com"]);
+        .with_team_members(team_id, vec!["rox|alice@user.com"]);
     let service = make_sync_service_with_repo(repo);
     let event = notification_pull_request_event(
         "opened",
@@ -3241,10 +3241,10 @@ async fn github_pr_status_changed_send_failure_does_not_fail_webhook_processing(
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|recipient@user.com".to_string(),
+                "rox|recipient@user.com".to_string(),
             )],
         )
-        .with_github_link("222", "macro|recipient@user.com");
+        .with_github_link("222", "rox|recipient@user.com");
     let service = make_sync_service_with_repo_and_notification_ingress(
         repo,
         StubNotificationIngress::failing(),
@@ -3282,14 +3282,14 @@ async fn github_pr_check_run_success_notifies_participant_team_members_from_bot_
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|bob@user.com",
-                "macro|carol@user.com",
+                "rox|alice@user.com",
+                "rox|bob@user.com",
+                "rox|carol@user.com",
             ],
         )
-        .with_github_link("222", "macro|alice@user.com")
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("444", "macro|carol@user.com");
+        .with_github_link("222", "rox|alice@user.com")
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("444", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["333", "444", "999"]);
     let event = notification_check_run_event(
@@ -3313,15 +3313,15 @@ async fn github_pr_check_run_success_notifies_participant_team_members_from_bot_
     assert_eq!(
         notification_request_recipients(request),
         vec![
-            "macro|bob@user.com".to_string(),
-            "macro|carol@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
+            "rox|carol@user.com".to_string(),
         ]
     );
     assert_eq!(
         request
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|alice@user.com")
+        Some("rox|alice@user.com")
     );
 
     let content = notification_request_content(request);
@@ -3378,11 +3378,11 @@ async fn github_pr_check_run_failure_notifies_participant_user_source() {
             .with_installation_sources(
                 "12345",
                 vec![GithubAppInstallationSource::User(
-                    "macro|reviewer@user.com".to_string(),
+                    "rox|reviewer@user.com".to_string(),
                 )],
             )
-            .with_github_link("222", "macro|sender@user.com")
-            .with_github_link("444", "macro|reviewer@user.com");
+            .with_github_link("222", "rox|sender@user.com")
+            .with_github_link("444", "rox|reviewer@user.com");
         let service = make_sync_service_with_repo(repo);
         seed_pull_request_details_with_participants(&service, &["444"]);
         let event = notification_check_run_event(
@@ -3405,7 +3405,7 @@ async fn github_pr_check_run_failure_notifies_participant_user_source() {
         );
         assert_eq!(
             notification_request_recipients(&requests[0]),
-            vec!["macro|reviewer@user.com".to_string()]
+            vec!["rox|reviewer@user.com".to_string()]
         );
 
         let content = notification_request_content(&requests[0]);
@@ -3451,10 +3451,10 @@ async fn github_pr_check_run_noncompleted_and_ignored_conclusions_do_not_notify(
             .with_installation_sources(
                 "12345",
                 vec![GithubAppInstallationSource::User(
-                    "macro|reviewer@user.com".to_string(),
+                    "rox|reviewer@user.com".to_string(),
                 )],
             )
-            .with_github_link("444", "macro|reviewer@user.com");
+            .with_github_link("444", "rox|reviewer@user.com");
         let service = make_sync_service_with_repo(repo);
         seed_pull_request_details_with_participants(&service, &["444"]);
         let event = notification_check_run_event(
@@ -3483,11 +3483,11 @@ async fn github_pr_check_run_nonparticipant_recipient_does_not_notify() {
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|reviewer@user.com".to_string(),
+                "rox|reviewer@user.com".to_string(),
             )],
         )
-        .with_github_link("333", "macro|external@user.com")
-        .with_github_link("444", "macro|reviewer@user.com");
+        .with_github_link("333", "rox|external@user.com")
+        .with_github_link("444", "rox|reviewer@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["333"]);
     let event = notification_check_run_event(
@@ -3511,7 +3511,7 @@ async fn github_pr_check_run_without_pull_request_does_not_notify_or_upsert() {
     let repo = StubSyncRepo::new().with_installation_sources(
         "12345",
         vec![GithubAppInstallationSource::User(
-            "macro|reviewer@user.com".to_string(),
+            "rox|reviewer@user.com".to_string(),
         )],
     );
     let service = make_sync_service_with_repo(repo);
@@ -3539,10 +3539,10 @@ async fn github_pr_check_run_send_failure_does_not_fail_webhook_processing() {
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|reviewer@user.com".to_string(),
+                "rox|reviewer@user.com".to_string(),
             )],
         )
-        .with_github_link("444", "macro|reviewer@user.com");
+        .with_github_link("444", "rox|reviewer@user.com");
     let service = make_sync_service_with_repo_and_notification_ingress(
         repo,
         StubNotificationIngress::failing(),
@@ -4519,7 +4519,7 @@ async fn installation_deleted_removes_only_installation_sources() {
         .with_installation_sources(
             "88888",
             vec![GithubAppInstallationSource::User(
-                "macro|user@user.com".to_string(),
+                "rox|user@user.com".to_string(),
             )],
         );
 
@@ -4544,7 +4544,7 @@ async fn installation_deleted_removes_only_installation_sources() {
             .await
             .unwrap(),
         vec![GithubAppInstallationSource::User(
-            "macro|user@user.com".to_string()
+            "rox|user@user.com".to_string()
         )]
     );
 }
@@ -4643,13 +4643,13 @@ async fn review_requested_notifies_only_mapped_reviewer_in_team() {
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|bob@user.com",
-                "macro|carol@user.com",
+                "rox|alice@user.com",
+                "rox|bob@user.com",
+                "rox|carol@user.com",
             ],
         )
-        .with_github_link("222", "macro|alice@user.com")
-        .with_github_link("333", "macro|bob@user.com");
+        .with_github_link("222", "rox|alice@user.com")
+        .with_github_link("333", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(Some((333, "bob-gh")), 222, "octocat");
 
@@ -4667,13 +4667,13 @@ async fn review_requested_notifies_only_mapped_reviewer_in_team() {
     assert_github_notification_realtime_enabled_apns_disabled(request, "github_review_requested");
     assert_eq!(
         notification_request_recipients(request),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
     assert_eq!(
         request
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|alice@user.com")
+        Some("rox|alice@user.com")
     );
 
     let content = notification_request_content(request);
@@ -4712,14 +4712,14 @@ async fn review_requested_fans_out_to_all_rox_users_sharing_reviewer_github_acco
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|bob@user.com",
-                "macro|bob2@user.com",
+                "rox|alice@user.com",
+                "rox|bob@user.com",
+                "rox|bob2@user.com",
             ],
         )
-        .with_github_link("222", "macro|alice@user.com")
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("333", "macro|bob2@user.com");
+        .with_github_link("222", "rox|alice@user.com")
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("333", "rox|bob2@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(Some((333, "bob-gh")), 222, "octocat");
 
@@ -4737,8 +4737,8 @@ async fn review_requested_fans_out_to_all_rox_users_sharing_reviewer_github_acco
     assert_eq!(
         notification_request_recipients(request),
         vec![
-            "macro|bob2@user.com".to_string(),
-            "macro|bob@user.com".to_string(),
+            "rox|bob2@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
         ]
     );
 }
@@ -4748,7 +4748,7 @@ async fn review_requested_unmapped_reviewer_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com"]);
+        .with_team_members(team_id, vec!["rox|alice@user.com"]);
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(Some((999, "stranger")), 222, "octocat");
 
@@ -4762,8 +4762,8 @@ async fn review_requested_reviewer_outside_source_recipients_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com"])
-        .with_github_link("333", "macro|outsider@user.com");
+        .with_team_members(team_id, vec!["rox|alice@user.com"])
+        .with_github_link("333", "rox|outsider@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(Some((333, "bob-gh")), 222, "octocat");
 
@@ -4777,7 +4777,7 @@ async fn review_requested_team_reviewer_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
-        .with_team_members(team_id, vec!["macro|alice@user.com"]);
+        .with_team_members(team_id, vec!["rox|alice@user.com"]);
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(None, 222, "octocat");
 
@@ -4792,10 +4792,10 @@ async fn review_requested_user_source_notifies_installed_reviewer() {
         .with_installation_sources(
             "12345",
             vec![GithubAppInstallationSource::User(
-                "macro|solo@user.com".to_string(),
+                "rox|solo@user.com".to_string(),
             )],
         )
-        .with_github_link("333", "macro|solo@user.com");
+        .with_github_link("333", "rox|solo@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_requested_event(Some((333, "solo-gh")), 222, "octocat");
 
@@ -4809,7 +4809,7 @@ async fn review_requested_user_source_notifies_installed_reviewer() {
     );
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|solo@user.com".to_string()]
+        vec!["rox|solo@user.com".to_string()]
     );
 }
 
@@ -4867,12 +4867,12 @@ fn comment_team_repo(team_id: uuid::Uuid) -> StubSyncRepo {
         .with_team_members(
             team_id,
             vec![
-                "macro|alice@user.com",
-                "macro|bob@user.com",
-                "macro|carol@user.com",
+                "rox|alice@user.com",
+                "rox|bob@user.com",
+                "rox|carol@user.com",
             ],
         )
-        .with_github_link("222", "macro|alice@user.com")
+        .with_github_link("222", "rox|alice@user.com")
 }
 
 fn requests_with_tag(requests: &[serde_json::Value], tag: &str) -> Vec<serde_json::Value> {
@@ -4892,8 +4892,8 @@ fn requests_with_tag(requests: &[serde_json::Value], tag: &str) -> Vec<serde_jso
 async fn issue_comment_notifies_participants_without_mentions() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("444", "macro|carol@user.com");
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("444", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["333", "444", "999"]);
     let event = notification_comment_event(
@@ -4914,8 +4914,8 @@ async fn issue_comment_notifies_participants_without_mentions() {
     assert_eq!(
         notification_request_recipients(request),
         vec![
-            "macro|bob@user.com".to_string(),
-            "macro|carol@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
+            "rox|carol@user.com".to_string(),
         ]
     );
 
@@ -4950,8 +4950,8 @@ async fn issue_comment_notifies_participants_without_mentions() {
 async fn issue_comment_uses_existing_participant_metadata_when_live_details_are_missing() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("444", "macro|carol@user.com");
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("444", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     let opened_event = notification_pull_request_event_with_participants(
         "opened",
@@ -4993,8 +4993,8 @@ async fn issue_comment_uses_existing_participant_metadata_when_live_details_are_
     assert_eq!(
         notification_request_recipients(&requests[0]),
         vec![
-            "macro|bob@user.com".to_string(),
-            "macro|carol@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
+            "rox|carol@user.com".to_string(),
         ]
     );
 }
@@ -5021,8 +5021,8 @@ async fn issue_comment_missing_participants_does_not_notify_team_members() {
 async fn issue_comment_mentioned_member_gets_mention_not_comment() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("444", "macro|carol@user.com")
-        .with_github_login_link("bob-gh", "macro|bob@user.com");
+        .with_github_link("444", "rox|carol@user.com")
+        .with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["444"]);
     let event = notification_comment_event(
@@ -5042,7 +5042,7 @@ async fn issue_comment_mentioned_member_gets_mention_not_comment() {
     assert_eq!(mentions.len(), 1);
     assert_eq!(
         notification_request_recipients(&mentions[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
     let mention_content = notification_request_content(&mentions[0]);
     assert_eq!(
@@ -5062,7 +5062,7 @@ async fn issue_comment_mentioned_member_gets_mention_not_comment() {
     assert_eq!(comments.len(), 1);
     assert_eq!(
         notification_request_recipients(&comments[0]),
-        vec!["macro|carol@user.com".to_string()]
+        vec!["rox|carol@user.com".to_string()]
     );
 }
 
@@ -5070,8 +5070,8 @@ async fn issue_comment_mentioned_member_gets_mention_not_comment() {
 async fn review_comment_uses_review_comment_kind_and_location() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("444", "macro|carol@user.com")
-        .with_github_login_link("bob-gh", "macro|bob@user.com");
+        .with_github_link("444", "rox|carol@user.com")
+        .with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["444"]);
     let event = notification_comment_event(
@@ -5091,11 +5091,11 @@ async fn review_comment_uses_review_comment_kind_and_location() {
     assert_eq!(comments.len(), 1);
     assert_eq!(
         notification_request_recipients(&mentions[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
     assert_eq!(
         notification_request_recipients(&comments[0]),
-        vec!["macro|carol@user.com".to_string()]
+        vec!["rox|carol@user.com".to_string()]
     );
     assert_eq!(
         notification_request_content(&mentions[0])
@@ -5149,8 +5149,8 @@ async fn edited_comment_does_not_notify() {
 async fn mention_of_unlinked_login_falls_back_to_comment_for_participants() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("333", "macro|bob@user.com")
-        .with_github_link("444", "macro|carol@user.com");
+        .with_github_link("333", "rox|bob@user.com")
+        .with_github_link("444", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["333", "444"]);
     let event = notification_comment_event(
@@ -5169,8 +5169,8 @@ async fn mention_of_unlinked_login_falls_back_to_comment_for_participants() {
     assert_eq!(
         notification_request_recipients(&requests[0]),
         vec![
-            "macro|bob@user.com".to_string(),
-            "macro|carol@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
+            "rox|carol@user.com".to_string(),
         ]
     );
 }
@@ -5179,9 +5179,9 @@ async fn mention_of_unlinked_login_falls_back_to_comment_for_participants() {
 async fn mention_login_linked_to_multiple_users_notifies_all_in_team() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_login_link("shared-gh", "macro|bob@user.com")
-        .with_github_login_link("shared-gh", "macro|carol@user.com")
-        .with_github_login_link("shared-gh", "macro|outsider@user.com");
+        .with_github_login_link("shared-gh", "rox|bob@user.com")
+        .with_github_login_link("shared-gh", "rox|carol@user.com")
+        .with_github_login_link("shared-gh", "rox|outsider@user.com");
     let service = make_sync_service_with_repo(repo);
     seed_pull_request_details_with_participants(&service, &["222"]);
     let event = notification_comment_event(
@@ -5201,8 +5201,8 @@ async fn mention_login_linked_to_multiple_users_notifies_all_in_team() {
     assert_eq!(
         notification_request_recipients(&mentions[0]),
         vec![
-            "macro|bob@user.com".to_string(),
-            "macro|carol@user.com".to_string(),
+            "rox|bob@user.com".to_string(),
+            "rox|carol@user.com".to_string(),
         ]
     );
     // The only non-mentioned participant is Alice, who wrote the comment, so
@@ -5257,7 +5257,7 @@ fn notification_review_event(
 #[tokio::test]
 async fn approved_review_notifies_author_only() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_link("444", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_link("444", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event("submitted", "approved", None, 444, "octocat", "User");
 
@@ -5270,13 +5270,13 @@ async fn approved_review_notifies_author_only() {
     assert_github_notification_realtime_enabled_apns_disabled(request, "github_pr_review");
     assert_eq!(
         notification_request_recipients(request),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
     assert_eq!(
         request
             .pointer("/req/sender_id")
             .and_then(|value| value.as_str()),
-        Some("macro|alice@user.com")
+        Some("rox|alice@user.com")
     );
 
     let content = notification_request_content(request);
@@ -5300,7 +5300,7 @@ async fn approved_review_notifies_author_only() {
 #[tokio::test]
 async fn changes_requested_review_carries_snippet() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_link("444", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_link("444", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event(
         "submitted",
@@ -5332,7 +5332,7 @@ async fn changes_requested_review_carries_snippet() {
 async fn unmapped_author_review_still_notifies_mentions() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo =
-        comment_team_repo(team_id).with_github_login_link("carol-gh", "macro|carol@user.com");
+        comment_team_repo(team_id).with_github_login_link("carol-gh", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event(
         "submitted",
@@ -5350,7 +5350,7 @@ async fn unmapped_author_review_still_notifies_mentions() {
     assert_github_notification_realtime_enabled_apns_disabled(&requests[0], "github_pr_mention");
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|carol@user.com".to_string()]
+        vec!["rox|carol@user.com".to_string()]
     );
     let content = notification_request_content(&requests[0]);
     assert_eq!(
@@ -5362,7 +5362,7 @@ async fn unmapped_author_review_still_notifies_mentions() {
 #[tokio::test]
 async fn empty_commented_review_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_link("444", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_link("444", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event("submitted", "commented", None, 444, "octocat", "User");
 
@@ -5375,8 +5375,8 @@ async fn empty_commented_review_does_not_notify() {
 async fn author_mentioned_in_review_gets_review_only() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_link("444", "macro|bob@user.com")
-        .with_github_login_link("bob-gh", "macro|bob@user.com");
+        .with_github_link("444", "rox|bob@user.com")
+        .with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event(
         "submitted",
@@ -5394,14 +5394,14 @@ async fn author_mentioned_in_review_gets_review_only() {
     assert_github_notification_realtime_enabled_apns_disabled(&requests[0], "github_pr_review");
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
 }
 
 #[tokio::test]
 async fn bot_review_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_link("444", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_link("444", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event =
         notification_review_event("submitted", "approved", None, 444, "review-bot[bot]", "Bot");
@@ -5414,7 +5414,7 @@ async fn bot_review_does_not_notify() {
 #[tokio::test]
 async fn dismissed_review_action_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_link("444", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_link("444", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_review_event("dismissed", "dismissed", None, 444, "octocat", "User");
 
@@ -5467,7 +5467,7 @@ fn notification_pr_body_event(
 #[tokio::test]
 async fn opened_pr_body_mention_notifies_mentioned_member() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pr_body_event(
         "opened",
@@ -5484,7 +5484,7 @@ async fn opened_pr_body_mention_notifies_mentioned_member() {
     assert_eq!(mentions.len(), 1);
     assert_eq!(
         notification_request_recipients(&mentions[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
     let content = notification_request_content(&mentions[0]);
     assert_eq!(
@@ -5502,8 +5502,8 @@ async fn opened_pr_body_mention_notifies_mentioned_member() {
 async fn edited_pr_body_notifies_only_newly_added_mentions() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = comment_team_repo(team_id)
-        .with_github_login_link("bob-gh", "macro|bob@user.com")
-        .with_github_login_link("carol-gh", "macro|carol@user.com");
+        .with_github_login_link("bob-gh", "rox|bob@user.com")
+        .with_github_login_link("carol-gh", "rox|carol@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pr_body_event(
         "edited",
@@ -5519,14 +5519,14 @@ async fn edited_pr_body_notifies_only_newly_added_mentions() {
     assert_github_notification_realtime_enabled_apns_disabled(&requests[0], "github_pr_mention");
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|carol@user.com".to_string()]
+        vec!["rox|carol@user.com".to_string()]
     );
 }
 
 #[tokio::test]
 async fn edited_pr_body_with_unchanged_mentions_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pr_body_event(
         "edited",
@@ -5543,7 +5543,7 @@ async fn edited_pr_body_with_unchanged_mentions_does_not_notify() {
 #[tokio::test]
 async fn edited_pr_without_body_change_does_not_notify() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     // Title-only edit: no changes.body.from in the payload.
     let event = notification_pr_body_event("edited", Some("cc @bob-gh"), None, "User");
@@ -5556,7 +5556,7 @@ async fn edited_pr_without_body_change_does_not_notify() {
 #[tokio::test]
 async fn edited_pr_with_previously_blank_body_notifies_new_mentions() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     // The PR had no description; the edit adds one containing a mention.
     let event = notification_pr_body_event("edited", Some("cc @bob-gh"), Some(""), "User");
@@ -5568,14 +5568,14 @@ async fn edited_pr_with_previously_blank_body_notifies_new_mentions() {
     assert_github_notification_realtime_enabled_apns_disabled(&requests[0], "github_pr_mention");
     assert_eq!(
         notification_request_recipients(&requests[0]),
-        vec!["macro|bob@user.com".to_string()]
+        vec!["rox|bob@user.com".to_string()]
     );
 }
 
 #[tokio::test]
 async fn bot_opened_pr_body_mention_does_not_notify_mention() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
-    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "macro|bob@user.com");
+    let repo = comment_team_repo(team_id).with_github_login_link("bob-gh", "rox|bob@user.com");
     let service = make_sync_service_with_repo(repo);
     let event = notification_pr_body_event("opened", Some("automated PR cc @bob-gh"), None, "Bot");
 
@@ -5586,7 +5586,7 @@ async fn bot_opened_pr_body_mention_does_not_notify_mention() {
 }
 
 fn installation_setup_user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|setup@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|setup@example.com".to_string()).unwrap()
 }
 
 /// Repo where the setup user has linked the stub client's GitHub account,
@@ -6070,7 +6070,7 @@ async fn complete_installation_setup_rejects_unlinked_completer() {
 async fn complete_installation_setup_rejects_completer_linked_to_other_user() {
     let service = make_sync_service_with_repo(StubSyncRepo::new().with_github_link(
         &TEST_GITHUB_USER_ID.to_string(),
-        "macro|someone-else@example.com",
+        "rox|someone-else@example.com",
     ));
     service.client.set_user_installations(&[9]);
 
@@ -6139,7 +6139,7 @@ impl crate::domain::ports::GithubSyncRealtime for StubRealtime {
 async fn realtime_publishes_saved_entities_only_to_their_source_members() {
     let team = rox_uuid::generate_uuid_v7();
     let repo = StubSyncRepo::new()
-        .with_team_members(team, vec!["macro|actor@user.com", "macro|reader@user.com"]);
+        .with_team_members(team, vec!["rox|actor@user.com", "rox|reader@user.com"]);
     let service = make_sync_service_with_repo(repo);
     let pull_request: EnrichedGithubPullRequest = serde_json::from_value(
         expected_pull_request_metadata("PR", GithubPullRequestStatus::Open, None, None),
@@ -6147,7 +6147,7 @@ async fn realtime_publishes_saved_entities_only_to_their_source_members() {
     .unwrap();
     let sources = vec![
         GithubAppInstallationSource::Team(team),
-        GithubAppInstallationSource::User("macro|owner@user.com".to_string()),
+        GithubAppInstallationSource::User("rox|owner@user.com".to_string()),
     ];
     service
         .upsert_enriched_pull_request_foreign_entities(pull_request.clone(), &sources)
@@ -6161,11 +6161,11 @@ async fn realtime_publishes_saved_entities_only_to_their_source_members() {
         let recipients: HashSet<_> = events[0].0.iter().map(|id| id.as_ref()).collect();
         assert_eq!(
             recipients,
-            HashSet::from(["macro|actor@user.com", "macro|reader@user.com"])
+            HashSet::from(["rox|actor@user.com", "rox|reader@user.com"])
         );
         assert_eq!(
             events[1].0.iter().map(|id| id.as_ref()).collect::<Vec<_>>(),
-            vec!["macro|owner@user.com"]
+            vec!["rox|owner@user.com"]
         );
     }
     let mut merged = pull_request;
@@ -6210,7 +6210,7 @@ async fn realtime_delivery_failure_keeps_the_saved_mapping() {
         .upsert_enriched_pull_request_foreign_entities(
             pull_request,
             &[GithubAppInstallationSource::User(
-                "macro|owner@user.com".to_string(),
+                "rox|owner@user.com".to_string(),
             )],
         )
         .await;

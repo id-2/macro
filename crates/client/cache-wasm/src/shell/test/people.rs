@@ -7,8 +7,8 @@ async fn people_abi_preserves_scope_publication_and_winning_identity() {
         .await
         .as_string()
         .unwrap();
-    let viewer = "macro|viewer@example.com";
-    let user = "macro|person@example.com";
+    let viewer = "rox|viewer@example.com";
+    let user = "rox|person@example.com";
     let contact = uuid::Uuid::new_v5(
         &uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, viewer.as_bytes()),
         user.as_bytes(),

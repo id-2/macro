@@ -234,7 +234,7 @@ async fn edit_share_permission_preserves_update_field_semantics(
     Ok(())
 }
 
-const THREAD_AUDIT_ACTOR: &str = "macro|thread-owner@example.com";
+const THREAD_AUDIT_ACTOR: &str = "rox|thread-owner@example.com";
 const THREAD_AUDIT_RESOURCE: Uuid = uuid::uuid!("01900000-0000-7000-8000-000000000001");
 
 #[derive(Debug, PartialEq)]

@@ -146,7 +146,7 @@ function engine(count: () => number, offline: () => boolean = () => false) {
           });
         const data: SoupQuery = {
           user: {
-            id: 'macro|viewer@databases.test',
+            id: 'rox|viewer@databases.test',
             emailLinks: [],
             soup: { items: [], nextCursor: null },
           },
@@ -161,7 +161,7 @@ function engine(count: () => number, offline: () => boolean = () => false) {
   const read: DatabaseSqlQueryCapabilities = {
     client: () => client,
     cacheHost: () => undefined,
-    account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
+    account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
     describe: async (catalog) => ({
       readTables: catalog.tables.map((table) => table.id),
       columns: [],

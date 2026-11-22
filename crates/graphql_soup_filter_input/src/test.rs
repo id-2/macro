@@ -185,7 +185,7 @@ fn initiative_filters_materialize_for_browser_and_server() {
     for literal in [
         json!({"include": true}),
         json!({"id": id.to_string()}),
-        json!({"owner": "macro|user@example.com"}),
+        json!({"owner": "rox|user@example.com"}),
         json!({"nameContains": "Launch"}),
         json!({"dueBefore": "2026-10-01T00:00:00Z"}),
         json!({"dueAfter": "2026-09-01T00:00:00Z"}),

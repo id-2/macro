@@ -10,7 +10,7 @@ async fn seed(pool: &Pool<Postgres>) -> Result<Vec<Uuid>> {
     sqlx::query!(
         r#"
         INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content, created_at, deleted_at)
-        SELECT id, 'channel', channel_id::text, 'macro|user1@test.com', 'history',
+        SELECT id, 'channel', channel_id::text, 'rox|user1@test.com', 'history',
                '2020-01-01T00:00:00.123456Z'::timestamptz, deleted_at
         FROM UNNEST($1::uuid[], $2::uuid[], $3::timestamptz[]) AS rows(id, channel_id, deleted_at)
         "#,
@@ -34,8 +34,8 @@ async fn backfill_includes_replies_but_not_document_messages(pool: Pool<Postgres
     sqlx::query!(
         r#"
         INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content, created_at)
-        VALUES ($1, 'channel', $2, $3, 'macro|user1@test.com', 'reply', '2020-01-02T00:00:00Z'),
-               ($4, 'document', 'doc-backfill-test', NULL, 'macro|user1@test.com', 'document', '2020-01-02T00:00:00Z')
+        VALUES ($1, 'channel', $2, $3, 'rox|user1@test.com', 'reply', '2020-01-02T00:00:00Z'),
+               ($4, 'document', 'doc-backfill-test', NULL, 'rox|user1@test.com', 'document', '2020-01-02T00:00:00Z')
         "#,
         reply,
         CHANNEL.to_string(),

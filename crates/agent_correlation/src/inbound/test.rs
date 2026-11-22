@@ -47,7 +47,7 @@ fn mint(
 ) -> String {
     encode_rox_api_token(EncodeMacroApiTokenArgs {
         fusionauth_id: "fixture".into(),
-        rox_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "rox|owner@example.com".into(),
         organization_id: None,
         issuer: "fixture".into(),
         private_key: PRIVATE.into(),

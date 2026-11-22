@@ -47,7 +47,7 @@ fn capabilities_match_existing_sharing() {
 
 #[test]
 fn only_team_administrators_review_team_owned_entities() {
-    let user = |name: &str| RoxUserIdStr::try_from(format!("macro|{name}@test.com")).unwrap();
+    let user = |name: &str| RoxUserIdStr::try_from(format!("rox|{name}@test.com")).unwrap();
     let facts = SharingFacts {
         owner: Owner::Team(Uuid::new_v4()),
         sponsor: None,

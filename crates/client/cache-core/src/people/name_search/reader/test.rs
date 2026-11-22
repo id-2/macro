@@ -8,7 +8,7 @@ const VERSION: PeopleReadVersion = PeopleReadVersion {
 fn request(query: &str, mode: PeopleMode, limit: usize) -> PeopleSearch {
     PeopleSearch {
         scope: HydrationScope {
-            identity: "macro|viewer@example.com".into(),
+            identity: "rox|viewer@example.com".into(),
             storage_generation: Uuid::from_u128(1),
             contact_fence: None,
         },
@@ -44,7 +44,7 @@ fn person(
                 ("userId".into(), CacheValue::String(id.into())),
                 (
                     "email".into(),
-                    CacheValue::String(id.strip_prefix("macro|").unwrap().into()),
+                    CacheValue::String(id.strip_prefix("rox|").unwrap().into()),
                 ),
                 ("name".into(), CacheValue::String(name.into())),
                 (
@@ -66,10 +66,10 @@ fn person(
 fn tiers_then_recency_then_identity_and_bounded_duplicate_handling() {
     let request = request("jo", PeopleMode::Recipient, 3);
     let rows = [
-        person(&request, "macro|a@example.com", "Jo", 1, None),
-        person(&request, "macro|c@example.com", "John", 20, None),
-        person(&request, "macro|b@example.com", "John", 20, None),
-        person(&request, "macro|d@example.com", "Banjo", 100, None),
+        person(&request, "rox|a@example.com", "Jo", 1, None),
+        person(&request, "rox|c@example.com", "John", 20, None),
+        person(&request, "rox|b@example.com", "John", 20, None),
+        person(&request, "rox|d@example.com", "Banjo", 100, None),
     ];
     let mut read = NameSearchRead::new(&request, Uuid::from_u128(2), VERSION).unwrap();
     for _ in 0..3 {
@@ -92,9 +92,9 @@ fn tiers_then_recency_then_identity_and_bounded_duplicate_handling() {
             .map(|p| p.user_id.as_ref())
             .collect::<Vec<_>>(),
         [
-            "macro|a@example.com",
-            "macro|b@example.com",
-            "macro|c@example.com"
+            "rox|a@example.com",
+            "rox|b@example.com",
+            "rox|c@example.com"
         ]
     );
     let mut next = request.clone();
@@ -122,9 +122,9 @@ fn earlier_eligible_dm_alias_does_not_reappear_on_a_later_tier() {
     let request = request("jo", PeopleMode::Command, 1);
     let dm = Uuid::from_u128(9);
     let rows = [
-        person(&request, "macro|a@example.com", "Jo", 1, Some(dm)),
-        person(&request, "macro|b@example.com", "John", 2, Some(dm)),
-        person(&request, "macro|c@example.com", "John", 3, None),
+        person(&request, "rox|a@example.com", "Jo", 1, Some(dm)),
+        person(&request, "rox|b@example.com", "John", 2, Some(dm)),
+        person(&request, "rox|c@example.com", "John", 3, None),
     ];
     let mut read = NameSearchRead::new(&request, Uuid::from_u128(2), VERSION).unwrap();
     for (k, r) in &rows {
@@ -138,7 +138,7 @@ fn earlier_eligible_dm_alias_does_not_reappear_on_a_later_tier() {
     else {
         panic!("page");
     };
-    assert_eq!(people[0].user_id.as_ref(), "macro|a@example.com");
+    assert_eq!(people[0].user_id.as_ref(), "rox|a@example.com");
     let mut request = request;
     request.cursor = next_cursor;
     request.limit = 2;
@@ -153,18 +153,18 @@ fn earlier_eligible_dm_alias_does_not_reappear_on_a_later_tier() {
         panic!("page");
     };
     assert_eq!(people.len(), 1);
-    assert_eq!(people[0].user_id.as_ref(), "macro|c@example.com");
+    assert_eq!(people[0].user_id.as_ref(), "rox|c@example.com");
 }
 #[test]
 fn eligibility_preserves_self_pin_automated_addresses_and_foreign_keys() {
     let request = request("", PeopleMode::Property, 2);
     let own = person(&request, &request.scope.identity, "Viewer", 0, None);
-    let other = person(&request, "macro|other@example.com", "Other", 100, None);
+    let other = person(&request, "rox|other@example.com", "Other", 100, None);
     let mut read = NameSearchRead::new(&request, Uuid::from_u128(2), VERSION).unwrap();
     read.push(&other.0, &other.1, None);
     read.push(&own.0, &own.1, None);
     read.push(
-        &crate::people::contact_key("macro|foreign@example.com", "macro|other@example.com"),
+        &crate::people::contact_key("rox|foreign@example.com", "rox|other@example.com"),
         &other.1,
         None,
     );
@@ -177,7 +177,7 @@ fn eligibility_preserves_self_pin_automated_addresses_and_foreign_keys() {
         let request = super::test::request(query, PeopleMode::Recipient, 2);
         let row = person(
             &request,
-            "macro|notifications@example.com",
+            "rox|notifications@example.com",
             "Notice",
             0,
             None,

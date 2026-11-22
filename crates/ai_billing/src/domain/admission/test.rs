@@ -30,7 +30,7 @@ impl BillingService for FakeBilling {
     }
 
     async fn check_allowance(&self, user: &RoxUserIdStr<'_>) -> BillingResult<AllowanceDecision> {
-        assert_eq!(user.as_ref(), "macro|user@example.com");
+        assert_eq!(user.as_ref(), "rox|user@example.com");
         self.calls.fetch_add(1, Ordering::SeqCst);
         if self.fail {
             return Err(crate::BillingError::Storage(anyhow::anyhow!(
@@ -109,7 +109,7 @@ impl BillingService for FakeBilling {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|user@example.com").unwrap()
+    RoxUserIdStr::try_from("rox|user@example.com").unwrap()
 }
 
 #[tokio::test]

@@ -15,7 +15,7 @@ async fn set_company_name_writes_override_that_wins_over_directory(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     // Populate-style company: no custom_name, display name resolved
     // from the global directory.
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
@@ -55,7 +55,7 @@ async fn set_company_name_returns_not_found_for_unknown_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -70,8 +70,8 @@ async fn set_company_name_returns_not_found_for_unknown_company(
 async fn set_company_name_isolates_companies_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|owner_a@test.com").await?;
-    seed_team(&pool, team_b, "macro|owner_b@test.com").await?;
+    seed_team(&pool, team_a, "rox|owner_a@test.com").await?;
+    seed_team(&pool, team_b, "rox|owner_b@test.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -90,7 +90,7 @@ async fn set_company_name_isolates_companies_across_teams(pool: PgPool) -> anyho
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_name_respects_hidden_gate(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     repo.set_company_hidden(&team_id, &company_id, true).await?;
@@ -118,7 +118,7 @@ async fn set_company_name_respects_hidden_gate(pool: PgPool) -> anyhow::Result<(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_set_company_name_trims_and_persists(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
 
     let service = CrmServiceImpl::new(

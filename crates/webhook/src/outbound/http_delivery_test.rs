@@ -32,7 +32,7 @@ fn webhook(endpoint_url: &str, headers: WebhookHeaders) -> Webhook {
         headers,
         status: WebhookStatus::Active,
         is_valid: true,
-        created_by_user_id: "macro|test@example.com".to_string(),
+        created_by_user_id: "rox|test@example.com".to_string(),
         created_at: Utc::now(),
         updated_at: Utc::now(),
         deleted_at: None,

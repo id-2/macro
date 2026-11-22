@@ -8,7 +8,7 @@
 --   insert_attachments path test to add and then orphan-delete an .ics.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000b01', 'macro|calflag_user@example.com', '00000000-0000-0000-0000-000000000b01',
+VALUES ('00000000-0000-0000-0000-000000000b01', 'rox|calflag_user@example.com', '00000000-0000-0000-0000-000000000b01',
         'calflag_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, created_at, updated_at)

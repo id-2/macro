@@ -4,7 +4,7 @@
 -- Thread 2: one sent message in Sent Items, never received.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('0a000000-0000-0000-0000-000000000001', 'macro|user1@test.com', 'user1', 'user1@test.com', 'OUTLOOK', true, NOW(), NOW());
+VALUES ('0a000000-0000-0000-0000-000000000001', 'rox|user1@test.com', 'user1', 'user1@test.com', 'OUTLOOK', true, NOW(), NOW());
 
 INSERT INTO email_threads (id, provider_id, link_id, inbox_visible, is_read, created_at, updated_at)
 VALUES

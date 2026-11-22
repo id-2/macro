@@ -128,8 +128,8 @@ impl AgentCreations for Creations {
 
 const CHANNEL: Uuid = Uuid::from_u128(2);
 const REPLIED_THREAD: Uuid = Uuid::from_u128(9);
-const MEMBER: &str = "macro|member@example.com";
-const SENDER: &str = "macro|sender@example.com";
+const MEMBER: &str = "rox|member@example.com";
+const SENDER: &str = "rox|sender@example.com";
 const BOT: &str = "bot|00000000-0000-0000-0000-00000000b07a";
 const DOCUMENT: Uuid = Uuid::from_u128(3);
 const EXISTING_DOCUMENT: Uuid = Uuid::from_u128(8);

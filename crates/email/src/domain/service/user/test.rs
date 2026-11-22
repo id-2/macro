@@ -79,7 +79,7 @@ fn service(repo: FakeUserRepo) -> EmailServiceImpl<FakeUserRepo, (), (), (), (),
 }
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap()
 }
 
 fn link(id: Uuid, owner: &str) -> Link {

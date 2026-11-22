@@ -31,7 +31,7 @@ async fn failed_access_check_never_reads_session_metadata_or_history() {
 fn rejects_ai_supplied_identity() {
     assert!(
         serde_json::from_value::<ReadAgentSession>(serde_json::json!({
-            "sessionId": uuid::Uuid::nil(), "userId": "macro|someone@example.com"
+            "sessionId": uuid::Uuid::nil(), "userId": "rox|someone@example.com"
         }))
         .is_err()
     );

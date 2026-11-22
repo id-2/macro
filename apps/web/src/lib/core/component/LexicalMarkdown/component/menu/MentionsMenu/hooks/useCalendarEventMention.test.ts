@@ -21,7 +21,7 @@ function event(
     type: 'calendar_event',
     id,
     name: 'Standup',
-    ownerId: 'macro|gab@rox.one',
+    ownerId: 'rox|gab@rox.one',
     status: 'confirmed',
     isReadOnly: false,
     time: {

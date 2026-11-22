@@ -103,7 +103,7 @@ pub struct ToolFieldValue {
     pub field: String,
     /// One value as text.
     #[schemars(
-        description = "The value as text: a stage or other option label (\"Negotiation\"), a person as \"me\", an email or a macro| user id, a number (\"48000\"), true/false, or a date (\"2026-10-12\"). Omit both value and values to empty the field (or, in a filter, to match empty fields)."
+        description = "The value as text: a stage or other option label (\"Negotiation\"), a person as \"me\", an email or a rox| user id, a number (\"48000\"), true/false, or a date (\"2026-10-12\"). Omit both value and values to empty the field (or, in a filter, to match empty fields)."
     )]
     #[serde(default)]
     pub value: Option<String>,
@@ -249,7 +249,7 @@ pub enum ToolFieldType {
     Select,
     /// Tags.
     Tags,
-    /// Rox users, written as "me", an email or a macro| id.
+    /// Rox users, written as "me", an email or a rox| id.
     Person,
     /// Ids of other Rox items.
     Item,
@@ -420,7 +420,7 @@ pub struct ToolEntry {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<ToolRecord>,
     /// Its filled-in fields by name: text, a number, true/false, a date, or a
-    /// list when a field holds several values. People are macro| user ids.
+    /// list when a field holds several values. People are rox| user ids.
     pub fields: BTreeMap<String, serde_json::Value>,
     /// Currency codes keyed by monetary field name, including renamed fields.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

@@ -101,7 +101,7 @@ in Settings → Account Managers.
 
 ```ts
 const asBot = new Rox({ auth: { type: 'bot', token: process.env.ROX_BOT_TOKEN } });
-const asWolf = asBot.requestedAs('macro|wolf@rox.one');
+const asWolf = asBot.requestedAs('rox|wolf@rox.one');
 ```
 
 Bot requests carry an access scope. `user` uses the requested-as user's access, and is the default when `requestedAs` is set. `team` uses the owning team's access, for team-owned bots, and is the default otherwise. Pass `auth: { type: 'bot', token, scope: ... }` to override.

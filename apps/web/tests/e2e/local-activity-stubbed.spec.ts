@@ -14,7 +14,7 @@ test.skip(
   'local activity tests require LOCAL_E2E=true and a running local stack'
 );
 
-const ACTOR = 'macro|stub-actor@macro.local';
+const ACTOR = 'rox|stub-actor@macro.local';
 
 function wireEvent(
   id: string,

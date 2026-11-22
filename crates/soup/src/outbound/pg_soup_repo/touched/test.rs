@@ -6,7 +6,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-const USER_1: &str = "macro|user-1@test.com";
+const USER_1: &str = "rox|user-1@test.com";
 const DOC_A: &str = "11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const DOC_B: &str = "11111111-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
 const CHAT_A: &str = "22222222-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
@@ -144,7 +144,7 @@ fn non_touch_tags_render_as_quoted_list() {
 #[test]
 fn no_filter_includes_every_touchable_type_with_inboxes() {
     let link_ids = [uuid::Uuid::from_u128(1)];
-    let types = included_types(&req("macro|user@example.com", None, &link_ids));
+    let types = included_types(&req("rox|user@example.com", None, &link_ids));
     assert_eq!(
         types,
         vec!["document", "chat", "project", "channel", "email_thread"]
@@ -153,7 +153,7 @@ fn no_filter_includes_every_touchable_type_with_inboxes() {
 
 #[test]
 fn no_inboxes_drops_email_threads() {
-    let types = included_types(&req("macro|user@example.com", None, &[]));
+    let types = included_types(&req("rox|user@example.com", None, &[]));
     assert!(!types.contains(&"email_thread"));
 }
 
@@ -174,7 +174,7 @@ fn positive_properties_filter_drops_propertyless_channels() {
         ))),
         ..EntityFilterAst::default()
     };
-    let types = included_types(&req("macro|user@example.com", Some(&filter), &link_ids));
+    let types = included_types(&req("rox|user@example.com", Some(&filter), &link_ids));
     assert!(!types.contains(&"channel"));
     assert!(types.contains(&"document"));
 }
@@ -196,7 +196,7 @@ fn negated_properties_filter_keeps_propertyless_channels() {
         ))),
         ..EntityFilterAst::default()
     };
-    let types = included_types(&req("macro|user@example.com", Some(&filter), &link_ids));
+    let types = included_types(&req("rox|user@example.com", Some(&filter), &link_ids));
     assert!(types.contains(&"channel"));
 }
 
@@ -209,7 +209,7 @@ fn impossible_document_filter_drops_documents() {
         ))),
         ..EntityFilterAst::default()
     };
-    let types = included_types(&req("macro|user@example.com", Some(&filter), &link_ids));
+    let types = included_types(&req("rox|user@example.com", Some(&filter), &link_ids));
     assert!(!types.contains(&"document"));
     assert!(types.contains(&"chat"));
 }
@@ -217,7 +217,7 @@ fn impossible_document_filter_drops_documents() {
 #[test]
 fn keyset_position_is_optional() {
     let link_ids = [uuid::Uuid::from_u128(1)];
-    let mut request = req("macro|user@example.com", None, &link_ids);
+    let mut request = req("rox|user@example.com", None, &link_ids);
     request.after = Some(TouchedPagePosition {
         occurred_at: chrono::DateTime::UNIX_EPOCH,
         entity_id: uuid::Uuid::from_u128(2).to_string(),

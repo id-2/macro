@@ -25,7 +25,7 @@ fn deals() -> Vec<Row> {
                 (NAME, Cell::Text("Acme".into())),
                 (AMOUNT, Cell::Number(12000.0)),
                 (STAGE, Cell::Options(vec![WON])),
-                (OWNER, Cell::Entities(vec!["macro|sam@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|sam@example.com".into()])),
                 (TAGS, Cell::Options(vec![VIP])),
                 (DONE, Cell::Bool(true)),
             ]),
@@ -37,7 +37,7 @@ fn deals() -> Vec<Row> {
                 (NAME, Cell::Text("Globex".into())),
                 (AMOUNT, Cell::Number(3000.0)),
                 (STAGE, Cell::Options(vec![LEAD])),
-                (OWNER, Cell::Entities(vec!["macro|sam@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|sam@example.com".into()])),
                 (TAGS, Cell::Options(vec![])),
             ]),
         },
@@ -51,7 +51,7 @@ fn deals() -> Vec<Row> {
                     CLOSED_AT,
                     Cell::Date(Utc.with_ymd_and_hms(2026, 9, 15, 0, 0, 0).unwrap()),
                 ),
-                (OWNER, Cell::Entities(vec!["macro|ana@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|ana@example.com".into()])),
             ]),
         },
         Row {
@@ -125,7 +125,7 @@ fn aggregates_per_group_with_a_residual_filter() {
         fold_rows(&catalog(), &plan, won_or_lead),
         vec![
             vec![
-                Some(Cell::Entities(vec!["macro|sam@example.com".into()])),
+                Some(Cell::Entities(vec!["rox|sam@example.com".into()])),
                 Some(Cell::Number(15000.0)),
                 Some(Cell::Number(2.0)),
                 Some(Cell::Number(2.0)),
@@ -134,7 +134,7 @@ fn aggregates_per_group_with_a_residual_filter() {
             // Hooli has no amount: SUM and AVG of nothing are NULL, COUNT(*)
             // still counts the row, COUNT(amount) does not.
             vec![
-                Some(Cell::Entities(vec!["macro|ana@example.com".into()])),
+                Some(Cell::Entities(vec!["rox|ana@example.com".into()])),
                 None,
                 Some(Cell::Number(1.0)),
                 Some(Cell::Number(0.0)),
@@ -295,7 +295,7 @@ fn residual_predicates_follow_sql_null_rules_and_rox_matching() {
         // != and NOT IN drop empty cells, as in SQL
         ("stage != 'Won'", &[GLOBEX]),
         ("stage NOT IN ('Won', 'Lead')", &[]),
-        ("owner NOT IN ('macro|sam@example.com')", &[HOOLI]),
+        ("owner NOT IN ('rox|sam@example.com')", &[HOOLI]),
         // IS NULL is how you ask for empty cells
         ("stage IS NULL", &[INITECH]),
         ("stage IS NOT NULL", &[ACME, GLOBEX, HOOLI]),
@@ -330,7 +330,7 @@ fn residual_predicates_follow_sql_null_rules_and_rox_matching() {
         ("amount > 5000 AND done = TRUE", &[ACME]),
         ("amount > 5000 OR stage = 'Lead'", &[ACME, GLOBEX, INITECH]),
         (
-            "(amount > 5000 OR stage = 'Lead') AND owner = 'macro|sam@example.com'",
+            "(amount > 5000 OR stage = 'Lead') AND owner = 'rox|sam@example.com'",
             &[ACME, GLOBEX],
         ),
     ];
@@ -363,8 +363,8 @@ fn distinct_keeps_the_first_of_equal_rows_after_sorting() {
     assert_eq!(
         rows,
         vec![
-            vec![Some(Cell::Entities(vec!["macro|ana@example.com".into()]))],
-            vec![Some(Cell::Entities(vec!["macro|sam@example.com".into()]))],
+            vec![Some(Cell::Entities(vec!["rox|ana@example.com".into()]))],
+            vec![Some(Cell::Entities(vec!["rox|sam@example.com".into()]))],
             vec![None],
         ]
     );
@@ -434,7 +434,7 @@ fn join_matches_by_membership_and_leaves_empty_cells_unmatched() {
             cells: HashMap::from([
                 (
                     column_key(1, PEOPLE_ID),
-                    Cell::Entities(vec!["macro|sam@example.com".into()]),
+                    Cell::Entities(vec!["rox|sam@example.com".into()]),
                 ),
                 (
                     column_key(1, crate::catalog::PEOPLE_NAME),
@@ -448,7 +448,7 @@ fn join_matches_by_membership_and_leaves_empty_cells_unmatched() {
             cells: HashMap::from([
                 (
                     column_key(1, PEOPLE_ID),
-                    Cell::Entities(vec!["macro|ana@example.com".into()]),
+                    Cell::Entities(vec!["rox|ana@example.com".into()]),
                 ),
                 (
                     column_key(1, crate::catalog::PEOPLE_NAME),

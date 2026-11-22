@@ -6,9 +6,9 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|sharedbox@corp.test";
-const DELEGATE: &str = "macro|primary@corp.test";
-const BOT_OWNER: &str = "macro|bot-owner@corp.test";
+const OWNER: &str = "rox|sharedbox@corp.test";
+const DELEGATE: &str = "rox|primary@corp.test";
+const BOT_OWNER: &str = "rox|bot-owner@corp.test";
 
 /// rox_user + "User" rows so rox_user_links FKs resolve.
 async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
@@ -164,7 +164,7 @@ async fn team_scope_source_ids_include_only_owning_team_and_active_bot_sources(
     let departed_channel_id = Uuid::new_v4();
 
     insert_team(&pool, team_id).await;
-    let other_owner_id = format!("macro|{other_team_id}@corp.test");
+    let other_owner_id = format!("rox|{other_team_id}@corp.test");
     let other_owner_email = format!("{other_team_id}@corp.test");
     insert_user(&pool, &other_owner_id, &other_owner_email).await;
     sqlx::query!(

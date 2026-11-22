@@ -228,7 +228,7 @@ async fn generic_call_entities_preserve_native_identity_and_optional_resources(p
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explicit_primary_preserves_legacy_writes_and_crm_consent_guard(pool: PgPool) {
-    let owner = "macro|legacy@example.com";
+    let owner = "rox|legacy@example.com";
     let link = Uuid::new_v4();
     let team = Uuid::new_v4();
     sqlx::query!(
@@ -304,8 +304,8 @@ async fn explicit_primary_preserves_legacy_writes_and_crm_consent_guard(pool: Pg
     for lifecycle_change in [
         "UPDATE email_links SET is_primary = false".to_owned(),
         "UPDATE email_links SET is_primary = true".to_owned(),
-        "UPDATE email_links SET rox_id = 'macro|other@example.com'".to_owned(),
-        "UPDATE email_links SET rox_id = 'macro|legacy@example.com', email_address = 'changed@example.com'".to_owned(),
+        "UPDATE email_links SET rox_id = 'rox|other@example.com'".to_owned(),
+        "UPDATE email_links SET rox_id = 'rox|legacy@example.com', email_address = 'changed@example.com'".to_owned(),
         "UPDATE email_links SET deleting_at = now()".to_owned(),
         "UPDATE email_links SET deleting_at = NULL, disconnect_requested_at = now()".to_owned(),
         "UPDATE email_links SET disconnect_requested_at = NULL, needs_reauth = true".to_owned(),

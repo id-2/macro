@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const person = 'macro|person@example.com';
+const person = 'rox|person@example.com';
 test.beforeEach(async ({ page }) => {
   await page.route('https://**', (route) => route.abort());
   await page.route('**/jwt/rox_api_token', (route) =>

@@ -23,9 +23,9 @@ const SHIP_IT: RowId = RowId::from_uuid(Uuid::from_u128(0xe3));
 const IDLE: RowId = RowId::from_uuid(Uuid::from_u128(0xe4));
 const ACME: RowId = RowId::from_uuid(Uuid::from_u128(0xa1));
 const GLOBEX: RowId = RowId::from_uuid(Uuid::from_u128(0xa2));
-const SAM: &str = "macro|sam@example.com";
-const ANA: &str = "macro|ana@example.com";
-const KIM: &str = "macro|kim@example.com";
+const SAM: &str = "rox|sam@example.com";
+const ANA: &str = "rox|ana@example.com";
+const KIM: &str = "rox|kim@example.com";
 
 /// Sam and Ana share the high-priority login fix; Kim has a low one; the
 /// idle task has no one and no deal.
@@ -947,7 +947,7 @@ fn an_aggregate_of_row_position_is_named_after_it() {
 fn a_filter_on_people_is_applied_by_the_fold() {
     let (mut engine, step) = Engine::start(
         &catalog(),
-        "SELECT email FROM macro.people WHERE id = 'macro|ana@example.com'",
+        "SELECT email FROM macro.people WHERE id = 'rox|ana@example.com'",
     )
     .unwrap();
     let Step::Fetch(request) = step else {
@@ -1075,7 +1075,7 @@ fn a_join_past_the_hint_limit_fetches_the_joined_relation_whole() {
                 position: None,
                 cells: HashMap::from([(
                     ASSIGNEES,
-                    Cell::Entities(vec![format!("macro|person{index}@example.com")]),
+                    Cell::Entities(vec![format!("rox|person{index}@example.com")]),
                 )]),
             })
             .collect()
@@ -1103,7 +1103,7 @@ fn a_join_past_the_hint_limit_fetches_the_joined_relation_whole() {
         GqlQuery::People {
             ids: Some(
                 (0..MAX_KEY_HINT_VALUES)
-                    .map(|index| format!("macro|person{index}@example.com"))
+                    .map(|index| format!("rox|person{index}@example.com"))
                     .collect()
             ),
         }

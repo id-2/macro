@@ -41,7 +41,7 @@ fn target(provider_calendar_id: &str) -> ProviderCalendarTarget {
     ProviderCalendarTarget {
         binding: None,
         provider: CalendarProvider::Google,
-        owner_id: "macro|ada@example.com".to_string(),
+        owner_id: "rox|ada@example.com".to_string(),
         email_link_id: Uuid::now_v7(),
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),

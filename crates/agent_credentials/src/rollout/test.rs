@@ -4,8 +4,8 @@ use rox_user_id::cowlike::CowLike;
 
 use super::*;
 
-const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
-const CREATOR: &str = "macro|admin@rox.one";
+const AGENT: &str = "rox|sam-rivera-abc123@agents.macro.invalid";
+const CREATOR: &str = "rox|admin@rox.one";
 
 fn user(id: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).unwrap().into_owned()

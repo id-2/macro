@@ -88,7 +88,7 @@ fn recognizes_the_names_earlier_releases_showed() {
 
 #[test]
 fn rejects_non_bot_storage_string() {
-    assert!(BotIdStr::parse_from_str("macro|teo@rox.one").is_err());
+    assert!(BotIdStr::parse_from_str("rox|teo@rox.one").is_err());
 }
 
 #[test]

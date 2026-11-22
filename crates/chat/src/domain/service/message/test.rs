@@ -14,7 +14,7 @@ const CHAT_ID: &str = "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90";
 const MESSAGE_ID: &str = "7d2c1e5a-4b3f-4c6d-8e9f-0a1b2c3d4e5f";
 
 fn test_user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|sender@acme.com")
+    RoxUserIdStr::parse_from_str("rox|sender@acme.com")
         .expect("valid user id")
         .into_owned()
 }
@@ -239,7 +239,7 @@ async fn create_publishes_user_message_sent_keyed_by_chat_id() {
             "message_id": MESSAGE_ID,
             "role": "user",
             "model": "gpt-test",
-            "actor_user_id": "macro|sender@acme.com",
+            "actor_user_id": "rox|sender@acme.com",
             "attachment_count": 2
         })
     );

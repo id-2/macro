@@ -19,7 +19,7 @@ export function releaseTeamContacts() {
   gate?.resolve();
   gate = undefined;
 }
-const viewer = 'macro|viewer@example.com';
+const viewer = 'rox|viewer@example.com';
 export const onboardingCacheHost: ContactWindowHost = {
   ...createNoopCacheHost(),
   disabled: false,
@@ -53,8 +53,8 @@ export const onboardingCacheHost: ContactWindowHost = {
           page < 5
             ? []
             : emails.map((email) => ({
-                userId: `macro|${email}`,
-                recordKey: contactRecordKey(viewer, `macro|${email}`),
+                userId: `rox|${email}`,
+                recordKey: contactRecordKey(viewer, `rox|${email}`),
                 email,
                 name: 'Person',
                 matchRank: 0,

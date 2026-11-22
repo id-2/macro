@@ -178,7 +178,7 @@ export const stubVault = ({
   clock,
   teamId,
   agentKey,
-  agentAccountId = 'macro|agent@example.com',
+  agentAccountId = 'rox|agent@example.com',
 }: {
   readonly clock: Pick<Clock, 'now' | 'sleep'>;
   readonly teamId: string;

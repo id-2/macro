@@ -21,8 +21,8 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-const BUYER: &str = "macro|buyer@example.com";
-const TEAMMATE: &str = "macro|teammate@example.com";
+const BUYER: &str = "rox|buyer@example.com";
+const TEAMMATE: &str = "rox|teammate@example.com";
 
 /// A team of two whose admin, Grace, bought a computer: the hosted harness
 /// the operator pairs, owned by the buyer and granted to the team.
@@ -42,8 +42,8 @@ async fn team_computer(pool: &PgPool, team_id: Uuid) -> (ComputerId, HarnessId) 
         r#"
         INSERT INTO "User" (id, email, rox_user_id)
         VALUES
-            ('macro|buyer@example.com', 'buyer@example.com', '00000000-0000-4000-8000-000000000001'),
-            ('macro|teammate@example.com', 'teammate@example.com', '00000000-0000-4000-8000-000000000002')
+            ('rox|buyer@example.com', 'buyer@example.com', '00000000-0000-4000-8000-000000000001'),
+            ('rox|teammate@example.com', 'teammate@example.com', '00000000-0000-4000-8000-000000000002')
         "#,
     )
     .execute(pool)

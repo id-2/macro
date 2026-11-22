@@ -19,7 +19,7 @@ const data = {
   targetMessageId: 'reply-1',
   targetThreadId: 'thread-1',
   displayText: 'A one-line preview',
-  senderId: 'macro|sender@example.com',
+  senderId: 'rox|sender@example.com',
 };
 const markdown = buildReplyTargetMarkdown(data);
 

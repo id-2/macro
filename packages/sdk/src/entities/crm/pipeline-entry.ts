@@ -18,7 +18,7 @@ import type { CrmPipeline } from './pipeline';
 /**
  * A value to write into a pipeline field, or to match one against: an option
  * label such as a stage (`'Negotiation'`), a person as `'me'`, an email or a
- * `macro|` user id, a number, true/false, a date (`'2026-10-12'`), a list for
+ * `rox|` user id, a number, true/false, a date (`'2026-10-12'`), a list for
  * a field holding several values (in a filter, any of them matches), or
  * `null` to empty the field (in a filter, to match an empty field).
  */
@@ -27,7 +27,7 @@ export type PipelineFieldInput = string | number | boolean | string[] | null;
 /** Pipeline fields by name (case-insensitive), each with what to write or match. */
 export type PipelineFieldInputs = Record<string, PipelineFieldInput>;
 
-/** A stored pipeline field value, tagged with its kind: `labels` for a stage or other select, `references` for people (`macro|` user ids). */
+/** A stored pipeline field value, tagged with its kind: `labels` for a stage or other select, `references` for people (`rox|` user ids). */
 export type PipelineFieldValue = EntryFieldValue;
 
 /** A field of a pipeline as entries and filters name it. */

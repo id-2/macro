@@ -44,8 +44,8 @@ use crate::{
     inbound::axum_router::CrmRouterState,
 };
 
-const USER_ID: &str = "macro|user@example.com";
-const INTERNAL_USER_ID: &str = "macro|acting@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const INTERNAL_USER_ID: &str = "rox|acting@example.com";
 const VALID_TOKEN: &str = "valid";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const COMPANY_ID: &str = "11111111-1111-4111-8111-111111111111";

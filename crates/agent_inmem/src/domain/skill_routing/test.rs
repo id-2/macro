@@ -36,7 +36,7 @@ fn text(message: &ChatMessage) -> &str {
 #[tokio::test]
 async fn only_flagged_owners_route_and_failures_do_not() {
     let owners: Vec<_> = ["enabled", "disabled", "failure"]
-        .map(|name| RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap())
+        .map(|name| RoxUserIdStr::try_from(format!("rox|{name}@example.com")).unwrap())
         .into();
     let mut flags = FakeFeatureFlags::default();
     flags.set(

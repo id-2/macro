@@ -504,7 +504,7 @@ async fn members_can_add_team_blocks_but_only_admins_can_remove_them() {
         recorded,
         vec![(
             member.team_id(),
-            "macro|user@example.com".into(),
+            "rox|user@example.com".into(),
             EmailPrivacyChange::AddDomain {
                 scope: EmailBlockScope::Team,
                 domain: "acme.example.com".into()
@@ -562,7 +562,7 @@ async fn personal_consent_and_exclusions_are_bound_to_the_authenticated_caller()
     assert!(
         calls
             .iter()
-            .all(|(team, user, _)| *team == member.team_id() && user == "macro|user@example.com")
+            .all(|(team, user, _)| *team == member.team_id() && user == "rox|user@example.com")
     );
 }
 
@@ -619,7 +619,7 @@ async fn unconsented_ingestion_stops_before_metadata_or_contact_writes() {
 }
 
 fn receipt_with_role(role: TeamRole) -> CrmTeamReceipt<MemberTeamRole> {
-    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("rox|user@example.com")
         .unwrap()
         .into_owned();
     CrmTeamReceipt::from_team_receipt(
@@ -672,7 +672,7 @@ fn bot_receipt(
 async fn contact_listing_checks_viewer_and_bounds_page_size() {
     let service = service();
     let access = receipt_with_role(TeamRole::Member);
-    let viewer = "macro|user@example.com";
+    let viewer = "rox|user@example.com";
     for (receipt, limit) in [(None, 0), (Some(&access), u16::MAX)] {
         service
             .list_contacts_for_soup(viewer, receipt, contact_query(limit))
@@ -695,7 +695,7 @@ async fn contact_listing_checks_viewer_and_bounds_page_size() {
         ]
     );
     let error = service
-        .list_contacts_for_soup("macro|other@example.com", Some(&access), contact_query(10))
+        .list_contacts_for_soup("rox|other@example.com", Some(&access), contact_query(10))
         .await
         .unwrap_err();
     assert!(matches!(error, CrmError::InvalidRequest(_)));
@@ -765,7 +765,7 @@ async fn contact_listing_restricts_team_bots_and_preserves_hidden_permission() {
 #[tokio::test]
 async fn contact_listing_requires_a_user_bot_to_match_its_acting_user() {
     let service = service();
-    let viewer = "macro|user@example.com";
+    let viewer = "rox|user@example.com";
     let access = bot_receipt(
         uuid::Uuid::from_u128(42),
         BotReceiptScope::User {
@@ -786,7 +786,7 @@ async fn contact_listing_requires_a_user_bot_to_match_its_acting_user() {
         },]
     );
     let error = service
-        .list_contacts_for_soup("macro|other@example.com", Some(&access), contact_query(20))
+        .list_contacts_for_soup("rox|other@example.com", Some(&access), contact_query(20))
         .await
         .unwrap_err();
     assert!(matches!(error, CrmError::InvalidRequest(_)));
@@ -806,7 +806,7 @@ async fn association_uses_the_viewer_scope_and_reports_invisible_records() {
     use crate::domain::association::{CrmAssociation, CrmRecordAssociation};
     let company = uuid::Uuid::from_u128(7);
     let contact = uuid::Uuid::from_u128(8);
-    let viewer = "macro|user@example.com";
+    let viewer = "rox|user@example.com";
     let resolved = CrmRecordAssociation::company(company, vec![contact]);
     let found = CrmServiceImpl::new(
         StubRepo {
@@ -836,7 +836,7 @@ async fn association_uses_the_viewer_scope_and_reports_invisible_records() {
     assert!(matches!(
         found
             .resolve_association(
-                "macro|other@example.com",
+                "rox|other@example.com",
                 Some(&member),
                 CrmAssociation::Company(company)
             )
@@ -865,7 +865,7 @@ async fn activity_edges_use_the_scope_resolve_association_uses() {
     let found = service();
     let types = [EntityType::Task];
     found
-        .activity_property_edges("macro|user@example.com", None, &types)
+        .activity_property_edges("rox|user@example.com", None, &types)
         .await
         .unwrap();
     let team_id = uuid::Uuid::from_u128(42);
@@ -881,7 +881,7 @@ async fn activity_edges_use_the_scope_resolve_association_uses() {
     let member = receipt_with_role(TeamRole::Member);
     assert!(matches!(
         found
-            .activity_property_edges("macro|other@example.com", Some(&member), &types)
+            .activity_property_edges("rox|other@example.com", Some(&member), &types)
             .await,
         Err(CrmError::InvalidRequest(_))
     ));
@@ -1247,7 +1247,7 @@ async fn contact_detail_reads_with_the_receipts_team_and_hidden_scope() {
     let team_id = uuid::Uuid::from_u128(42);
     let contact_id = uuid::Uuid::from_u128(7);
     for role in [TeamRole::Member, TeamRole::Admin] {
-        let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
+        let user = RoxUserIdStr::parse_from_str("rox|user@example.com")
             .unwrap()
             .into_owned();
         let receipt = EntityAccessReceipt::<ViewAccessLevel>::try_new_authenticated_user(

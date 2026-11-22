@@ -401,7 +401,7 @@ fn owner(value: &str) -> Owner {
 
 #[test]
 fn event_actor_user_id_only_maps_authenticated_users() {
-    let user_id = user_id("macro|actor@example.com");
+    let user_id = user_id("rox|actor@example.com");
 
     assert_eq!(
         event_actor_user_id(&EntityAccessAuth::Authenticated(user_id.clone())),
@@ -427,7 +427,7 @@ async fn publish_project_event_records_the_serialized_envelope() {
         "project-id",
         ProjectCreatedMetadata {
             project_id: "project-id".to_string(),
-            owner: owner("macro|owner@example.com"),
+            owner: owner("rox|owner@example.com"),
             name: "Project".to_string(),
             parent_project_id: None,
             created_at: None,
@@ -456,7 +456,7 @@ fn publish_project_event_errors_are_non_fatal() {
         "project-id",
         ProjectCreatedMetadata {
             project_id: "project-id".to_string(),
-            owner: owner("macro|owner@example.com"),
+            owner: owner("rox|owner@example.com"),
             name: "Project".to_string(),
             parent_project_id: None,
             created_at: None,
@@ -496,7 +496,7 @@ fn receipt(
 pub(super) fn basic_project(id: Uuid, parent_id: Option<Uuid>, deleted: bool) -> BasicProject {
     BasicProject {
         id: id.to_string(),
-        user_id: owner("macro|owner@example.com"),
+        user_id: owner("rox|owner@example.com"),
         parent_id: parent_id.map(|id| id.to_string()),
         name: "Project".to_string(),
         deleted_at: deleted.then(chrono::Utc::now),
@@ -510,7 +510,7 @@ where
     mutation_receipt_with_auth(
         project_id,
         access_level,
-        EntityAccessAuth::Authenticated(user_id("macro|owner@example.com")),
+        EntityAccessAuth::Authenticated(user_id("rox|owner@example.com")),
     )
 }
 
@@ -574,8 +574,8 @@ async fn content_attributes_owner_access_to_owned_items() {
     repo.expect_get_project_children().return_once(|_| {
         Box::pin(async {
             Ok(vec![
-                Item::Project(project("owned", "macro|owner@example.com", Some("root"))),
-                Item::Project(project("shared", "macro|other@example.com", Some("root"))),
+                Item::Project(project("owned", "rox|owner@example.com", Some("root"))),
+                Item::Project(project("shared", "rox|other@example.com", Some("root"))),
             ])
         })
     });
@@ -583,7 +583,7 @@ async fn content_attributes_owner_access_to_owned_items() {
 
     let content = service
         .get_project_content(receipt(
-            EntityAccessAuth::Authenticated(user_id("macro|owner@example.com")),
+            EntityAccessAuth::Authenticated(user_id("rox|owner@example.com")),
             AccessLevel::Edit,
         ))
         .await
@@ -616,7 +616,7 @@ async fn content_does_not_attribute_bot_or_team_owned_items_to_the_user() {
 
     let content = service
         .get_project_content(receipt(
-            EntityAccessAuth::Authenticated(user_id("macro|owner@example.com")),
+            EntityAccessAuth::Authenticated(user_id("rox|owner@example.com")),
             AccessLevel::Edit,
         ))
         .await
@@ -633,7 +633,7 @@ async fn content_attributes_owner_access_to_every_item_for_internal_receipts() {
         Box::pin(async {
             Ok(vec![Item::Project(project(
                 "shared",
-                "macro|other@example.com",
+                "rox|other@example.com",
                 Some("root"),
             ))])
         })
@@ -655,19 +655,19 @@ async fn pending_projects_isolate_status_failures_and_root_mismatches() {
         Box::pin(async {
             Ok(vec![
                 ProjectWithUploadRequest {
-                    project: project("failed", "macro|owner@example.com", None),
+                    project: project("failed", "rox|owner@example.com", None),
                     upload_request_id: Some("failed".to_string()),
                 },
                 ProjectWithUploadRequest {
-                    project: project("mismatch", "macro|owner@example.com", None),
+                    project: project("mismatch", "rox|owner@example.com", None),
                     upload_request_id: Some("mismatch".to_string()),
                 },
                 ProjectWithUploadRequest {
-                    project: project("nested", "macro|owner@example.com", Some("root")),
+                    project: project("nested", "rox|owner@example.com", Some("root")),
                     upload_request_id: Some("nested".to_string()),
                 },
                 ProjectWithUploadRequest {
-                    project: project("without-request", "macro|owner@example.com", None),
+                    project: project("without-request", "rox|owner@example.com", None),
                     upload_request_id: None,
                 },
             ])
@@ -678,7 +678,7 @@ async fn pending_projects_isolate_status_failures_and_root_mismatches() {
     let service = service(repo, bulk_upload);
 
     let pending = service
-        .list_pending_projects(user_id("macro|owner@example.com"))
+        .list_pending_projects(user_id("rox|owner@example.com"))
         .await
         .unwrap();
 
@@ -711,7 +711,7 @@ async fn preview_deduplicates_ids_before_calling_repository() {
                 Ok(vec![ProjectPreviewV2::Found(ProjectPreviewData {
                     id: "one".to_string(),
                     name: "One".to_string(),
-                    owner: owner("macro|owner@example.com"),
+                    owner: owner("rox|owner@example.com"),
                     path: Vec::new(),
                     updated_at: None,
                 })])
@@ -721,7 +721,7 @@ async fn preview_deduplicates_ids_before_calling_repository() {
 
     let previews = service
         .get_batch_preview(
-            Some(user_id("macro|owner@example.com")),
+            Some(user_id("rox|owner@example.com")),
             vec!["one".to_string(), "two".to_string(), "one".to_string()],
         )
         .await
@@ -742,7 +742,7 @@ async fn create_uses_grapheme_limit_and_orchestrates_parent_side_effects() {
         .returning(|_| Box::pin(async { Ok(None) }));
     repo.expect_create_project()
         .withf(move |args| {
-            args.owner == owner("macro|owner@example.com")
+            args.owner == owner("rox|owner@example.com")
                 && args.name == expected_name
                 && args.parent_id.as_deref() == Some(parent_id.to_string().as_str())
                 && args.share_permission.link_share.is_none()
@@ -752,7 +752,7 @@ async fn create_uses_grapheme_limit_and_orchestrates_parent_side_effects() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     Some(&parent_id.to_string()),
                 ))
             })
@@ -766,7 +766,7 @@ async fn create_uses_grapheme_limit_and_orchestrates_parent_side_effects() {
 
     service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|owner@example.com")),
+            &CreationPrincipal::User(user_id("rox|owner@example.com")),
             CreateProjectRequest {
                 name: accepted_name,
                 project_parent_id: Some(parent_id),
@@ -776,7 +776,7 @@ async fn create_uses_grapheme_limit_and_orchestrates_parent_side_effects() {
         .unwrap();
     let error = service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|owner@example.com")),
+            &CreationPrincipal::User(user_id("rox|owner@example.com")),
             CreateProjectRequest {
                 name: "👨‍👩‍👧‍👦".repeat(101),
                 project_parent_id: None,
@@ -805,7 +805,7 @@ async fn create_project_publishes_repository_metadata_after_success() {
         Box::pin(async move {
             let mut created = project(
                 &project_id.to_string(),
-                "macro|ignored-repository-owner@example.com",
+                "rox|ignored-repository-owner@example.com",
                 Some(&parent_id.to_string()),
             );
             created.name = "Repository name".to_string();
@@ -826,7 +826,7 @@ async fn create_project_publishes_repository_metadata_after_success() {
 
     let result = service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "Requested name".to_string(),
                 project_parent_id: Some(parent_id),
@@ -842,7 +842,7 @@ async fn create_project_publishes_repository_metadata_after_success() {
     assert_eq!(published[0].key, project_id.to_string());
     let metadata = &published[0].payload["metadata"];
     assert_eq!(metadata["project_id"], project_id.to_string());
-    assert_eq!(metadata["owner"], "macro|actor@example.com");
+    assert_eq!(metadata["owner"], "rox|actor@example.com");
     assert_eq!(metadata["name"], "Repository name");
     assert_eq!(metadata["parent_project_id"], parent_id.to_string());
     assert_eq!(metadata["created_at"], expected_created_at);
@@ -860,7 +860,7 @@ async fn a_project_dated_by_contents_starts_never_edited_and_leaves_its_parent_a
             Box::pin(async move {
                 Ok(project(
                     &Uuid::new_v4().to_string(),
-                    "macro|actor@example.com",
+                    "rox|actor@example.com",
                     Some(&parent_id.to_string()),
                 ))
             })
@@ -875,7 +875,7 @@ async fn a_project_dated_by_contents_starts_never_edited_and_leaves_its_parent_a
 
     service
         .create_project_dated_by_contents(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "Imported".to_string(),
                 project_parent_id: Some(parent_id),
@@ -903,7 +903,7 @@ async fn create_project_failures_publish_no_event() {
 
     let validation_error = service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "x".repeat(101),
                 project_parent_id: None,
@@ -912,7 +912,7 @@ async fn create_project_failures_publish_no_event() {
         .await;
     let repository_error = service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "Project".to_string(),
                 project_parent_id: None,
@@ -935,7 +935,7 @@ async fn create_project_succeeds_when_event_publication_fails() {
         Box::pin(async move {
             Ok(project(
                 &project_id.to_string(),
-                "macro|actor@example.com",
+                "rox|actor@example.com",
                 None,
             ))
         })
@@ -949,7 +949,7 @@ async fn create_project_succeeds_when_event_publication_fails() {
 
     let result = service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "Project".to_string(),
                 project_parent_id: None,
@@ -969,7 +969,7 @@ async fn create_project_resolves_share_permission_from_team_default() {
     let project_id = Uuid::new_v4();
     let mut repo = MockProjectRepo::new();
     repo.expect_get_team_default_link_share()
-        .withf(|owner| owner == &Owner::User(user_id("macro|actor@example.com")))
+        .withf(|owner| owner == &Owner::User(user_id("rox|actor@example.com")))
         .returning(|_| Box::pin(async { Ok(Some(TeamLinkShareDefault(Some(LinkShare::Team)))) }));
     repo.expect_create_project()
         .withf(|args| {
@@ -980,7 +980,7 @@ async fn create_project_resolves_share_permission_from_team_default() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|actor@example.com",
+                    "rox|actor@example.com",
                     None,
                 ))
             })
@@ -989,7 +989,7 @@ async fn create_project_resolves_share_permission_from_team_default() {
 
     service
         .create_project(
-            &CreationPrincipal::User(user_id("macro|actor@example.com")),
+            &CreationPrincipal::User(user_id("rox|actor@example.com")),
             CreateProjectRequest {
                 name: "Project".to_string(),
                 project_parent_id: None,
@@ -1107,7 +1107,7 @@ async fn edit_project_publishes_requested_update_metadata() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     None,
                 ))
             })
@@ -1151,8 +1151,8 @@ async fn edit_project_publishes_requested_update_metadata() {
         assert_eq!(published[0].payload["event_type"], "project.updated");
         let metadata = &published[0].payload["metadata"];
         assert_eq!(metadata["project_id"], project_id.to_string());
-        assert_eq!(metadata["owner"], "macro|owner@example.com");
-        assert_eq!(metadata["actor_user_id"], "macro|owner@example.com");
+        assert_eq!(metadata["owner"], "rox|owner@example.com");
+        assert_eq!(metadata["actor_user_id"], "rox|owner@example.com");
         assert_eq!(metadata["name"], serde_json::json!(case.name));
         assert_eq!(
             metadata["previous_parent_id"],
@@ -1321,7 +1321,7 @@ async fn edit_project_succeeds_when_event_publication_fails() {
         Box::pin(async move {
             Ok(project(
                 &project_id.to_string(),
-                "macro|owner@example.com",
+                "rox|owner@example.com",
                 None,
             ))
         })
@@ -1369,7 +1369,7 @@ async fn owner_edit_propagates_move_and_updates_all_modified_timestamps() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     Some(&new_parent_id.to_string()),
                 ))
             })
@@ -1425,7 +1425,7 @@ async fn sharing_a_nested_project_keeps_what_it_inherits_from_its_parent() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     Some(&parent_id.to_string()),
                 ))
             })
@@ -1464,7 +1464,7 @@ async fn empty_parent_clears_persistence_and_eam_parent_argument() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     None,
                 ))
             })
@@ -1500,7 +1500,7 @@ async fn edit_name_limit_counts_unicode_graphemes() {
         Box::pin(async move {
             Ok(project(
                 &project_id.to_string(),
-                "macro|owner@example.com",
+                "rox|owner@example.com",
                 None,
             ))
         })
@@ -1587,8 +1587,8 @@ async fn soft_delete_updates_parent_timestamp_and_publishes_event() {
     assert_project_event(&published[0], project_id, "project.deleted");
     let metadata = &published[0].payload["metadata"];
     assert_eq!(metadata["project_id"], project_id.to_string());
-    assert_eq!(metadata["owner"], "macro|owner@example.com");
-    assert_eq!(metadata["actor_user_id"], "macro|owner@example.com");
+    assert_eq!(metadata["owner"], "rox|owner@example.com");
+    assert_eq!(metadata["actor_user_id"], "rox|owner@example.com");
     assert_eq!(metadata["parent_project_id"], parent_id.to_string());
     assert_eq!(
         metadata["deleted_project_ids"],
@@ -1695,7 +1695,7 @@ async fn revert_publishes_every_restored_project_in_event() {
     assert_project_event(&published[0], project_id, "project.restored");
     let metadata = &published[0].payload["metadata"];
     assert_eq!(metadata["project_id"], project_id.to_string());
-    assert_eq!(metadata["owner"], "macro|owner@example.com");
+    assert_eq!(metadata["owner"], "rox|owner@example.com");
     assert!(metadata["actor_user_id"].is_null());
     assert_eq!(metadata["parent_project_id"], parent_id.to_string());
     assert_eq!(
@@ -1838,7 +1838,7 @@ async fn missing_full_project_maps_to_not_found() {
 
     let error = service
         .get_project(receipt(
-            EntityAccessAuth::Authenticated(user_id("macro|owner@example.com")),
+            EntityAccessAuth::Authenticated(user_id("rox|owner@example.com")),
             AccessLevel::View,
         ))
         .await
@@ -2042,12 +2042,12 @@ async fn upload_extract_status_reports_the_owners_request() {
     let service = service(
         MockProjectRepo::new(),
         StoredUploadRequest {
-            owner: Some("macro|owner@example.com"),
+            owner: Some("rox|owner@example.com"),
         },
     );
 
     let status = service
-        .get_upload_extract_status(user_id("macro|owner@example.com"), "request-1")
+        .get_upload_extract_status(user_id("rox|owner@example.com"), "request-1")
         .await
         .unwrap();
 
@@ -2070,7 +2070,7 @@ async fn upload_extract_status_hides_another_users_request() {
     let service = service(
         MockProjectRepo::new(),
         StoredUploadRequest {
-            owner: Some("macro|owner@example.com"),
+            owner: Some("rox|owner@example.com"),
         },
     );
 
@@ -2086,7 +2086,7 @@ async fn upload_extract_status_of_a_missing_request_is_not_found() {
     let service = service(MockProjectRepo::new(), StoredUploadRequest { owner: None });
 
     let result = service
-        .get_upload_extract_status(user_id("macro|owner@example.com"), "request-1")
+        .get_upload_extract_status(user_id("rox|owner@example.com"), "request-1")
         .await;
 
     assert!(matches!(result, Err(ProjectError::NotFound(_))));
@@ -2096,7 +2096,7 @@ fn upload_document(id: &str, file_type: FileType) -> DocumentMetadata {
     DocumentMetadata::new_document(
         id,
         7,
-        model_owner::Owner::User(user_id("macro|owner@example.com")),
+        model_owner::Owner::User(user_id("rox|owner@example.com")),
         id,
         Some(file_type),
         "0123456789abcdef",
@@ -2166,8 +2166,8 @@ async fn permanent_delete_runs_external_work_after_committed_purge() {
     assert_project_event(&published[0], project_id, "project.permanently_deleted");
     let metadata = &published[0].payload["metadata"];
     assert_eq!(metadata["project_id"], project_id.to_string());
-    assert_eq!(metadata["owner"], "macro|owner@example.com");
-    assert_eq!(metadata["actor_user_id"], "macro|owner@example.com");
+    assert_eq!(metadata["owner"], "rox|owner@example.com");
+    assert_eq!(metadata["actor_user_id"], "rox|owner@example.com");
     assert_eq!(metadata["parent_project_id"], parent_id.to_string());
     assert_eq!(
         metadata["purged_project_ids"],
@@ -2288,7 +2288,7 @@ async fn mark_projects_uploaded_publishes_root_metadata_and_returns_subtree_ids(
                 Ok(MarkedUploadedTree {
                     id: root_project_id.to_string(),
                     name: "Uploaded tree".to_string(),
-                    user_id: user_id("macro|owner@example.com"),
+                    user_id: user_id("rox|owner@example.com"),
                     parent_id: Some("parent-project".to_string()),
                     project_ids,
                     upload_pending_transitioned: true,
@@ -2315,7 +2315,7 @@ async fn mark_projects_uploaded_publishes_root_metadata_and_returns_subtree_ids(
         published[0].payload["metadata"],
         serde_json::json!({
             "root_project_id": root_project_id,
-            "owner": "macro|owner@example.com",
+            "owner": "rox|owner@example.com",
             "name": "Uploaded tree",
             "parent_project_id": "parent-project",
             "project_ids": expected_project_ids,
@@ -2333,7 +2333,7 @@ async fn repeated_mark_projects_uploaded_returns_subtree_ids_without_publishing(
             Ok(MarkedUploadedTree {
                 id: "root-project".to_string(),
                 name: "Uploaded tree".to_string(),
-                user_id: user_id("macro|owner@example.com"),
+                user_id: user_id("rox|owner@example.com"),
                 parent_id: None,
                 project_ids,
                 upload_pending_transitioned: false,
@@ -2391,7 +2391,7 @@ async fn mark_projects_uploaded_publication_failure_is_non_fatal() {
             Ok(MarkedUploadedTree {
                 id: "root-project".to_string(),
                 name: "Uploaded tree".to_string(),
-                user_id: user_id("macro|owner@example.com"),
+                user_id: user_id("rox|owner@example.com"),
                 parent_id: None,
                 project_ids: vec!["root-project".to_string(), "child-project".to_string()],
                 upload_pending_transitioned: true,
@@ -2421,7 +2421,7 @@ async fn upload_folder_publishes_uploaded_event() {
         .returning(|_| Box::pin(async { Ok(None) }));
     repo.expect_upload_folder()
         .withf(|args| {
-            args.user_id.as_ref() == "macro|owner@example.com"
+            args.user_id.as_ref() == "rox|owner@example.com"
                 && args.root_folder_name == "Uploaded tree"
                 && args.upload_request_id == "request"
                 && args.parent_id.as_deref() == Some("parent-project")
@@ -2459,7 +2459,7 @@ async fn upload_folder_publishes_uploaded_event() {
 
     service
         .upload_folder(
-            user_id("macro|owner@example.com"),
+            user_id("rox|owner@example.com"),
             false,
             UploadFolderRequest {
                 content: vec![FolderItem {
@@ -2489,7 +2489,7 @@ async fn upload_folder_publishes_uploaded_event() {
         published[0].payload["metadata"],
         serde_json::json!({
             "root_project_id": "root-project",
-            "owner": "macro|owner@example.com",
+            "owner": "rox|owner@example.com",
             "name": "Uploaded tree",
             "parent_project_id": "parent-project",
             "project_ids": expected_project_ids,
@@ -2520,7 +2520,7 @@ async fn upload_folder_with_no_project_ids_publishes_no_event() {
 
     service
         .upload_folder(
-            user_id("macro|owner@example.com"),
+            user_id("rox|owner@example.com"),
             false,
             UploadFolderRequest {
                 content: Vec::new(),
@@ -2575,7 +2575,7 @@ async fn upload_folder_compensates_after_destination_failure() {
 
     let result = service
         .upload_folder(
-            user_id("macro|owner@example.com"),
+            user_id("rox|owner@example.com"),
             false,
             UploadFolderRequest {
                 content: vec![FolderItem {
@@ -2621,7 +2621,7 @@ async fn upload_extract_uses_fixed_request_id() {
 
     let response = service
         .create_upload_extract_request(
-            user_id("macro|owner@example.com"),
+            user_id("rox|owner@example.com"),
             UploadExtractFolderRequest {
                 sha: "0123456789abcdef".to_string(),
                 name: Some("Upload".to_string()),
@@ -2637,11 +2637,11 @@ async fn upload_extract_uses_fixed_request_id() {
 
 use models_permissions::share_permission::team_share::{TeamShareFacts, TeamShareLevel};
 
-const OTHER_USER: &str = "macro|other@example.com";
+const OTHER_USER: &str = "rox|other@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 
 fn owner_user() -> RoxUserIdStr<'static> {
-    user_id("macro|owner@example.com")
+    user_id("rox|owner@example.com")
 }
 
 fn team_share_facts(
@@ -2683,7 +2683,7 @@ async fn edit_without_team_share_field_does_not_load_facts_or_send_command() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     None,
                 ))
             })
@@ -2737,7 +2737,7 @@ async fn edit_with_team_share_level_forwards_authorized_command() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     None,
                 ))
             })
@@ -2787,7 +2787,7 @@ async fn edit_with_team_share_null_forwards_clear_command() {
             Box::pin(async move {
                 Ok(project(
                     &project_id.to_string(),
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                     None,
                 ))
             })

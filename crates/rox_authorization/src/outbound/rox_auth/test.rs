@@ -10,7 +10,7 @@ use rootcause::Report;
 
 use super::*;
 
-const ROX_USER_ID: &str = "macro|user@example.com";
+const ROX_USER_ID: &str = "rox|user@example.com";
 const FUSION_USER_ID: &str = "fusion-user-id";
 
 fn unix_timestamp() -> usize {

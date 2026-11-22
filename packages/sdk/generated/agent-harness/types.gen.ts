@@ -23,7 +23,7 @@ export type ActivityWireRow = {
      */
     action_payload?: unknown;
     /**
-     * Who mechanically acted, as a principal string (`macro|…` / `bot|…`).
+     * Who mechanically acted, as a principal string (`rox|…` / `bot|…`).
      */
     actor_id: string;
     /**

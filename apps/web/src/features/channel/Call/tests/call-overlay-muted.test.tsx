@@ -836,7 +836,7 @@ it.each(['speaker', 'sidebar'] as const)(
 );
 
 describe('CallOverlay Work', () => {
-  const account = 'macro|agent@example.com';
+  const account = 'rox|agent@example.com';
   const row: WorkItem = {
     registrationId: 'registration-1',
     accountId: account,

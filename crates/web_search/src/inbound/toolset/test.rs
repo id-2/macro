@@ -49,7 +49,7 @@ impl UsageRecorder for Recorder {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|web-tool@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|web-tool@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

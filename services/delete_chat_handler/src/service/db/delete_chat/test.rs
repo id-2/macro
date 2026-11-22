@@ -14,7 +14,7 @@ async fn delete_chat_removes_entity_row(pool: Pool<Postgres>) {
         VALUES ($1, $2)
         RETURNING id
         "#,
-        "macro|test@example.com",
+        "rox|test@example.com",
         "Retention Chat",
     )
     .fetch_one(&pool)
@@ -29,7 +29,7 @@ async fn delete_chat_removes_entity_row(pool: Pool<Postgres>) {
         "#,
     )
     .bind(chat_uuid)
-    .bind("macro|test@example.com")
+    .bind("rox|test@example.com")
     .execute(&pool)
     .await
     .unwrap();

@@ -159,7 +159,7 @@ fn every_atom_form_and_literal_kind() {
         select name from crm.deals
         where stage not in ('Lost')
           and tags has 'vip'
-          and assignees not has 'macro|a@b.com'
+          and assignees not has 'rox|a@b.com'
           and closed_at is null
           and name like 'A%'
           and notes not like '%draft%'
@@ -206,7 +206,7 @@ fn every_atom_form_and_literal_kind() {
                     table: None,
                     column: Identifier("assignees".into()),
                 },
-                value: Literal::Text("macro|a@b.com".into()),
+                value: Literal::Text("rox|a@b.com".into()),
                 negated: true,
             },
             Condition::IsNull {
@@ -723,7 +723,7 @@ fn an_update_can_copy_another_column_of_the_row() {
 
 #[test]
 fn list_values_default_values_and_limit_offset() {
-    let sql = "UPDATE crm.deals SET tags = ['vip', 'renewal'], owner = ['macro|sam@example.com'] WHERE row_id = '00000000-0000-0000-0000-0000000000a1'";
+    let sql = "UPDATE crm.deals SET tags = ['vip', 'renewal'], owner = ['rox|sam@example.com'] WHERE row_id = '00000000-0000-0000-0000-0000000000a1'";
     let expected = Statement::Update(Update {
         table: TableName {
             database: Some(Identifier("crm".into())),
@@ -740,7 +740,7 @@ fn list_values_default_values_and_limit_offset() {
             (
                 Identifier("owner".into()),
                 SetValue::Literal(Literal::List(vec![Literal::Text(
-                    "macro|sam@example.com".into(),
+                    "rox|sam@example.com".into(),
                 )])),
             ),
         ],

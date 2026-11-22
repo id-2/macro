@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn resolves_only_the_typed_owners_audience() {
-    let user = Owner::from_principal_str("macro|owner@example.com").unwrap();
+    let user = Owner::from_principal_str("rox|owner@example.com").unwrap();
     let bot = Owner::from_principal_str("bot|00000000-0000-0000-0000-000000000001").unwrap();
     let team = Uuid::from_u128(2);
     let other = Uuid::from_u128(3);

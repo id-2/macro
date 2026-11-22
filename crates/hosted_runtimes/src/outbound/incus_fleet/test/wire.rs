@@ -139,7 +139,7 @@ async fn a_retried_create_reuses_the_data_volume_an_earlier_attempt_made() {
             start: false,
         }),
         harness_id: None,
-        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
         created_at: "2026-11-05T10:00:00Z".parse().unwrap(),
         enrolled_at: None,
         setup_completed_at: None,

@@ -8,7 +8,7 @@ use rootcause::Report;
 use super::*;
 use crate::domain::service::AGENT_TEAMMATES_FLAG;
 
-const ADMIN: &str = "macro|admin@example.com";
+const ADMIN: &str = "rox|admin@example.com";
 const TEAM: &str = "0193a1b2-0000-7000-8000-0000000000aa";
 
 /// One voice, and every sample it was asked for.

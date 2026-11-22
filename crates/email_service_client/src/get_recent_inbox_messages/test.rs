@@ -9,7 +9,7 @@ use wiremock::{
 async fn asks_for_one_users_messages_with_internal_auth() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
-        .and(path("/internal/recent_messages/macro|owner@example.com"))
+        .and(path("/internal/recent_messages/rox|owner@example.com"))
         .and(query_param("limit", "20"))
         .and(header("x-internal-auth-key", "internal-key"))
         .respond_with(
@@ -29,7 +29,7 @@ async fn asks_for_one_users_messages_with_internal_auth() {
     let client = EmailServiceClient::new("internal-key".to_owned(), server.uri());
 
     let response = client
-        .get_recent_inbox_messages("macro|owner@example.com", 20)
+        .get_recent_inbox_messages("rox|owner@example.com", 20)
         .await
         .unwrap();
 
@@ -47,7 +47,7 @@ async fn an_error_status_fails_the_call() {
     let client = EmailServiceClient::new("internal-key".to_owned(), server.uri());
 
     let result = client
-        .get_recent_inbox_messages("macro|owner@example.com", 20)
+        .get_recent_inbox_messages("rox|owner@example.com", 20)
         .await;
 
     assert!(result.is_err());
@@ -57,7 +57,7 @@ async fn an_error_status_fails_the_call() {
 async fn asks_for_longer_snippets_and_reads_labels() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
-        .and(path("/internal/recent_messages/macro|owner@example.com"))
+        .and(path("/internal/recent_messages/rox|owner@example.com"))
         .and(query_param("limit", "100"))
         .and(query_param("snippet_chars", "500"))
         .respond_with(
@@ -78,7 +78,7 @@ async fn asks_for_longer_snippets_and_reads_labels() {
     let client = EmailServiceClient::new("internal-key".to_owned(), server.uri());
 
     let response = client
-        .get_recent_inbox_messages_with_snippets("macro|owner@example.com", 100, Some(500))
+        .get_recent_inbox_messages_with_snippets("rox|owner@example.com", 100, Some(500))
         .await
         .unwrap();
 

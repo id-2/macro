@@ -16,7 +16,7 @@ impl Fixture {
         let repository = Arc::new(FakeRepository::new());
         let provider = Arc::new(FakeProvider::new());
         let actor = Actor {
-            user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
+            user_id: RoxUserIdStr::parse_from_str("rox|creator@example.com")
                 .unwrap()
                 .into_owned(),
         };

@@ -59,7 +59,7 @@ impl ChannelEventDispatcher for Events {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|person@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

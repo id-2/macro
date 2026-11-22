@@ -5,7 +5,7 @@ import { createRequestComposer } from './request-composer';
 
 const pending = {
   id: 'request',
-  requesterId: 'macro|reader@test.com',
+  requesterId: 'rox|reader@test.com',
   requestedLevel: 'comment' as const,
   status: 'pending' as const,
   revision: 3,

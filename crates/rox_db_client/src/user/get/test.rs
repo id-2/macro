@@ -14,7 +14,7 @@ async fn test_get_user_rox_user_id_and_id_by_email_success(pool: Pool<Postgres>)
         rox_user_id,
         uuid::Uuid::parse_str("a1111111-1111-1111-1111-111111111111").unwrap()
     );
-    assert_eq!(id, "macro|user@user.com");
+    assert_eq!(id, "rox|user@user.com");
 }
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("users")))]
@@ -31,7 +31,7 @@ async fn get_user_profile_by_fusionauth_user_id_and_email_matches_email_case_ins
     let fusionauth_user_id = uuid::Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
-           VALUES ($1, 'macro|support@external.test', 'Support@External.Test', 'cus_test')"#,
+           VALUES ($1, 'rox|support@external.test', 'Support@External.Test', 'cus_test')"#,
         fusionauth_user_id,
     )
     .execute(&pool)
@@ -39,7 +39,7 @@ async fn get_user_profile_by_fusionauth_user_id_and_email_matches_email_case_ins
 
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-           VALUES ('macro|support@external.test', 'Support@External.Test', $1)"#,
+           VALUES ('rox|support@external.test', 'Support@External.Test', $1)"#,
         fusionauth_user_id,
     )
     .execute(&pool)
@@ -54,7 +54,7 @@ async fn get_user_profile_by_fusionauth_user_id_and_email_matches_email_case_ins
 
     assert_eq!(
         profile,
-        Some(("macro|support@external.test".to_string(), None))
+        Some(("rox|support@external.test".to_string(), None))
     );
 
     Ok(())

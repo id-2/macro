@@ -11,8 +11,8 @@ async fn notification_delete_trigger_notifies_affected_users(pool: sqlx::Pool<Po
     receiver.listener().await.unwrap();
 
     let notification_id = Uuid::new_v4();
-    let user_a = "macro|notify-a@test.com";
-    let user_b = "macro|notify-b@test.com";
+    let user_a = "rox|notify-a@test.com";
+    let user_b = "rox|notify-b@test.com";
 
     sqlx::query(
         r#"

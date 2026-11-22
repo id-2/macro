@@ -103,7 +103,7 @@ mod tests {
             r#"
             SELECT "createdAt" as created_at, "updatedAt" as updated_at FROM "UserHistory" WHERE "userId" = $1 AND "itemId" = $2
             "#,
-            "macro|user@user.com",
+            "rox|user@user.com",
             "document-one"
         )
         .fetch_one(&pool)
@@ -120,7 +120,7 @@ mod tests {
         sqlx::query!(
             r#"
             INSERT INTO "Project" ("id", "name", "userId", "deletedAt")
-            VALUES ('p1', 'd', 'macro|user@user.com', '2019-10-16 00:00:00')
+            VALUES ('p1', 'd', 'rox|user@user.com', '2019-10-16 00:00:00')
             "#
         )
         .execute(&pool)
@@ -159,7 +159,7 @@ mod tests {
         sqlx::query!(
             r#"
             INSERT INTO "Project" ("id", "name", "userId")
-            VALUES ('p1', 'd', 'macro|user@user.com')
+            VALUES ('p1', 'd', 'rox|user@user.com')
             "#
         )
         .execute(&pool)
@@ -198,7 +198,7 @@ mod tests {
         sqlx::query(
             r#"
             INSERT INTO "Document" (id, name, "fileType", owner, "deletedAt")
-            VALUES ($1, 'uuid-doc', 'md', 'macro|user@user.com', NOW())
+            VALUES ($1, 'uuid-doc', 'md', 'rox|user@user.com', NOW())
             "#,
         )
         .bind(document_id.to_string())
@@ -212,7 +212,7 @@ mod tests {
                 document_id,
                 entity_registry_db_utils::RegisteredEntityType::Document,
                 model_owner::Owner::User(
-                    rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")?
+                    rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")?
                         .into_owned(),
                 ),
             ),
@@ -245,7 +245,7 @@ mod tests {
         sqlx::query(
             r#"
             INSERT INTO "Document" (id, name, "fileType", owner, "deletedAt")
-            VALUES ($1, 'uuid-doc', 'md', 'macro|user@user.com', NOW())
+            VALUES ($1, 'uuid-doc', 'md', 'rox|user@user.com', NOW())
             "#,
         )
         .bind(document_id.to_string())

@@ -25,8 +25,8 @@ use crate::domain::{
 };
 
 pub(super) const INTERNAL_KEY: &str = "valid-internal-key";
-pub(super) const USER_ID: &str = "macro|user@example.com";
-pub(super) const BOT_ACTING_USER_ID: &str = "macro|bot-acting-user@example.com";
+pub(super) const USER_ID: &str = "rox|user@example.com";
+pub(super) const BOT_ACTING_USER_ID: &str = "rox|bot-acting-user@example.com";
 pub(super) const BOT_ACTING_USER_ORGANIZATION_ID: i32 = 42;
 pub(super) const BOT_ID: BotId = BotId::new_from_uuid(Uuid::from_u128(1));
 pub(super) const BOT_TEAM_ID: Uuid = Uuid::from_u128(3);

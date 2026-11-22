@@ -6,7 +6,7 @@ use cache_core::{
 use serde_json::{Map, Value, json};
 
 const QUERY: &str = include_str!("test/rows.graphql");
-const VIEWER: &str = "macro|viewer@databases.test";
+const VIEWER: &str = "rox|viewer@databases.test";
 const DEALS: &str = "7ab00000-0000-0000-0000-000000000001";
 const CONTACTS: &str = "7ab00000-0000-0000-0000-000000000002";
 const STAGE: &str = "5e1ec700-0000-0000-0000-000000000001";
@@ -85,7 +85,7 @@ fn a_tables_rows_are_answered_from_the_cache_and_pick_up_a_new_row() {
                         "__typename": "GraphqlSoupDatabaseRow", "id": DEAL_1, "isFavorited": false,
                         "cacheProjection": null, "notifications": [],
                         "tableId": DEALS, "databaseId": "db000000-0000-0000-0000-000000000001",
-                        "ownerId": "macro|owner@databases.test",
+                        "ownerId": "rox|owner@databases.test",
                         "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z",
                         "properties": [{
                             "id": "e0000000-0000-0000-0000-000000000001", "propertyDefinitionId": STAGE,
@@ -96,7 +96,7 @@ fn a_tables_rows_are_answered_from_the_cache_and_pick_up_a_new_row() {
                         "__typename": "GraphqlSoupDatabaseRow", "id": DEAL_2, "isFavorited": false,
                         "cacheProjection": null, "notifications": [],
                         "tableId": DEALS, "databaseId": "db000000-0000-0000-0000-000000000001",
-                        "ownerId": "macro|owner@databases.test",
+                        "ownerId": "rox|owner@databases.test",
                         "createdAt": "2026-01-02T00:00:00Z", "updatedAt": "2026-01-02T00:00:00Z",
                         "properties": [{
                             "id": "e0000000-0000-0000-0000-000000000002", "propertyDefinitionId": STAGE,
@@ -107,7 +107,7 @@ fn a_tables_rows_are_answered_from_the_cache_and_pick_up_a_new_row() {
                         "__typename": "GraphqlSoupDatabaseRow", "id": CONTACT, "isFavorited": false,
                         "cacheProjection": null, "notifications": [],
                         "tableId": CONTACTS, "databaseId": "db000000-0000-0000-0000-000000000001",
-                        "ownerId": "macro|owner@databases.test",
+                        "ownerId": "rox|owner@databases.test",
                         "createdAt": "2026-01-04T00:00:00Z", "updatedAt": "2026-01-04T00:00:00Z",
                         "properties": [],
                     }
@@ -162,7 +162,7 @@ fn a_tables_rows_are_answered_from_the_cache_and_pick_up_a_new_row() {
                         "__typename": "GraphqlSoupDatabaseRow", "id": DEAL_3, "isFavorited": false,
                         "cacheProjection": null, "notifications": [],
                         "tableId": DEALS, "databaseId": "db000000-0000-0000-0000-000000000001",
-                        "ownerId": "macro|owner@databases.test",
+                        "ownerId": "rox|owner@databases.test",
                         "createdAt": "2026-01-03T00:00:00Z", "updatedAt": "2026-01-03T00:00:00Z",
                         "properties": [{
                             "id": "e0000000-0000-0000-0000-000000000003", "propertyDefinitionId": STAGE,

@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ startAddInbox: vi.fn() }));
 
-const [userId, setUserId] = createSignal<string | undefined>('macro|self');
+const [userId, setUserId] = createSignal<string | undefined>('rox|self');
 const [links, setLinks] = createSignal<EmailLink[]>([]);
 
 vi.mock(
@@ -49,7 +49,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    rox_id: 'macro|self',
+    rox_id: 'rox|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: true,
     needs_reauth: false,
@@ -71,7 +71,7 @@ function renderPrompt() {
 beforeEach(() => {
   mocks.startAddInbox.mockResolvedValue(undefined);
   localStorage.clear();
-  setUserId('macro|self');
+  setUserId('rox|self');
   setLinks([]);
 });
 
@@ -85,7 +85,7 @@ describe('CalendarPermissionPrompt', () => {
     const user = userEvent.setup();
     setLinks([
       link('own'),
-      link('delegated', { rox_id: 'macro|someone-else' }),
+      link('delegated', { rox_id: 'rox|someone-else' }),
     ]);
     renderPrompt();
 
@@ -110,7 +110,7 @@ describe('CalendarPermissionPrompt', () => {
   it('stays quiet when the only inbox missing calendar is delegated', () => {
     setLinks([
       link('own', { needs_calendar_permission: false }),
-      link('delegated', { rox_id: 'macro|someone-else' }),
+      link('delegated', { rox_id: 'rox|someone-else' }),
     ]);
     renderPrompt();
 
@@ -123,7 +123,7 @@ describe('CalendarPermissionPrompt', () => {
     setLinks([link('own')]);
     renderPrompt();
 
-    setUserId('macro|self');
+    setUserId('rox|self');
 
     expect(screen.queryByRole('status')).toBeNull();
     expect(JSON.parse(localStorage.getItem(PERSIST_KEY) ?? '[]')).toEqual([

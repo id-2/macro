@@ -10,8 +10,8 @@ use cache_core::{
 use serde_json::json;
 use uuid::Uuid;
 
-const VIEWER: &str = "macro|viewer@example.com";
-const PERSON: &str = "macro|person@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
+const PERSON: &str = "rox|person@example.com";
 /// Enumerate and verify a large corpus in bounded keyset windows. Deleting one
 /// tenth must not skip the following keys or leave stale relational projections.
 pub async fn verify<S: Storage>(
@@ -282,7 +282,7 @@ pub async fn contract<S: Storage>(storage: S) -> S {
         ContactReconcile {
             scope: scope.clone(),
             fence: fresh.fence,
-            viewer: "macro|other@example.com".into(),
+            viewer: "rox|other@example.com".into(),
             requested: vec![PERSON.try_into().unwrap()],
             present: vec![],
         },

@@ -30,9 +30,9 @@ const VALID_BEARER_TOKEN: &str = "valid-token";
 const INVALID_BEARER_TOKEN: &str = "invalid-token";
 const EXPIRED_BEARER_TOKEN: &str = "expired-token";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
-const BEARER_USER_ID: &str = "macro|bearer@example.com";
-const ACTING_USER_ID: &str = "macro|acting@example.com";
-const DEFAULT_USER_ID: &str = "macro|default@example.com";
+const BEARER_USER_ID: &str = "rox|bearer@example.com";
+const ACTING_USER_ID: &str = "rox|acting@example.com";
+const DEFAULT_USER_ID: &str = "rox|default@example.com";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum ServiceCall {

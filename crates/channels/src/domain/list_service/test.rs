@@ -28,7 +28,7 @@ impl AggregateFrecencyStorage for PanicFrecencyStorage {
 
 #[tokio::test]
 async fn skips_frecency_lookup_when_not_requested() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let scores = get_channel_frecency(&PanicFrecencyStorage, false, user_id, &[])
         .await
         .unwrap();

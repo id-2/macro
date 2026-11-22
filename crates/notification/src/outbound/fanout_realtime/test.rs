@@ -37,8 +37,8 @@ fn user(id: &str) -> RoxUserIdStr<'static> {
 async fn sends_through_both_adapters_and_combines_receipts() {
     let first_calls = Arc::new(Mutex::new(Vec::new()));
     let second_calls = Arc::new(Mutex::new(Vec::new()));
-    let first_user = user("macro|first@example.com");
-    let second_user = user("macro|second@example.com");
+    let first_user = user("rox|first@example.com");
+    let second_user = user("rox|second@example.com");
     let sender = FanoutRealtimeSender::new(
         RecordingSender {
             calls: first_calls.clone(),
@@ -59,8 +59,8 @@ async fn sends_through_both_adapters_and_combines_receipts() {
         .expect("both sends succeed");
 
     assert_eq!(delivered.len(), 2);
-    assert!(delivered.contains(&user("macro|first@example.com")));
-    assert!(delivered.contains(&user("macro|second@example.com")));
+    assert!(delivered.contains(&user("rox|first@example.com")));
+    assert!(delivered.contains(&user("rox|second@example.com")));
     assert_eq!(
         first_calls.lock().expect("first calls lock").as_slice(),
         &[notification.clone()]
@@ -90,7 +90,7 @@ async fn attempts_both_adapters_when_one_fails() {
 
     sender
         .send_notifications(
-            &[user("macro|recipient@example.com")],
+            &[user("rox|recipient@example.com")],
             &serde_json::json!({ "kind": "test" }),
         )
         .await

@@ -35,7 +35,7 @@ fn mention_bot_id(entity_id: &str) -> Option<BotId> {
 }
 
 /// Whether a `user`-tagged mention actually targets a bot (and so must not be
-/// treated as a user recipient). Real user ids are `macro|<email>` strings,
+/// treated as a user recipient). Real user ids are `rox|<email>` strings,
 /// never `bot|<uuid>` principals, so this only matches the Rox AI bot
 /// surfaced through the user-mention UI.
 fn is_bot_user_mention(mention: &SimpleMention) -> bool {

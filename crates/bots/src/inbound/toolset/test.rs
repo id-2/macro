@@ -37,7 +37,7 @@ use std::sync::{
 };
 use uuid::Uuid;
 
-const TEST_USER_ID: &str = "macro|bot-manager@example.com";
+const TEST_USER_ID: &str = "rox|bot-manager@example.com";
 
 fn user_id() -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid macro user id")
@@ -438,7 +438,7 @@ fn bot_summary_preserves_team_scope_and_profile() {
         handle: "build-bot".to_string(),
         description: Some("Builds things".to_string()),
         avatar_url: Some("https://static.example/bot.png".to_string()),
-        created_by: Some("macro|owner@example.com".to_string()),
+        created_by: Some("rox|owner@example.com".to_string()),
         created_at: now,
         updated_at: now,
         deleted_at: None,

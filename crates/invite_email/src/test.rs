@@ -153,14 +153,14 @@ fn team_invite_rate_limit_key_is_per_invite() {
 fn colleague_joined_serde_round_trip_keeps_the_wire_shape() {
     let wire = serde_json::json!({
         "team_name": "Acme",
-        "joined_by": "macro|alice@example.com",
+        "joined_by": "rox|alice@example.com",
         "joined_name": "Alice Example",
         "recipient_email": "bob@example.com",
     });
     assert_eq!(serde_json::to_value(make_colleague_joined()).unwrap(), wire);
     let parsed: ColleagueJoinedMacro = serde_json::from_value(wire).unwrap();
     assert_eq!(parsed.team_name, "Acme");
-    assert_eq!(parsed.joined_by.to_string(), "macro|alice@example.com");
+    assert_eq!(parsed.joined_by.to_string(), "rox|alice@example.com");
     assert_eq!(parsed.joined_name.as_deref(), Some("Alice Example"));
     assert_eq!(String::from(parsed.recipient_email), "bob@example.com");
 }
@@ -271,11 +271,11 @@ fn invite_email_escapes_message_content_and_channel_names() {
 fn legacy_channel_invites_default_to_channel_wording() {
     for wire in [
         serde_json::json!({
-            "invitedBy": "macro|sender@example.com",
+            "invitedBy": "rox|sender@example.com",
             "channelName": "general",
         }),
         serde_json::json!({
-            "invited_by": "macro|sender@example.com",
+            "invited_by": "rox|sender@example.com",
             "channel_name": "general",
         }),
     ] {
@@ -699,7 +699,7 @@ fn team_invite_sent_before_plans_were_recorded_reads_as_free() {
         "team_name": "Acme",
         "team_id": "00000000-0000-0000-0000-000000000001",
         "team_invite_id": "00000000-0000-0000-0000-00000000000a",
-        "invited_by": "macro|alice@example.com",
+        "invited_by": "rox|alice@example.com",
         "role": null,
     });
 

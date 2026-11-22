@@ -50,7 +50,7 @@ impl McpServerStore for FakeServerStore {
 }
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned()
 }

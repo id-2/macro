@@ -12,43 +12,43 @@ fn print_contacts_message(users: HashSet<RoxUserIdStr<'static>>) {
 
 async fn genmsg_add_user_to_group() {
     let mut users: HashSet<RoxUserIdStr<'static>> = [
-        "macro|alice@rox.one",
-        "macro|bob@rox.one",
-        "macro|carol@rox.one",
-        "macro|dave@rox.one",
-        "macro|eve@rox.one",
-        "macro|frank@rox.one",
-        "macro|grace@rox.one",
+        "rox|alice@rox.one",
+        "rox|bob@rox.one",
+        "rox|carol@rox.one",
+        "rox|dave@rox.one",
+        "rox|eve@rox.one",
+        "rox|frank@rox.one",
+        "rox|grace@rox.one",
     ]
     .iter()
     .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
-    users.insert(RoxUserIdStr::try_from("macro|henry@rox.one".to_string()).unwrap());
+    users.insert(RoxUserIdStr::try_from("rox|henry@rox.one".to_string()).unwrap());
     print_contacts_message(users);
 }
 
 async fn genmsg_add_paul() {
     let mut users: HashSet<RoxUserIdStr<'static>> = [
-        "macro|zeus@olympus.mountain",
-        "macro|athena@olympus.mountain",
-        "macro|apollo@olympus.mountain",
-        "macro|hermes@olympus.mountain",
-        "macro|poseidon@olympus.mountain",
+        "rox|zeus@olympus.mountain",
+        "rox|athena@olympus.mountain",
+        "rox|apollo@olympus.mountain",
+        "rox|hermes@olympus.mountain",
+        "rox|poseidon@olympus.mountain",
     ]
     .iter()
     .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
-    users.insert(RoxUserIdStr::try_from("macro|paul@rox.one".to_string()).unwrap());
+    users.insert(RoxUserIdStr::try_from("rox|paul@rox.one".to_string()).unwrap());
     print_contacts_message(users);
 }
 
 async fn genmsg_create_group() {
     let users: HashSet<RoxUserIdStr<'static>> = [
-        "macro|jupiter@olympus.mountain",
-        "macro|athena@olympus.mountain",
-        "macro|mercury@olympus.mountain",
-        "macro|neptune@olympus.mountain",
-        "macro|paul@rox.one",
+        "rox|jupiter@olympus.mountain",
+        "rox|athena@olympus.mountain",
+        "rox|mercury@olympus.mountain",
+        "rox|neptune@olympus.mountain",
+        "rox|paul@rox.one",
     ]
     .iter()
     .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
@@ -58,12 +58,12 @@ async fn genmsg_create_group() {
 
 async fn genmsg_add_participants() {
     let users: HashSet<RoxUserIdStr<'static>> = [
-        "macro|an@uruk.place",
-        "macro|enlil@nippur.place",
-        "macro|enki@eridu.place",
-        "macro|marduk@babylon.place",
-        "macro|paul@rox.one",
-        "macro|poseidon@olympus.mountain",
+        "rox|an@uruk.place",
+        "rox|enlil@nippur.place",
+        "rox|enki@eridu.place",
+        "rox|marduk@babylon.place",
+        "rox|paul@rox.one",
+        "rox|poseidon@olympus.mountain",
     ]
     .iter()
     .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())

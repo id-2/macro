@@ -32,7 +32,7 @@ const company: EntityProperty = {
   specificEntityType: 'COMPANY',
   isMultiSelect: false,
   value: [{ entity_id: 'acme', entity_type: 'COMPANY' }],
-  owner: { scope: 'user', user_id: 'macro|owner@example.com' },
+  owner: { scope: 'user', user_id: 'rox|owner@example.com' },
   createdAt: '2026-01-01',
   updatedAt: '2026-01-01',
 };

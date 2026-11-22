@@ -12,8 +12,8 @@ fn mid(s: &str) -> RoxUserIdStr<'static> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_basic(pool: PgPool) -> sqlx::Result<()> {
-    let user1 = "macro|a@test.com";
-    let user2 = "macro|b@test.com";
+    let user1 = "rox|a@test.com";
+    let user2 = "rox|b@test.com";
     let repo = DbContactsRepository::new(pool.clone());
     repo.create_connections(vec![(mid(user1), mid(user2))])
         .await
@@ -28,8 +28,8 @@ async fn test_create_connections_basic(pool: PgPool) -> sqlx::Result<()> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_ordering(pool: PgPool) -> sqlx::Result<()> {
-    let user1 = "macro|a@test.com";
-    let user2 = "macro|b@test.com";
+    let user1 = "rox|a@test.com";
+    let user2 = "rox|b@test.com";
     let repo = DbContactsRepository::new(pool.clone());
     repo.create_connections(vec![(mid(user2), mid(user1))])
         .await
@@ -46,8 +46,8 @@ async fn test_create_connections_ordering(pool: PgPool) -> sqlx::Result<()> {
 async fn test_create_connections_deduplicates_and_ignores_self_edges(
     pool: PgPool,
 ) -> sqlx::Result<()> {
-    let user1 = "macro|a@test.com";
-    let user2 = "macro|b@test.com";
+    let user1 = "rox|a@test.com";
+    let user2 = "rox|b@test.com";
     let repo = DbContactsRepository::new(pool.clone());
 
     repo.create_connections(vec![
@@ -72,7 +72,7 @@ async fn test_create_connections_deduplicates_and_ignores_self_edges(
 )]
 async fn test_get_contacts(pool: PgPool) -> sqlx::Result<()> {
     let repo = DbContactsRepository::new(pool);
-    let contacts = repo.get_contacts(mid("macro|a@test.com")).await.unwrap();
+    let contacts = repo.get_contacts(mid("rox|a@test.com")).await.unwrap();
     assert_eq!(contacts.len(), 3);
     Ok(())
 }
@@ -84,7 +84,7 @@ async fn test_get_contacts(pool: PgPool) -> sqlx::Result<()> {
 async fn test_get_contacts_reads_both_columns_once(pool: PgPool) -> sqlx::Result<()> {
     let repo = DbContactsRepository::new(pool);
     let mut contacts: Vec<String> = repo
-        .get_contacts(mid("macro|m@example.com"))
+        .get_contacts(mid("rox|m@example.com"))
         .await
         .unwrap()
         .iter()
@@ -94,10 +94,10 @@ async fn test_get_contacts_reads_both_columns_once(pool: PgPool) -> sqlx::Result
     assert_eq!(
         contacts,
         [
-            "macro|a@example.com",
-            "macro|b@example.com",
-            "macro|x@example.com",
-            "macro|z@example.com",
+            "rox|a@example.com",
+            "rox|b@example.com",
+            "rox|x@example.com",
+            "rox|z@example.com",
         ]
     );
     Ok(())
@@ -108,8 +108,8 @@ async fn test_create_connections_batch(pool: PgPool) -> sqlx::Result<()> {
     let connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)> = (0..8)
         .map(|i| {
             (
-                mid("macro|user0@test.com"),
-                mid(&format!("macro|user{i}@test.com")),
+                mid("rox|user0@test.com"),
+                mid(&format!("rox|user{i}@test.com")),
             )
         })
         .filter(|(a, b)| a.as_ref() != b.as_ref())
@@ -127,7 +127,7 @@ async fn test_create_connections_batch(pool: PgPool) -> sqlx::Result<()> {
     assert_eq!(count, expected_count);
 
     let contacts = repo
-        .get_contacts(mid("macro|user0@test.com"))
+        .get_contacts(mid("rox|user0@test.com"))
         .await
         .unwrap();
     assert_eq!(contacts.len(), expected_count as usize);
@@ -137,7 +137,7 @@ async fn test_create_connections_batch(pool: PgPool) -> sqlx::Result<()> {
 async fn insert_channel(pool: &PgPool, id: Uuid) {
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) \
-         VALUES ($1, 'direct_message', 'macro|owner@test.com')",
+         VALUES ($1, 'direct_message', 'rox|owner@test.com')",
         id
     )
     .execute(pool)
@@ -153,7 +153,7 @@ async fn test_get_unapplied_messages_returns_inserted_rows(pool: PgPool) -> sqlx
     // Simulate what the migration backfill inserts
     sqlx::query!(
         "INSERT INTO contacts_backfill_outbox (comms_channel_id, user_ids) \
-         VALUES ($1, '[\"macro|a@test.com\", \"macro|b@test.com\"]'::jsonb)",
+         VALUES ($1, '[\"rox|a@test.com\", \"rox|b@test.com\"]'::jsonb)",
         channel_id,
     )
     .execute(&pool)
@@ -166,7 +166,7 @@ async fn test_get_unapplied_messages_returns_inserted_rows(pool: PgPool) -> sqlx
     assert_eq!(messages[0].channel_id, channel_id);
     assert_eq!(
         messages[0].channel_participants,
-        [mid("macro|a@test.com"), mid("macro|b@test.com")]
+        [mid("rox|a@test.com"), mid("rox|b@test.com")]
             .into_iter()
             .collect()
     );
@@ -182,7 +182,7 @@ async fn test_get_unapplied_messages_excludes_applied(pool: PgPool) -> sqlx::Res
 
     sqlx::query!(
         "INSERT INTO contacts_backfill_outbox (comms_channel_id, user_ids) \
-         VALUES ($1, '[\"macro|a@test.com\"]'::jsonb)",
+         VALUES ($1, '[\"rox|a@test.com\"]'::jsonb)",
         unapplied_id,
     )
     .execute(&pool)
@@ -190,7 +190,7 @@ async fn test_get_unapplied_messages_excludes_applied(pool: PgPool) -> sqlx::Res
 
     sqlx::query!(
         "INSERT INTO contacts_backfill_outbox (comms_channel_id, user_ids, applied_at) \
-         VALUES ($1, '[\"macro|b@test.com\"]'::jsonb, now())",
+         VALUES ($1, '[\"rox|b@test.com\"]'::jsonb, now())",
         applied_id,
     )
     .execute(&pool)

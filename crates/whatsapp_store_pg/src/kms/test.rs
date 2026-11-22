@@ -7,10 +7,10 @@ const ACCOUNT: Uuid = Uuid::from_u128(1);
 #[test]
 fn the_encryption_context_names_the_purpose_user_account_and_version() {
     assert_eq!(
-        encryption_context("macro|alice", ACCOUNT),
+        encryption_context("rox|alice", ACCOUNT),
         HashMap::from([
             ("macro:purpose".to_owned(), "whatsapp-session".to_owned()),
-            ("macro:user-id".to_owned(), "macro|alice".to_owned()),
+            ("macro:user-id".to_owned(), "rox|alice".to_owned()),
             (
                 "macro:account-id".to_owned(),
                 "00000000-0000-0000-0000-000000000001".to_owned()
@@ -23,7 +23,7 @@ fn the_encryption_context_names_the_purpose_user_account_and_version() {
 #[tokio::test]
 async fn the_fake_unwraps_only_under_the_same_context_and_key() {
     let kms = FakeWhatsAppKms::new("key-1");
-    let context = encryption_context("macro|alice", ACCOUNT);
+    let context = encryption_context("rox|alice", ACCOUNT);
     let generated = kms.generate_data_key(context.clone()).await.unwrap();
     assert_eq!(generated.plaintext.len(), 32);
     assert_eq!(generated.kms_key_id, "key-1");
@@ -35,8 +35,8 @@ async fn the_fake_unwraps_only_under_the_same_context_and_key() {
     assert_eq!(*unwrapped, *generated.plaintext);
 
     for wrong_context in [
-        encryption_context("macro|bob", ACCOUNT),
-        encryption_context("macro|alice", Uuid::from_u128(2)),
+        encryption_context("rox|bob", ACCOUNT),
+        encryption_context("rox|alice", Uuid::from_u128(2)),
     ] {
         assert!(
             kms.decrypt("key-1", &generated.ciphertext, wrong_context)

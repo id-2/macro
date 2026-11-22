@@ -38,7 +38,7 @@ use crate::domain::{
 };
 
 const GITHUB_KEY: &str = "macro/app/pull/7";
-const USER_ID: &str = "macro|user@example.com";
+const USER_ID: &str = "rox|user@example.com";
 const TEAM_ID: &str = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
 #[derive(Clone, Default)]

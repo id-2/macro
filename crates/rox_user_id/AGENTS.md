@@ -3,7 +3,7 @@
 ## What it is
 
 Shared infrastructure: the identity type used across the whole backend. The
-`RoxUserId` newtype (`macro|<email>`) and its `nom`-based parser —
+`RoxUserId` newtype (`rox|<email>`) and its `nom`-based parser —
 parse-don't-validate for the single most widely used identity type in the
 backend.
 
@@ -17,7 +17,7 @@ backend.
 
 ## Scope
 
-- Owns: parsing and representing the `macro|<email>` user id shape.
+- Owns: parsing and representing the `rox|<email>` user id shape.
 - Not here: resolving a user id to a user record (RoxDB) — that's
   `rox_db_client`/the owning domain crate.
 

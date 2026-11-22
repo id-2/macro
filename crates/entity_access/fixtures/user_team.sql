@@ -24,21 +24,21 @@ INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ------------------------------------------------------------
 
 INSERT INTO "User" (id, email, rox_user_id) VALUES
-    ('macro|alpha_owner@team.com', 'alpha_owner@team.com', '00000000-0000-0000-0000-000000000a01'),
-    ('macro|beta_owner@team.com',  'beta_owner@team.com',  '00000000-0000-0000-0000-000000000a02'),
-    ('macro|member@team.com',      'member@team.com',      '00000000-0000-0000-0000-000000000a03'),
-    ('macro|admin@team.com',       'admin@team.com',       '00000000-0000-0000-0000-000000000a04'),
-    ('macro|owner@team.com',       'owner@team.com',       '00000000-0000-0000-0000-000000000a05'),
-    ('macro|multi@team.com',       'multi@team.com',       '00000000-0000-0000-0000-000000000a06'),
-    ('macro|noteam@team.com',      'noteam@team.com',      '00000000-0000-0000-0000-000000000a07');
+    ('rox|alpha_owner@team.com', 'alpha_owner@team.com', '00000000-0000-0000-0000-000000000a01'),
+    ('rox|beta_owner@team.com',  'beta_owner@team.com',  '00000000-0000-0000-0000-000000000a02'),
+    ('rox|member@team.com',      'member@team.com',      '00000000-0000-0000-0000-000000000a03'),
+    ('rox|admin@team.com',       'admin@team.com',       '00000000-0000-0000-0000-000000000a04'),
+    ('rox|owner@team.com',       'owner@team.com',       '00000000-0000-0000-0000-000000000a05'),
+    ('rox|multi@team.com',       'multi@team.com',       '00000000-0000-0000-0000-000000000a06'),
+    ('rox|noteam@team.com',      'noteam@team.com',      '00000000-0000-0000-0000-000000000a07');
 
 ------------------------------------------------------------
 -- Teams
 ------------------------------------------------------------
 
 INSERT INTO team (id, name, owner_id) VALUES
-    ('00000000-0000-0000-0000-0000000ea001', 'Team Alpha', 'macro|alpha_owner@team.com'),
-    ('00000000-0000-0000-0000-0000000ea002', 'Team Beta',  'macro|beta_owner@team.com');
+    ('00000000-0000-0000-0000-0000000ea001', 'Team Alpha', 'rox|alpha_owner@team.com'),
+    ('00000000-0000-0000-0000-0000000ea002', 'Team Beta',  'rox|beta_owner@team.com');
 
 ------------------------------------------------------------
 -- Memberships
@@ -51,7 +51,7 @@ INSERT INTO team (id, name, owner_id) VALUES
 ------------------------------------------------------------
 
 INSERT INTO team_user (user_id, team_id, team_role) VALUES
-    ('macro|member@team.com', '00000000-0000-0000-0000-0000000ea001', 'member'),
-    ('macro|admin@team.com',  '00000000-0000-0000-0000-0000000ea001', 'admin'),
-    ('macro|owner@team.com',  '00000000-0000-0000-0000-0000000ea001', 'owner'),
-    ('macro|multi@team.com',  '00000000-0000-0000-0000-0000000ea002', 'owner');
+    ('rox|member@team.com', '00000000-0000-0000-0000-0000000ea001', 'member'),
+    ('rox|admin@team.com',  '00000000-0000-0000-0000-0000000ea001', 'admin'),
+    ('rox|owner@team.com',  '00000000-0000-0000-0000-0000000ea001', 'owner'),
+    ('rox|multi@team.com',  '00000000-0000-0000-0000-0000000ea002', 'owner');

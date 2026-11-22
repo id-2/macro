@@ -5,7 +5,7 @@ use super::{
     validate_profile_picture_file, validate_profile_picture_upload,
 };
 
-const CALLER: &str = "macro|agent@example.com";
+const CALLER: &str = "rox|agent@example.com";
 
 fn metadata(owner_id: &str, content_type: &str) -> FileMetadata {
     FileMetadata {
@@ -30,7 +30,7 @@ fn the_callers_uploaded_image_is_accepted() {
 #[test]
 fn another_users_image_is_rejected() {
     assert_eq!(
-        validate_profile_picture_file(&metadata("macro|other@example.com", "image/png"), CALLER),
+        validate_profile_picture_file(&metadata("rox|other@example.com", "image/png"), CALLER),
         Err(ProfilePictureFileError::NotOwner)
     );
 }

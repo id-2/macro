@@ -49,7 +49,7 @@ async fn event_with_uid(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: PgPool) {
-    let viewer = "macro|invite-reader@example.com";
+    let viewer = "rox|invite-reader@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let a = insert_link(&pool, viewer).await;
@@ -68,7 +68,7 @@ async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: Pg
     assert!(matches!(result[1], InvitationResolution::Ambiguous));
     assert!(matches!(
         resolver
-            .resolve("macro|unrelated@example.com", &[identity(a)])
+            .resolve("rox|unrelated@example.com", &[identity(a)])
             .await
             .unwrap()[0],
         InvitationResolution::Disconnected
@@ -77,7 +77,7 @@ async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: Pg
     disconnected_cancel.revision.cancelled = true;
     assert!(matches!(
         resolver
-            .resolve("macro|unrelated@example.com", &[disconnected_cancel])
+            .resolve("rox|unrelated@example.com", &[disconnected_cancel])
             .await
             .unwrap()[0],
         InvitationResolution::Cancelled
@@ -108,7 +108,7 @@ async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: Pg
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_inbox_answers_through_its_own_copy_of_a_google_meeting(pool: PgPool) {
-    let viewer = "macro|invite-outlook@example.com";
+    let viewer = "rox|invite-outlook@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let google = insert_link(&pool, viewer).await;
@@ -157,7 +157,7 @@ async fn an_outlook_inbox_answers_through_its_own_copy_of_a_google_meeting(pool:
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_receiving_inbox_keeps_its_copy_past_the_candidate_limit(pool: PgPool) {
-    let viewer = "macro|invite-many@example.com";
+    let viewer = "rox|invite-many@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     for _ in 0..16 {
@@ -179,7 +179,7 @@ async fn the_receiving_inbox_keeps_its_copy_past_the_candidate_limit(pool: PgPoo
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn copies_without_the_requested_occurrence_leave_room_for_one_with_it(pool: PgPool) {
-    let viewer = "macro|invite-instance@example.com";
+    let viewer = "rox|invite-instance@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     for _ in 0..16 {
@@ -212,8 +212,8 @@ async fn copies_without_the_requested_occurrence_leave_room_for_one_with_it(pool
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
-    let viewer = "macro|invite-delegate@example.com";
-    let owner = "macro|invite-owner@example.com";
+    let viewer = "rox|invite-delegate@example.com";
+    let owner = "rox|invite-owner@example.com";
     insert_user(&pool, viewer).await;
     insert_user(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -256,7 +256,7 @@ async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
     }
     assert!(matches!(
         resolver
-            .resolve("macro|unrelated@example.com", &[identity(delegated_link)])
+            .resolve("rox|unrelated@example.com", &[identity(delegated_link)])
             .await
             .unwrap()[0],
         InvitationResolution::Disconnected
@@ -292,8 +292,8 @@ async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_delegation_preserves_connection_and_sync_states(pool: PgPool) {
-    let viewer = "macro|invite-sync-delegate@example.com";
-    let owner = "macro|invite-sync-owner@example.com";
+    let viewer = "rox|invite-sync-delegate@example.com";
+    let owner = "rox|invite-sync-owner@example.com";
     insert_user(&pool, viewer).await;
     insert_user(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -335,7 +335,7 @@ async fn invitation_delegation_preserves_connection_and_sync_states(pool: PgPool
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_moved_instance_uses_original_key_and_instance_revision(pool: PgPool) {
-    let viewer = "macro|instance-reader@example.com";
+    let viewer = "rox|instance-reader@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let link = insert_link(&pool, viewer).await;
@@ -402,7 +402,7 @@ async fn invitation_moved_instance_uses_original_key_and_instance_revision(pool:
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn master_invitation_does_not_compare_revisions_with_first_exception(pool: PgPool) {
-    let viewer = "macro|master-reader@example.com";
+    let viewer = "rox|master-reader@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let link = insert_link(&pool, viewer).await;
@@ -457,7 +457,7 @@ async fn master_invitation_does_not_compare_revisions_with_first_exception(pool:
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn master_invitation_resolves_the_current_or_next_live_occurrence(pool: PgPool) {
     use chrono::SubsecRound;
-    let viewer = "macro|series-reader@example.com";
+    let viewer = "rox|series-reader@example.com";
     insert_user(&pool, viewer).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let link = insert_link(&pool, viewer).await;

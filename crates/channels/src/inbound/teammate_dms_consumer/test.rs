@@ -49,10 +49,10 @@ fn user(value: &str) -> RoxUserIdStr<'static> {
 
 fn member_joined() -> TeamsTopicForDms {
     TeamsTopicForDms::MemberJoined(MemberJoinedEnvelope::Payload(TeammateDmsJoinedMetadata {
-        member_id: user("macro|joiner@acme.com"),
+        member_id: user("rox|joiner@acme.com"),
         teammate_ids: vec![
-            user("macro|owner@acme.com"),
-            user("macro|teammate@acme.com"),
+            user("rox|owner@acme.com"),
+            user("rox|teammate@acme.com"),
         ],
     }))
 }
@@ -86,7 +86,7 @@ fn decodes_other_team_events_as_ignored() {
         "event_type": "team.updated",
         "metadata": {
             "team_id": "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90",
-            "actor_user_id": "macro|admin@acme.com",
+            "actor_user_id": "rox|admin@acme.com",
             "name": "Acme",
             "slug": null
         }
@@ -113,8 +113,8 @@ fn decodes_canonical_member_joined_json() {
         "event_type": "team.member_joined",
         "metadata": {
             "team_id": "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90",
-            "member_id": "macro|joiner@acme.com",
-            "teammate_ids": ["macro|owner@acme.com", "macro|teammate@acme.com"],
+            "member_id": "rox|joiner@acme.com",
+            "teammate_ids": ["rox|owner@acme.com", "rox|teammate@acme.com"],
             "role": "member",
             "join_method": { "type": "domain_auto_join" }
         }
@@ -141,7 +141,7 @@ fn missing_teammate_ids_defaults_to_empty() {
         "event_type": "team.member_joined",
         "metadata": {
             "team_id": "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90",
-            "member_id": "macro|joiner@acme.com",
+            "member_id": "rox|joiner@acme.com",
             "role": "member",
             "join_method": { "type": "domain_auto_join" }
         }
@@ -159,7 +159,7 @@ fn missing_teammate_ids_defaults_to_empty() {
                 event.event().event,
                 TeamsTopicForDms::MemberJoined(MemberJoinedEnvelope::Payload(
                     TeammateDmsJoinedMetadata {
-                        member_id: user("macro|joiner@acme.com"),
+                        member_id: user("rox|joiner@acme.com"),
                         teammate_ids: Vec::new(),
                     }
                 ))
@@ -178,7 +178,7 @@ async fn member_joined_ensures_dms_from_payload() {
 
     let calls = channels.calls.lock().unwrap().clone();
     assert_eq!(calls.len(), 2);
-    assert!(calls.iter().all(|owner| owner == "macro|joiner@acme.com"));
+    assert!(calls.iter().all(|owner| owner == "rox|joiner@acme.com"));
 }
 
 #[tokio::test]
@@ -204,7 +204,7 @@ async fn empty_teammate_ids_is_success() {
     handle_team_event(
         &channels,
         &TeamsTopicForDms::MemberJoined(MemberJoinedEnvelope::Payload(TeammateDmsJoinedMetadata {
-            member_id: user("macro|joiner@acme.com"),
+            member_id: user("rox|joiner@acme.com"),
             teammate_ids: Vec::new(),
         })),
     )

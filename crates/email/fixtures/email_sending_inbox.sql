@@ -3,13 +3,13 @@
 -- One user with two of their own inboxes, each holding a received message, so
 -- a reply can be checked against the inbox that actually received it rather
 -- than the one that happens to come back first. `is_primary` is a generated
--- column (rox_id = 'macro|' || lower(email_address)), so user1@test.com is
+-- column (rox_id = 'rox|' || lower(email_address)), so user1@test.com is
 -- the primary inbox and user1-alt@test.com is not.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('a1111111-1111-1111-1111-111111111111', 'macro|user1@test.com', 'fa-user-1', 'user1@test.com', 'GMAIL', true, NOW() - INTERVAL '2 hours', NOW()),
-    ('a2222222-2222-2222-2222-222222222222', 'macro|user1@test.com', 'fa-user-1', 'user1-alt@test.com', 'GMAIL', true, NOW() - INTERVAL '1 hour', NOW());
+    ('a1111111-1111-1111-1111-111111111111', 'rox|user1@test.com', 'fa-user-1', 'user1@test.com', 'GMAIL', true, NOW() - INTERVAL '2 hours', NOW()),
+    ('a2222222-2222-2222-2222-222222222222', 'rox|user1@test.com', 'fa-user-1', 'user1-alt@test.com', 'GMAIL', true, NOW() - INTERVAL '1 hour', NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, sfs_photo_url, created_at, updated_at)
 VALUES

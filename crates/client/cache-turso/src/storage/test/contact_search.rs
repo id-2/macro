@@ -85,7 +85,7 @@ fn covering_contact_payloads_follow_updates_deletes_and_reopen() {
                 ("id".into(), CacheValue::String(key.id().unwrap().into())),
                 (
                     "userId".into(),
-                    CacheValue::String("macro|person@example.com".into()),
+                    CacheValue::String("rox|person@example.com".into()),
                 ),
                 (
                     "email".into(),

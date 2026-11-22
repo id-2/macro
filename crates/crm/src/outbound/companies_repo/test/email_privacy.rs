@@ -13,7 +13,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 #[sqlx::test(migrations = false)]
 async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
@@ -89,7 +89,7 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
         .await?
     );
     let new_team = Uuid::now_v7();
-    seed_team(&pool, new_team, "macro|new-owner@example.com").await?;
+    seed_team(&pool, new_team, "rox|new-owner@example.com").await?;
     for legacy_team in [team, new_team] {
         let error = sqlx::query!(
             "INSERT INTO team_crm_settings (team_id, crm_enabled) VALUES ($1, TRUE) ON CONFLICT (team_id) DO UPDATE SET crm_enabled = EXCLUDED.crm_enabled",
@@ -412,7 +412,7 @@ async fn one_blocked_bcc_participant_excludes_the_entire_thread_and_its_timestam
 async fn personal_blocks_only_affect_the_contributors_mailbox(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, link) = setup(&pool).await?;
     consent_to_mailbox(&pool, team, link).await?;
-    let other = "macro|colleague@example.com";
+    let other = "rox|colleague@example.com";
     let user = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",

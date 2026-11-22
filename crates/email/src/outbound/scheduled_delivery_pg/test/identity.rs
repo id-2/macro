@@ -24,7 +24,7 @@ async fn imported_delivery(pool: &PgPool) -> anyhow::Result<delivery::DeliveryCl
     assert!(delivery::begin_submission(pool, &claim, 300).await?);
     sqlx::query!(
         r#"INSERT INTO email_send_attempts (user_id, link_id, attempt_id, message_id, thread_id)
-           VALUES ('macro|sent-cache@example.com', $1, $2, $2, $3)"#,
+           VALUES ('rox|sent-cache@example.com', $1, $2, $2, $3)"#,
         LINK,
         MESSAGE,
         THREAD,
@@ -261,7 +261,7 @@ async fn duplicate_attachment_references_survive_reconciliation(
     ).execute(&pool).await?;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-           VALUES ('macro|sent-cache@example.com', 'sent-cache@example.com', $1)"#,
+           VALUES ('rox|sent-cache@example.com', 'sent-cache@example.com', $1)"#,
         sfs,
     )
     .execute(&pool)
@@ -269,7 +269,7 @@ async fn duplicate_attachment_references_survive_reconciliation(
     let document = duplicate.to_string();
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner, "fileType", uploaded)
-           VALUES ($1, 'attached.pdf', 'macro|sent-cache@example.com', 'pdf', TRUE)"#,
+           VALUES ($1, 'attached.pdf', 'rox|sent-cache@example.com', 'pdf', TRUE)"#,
         document,
     )
     .execute(&pool)

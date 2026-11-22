@@ -127,15 +127,15 @@ export const dmOwner = async (
 /**
  * DM someone in Rox, by their Rox id.
  *
- * The id looks like `macro|name@example.com`. `text` mustn't be empty or a
+ * The id looks like `rox|name@example.com`. `text` mustn't be empty or a
  * flag.
  */
 export const dmPerson = async (
   { chat }: ChatContext,
   { userId, text }: { readonly userId: string; readonly text: string }
 ): Promise<Posted> => {
-  if (!userId.startsWith('macro|'))
-    throw new Error('userId: must start with "macro|"');
+  if (!userId.startsWith('rox|'))
+    throw new Error('userId: must start with "rox|"');
   return chat.dm(userId, message(text));
 };
 

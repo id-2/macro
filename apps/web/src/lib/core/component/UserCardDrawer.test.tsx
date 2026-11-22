@@ -41,7 +41,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|current@example.com',
+  useUserId: () => () => 'rox|current@example.com',
 }));
 
 vi.mock('@core/user', () => ({
@@ -103,7 +103,7 @@ function openJane() {
   openUserCard({
     displayName: 'Jane Doe',
     email: 'jane.doe@example.com',
-    id: 'macro|jane.doe@example.com',
+    id: 'rox|jane.doe@example.com',
   });
 }
 
@@ -134,8 +134,8 @@ describe('UserCardDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'DM' }));
 
     expect(mocks.existingDm).toHaveBeenCalledWith(
-      'macro|current@example.com',
-      'macro|jane.doe@example.com'
+      'rox|current@example.com',
+      'rox|jane.doe@example.com'
     );
     expect(mocks.openWithSplit).toHaveBeenCalledWith(
       { type: 'channel', id: expect.stringMatching(/^pending-dm-/) },
@@ -180,7 +180,7 @@ describe('UserCardDrawer', () => {
     expect(mocks.popoverSplit).toHaveBeenCalledWith({
       type: 'component',
       id: 'task-compose',
-      params: { initialAssigneeIds: ['macro|jane.doe@example.com'] },
+      params: { initialAssigneeIds: ['rox|jane.doe@example.com'] },
     });
   });
 

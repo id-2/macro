@@ -17,7 +17,7 @@ fn an_agent_task_assignment_reads_back_with_its_lineage() {
         "by": {
             "type": "agent",
             "bot": "01a0fd65-0ef7-763f-86ba-f065d75eaa66",
-            "on_behalf_of": "macro|user@example.com",
+            "on_behalf_of": "rox|user@example.com",
             "lineage": {
                 "type": "session",
                 "session": "01a1a9da-8e60-7e60-9678-68ce6e69e117",

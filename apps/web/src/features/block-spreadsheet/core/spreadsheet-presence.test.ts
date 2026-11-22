@@ -4,7 +4,7 @@ import { spreadsheetCursors } from './spreadsheet-presence';
 const peer = (peerId: string, color = 'blue') => ({
   peerId,
   color,
-  userId: 'macro|alice@example.com',
+  userId: 'rox|alice@example.com',
   selection: { anchor: 'B2', focus: 'D4' },
 });
 describe('spreadsheet cursors', () => {

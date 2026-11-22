@@ -156,9 +156,9 @@ async fn typed_owner_team_links_match_batch_access(pool: sqlx::PgPool) -> anyhow
         .map(|suffix| format!("90000000-0000-0000-0000-{suffix:012}"))
         .collect();
     for (user, member) in [
-        ("macro|typed-owner@example.com", true),
-        ("macro|typed-other@example.com", false),
-        ("macro|typed-teamless@example.com", false),
+        ("rox|typed-owner@example.com", true),
+        ("rox|typed-other@example.com", false),
+        ("rox|typed-teamless@example.com", false),
     ] {
         let levels = get_highest_access_level_for_chats(&pool, &ids, user).await?;
         for (id, has_team) in ids

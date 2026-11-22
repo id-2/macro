@@ -29,7 +29,7 @@ mod schemas;
 mod views;
 use crate::domain::models::{Column, ColumnDetail, Database, Table, TableDetail, TableVersion};
 
-const USER: &str = "macro|wolf@rox.one";
+const USER: &str = "rox|wolf@rox.one";
 
 fn user() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(USER).expect("valid user id")

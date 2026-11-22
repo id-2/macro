@@ -18,7 +18,7 @@ fn id(hex: char) -> NotionId {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@acme.test")
+    RoxUserIdStr::parse_from_str("rox|owner@acme.test")
         .unwrap()
         .into_owned()
 }

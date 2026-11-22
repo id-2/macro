@@ -21,7 +21,7 @@ async fn a_channel_member_cannot_take_a_form_id_for_a_channel_surface() {
 
     let err = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             channel_receipt(),
             form,
             "squatted".to_string(),
@@ -43,7 +43,7 @@ async fn a_surface_squatting_a_form_id_is_not_handed_back_to_the_squatter() {
     let svc = service_with(repo.clone(), MockSurfaceInitializer::new());
 
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), channel_receipt(), form, String::new())
+        .ensure_surface(&user("rox|a@b.c"), channel_receipt(), form, String::new())
         .await
         .unwrap_err();
 
@@ -61,7 +61,7 @@ async fn an_id_no_form_names_is_free_for_a_channel_surface() {
     let svc = service_with(repo.clone(), init);
 
     let surface = svc
-        .ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
         .await
         .unwrap();
 

@@ -374,7 +374,7 @@ mod tests {
             tid: "tenant_id".to_string(),
             email: email.to_string(),
             fusion_user_id: "fusion_testing".to_string(),
-            rox_user_id: "macro|testing".to_string(),
+            rox_user_id: "rox|testing".to_string(),
             rox_organization_id: None,
             root_rox_id: None,
         };
@@ -512,7 +512,7 @@ CwIDAQAB
 
         let token = create_test_rox_api_token_jwt(
             "test.rox.one",
-            "macro|test@rox.one",
+            "rox|test@rox.one",
             "fusionauth_user_id",
             None,
             PRIVATE_KEY,
@@ -689,7 +689,7 @@ CwIDAQAB
 
         let token = create_test_rox_api_token_jwt(
             "test.rox.one",
-            "macro|test@rox.one",
+            "rox|test@rox.one",
             "fusionauth_user_id",
             None,
             PRIVATE_KEY,
@@ -703,7 +703,7 @@ CwIDAQAB
             &jwt_validation_args.rox_api_token_issuer,
         )?;
 
-        assert_eq!(result.rox_user_id, "macro|test@rox.one");
+        assert_eq!(result.rox_user_id, "rox|test@rox.one");
 
         Ok(())
     }
@@ -722,7 +722,7 @@ CwIDAQAB
 
         let token = create_test_rox_api_token_jwt(
             "bad.rox.one",
-            "macro|test@rox.one",
+            "rox|test@rox.one",
             "fusionauth_user_id",
             None,
             PRIVATE_KEY,
@@ -757,7 +757,7 @@ CwIDAQAB
 
         let token = create_test_rox_api_token_jwt(
             "test.rox.one",
-            "macro|test@rox.one",
+            "rox|test@rox.one",
             "fusionauth_user_id",
             None,
             PRIVATE_KEY,

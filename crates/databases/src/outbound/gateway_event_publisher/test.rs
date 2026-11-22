@@ -25,7 +25,7 @@ fn a_table_change_serializes_in_camel_case() {
 fn an_awareness_relay_serializes_its_relay_time_as_epoch_milliseconds() {
     let payload = AwarenessRelay {
         database_id: DatabaseId::from_uuid(Uuid::from_u128(1)),
-        user_id: "macro|sam@example.com".to_string(),
+        user_id: "rox|sam@example.com".to_string(),
         can_edit: true,
         state: Awareness {
             peer_id: Some(uuid::Uuid::from_u128(7)),
@@ -43,7 +43,7 @@ fn an_awareness_relay_serializes_its_relay_time_as_epoch_milliseconds() {
         serde_json::to_value(payload).unwrap(),
         serde_json::json!({
             "databaseId": "00000000-0000-0000-0000-000000000001",
-            "userId": "macro|sam@example.com",
+            "userId": "rox|sam@example.com",
             "canEdit": true,
             "state": {
                 "peerId": "00000000-0000-0000-0000-000000000007",

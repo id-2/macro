@@ -16,7 +16,7 @@ use crate::{RegisteredWorkGraphqlContext, RegisteredWorkGraphqlService};
 const SESSION_ID: Uuid = Uuid::from_u128(0x5E55);
 const REGISTRATION_ID: Uuid = Uuid::from_u128(0xBEEF);
 const ENDED_ID: Uuid = Uuid::from_u128(0xDEAD);
-const ACCOUNT: &str = "macro|registered-agent@example.com";
+const ACCOUNT: &str = "rox|registered-agent@example.com";
 
 fn session() -> AgentSessionId {
     AgentSessionId::new_from_uuid(SESSION_ID)
@@ -100,7 +100,7 @@ fn session_patch() -> Patch<Entity<'static>> {
     Patch::Updated(ModelEntityType::AgentSession.with_entity_string(SESSION_ID.to_string()))
 }
 
-const SUBSCRIPTION: &str = r#"subscription { registeredWorkUpdates(accountIds: ["macro|registered-agent@example.com"]) {
+const SUBSCRIPTION: &str = r#"subscription { registeredWorkUpdates(accountIds: ["rox|registered-agent@example.com"]) {
     __typename
     ... on GraphqlRegisteredWorkUpsert { entry { id accountId session { id name } } }
     ... on GraphqlRegisteredWorkRemove { id }
@@ -161,8 +161,8 @@ async fn registered_work_lists_entries_hydrated_for_the_viewer() {
             harness
                 .request(
                     r#"{ user { registeredWork(accountIds: [
-                        "macro|registered-agent@example.com",
-                        "macro|registered-agent@example.com"
+                        "rox|registered-agent@example.com",
+                        "rox|registered-agent@example.com"
                     ]) { id accountId session { id } } } }"#,
                     authenticated_parts(),
                 )
@@ -195,7 +195,7 @@ async fn registered_work_caps_the_accounts_one_request_may_name() {
     let service = FixedRegistrations::default();
     let read_accounts = Arc::clone(&service.read_accounts);
     let accounts = (0..51)
-        .map(|index| format!("\"macro|account-{index}@example.com\""))
+        .map(|index| format!("\"rox|account-{index}@example.com\""))
         .collect::<Vec<_>>()
         .join(",");
 

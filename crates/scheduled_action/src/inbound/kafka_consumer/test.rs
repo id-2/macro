@@ -116,10 +116,10 @@ fn envelope(name: &str) -> Value {
         "schema_version": 1,
         "event_type": name,
         "metadata": {
-            "document_id": ENTITY_ID, "owner": "macro|human@example.com",
-            "actor": "macro|human@example.com", "document_name": "Private title",
+            "document_id": ENTITY_ID, "owner": "rox|human@example.com",
+            "actor": "rox|human@example.com", "document_name": "Private title",
             "file_type": "md", "channel_id": ENTITY_ID, "channel_type": "public",
-            "participant_user_ids": ["macro|human@example.com"]
+            "participant_user_ids": ["rox|human@example.com"]
         }
     })
 }
@@ -400,10 +400,10 @@ fn call_conversion_preserves_the_envelope() {
         "schema_version": 1,
         "event_type": "call.record_archived",
         "metadata": {
-            "call_id": ENTITY_ID, "channel_id": null, "created_by": "macro|human@example.com",
+            "call_id": ENTITY_ID, "channel_id": null, "created_by": "rox|human@example.com",
             "started_at": "2026-10-08T14:00:00Z", "ended_at": "2026-10-08T14:30:00Z",
             "duration_ms": 1_800_000, "participant_count": 1,
-            "participants": ["macro|human@example.com"], "has_recording": false,
+            "participants": ["rox|human@example.com"], "has_recording": false,
             "archive_reason": "last_participant_left"
         }
     });

@@ -129,7 +129,7 @@ async fn one_read_per_record_type_answers_every_record_without_its_own_column() 
         id: Uuid::now_v7(),
         team_id: Uuid::now_v7(),
         name: "Deals".into(),
-        user_id: "macro|owner@rox.one".into(),
+        user_id: "rox|owner@rox.one".into(),
         record_type: Some(PipelineRecordType::Company),
         database_id: DatabaseId::new(),
         table_id: table,
@@ -151,7 +151,7 @@ async fn one_read_per_record_type_answers_every_record_without_its_own_column() 
         },
         calls: Mutex::default(),
     });
-    let viewer = RoxUserIdStr::parse_from_str("macro|viewer@rox.one")
+    let viewer = RoxUserIdStr::parse_from_str("rox|viewer@rox.one")
         .unwrap()
         .into_owned();
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();

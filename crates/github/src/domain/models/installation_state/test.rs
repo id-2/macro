@@ -4,7 +4,7 @@ const SECRET: &[u8] = b"a distinct installation state test secret";
 const NOW: i64 = 1_730_000_000;
 
 fn user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|installer@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|installer@example.com".to_string()).unwrap()
 }
 
 fn state(team_id: Option<Uuid>, exp: i64) -> InstallationState {
@@ -98,7 +98,7 @@ fn malformed_tokens_are_rejected() {
 #[test]
 fn malformed_ids_are_rejected() {
     let malformed_team_id = sign_raw_payload(
-        br#"{"rox_user_id":"macro|installer@example.com","team_id":"not-a-uuid","exp":1730003600}"#,
+        br#"{"rox_user_id":"rox|installer@example.com","team_id":"not-a-uuid","exp":1730003600}"#,
     );
     let malformed_user_id = sign_raw_payload(
         br#"{"rox_user_id":"not-a-macro-user","team_id":"8c06ab3e-693c-45a7-8f92-1b5a5bf876ac","exp":1730003600}"#,

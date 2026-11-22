@@ -7,7 +7,7 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-00000000001b', 'macro|user_b@example.com', '00000000-0000-0000-0000-00000000001b',
+VALUES ('00000000-0000-0000-0000-00000000001b', 'rox|user_b@example.com', '00000000-0000-0000-0000-00000000001b',
         'user_b@example.com', 'GMAIL', true, NOW(), NOW());
 
 ------------------------------------------------------------

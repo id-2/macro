@@ -130,9 +130,9 @@ async fn status_change_is_credited_to_a_user_who_can_edit_the_task() {
         "task-1",
         EntityType::Document,
     );
-    let merger = RoxUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
+    let merger = RoxUserIdStr::parse_from_str("rox|merger@example.com").unwrap();
     let entity_access = EditorsOnly {
-        editors: vec!["macro|merger@example.com"],
+        editors: vec!["rox|merger@example.com"],
     };
 
     let receipt = credited_task_edit_receipt(&entity_access, &access, Some(&merger)).await;
@@ -151,7 +151,7 @@ async fn status_change_stays_uncredited_when_the_user_cannot_edit_the_task() {
         "task-1",
         EntityType::Document,
     );
-    let merger = RoxUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
+    let merger = RoxUserIdStr::parse_from_str("rox|merger@example.com").unwrap();
     let entity_access = EditorsOnly { editors: vec![] };
 
     let receipt = credited_task_edit_receipt(&entity_access, &access, Some(&merger)).await;

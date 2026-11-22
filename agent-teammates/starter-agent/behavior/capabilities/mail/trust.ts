@@ -85,9 +85,9 @@ const publicDomains = new Set([
 	"mail.com",
 ]);
 
-/** Who, from the agent's mailbox and its owner's Rox id (`macro|name@domain`). */
+/** Who, from the agent's mailbox and its owner's Rox id (`rox|name@domain`). */
 export const whoOf = (mailbox: string, ownerId: string): Who => {
-	const owner = parseAddress(ownerId.replace(/^macro\|/, ""));
+	const owner = parseAddress(ownerId.replace(/^rox\|/, ""));
 	return {
 		mailbox: mailbox.trim().toLowerCase(),
 		owner: owner?.address,

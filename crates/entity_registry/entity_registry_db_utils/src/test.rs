@@ -11,7 +11,7 @@ use super::{
 };
 
 fn user_owner() -> Owner {
-    Owner::parse(OwnerType::User, "macro|hutch@rox.one").unwrap()
+    Owner::parse(OwnerType::User, "rox|hutch@rox.one").unwrap()
 }
 
 fn bot_owner() -> Owner {
@@ -105,7 +105,7 @@ async fn insert_encodes_user_bot_and_team_owners(pool: PgPool) {
             Uuid::from_u128(1),
             user_owner(),
             OwnerType::User,
-            "macro|hutch@rox.one",
+            "rox|hutch@rox.one",
         ),
         (
             Uuid::from_u128(2),

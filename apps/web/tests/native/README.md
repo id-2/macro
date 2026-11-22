@@ -51,7 +51,7 @@ signal and noise Mail metadata. Metadata requests must carry a recency cutoff,
 but fixture timestamps are fixed, so the server does not apply it. Projection
 capsules reuse the existing Rust-encoded fixtures.
 The runner starts from a fresh profile, so it first leaves the login hint
-(`localStorage['macro:login']`) and reloads: the app checks identity only when a
+(`localStorage['rox:login']`) and reloads: the app checks identity only when a
 hint exists (`user-info-gate.ts`), and reads it once at startup. Unrelated
 app-chrome reads (billing, language, system status, routines, MCP connections,
 calendars, forms, harnesses, saved views, work feed, contacts) return explicit

@@ -8,11 +8,11 @@ import { memoryStore, type Store } from "../store.ts";
 
 export const now = Temporal.Instant.from("2026-11-05T12:00:00Z");
 export const who: Who = {
-	me: "macro|agent@example.com",
-	owner: "macro|owner@example.com",
+	me: "rox|agent@example.com",
+	owner: "rox|owner@example.com",
 	name: "Pip",
 };
-export const ada = "macro|ada@example.com";
+export const ada = "rox|ada@example.com";
 
 /** A clock that stands still. */
 export const clock: Clock = { now: () => now, sleep: async () => undefined };

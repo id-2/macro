@@ -13,7 +13,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_contact_name_writes_and_overwrites_name(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     // Populate-style contact: no name yet, display falls back to email.
     let contact_id = insert_contact(&pool, company_id, "jane@acme.com").await?;
@@ -48,7 +48,7 @@ async fn set_contact_name_returns_not_found_for_unknown_contact(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -63,8 +63,8 @@ async fn set_contact_name_returns_not_found_for_unknown_contact(
 async fn set_contact_name_isolates_contacts_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|owner_a@test.com").await?;
-    seed_team(&pool, team_b, "macro|owner_b@test.com").await?;
+    seed_team(&pool, team_a, "rox|owner_a@test.com").await?;
+    seed_team(&pool, team_b, "rox|owner_b@test.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
     let contact_a = insert_contact(&pool, company_a, "jane@acme.com").await?;
 
@@ -81,7 +81,7 @@ async fn set_contact_name_isolates_contacts_across_teams(pool: PgPool) -> anyhow
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_contact_name_respects_hidden_contact_gate(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let contact_id = insert_contact(&pool, company_id, "jane@acme.com").await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -107,7 +107,7 @@ async fn set_contact_name_respects_hidden_contact_gate(pool: PgPool) -> anyhow::
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_contact_name_respects_hidden_company_gate(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let contact_id = insert_contact(&pool, company_id, "jane@acme.com").await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -132,7 +132,7 @@ async fn set_contact_name_respects_hidden_company_gate(pool: PgPool) -> anyhow::
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_set_contact_name_trims_and_persists(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let contact_id = insert_contact(&pool, company_id, "jane@acme.com").await?;
 

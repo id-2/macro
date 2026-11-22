@@ -185,7 +185,7 @@ fn oauth_service() -> OAuthService<FakeServerStore, FakeStateStore> {
 }
 
 fn test_user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|test@example.com")
+    RoxUserIdStr::parse_from_str("rox|test@example.com")
         .expect("valid test user id")
         .into_owned()
 }

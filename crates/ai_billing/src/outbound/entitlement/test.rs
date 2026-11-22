@@ -44,7 +44,7 @@ async fn only_a_paying_team_bills_its_members_seats(pool: PgPool) {
     );
 
     let paid_member =
-        RoxUserIdStr::try_from("macro|paid-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("rox|paid-member@example.com".to_string()).unwrap();
     let paid = entitlements.entitlement(&paid_member).await.unwrap();
     assert_eq!(paid.tier, PlanTier::Premium);
     assert_eq!(
@@ -55,7 +55,7 @@ async fn only_a_paying_team_bills_its_members_seats(pool: PgPool) {
     );
 
     let canceled_member =
-        RoxUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("rox|canceled-member@example.com".to_string()).unwrap();
     assert_eq!(
         entitlements.entitlement(&canceled_member).await.unwrap(),
         Entitlement::personal(canceled_member, PlanTier::Free)
@@ -74,7 +74,7 @@ async fn enterprise_team_still_bills_member_seats(pool: PgPool) {
     );
 
     let member =
-        RoxUserIdStr::try_from("macro|enterprise-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("rox|enterprise-member@example.com".to_string()).unwrap();
     let entitlement = entitlements.entitlement(&member).await.unwrap();
 
     assert!(entitlement.unlimited);
@@ -86,7 +86,7 @@ async fn enterprise_team_still_bills_member_seats(pool: PgPool) {
     );
     assert_eq!(
         entitlement.payer.as_ref(),
-        "macro|enterprise-owner@example.com"
+        "rox|enterprise-owner@example.com"
     );
     assert_eq!(entitlement.billed_users.len(), 2);
 }
@@ -122,7 +122,7 @@ async fn a_canceled_team_does_not_block_a_members_personal_subscription(pool: Pg
         evidence: PeriodEvidence::Snapshot,
     };
 
-    let member = RoxUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("rox|canceled-member@example.com".to_string()).unwrap();
     assert_eq!(
         entitlements.seats(&member, &personal).await.unwrap(),
         Some(vec![member])

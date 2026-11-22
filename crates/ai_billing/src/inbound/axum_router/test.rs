@@ -177,6 +177,6 @@ fn subscription_period_query_selects_the_scope() {
 
 #[test]
 fn settle_request_reads_the_camel_case_user_id() {
-    let request: SettleRequest = serde_json::from_str(r#"{"userId":"macro|a@b.c"}"#).unwrap();
-    assert_eq!(request.user_id, "macro|a@b.c");
+    let request: SettleRequest = serde_json::from_str(r#"{"userId":"rox|a@b.c"}"#).unwrap();
+    assert_eq!(request.user_id, "rox|a@b.c");
 }

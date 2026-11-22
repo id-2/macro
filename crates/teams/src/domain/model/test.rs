@@ -19,7 +19,7 @@ fn team_with_enterprise_status(enterprise: bool) -> Team {
         uuid::Uuid::nil(),
         "Test Team".to_string(),
         "TEST_TEAM".to_string(),
-        RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap(),
         false,
         enterprise,
     )

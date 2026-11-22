@@ -8,7 +8,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_returns_owned_visible_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@example.com";
+    let owner_id = "rox|owner@example.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["example.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -35,7 +35,7 @@ async fn get_contact_returns_owned_visible_contact(pool: PgPool) -> anyhow::Resu
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -49,10 +49,10 @@ async fn get_contact_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result
 async fn get_contact_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@example.com").await?;
-    seed_team(&pool, team_b, "macro|b@example.com").await?;
+    seed_team(&pool, team_a, "rox|a@example.com").await?;
+    seed_team(&pool, team_b, "rox|b@example.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["example.com"]).await?;
-    let link_a = insert_email_link(&pool, "macro|a@example.com", "a@macro.test").await?;
+    let link_a = insert_email_link(&pool, "rox|a@example.com", "a@macro.test").await?;
     let contact_a =
         insert_contact_with_source(&pool, company_a, "alice@example.com", link_a).await?;
 
@@ -68,7 +68,7 @@ async fn get_contact_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_returns_none_for_hidden_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@example.com";
+    let owner_id = "rox|owner@example.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["example.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -95,7 +95,7 @@ async fn get_contact_returns_none_when_parent_company_is_hidden(
     // must not be reachable. In practice `set_company_hidden` tears
     // down contacts on hide, but the query enforces the invariant.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@example.com";
+    let owner_id = "rox|owner@example.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["example.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -119,7 +119,7 @@ async fn get_contact_returns_none_when_parent_company_is_hidden(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_admin_sees_hidden_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@example.com";
+    let owner_id = "rox|owner@example.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["example.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -154,7 +154,7 @@ async fn get_contact_admin_reaches_contact_under_hidden_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@example.com";
+    let owner_id = "rox|owner@example.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["example.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;

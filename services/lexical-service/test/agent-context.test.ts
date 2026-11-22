@@ -19,7 +19,7 @@ const followUpWire = {
     },
     prompt_message_id: '00000000-0000-0000-0000-000000000003',
     sender: {
-      id: 'macro|julia@example.com',
+      id: 'rox|julia@example.com',
       name: 'Julia',
       email: 'julia@example.com',
     },
@@ -35,7 +35,7 @@ const followUpWire = {
         {
           id: '00000000-0000-0000-0000-000000000003',
           author: {
-            id: 'macro|julia@example.com',
+            id: 'rox|julia@example.com',
             name: 'Julia',
             email: 'julia@example.com',
           },
@@ -69,7 +69,7 @@ const taskAssignedWire = {
     },
   },
   assigned_by: {
-    id: 'macro|julia@example.com',
+    id: 'rox|julia@example.com',
     name: 'Julia',
     email: 'julia@example.com',
   },
@@ -80,7 +80,7 @@ const taskAssignedWire = {
 // Rust serializes DispatchedContext.from_bot as null when absent.
 const dispatchedWire = {
   kind: 'dispatched',
-  dispatched_by: { id: 'macro|julia@example.com', name: 'Julia' },
+  dispatched_by: { id: 'rox|julia@example.com', name: 'Julia' },
   dispatched_at: '2026-10-08T14:02:00Z',
   from_bot: null,
 };
@@ -90,7 +90,7 @@ const callStartedRoutineWire = {
   routine_id: '00000000-0000-0000-0000-0000000000f0',
   name: 'Call prep',
   owner: {
-    id: 'macro|julia@example.com',
+    id: 'rox|julia@example.com',
     name: 'Julia',
     email: 'julia@example.com',
   },
@@ -108,13 +108,13 @@ const callStartedRoutineWire = {
         channel_name: 'eng',
         started_at: '2026-10-08T14:00:00Z',
         started_by: {
-          id: 'macro|julia@example.com',
+          id: 'rox|julia@example.com',
           name: 'julia@example.com',
           email: 'julia@example.com',
         },
         participants: [
           {
-            id: 'macro|julia@example.com',
+            id: 'rox|julia@example.com',
             name: 'julia@example.com',
             email: 'julia@example.com',
           },
@@ -129,7 +129,7 @@ const callEndedRoutineWire = {
   routine_id: '00000000-0000-0000-0000-0000000000f1',
   name: 'Call recap',
   owner: {
-    id: 'macro|julia@example.com',
+    id: 'rox|julia@example.com',
     name: 'Julia',
     email: 'julia@example.com',
   },
@@ -148,7 +148,7 @@ const callEndedRoutineWire = {
         ended_at: '2026-10-08T14:30:00Z',
         participants: [
           {
-            id: 'macro|julia@example.com',
+            id: 'rox|julia@example.com',
             name: 'julia@example.com',
             email: 'julia@example.com',
           },
@@ -172,7 +172,7 @@ const githubRoutineWire = {
   routine_id: '00000000-0000-0000-0000-0000000000f2',
   name: 'Fix failing CI',
   owner: {
-    id: 'macro|julia@example.com',
+    id: 'rox|julia@example.com',
     name: 'Julia',
     email: 'julia@example.com',
   },

@@ -100,7 +100,7 @@ export function contactReferenceIdentity(label: string): string | undefined {
   if (id && !id.includes('$') && UTF8.encode(id).length <= MAX_CONTACT_ID_BYTES)
     return id;
   return validEmail(value)
-    ? canonicalContactUserId(`macro|${value}`)
+    ? canonicalContactUserId(`rox|${value}`)
     : undefined;
 }
 
@@ -230,7 +230,7 @@ export async function resolveContactReferences(
     const identities = request.labels.map(contactReferenceIdentity);
     const literals = request.labels.map(
       (label) =>
-        label.trim().toLowerCase().startsWith('macro|') ||
+        label.trim().toLowerCase().startsWith('rox|') ||
         validEmail(label.trim())
     );
     const nameIndexes = identities.flatMap((id, index) =>

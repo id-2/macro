@@ -353,7 +353,7 @@ async fn unknown_write_is_confirmed_before_retry_and_revoked_access_stops_execut
         .await
         .unwrap();
     sqlx::query!(
-        "UPDATE email_links SET rox_id = 'macro|new-owner@example.com' WHERE id = $1",
+        "UPDATE email_links SET rox_id = 'rox|new-owner@example.com' WHERE id = $1",
         work.mailbox.link_id
     )
     .execute(&db)

@@ -159,7 +159,7 @@ async fn authenticated_send_maps_the_immutable_snapshot_and_selected_inbox() {
         "ACCEPTED"
     );
     let calls = service.calls.lock().unwrap();
-    assert_eq!(calls[0].0, "macro|viewer@example.com");
+    assert_eq!(calls[0].0, "rox|viewer@example.com");
     assert_eq!(
         calls[0].1.to_string(),
         "00000000-0000-4000-8000-000000000002"
@@ -259,6 +259,6 @@ async fn pending_sends_require_authentication_and_reject_malformed_cursors() {
     );
     assert_eq!(
         service.calls.lock().unwrap()[0].0,
-        "macro|viewer@example.com"
+        "rox|viewer@example.com"
     );
 }

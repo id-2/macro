@@ -383,7 +383,7 @@ async fn an_in_process_session_whose_row_is_gone_releases() {
 /// open, still streams its reply.
 #[test]
 fn only_a_background_session_with_instructions_goes_unread() {
-    let owner = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|someone@example.com")
+    let owner = rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|someone@example.com")
         .expect("a user id");
     let mut session = test_agent_session(AgentSessionId::new());
     session.owner_id = model_owner::Owner::User(owner.clone());

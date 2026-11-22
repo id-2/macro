@@ -3,7 +3,7 @@ use crate::outbound::pg::source_access::verify_calendar_snapshot;
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_metadata_changes_never_certify_unchanged_ooo(pool: PgPool) {
-    let owner = "macro|calendar-refresh@example.com";
+    let owner = "rox|calendar-refresh@example.com";
     let link = insert_link(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (account, calendar_id) = provider_ids(&repo, link).await;
@@ -50,7 +50,7 @@ async fn calendar_metadata_changes_never_certify_unchanged_ooo(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn refresh_hint_preserves_unrelated_events_but_clears_old_and_new_ooo(pool: PgPool) {
-    let owner = "macro|refresh@example.com";
+    let owner = "rox|refresh@example.com";
     insert_user(&pool, owner).await;
     let link = insert_link(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool);

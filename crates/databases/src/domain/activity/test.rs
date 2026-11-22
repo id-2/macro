@@ -43,18 +43,18 @@ fn created_maps_to_a_created_activity_at_the_repository_timestamp() {
     let created_at = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
     let event = envelope(DatabaseTopicEvent::Created(DatabaseCreatedMetadata {
         database_id: DATABASE_ID.parse().unwrap(),
-        owner: user("macro|creator@example.com"),
+        owner: user("rox|creator@example.com"),
         name: "Roadmap".to_string(),
         created_at,
-        attribution: EventAttribution::user(user("macro|creator@example.com")),
+        attribution: EventAttribution::user(user("rox|creator@example.com")),
     }));
 
     let activity = single_activity(event.event.ingest(event.event_id));
     assert_eq!(activity.action, Action::Created);
     assert_eq!(activity.entity_type, EntityType::Database);
     assert_eq!(activity.entity_id, DATABASE_ID);
-    assert_eq!(activity.subject_id, "macro|creator@example.com");
-    assert_eq!(activity.actor.as_ref(), "macro|creator@example.com");
+    assert_eq!(activity.subject_id, "rox|creator@example.com");
+    assert_eq!(activity.actor.as_ref(), "rox|creator@example.com");
     assert_eq!(activity.occurred_at, created_at);
     assert_eq!(activity.id, activity_id(event.event_id, 0));
 }
@@ -64,16 +64,16 @@ fn renamed_restored_and_tables_changed_map_to_edited() {
     let events = [
         DatabaseTopicEvent::Renamed(DatabaseRenamedMetadata {
             database_id: DATABASE_ID.parse().unwrap(),
-            attribution: by_user("macro|editor@example.com"),
+            attribution: by_user("rox|editor@example.com"),
             name: "Renamed".to_string(),
         }),
         DatabaseTopicEvent::Restored(DatabaseRestoredMetadata {
             database_id: DATABASE_ID.parse().unwrap(),
-            attribution: by_user("macro|editor@example.com"),
+            attribution: by_user("rox|editor@example.com"),
         }),
         DatabaseTopicEvent::TablesChanged(DatabaseTablesChangedMetadata {
             database_id: DATABASE_ID.parse().unwrap(),
-            attribution: by_user("macro|editor@example.com"),
+            attribution: by_user("rox|editor@example.com"),
             tables: vec![TableVersionChange {
                 table_id: TableId::new(),
                 version: TableVersion(3),
@@ -87,7 +87,7 @@ fn renamed_restored_and_tables_changed_map_to_edited() {
         assert_eq!(activity.action, Action::Edited, "{:?}", event.event);
         assert_eq!(activity.entity_type, EntityType::Database);
         assert_eq!(activity.entity_id, DATABASE_ID);
-        assert_eq!(activity.subject_id, "macro|editor@example.com");
+        assert_eq!(activity.subject_id, "rox|editor@example.com");
     }
 }
 
@@ -98,19 +98,19 @@ fn an_agent_creation_lands_on_the_owners_feed_as_the_agent() {
         .expect("valid bot actor");
     let event = envelope(DatabaseTopicEvent::Created(DatabaseCreatedMetadata {
         database_id: DATABASE_ID.parse().unwrap(),
-        owner: user("macro|creator@example.com"),
+        owner: user("rox|creator@example.com"),
         name: "Roadmap".to_string(),
         created_at,
         attribution: EventAttribution {
             actor: bot.clone(),
-            on_behalf_of: Some(user("macro|creator@example.com")),
+            on_behalf_of: Some(user("rox|creator@example.com")),
         },
     }));
 
     let activity = single_activity(event.event.ingest(event.event_id));
     assert_eq!(activity.action, Action::Created);
     assert_eq!(activity.actor, bot);
-    assert_eq!(activity.subject_id, "macro|creator@example.com");
+    assert_eq!(activity.subject_id, "rox|creator@example.com");
     assert_eq!(activity.occurred_at, created_at);
 }
 
@@ -119,7 +119,7 @@ fn sharing_changed_maps_to_edited() {
     let event = envelope(DatabaseTopicEvent::SharingChanged(
         DatabaseSharingChangedMetadata {
             database_id: DATABASE_ID.parse().unwrap(),
-            attribution: by_user("macro|owner@example.com"),
+            attribution: by_user("rox|owner@example.com"),
         },
     ));
 
@@ -127,7 +127,7 @@ fn sharing_changed_maps_to_edited() {
     assert_eq!(activity.action, Action::Edited);
     assert_eq!(activity.entity_type, EntityType::Database);
     assert_eq!(activity.entity_id, DATABASE_ID);
-    assert_eq!(activity.subject_id, "macro|owner@example.com");
+    assert_eq!(activity.subject_id, "rox|owner@example.com");
     assert_eq!(activity.id, activity_id(event.event_id, 0));
 }
 
@@ -135,12 +135,12 @@ fn sharing_changed_maps_to_edited() {
 fn trashed_maps_to_deleted() {
     let event = envelope(DatabaseTopicEvent::Trashed(DatabaseTrashedMetadata {
         database_id: DATABASE_ID.parse().unwrap(),
-        attribution: by_user("macro|owner@example.com"),
+        attribution: by_user("rox|owner@example.com"),
     }));
 
     let activity = single_activity(event.event.ingest(event.event_id));
     assert_eq!(activity.action, Action::Deleted);
-    assert_eq!(activity.subject_id, "macro|owner@example.com");
+    assert_eq!(activity.subject_id, "rox|owner@example.com");
 }
 
 #[test]
@@ -152,7 +152,7 @@ fn delegated_writes_land_on_the_subjects_feed() {
             database_id: DATABASE_ID.parse().unwrap(),
             attribution: Some(EventAttribution {
                 actor: bot.clone(),
-                on_behalf_of: Some(user("macro|asker@example.com")),
+                on_behalf_of: Some(user("rox|asker@example.com")),
             }),
             tables: vec![],
         },
@@ -160,7 +160,7 @@ fn delegated_writes_land_on_the_subjects_feed() {
 
     let activity = single_activity(event.event.ingest(event.event_id));
     assert_eq!(activity.actor, bot);
-    assert_eq!(activity.subject_id, "macro|asker@example.com");
+    assert_eq!(activity.subject_id, "rox|asker@example.com");
 }
 
 #[test]
@@ -190,7 +190,7 @@ fn purged_purges_the_database() {
 fn events_round_trip_through_json() {
     let event = DatabaseTopicEvent::TablesChanged(DatabaseTablesChangedMetadata {
         database_id: DATABASE_ID.parse().unwrap(),
-        attribution: by_user("macro|editor@example.com"),
+        attribution: by_user("rox|editor@example.com"),
         tables: vec![TableVersionChange {
             table_id: TableId::new(),
             version: TableVersion(7),

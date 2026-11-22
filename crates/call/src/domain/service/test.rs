@@ -486,7 +486,7 @@ impl crate::domain::ports::RecordingStorage for StubRecordingStorage {
 
 const STARTED_EVENT_CALL_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b6c7);
 const STARTED_EVENT_CHANNEL_ID: Uuid = Uuid::from_u128(0x3f6f8b0a_6f9f_4a3f_9c3a_2b1e5d4c7a90);
-const STARTED_EVENT_CREATOR: &str = "macro|creator@example.com";
+const STARTED_EVENT_CREATOR: &str = "rox|creator@example.com";
 
 #[derive(Clone, Copy)]
 enum GetOrCreateScenario {
@@ -1141,8 +1141,8 @@ async fn reconcile_gives_recent_joiners_time_to_connect() {
 const ARCHIVED_EVENT_CALL_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b6d8);
 const ARCHIVED_EVENT_CHANNEL_ID: Uuid = Uuid::from_u128(0x4f6f8b0a_6f9f_4a3f_9c3a_2b1e5d4c7a91);
 const ARCHIVED_EVENT_ROOM_NAME: &str = "archived-event-room";
-const ARCHIVED_EVENT_CREATOR: &str = "macro|archiver@example.com";
-const ARCHIVED_EVENT_JOINER: &str = "macro|joiner@example.com";
+const ARCHIVED_EVENT_CREATOR: &str = "rox|archiver@example.com";
+const ARCHIVED_EVENT_JOINER: &str = "rox|joiner@example.com";
 const ARCHIVED_EVENT_PARTICIPANT: &str = "participant@example.com";
 const RECORDING_READY_EGRESS_ID: &str = "recording-ready-egress";
 const RECORDING_READY_FILE_URL: &str =
@@ -1391,7 +1391,7 @@ async fn participant_left_publishes_last_participant_archived_event() {
 #[tokio::test]
 async fn room_finished_publishes_room_finished_archived_event() {
     let active_call = active_call_for_archived_event(
-        "macro|stale-active-creator@example.com",
+        "rox|stale-active-creator@example.com",
         Some("archived-event-egress"),
     );
     let archived_call = archived_call_for_event(
@@ -1762,7 +1762,7 @@ async fn failed_recording_key_persistence_does_not_publish_recording_ready_event
 
 const MUTATED_EVENT_CALL_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b6e9);
 const MUTATED_EVENT_CHANNEL_ID: Uuid = Uuid::from_u128(0x5f6f8b0a_6f9f_4a3f_9c3a_2b1e5d4c7a92);
-const MUTATED_EVENT_ACTOR: &str = "macro|editor@example.com";
+const MUTATED_EVENT_ACTOR: &str = "rox|editor@example.com";
 
 fn call_record_for_mutation() -> CallRecord {
     CallRecord {
@@ -1772,7 +1772,7 @@ fn call_record_for_mutation() -> CallRecord {
         call_id: MUTATED_EVENT_CALL_ID,
         channel_id: Some(MUTATED_EVENT_CHANNEL_ID),
         room_name: Some("mutation-event-room".to_string()),
-        created_by: "macro|creator@example.com".to_string(),
+        created_by: "rox|creator@example.com".to_string(),
         started_at: archived_event_started_at(),
         ended_at: Some(archived_event_ended_at()),
         duration_ms: Some(183_000),
@@ -1909,7 +1909,7 @@ async fn get_active_calls_maps_repo_rows_into_response() {
     let summary = ActiveCallSummary {
         call_id: MUTATED_EVENT_CALL_ID,
         channel_id: MUTATED_EVENT_CHANNEL_ID,
-        created_by: "macro|user-a@test.com".to_string(),
+        created_by: "rox|user-a@test.com".to_string(),
         created_at: started_event_timestamp(),
         participant_count: 2,
     };
@@ -1917,7 +1917,7 @@ async fn get_active_calls_maps_repo_rows_into_response() {
     repo.expect_get_active_calls_for_user()
         .times(1)
         .return_once(move |user_id| {
-            assert_eq!(user_id.as_ref(), "macro|viewer@example.com");
+            assert_eq!(user_id.as_ref(), "rox|viewer@example.com");
             Box::pin(async move { Ok(vec![summary]) })
         });
     let service = build_mutation_service(repo, RecordingEventBroker::default());
@@ -2141,7 +2141,7 @@ async fn failed_edit_call_record_does_not_publish_updated_event() {
 
 // -- team sharing -------------------------------------------------------------
 
-const CREATOR: &str = "macro|creator@example.com";
+const CREATOR: &str = "rox|creator@example.com";
 const CREATOR_TEAM_ID: Uuid = Uuid::from_u128(42);
 
 fn team_share_facts() -> TeamShareFacts {
@@ -2919,7 +2919,7 @@ fn summarized_call_record(custom_name: Option<&str>) -> CallRecord {
         call_id: SUMMARIZED_EVENT_CALL_ID,
         channel_id: Some(SUMMARIZED_EVENT_CHANNEL_ID),
         room_name: Some(SUMMARIZED_EVENT_CHANNEL_ID.to_string()),
-        created_by: "macro|creator@example.com".to_string(),
+        created_by: "rox|creator@example.com".to_string(),
         started_at: started_event_timestamp(),
         ended_at: Some(started_event_timestamp()),
         duration_ms: Some(10_000),
@@ -2943,7 +2943,7 @@ fn summarized_call_record(custom_name: Option<&str>) -> CallRecord {
         transcript: vec![CallRecordTranscriptSegment {
             transcript_id: Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b701),
             segment_id: Some("segment-1".to_string()),
-            speaker_id: "macro|speaker@example.com".to_string(),
+            speaker_id: "rox|speaker@example.com".to_string(),
             diarized_speaker_id: Some("speaker-1".to_string()),
             content: "Discuss the event publication behavior.".to_string(),
             started_at: started_event_timestamp(),
@@ -3591,7 +3591,7 @@ fn active_call(call_id: Uuid) -> Call {
         id: call_id,
         channel_id: Some(Uuid::nil()),
         room_name: Uuid::nil().to_string(),
-        created_by: "macro|carla@example.com".to_string(),
+        created_by: "rox|carla@example.com".to_string(),
         created_at: chrono::Utc::now(),
         egress_id: None,
     }
@@ -3914,8 +3914,8 @@ async fn enroll_stable_speaker_voices_links_all_voices_for_consistent_diarized_s
 
     let call_repo = PgCallRepo::new(pool.clone());
     let voice_repo = PgVoiceRepo::new(pool.clone());
-    let user_a = RoxUserIdStr::parse_from_str("macro|user-a@test.com")?;
-    let user_b = RoxUserIdStr::parse_from_str("macro|user-b@test.com")?;
+    let user_a = RoxUserIdStr::parse_from_str("rox|user-a@test.com")?;
+    let user_b = RoxUserIdStr::parse_from_str("rox|user-b@test.com")?;
     let voice_a = rox_uuid::generate_uuid_v7();
     let voice_b = rox_uuid::generate_uuid_v7();
     let now = Utc::now();
@@ -4006,7 +4006,7 @@ impl NotificationIngress for CallInviteIngress {
         );
         assert_eq!(
             request["req"]["recipient_ids"],
-            json!(["macro|guest@outside.example"])
+            json!(["rox|guest@outside.example"])
         );
         let content = &request["req"]["notification"]["content"];
         assert_eq!(content["title"], "Design review");
@@ -4612,7 +4612,7 @@ async fn call_record_reader_names_the_channel_as_the_reader_sees_it() {
         .times(1)
         .returning(|channel_id, user_id| {
             assert_eq!(*channel_id, MUTATED_EVENT_CHANNEL_ID);
-            assert_eq!(user_id.as_ref(), "macro|reader@example.com");
+            assert_eq!(user_id.as_ref(), "rox|reader@example.com");
             Box::pin(async { Ok(Some("eng".to_string())) })
         });
 

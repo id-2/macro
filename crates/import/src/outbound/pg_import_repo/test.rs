@@ -399,7 +399,7 @@ async fn a_team_keeps_one_copy_of_each_notion_object(pool: PgPool) {
 async fn ledger_actor(pool: &PgPool, label: &str) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
-    let user_id = format!("macro|{email}");
+    let user_id = format!("rox|{email}");
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
         id,
@@ -460,7 +460,7 @@ async fn ledger_channel(pool: &PgPool, id: Uuid, team: Option<Uuid>, kind: Impor
     sqlx::query!(
         r#"INSERT INTO comms_channels (id, name, channel_type, team_id, owner_id)
            VALUES ($1, CASE WHEN $2 = 'direct_message' THEN NULL ELSE 'Historical' END,
-                   $2::comms_channel_type, $3, 'macro|admin@example.com')"#,
+                   $2::comms_channel_type, $3, 'rox|admin@example.com')"#,
         id,
         kind.as_ref() as &str,
         team,

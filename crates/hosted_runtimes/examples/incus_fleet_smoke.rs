@@ -163,7 +163,7 @@ async fn main() -> Result<(), rootcause::Report> {
         state,
         harness_id: None,
         created_by: rox_user_id::user_id::RoxUserIdStr::try_from(
-            "macro|smoke@example.com".to_owned(),
+            "rox|smoke@example.com".to_owned(),
         )?,
         created_at: now,
         enrolled_at: None,

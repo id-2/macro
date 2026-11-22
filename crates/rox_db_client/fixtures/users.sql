@@ -11,10 +11,10 @@ INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
 (SELECT 'a5555555-5555-5555-5555-555555555555', 'user5@user.com', 'user5@user.com', 'stripe_id5');
 
 INSERT INTO public."User" ("id","email","stripeCustomerId","rox_user_id")
-(SELECT 'macro|user@user.com', 'user@user.com','stripe_id', 'a1111111-1111-1111-1111-111111111111');
+(SELECT 'rox|user@user.com', 'user@user.com','stripe_id', 'a1111111-1111-1111-1111-111111111111');
 INSERT INTO public."User" ("id","email","stripeCustomerId", "hasOnboardingDocuments","rox_user_id")
-(SELECT 'macro|user2@user.com', 'user2@user.com','stripe_id2', TRUE, 'a2222222-2222-2222-2222-222222222222');
+(SELECT 'rox|user2@user.com', 'user2@user.com','stripe_id2', TRUE, 'a2222222-2222-2222-2222-222222222222');
 INSERT INTO public."User" ("id","email","stripeCustomerId", "organizationId","rox_user_id")
-(SELECT 'macro|user3@user.com', 'user3@user.com','stripe_id3', 1, 'a3333333-3333-3333-3333-333333333333');
+(SELECT 'rox|user3@user.com', 'user3@user.com','stripe_id3', 1, 'a3333333-3333-3333-3333-333333333333');
 INSERT INTO public."User" ("id","email","stripeCustomerId","rox_user_id")
-(SELECT 'macro|user5@user.com', 'user5@user.com','stripe_id5', 'a5555555-5555-5555-5555-555555555555');
+(SELECT 'rox|user5@user.com', 'user5@user.com','stripe_id5', 'a5555555-5555-5555-5555-555555555555');

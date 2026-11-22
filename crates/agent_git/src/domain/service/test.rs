@@ -346,9 +346,9 @@ fn request(endpoint: GitEndpoint, body: &'static [u8]) -> GitRequest {
     }
 }
 
-const AGENT: &str = "macro|agent@example.com";
-const ADMIN: &str = "macro|admin@example.com";
-const MEMBER: &str = "macro|member@example.com";
+const AGENT: &str = "rox|agent@example.com";
+const ADMIN: &str = "rox|admin@example.com";
+const MEMBER: &str = "rox|member@example.com";
 const TEAM: Uuid = Uuid::from_u128(0x0190_0000_0000_7000_8000_0000_0000_0001);
 
 #[tokio::test]
@@ -744,7 +744,7 @@ fn seed() -> PersonaSeed {
         personality: "Warm and direct.".to_owned(),
         voice: None,
         creator_id: Some(
-            RoxUserIdStr::parse_from_str("macro|admin@example.com")
+            RoxUserIdStr::parse_from_str("rox|admin@example.com")
                 .expect("creator id")
                 .into_owned(),
         ),
@@ -752,7 +752,7 @@ fn seed() -> PersonaSeed {
 }
 
 fn agent() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|sam@agents.example.com")
+    RoxUserIdStr::parse_from_str("rox|sam@agents.example.com")
         .expect("agent id")
         .into_owned()
 }
@@ -766,8 +766,8 @@ fn the_settings_name_the_agent_and_its_owner() {
         .expect("agent.json is rendered");
     let settings: serde_json::Value = serde_json::from_str(&settings.contents).unwrap();
 
-    assert_eq!(settings["owner"], "macro|admin@example.com");
-    assert_eq!(settings["me"], "macro|sam@agents.example.com");
+    assert_eq!(settings["owner"], "rox|admin@example.com");
+    assert_eq!(settings["me"], "rox|sam@agents.example.com");
     assert_eq!(settings["name"], "Sam");
     assert_eq!(settings["email"], "sam@agents.example.com");
     assert_eq!(settings["timeZone"], "UTC");

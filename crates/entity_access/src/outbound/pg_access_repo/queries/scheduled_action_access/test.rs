@@ -3,14 +3,14 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|scheduled-action-owner@corp.test";
-const STRANGER: &str = "macro|scheduled-action-stranger@corp.test";
+const OWNER: &str = "rox|scheduled-action-owner@corp.test";
+const STRANGER: &str = "rox|scheduled-action-stranger@corp.test";
 const CHANNEL: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_5a11);
 const TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_5a12);
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::now_v7();
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
 
     sqlx::query!(
         r#"

@@ -6,4 +6,4 @@ VALUES
 INSERT INTO
     public."User" (id, email, rox_user_id)
 VALUES
-    ('macro|new@user.com', 'new@user.com', 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid);
+    ('rox|new@user.com', 'new@user.com', 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid);

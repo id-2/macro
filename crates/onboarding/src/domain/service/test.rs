@@ -4,7 +4,7 @@ use mcp_client::domain::models::{McpServerRecord, StoredCredentials};
 use std::sync::Mutex;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
+    RoxUserIdStr::try_from("rox|tester@rox.one".to_string()).expect("valid test user id")
 }
 
 fn active_row() -> OnboardingRow {
@@ -165,7 +165,7 @@ fn suggested_team_domain_offers_custom_domains_only() {
 
     // Generic consumer provider: no domain team to suggest.
     let gmail =
-        RoxUserIdStr::try_from("macro|tester@gmail.com".to_string()).expect("valid test user id");
+        RoxUserIdStr::try_from("rox|tester@gmail.com".to_string()).expect("valid test user id");
     assert_eq!(suggested_team_domain(&gmail), None);
 }
 

@@ -6,7 +6,7 @@ use soup_filter_projection::{
     MailCacheProjectionFacts, SoupCacheProjectionSupplement, encode_cache_projection_supplement,
 };
 
-const VIEWER: &str = "macro|native@example.com";
+const VIEWER: &str = "rox|native@example.com";
 const MAIL: &str = include_str!("mail.graphql");
 const PARTIAL: &str = include_str!("partial-mail.graphql");
 const ROWS: &[u16] = &[4, 6, 8, 9, 10, 12];
@@ -413,21 +413,21 @@ fn native_identity_switch_does_not_borrow_old_mail_projection_inputs() {
     for hydration in [false, true] {
         let handle = spawn_handle();
         hydrate(&handle);
-        let data = patch("macro|new@example.com", 4, true);
+        let data = patch("rox|new@example.com", 4, true);
         let reset = if hydration {
             block_on(handle.hydrate_query(
                 PARTIAL.into(),
                 None,
                 Variables::new(),
                 data,
-                Some("macro|new@example.com".into()),
+                Some("rox|new@example.com".into()),
                 None,
             ))
             .unwrap()
             .write_result
             .reset
         } else {
-            write_data(&handle, PARTIAL, data, Some("macro|new@example.com")).reset
+            write_data(&handle, PARTIAL, data, Some("rox|new@example.com")).reset
         };
         assert!(reset);
         assert!(

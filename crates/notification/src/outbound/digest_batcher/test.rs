@@ -42,7 +42,7 @@ async fn cleanup_prefix(conn: &mut MultiplexedConnection, prefix: &str) {
 }
 
 fn test_user(suffix: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|test_{}@example.com", suffix)).unwrap()
+    RoxUserIdStr::try_from(format!("rox|test_{}@example.com", suffix)).unwrap()
 }
 
 fn create_test_notification(

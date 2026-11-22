@@ -10,8 +10,8 @@ import { sdkCalls } from '../macro.ts';
 import { macroPlaceFacts, placeCall } from '../place.ts';
 import { type NewPlaceRow, PlaceRow } from '../types.ts';
 
-const agent = 'macro|james@agents.example.com';
-const owner = 'macro|owner@example.com';
+const agent = 'rox|james@agents.example.com';
+const owner = 'rox|owner@example.com';
 const dm = '0190a3c4-0000-7000-8000-0000000000d1';
 const asked = '0190a3c4-0000-7000-8000-0000000000a1';
 const call = '0190a3c4-0000-7000-8000-0000000000c1';

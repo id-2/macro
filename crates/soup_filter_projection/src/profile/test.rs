@@ -20,7 +20,7 @@ fn project() -> IndexDocument {
                 .unwrap(),
             kind: SoupFlatEntityKind::Project,
             id: uuid::Uuid::from_u128(1),
-            owner: "macro|viewer@example.com".into(),
+            owner: "rox|viewer@example.com".into(),
             project_id: None,
             file_type: None,
             created_at: timestamp,
@@ -69,7 +69,7 @@ fn document_input(file_type: Option<&str>) -> DirectProjectionInput {
         record_key: RecordKey::new("GraphqlSoupDocument:00000000-0000-0000-0000-000000000001")
             .unwrap(),
         id: uuid::Uuid::from_u128(1),
-        owner: "macro|viewer@example.com".into(),
+        owner: "rox|viewer@example.com".into(),
         project_id: None,
         file_type: file_type.map(str::to_owned),
         created_at: chrono::DateTime::from_timestamp(0, 0).unwrap(),

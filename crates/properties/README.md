@@ -79,7 +79,7 @@ The current representations include:
 - `DataType` and `EntityType` as `SCREAMING_SNAKE_CASE` strings, such as
   `"SELECT_STRING"`, `"TAG"`, `"DOCUMENT"`, and `"TASK"`.
 - `PropertyOwner` as an internally tagged object:
-  `{"scope":"user","user_id":"macro|user@example.com"}`,
+  `{"scope":"user","user_id":"rox|user@example.com"}`,
   `{"scope":"team","team_id":"<uuid>"}`, or `{"scope":"system"}`.
 - `PropertyOptionValue` as `{"type":"string","value":"..."}` or
   `{"type":"number","value":42.5}`.
@@ -97,7 +97,7 @@ Payloads intentionally contain property metadata and complete property values.
 Property display names, string option values, string property values, and link
 values can contain user-authored text. `actor_user_id`, user-scoped
 `owner.user_id`, and user entity references such as task assignees can contain
-Rox user IDs serialized as `macro|<email address>` and must be handled as
+Rox user IDs serialized as `rox|<email address>` and must be handled as
 personal data.
 
 The producer does not redact those contract fields. Its sanitization boundary

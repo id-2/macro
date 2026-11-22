@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 async fn intent(pool: &PgPool, context: &ClaimedConversation) -> HistoricalMessage {
     let channel = Uuid::now_v7();
-    sqlx::query!("INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'source', 'private', 'macro|lifecycle@example.com')", channel).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'source', 'private', 'rox|lifecycle@example.com')", channel).execute(pool).await.unwrap();
     let text = MrkdwnConverter {
         users: &UserDirectory::default(),
         channels: &BTreeMap::new(),

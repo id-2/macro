@@ -91,9 +91,9 @@ pub struct DocumentFilters {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub project_ids: Vec<String>,
 
-    /// Filter by document owner principal — a user ('macro|user@example.com'), a bot
+    /// Filter by document owner principal — a user ('rox|user@example.com'), a bot
     /// ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-    /// ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+    /// ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
     /// search all owners.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub owners: Vec<String>,
@@ -160,9 +160,9 @@ pub struct ChatFilters {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub project_ids: Vec<String>,
 
-    /// Filter by chat owner principal — a user ('macro|user@example.com'), a bot
+    /// Filter by chat owner principal — a user ('rox|user@example.com'), a bot
     /// ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-    /// ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+    /// ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
     /// search all owners.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub owners: Vec<String>,
@@ -442,7 +442,7 @@ pub struct InitiativeFilters {
     /// Initiative ids to filter by. Empty to include all accessible initiatives.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub initiative_ids: Vec<String>,
-    /// Filter by initiative owner principal — a user ('macro|user@example.com'), a
+    /// Filter by initiative owner principal — a user ('rox|user@example.com'), a
     /// bot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include
     /// every owner.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -494,7 +494,7 @@ pub struct AgentSessionFilters {
     /// Agent session ids to filter by. Empty to include all accessible sessions.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ids: Vec<String>,
-    /// Filter by session owner principal — a user ('macro|user@example.com'), a bot
+    /// Filter by session owner principal — a user ('rox|user@example.com'), a bot
     /// ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every
     /// owner.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -741,9 +741,9 @@ pub struct ProjectFilters {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub include_root: bool,
 
-    /// Filter by project owner principal — a user ('macro|user@example.com'), a bot
+    /// Filter by project owner principal — a user ('rox|user@example.com'), a bot
     /// ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-    /// ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+    /// ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
     /// search all owners.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub owners: Vec<String>,

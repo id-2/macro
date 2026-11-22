@@ -222,13 +222,13 @@ fn launch() -> Launch {
 async fn owners_use_only_their_credentials_and_record_mapping_before_return() {
     let connections = Arc::new(Connections::default());
     let provider = Arc::new(Provider::default());
-    let a = runtime("macro|a@example.com", connections.clone(), provider.clone());
-    let b = runtime("macro|b@example.com", connections, provider.clone());
+    let a = runtime("rox|a@example.com", connections.clone(), provider.clone());
+    let b = runtime("rox|b@example.com", connections, provider.clone());
     a.launch(&launch()).await.unwrap();
     b.launch(&launch()).await.unwrap();
     assert_eq!(
         *provider.0.lock().unwrap(),
-        ["macro|a@example.com", "macro|b@example.com"]
+        ["rox|a@example.com", "rox|b@example.com"]
     );
     assert_eq!(
         a.sessions.get(a.session).await.unwrap().unwrap().provider,
@@ -239,7 +239,7 @@ async fn owners_use_only_their_credentials_and_record_mapping_before_return() {
 async fn disconnect_and_reconnect_cannot_retarget_existing_session() {
     let connections = Arc::new(Connections::default());
     let provider = Arc::new(Provider::default());
-    let old = runtime("macro|a@example.com", connections.clone(), provider.clone());
+    let old = runtime("rox|a@example.com", connections.clone(), provider.clone());
     connections.disconnect(old.owner.as_ref()).await.unwrap();
     assert!(old.launch(&launch()).await.is_err());
     let _new = runtime(old.owner.as_ref(), connections, provider.clone());
@@ -254,7 +254,7 @@ async fn disconnect_and_reconnect_cannot_retarget_existing_session() {
 async fn launch_rechecks_environment_visibility() {
     let connections = Arc::new(Connections::default());
     let provider = Arc::new(Provider::default());
-    let runtime = runtime("macro|a@example.com", connections, provider.clone());
+    let runtime = runtime("rox|a@example.com", connections, provider.clone());
     let mut request = launch();
     request.environment = CloudId::new("env_foreign".into()).unwrap();
     assert!(runtime.launch(&request).await.is_err());
@@ -300,7 +300,7 @@ async fn pr_publication_passes_the_activated_claim_and_rejects_disconnected_owne
     use agent_session::domain::model::{ManagerFence, ReplicaId, SessionClaim};
     let connections = Arc::new(Connections::default());
     let mut runtime = runtime(
-        "macro|pr@example.com",
+        "rox|pr@example.com",
         connections.clone(),
         Arc::new(Provider::default()),
     );

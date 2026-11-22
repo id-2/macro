@@ -37,7 +37,7 @@ fn system(name: &str) -> ResolvedAuthor {
 fn lowercases_raw_emails_without_canonicalizing_dots_or_plus_aliases() {
     let directory = directory();
     let id = directory.participant(&"U100".parse().unwrap()).unwrap();
-    assert_eq!(id.as_ref(), "macro|alice.example+archive@gmail.com");
+    assert_eq!(id.as_ref(), "rox|alice.example+archive@gmail.com");
     assert_eq!(
         author(&directory, r#"{"user":"U100"}"#),
         ResolvedAuthor::User(id)
@@ -47,7 +47,7 @@ fn lowercases_raw_emails_without_canonicalizing_dots_or_plus_aliases() {
             .participant(&"W100".parse().unwrap())
             .unwrap()
             .as_ref(),
-        "macro|enterprise+alias@example.test"
+        "rox|enterprise+alias@example.test"
     );
 }
 
@@ -86,8 +86,8 @@ fn dm_members_must_be_exactly_two_distinct_email_bearing_users() {
     let pair = directory
         .direct_message_members(&["U100".parse().unwrap(), "U200".parse().unwrap()])
         .unwrap();
-    assert_eq!(pair[0].as_ref(), "macro|alice.example+archive@gmail.com");
-    assert_eq!(pair[1].as_ref(), "macro|bob@example.test");
+    assert_eq!(pair[0].as_ref(), "rox|alice.example+archive@gmail.com");
+    assert_eq!(pair[1].as_ref(), "rox|bob@example.test");
 }
 
 #[test]

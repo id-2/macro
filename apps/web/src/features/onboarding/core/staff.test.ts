@@ -19,7 +19,7 @@ describe('canBypassOnboarding', () => {
 describe('isRoxStaffEmail', () => {
   it('matches only the rox.one domain', () => {
     expect(isRoxStaffEmail('ada@rox.one')).toBe(true);
-    expect(isRoxStaffEmail('ada@MACRO.com')).toBe(true);
+    expect(isRoxStaffEmail('ada@ROX.ONE')).toBe(true);
     expect(isRoxStaffEmail('ada@sub.rox.one')).toBe(false);
     expect(isRoxStaffEmail('ada@gmail.com')).toBe(false);
   });

@@ -92,7 +92,7 @@ fn target(emulator: &OutlookEmulator, email: &str, calendar: &str) -> ProviderCa
     ProviderCalendarTarget {
         binding: Some(binding()),
         provider: CalendarProvider::Outlook,
-        owner_id: format!("macro|{email}"),
+        owner_id: format!("rox|{email}"),
         email_link_id: binding().link_id,
         account_id: Uuid::from_u128(1),
         calendar_id: Uuid::from_u128(2),

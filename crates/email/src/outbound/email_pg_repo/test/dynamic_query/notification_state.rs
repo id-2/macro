@@ -13,12 +13,12 @@ async fn exact_states_are_viewer_scoped_and_independent_of_read(
     let seen = uuid::uuid!("20000004-0000-0000-0000-000000000004");
     let done = uuid::uuid!("20000005-0000-0000-0000-000000000005");
     let other = uuid::uuid!("20000007-0000-0000-0000-000000000007");
-    let viewer = "macro|user1@test.com";
+    let viewer = "rox|user1@test.com";
     for (thread, state, user) in [
         (unseen, Unseen, viewer),
         (seen, Seen, viewer),
         (done, Done, viewer),
-        (other, Unseen, "macro|other@test.com"),
+        (other, Unseen, "rox|other@test.com"),
     ] {
         let id = Uuid::now_v7();
         sqlx::query!(

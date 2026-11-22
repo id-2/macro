@@ -1,7 +1,7 @@
 import { mailProjectionCapsules } from '../../../src/lib/graphql-cache/worker/browser-test/mail-projection-capsules';
 import type { MailAccountFieldsFragment } from '../../../src/lib/service-clients/service-storage/graphql/generated/graphql';
 
-export const USER_ID = 'macro|offline@example.com';
+export const USER_ID = 'rox|offline@example.com';
 export const EMAIL = 'offline@example.com';
 export const fixtureId = (n: number) =>
   `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;

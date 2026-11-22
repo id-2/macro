@@ -3,8 +3,8 @@ import type { ActivityEventFieldsFragment } from '@service-storage/graphql/gener
 const BASE = {
   __typename: 'GraphqlActivityEvent' as const,
   id: 'evt-1',
-  actorId: 'macro|sarah@example.com',
-  subjectId: 'macro|sarah@example.com',
+  actorId: 'rox|sarah@example.com',
+  subjectId: 'rox|sarah@example.com',
   entityType: 'DOCUMENT' as const,
   entityId: 'doc-1',
   occurredAt: '2026-08-21T12:00:00.000Z',
@@ -67,7 +67,7 @@ export const participantAddedEvent: ActivityEventFieldsFragment = {
   entityId: 'channel-1',
   action: {
     __typename: 'GraphqlActivityParticipantAdded',
-    participant: 'macro|sarah@example.com',
+    participant: 'rox|sarah@example.com',
   },
 };
 
@@ -78,7 +78,7 @@ export const participantRemovedEvent: ActivityEventFieldsFragment = {
   entityId: 'channel-1',
   action: {
     __typename: 'GraphqlActivityParticipantRemoved',
-    participant: 'macro|sarah@example.com',
+    participant: 'rox|sarah@example.com',
   },
 };
 

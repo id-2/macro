@@ -3,10 +3,10 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER_WITH_TEAM: &str = "macro|call-owner@corp.test";
-const OWNER_WITHOUT_TEAM: &str = "macro|call-owner-no-team@corp.test";
-const REQUESTER: &str = "macro|call-requester@corp.test";
-const DIRECT_SOURCE_ID: &str = "macro|direct-grantee@corp.test";
+const OWNER_WITH_TEAM: &str = "rox|call-owner@corp.test";
+const OWNER_WITHOUT_TEAM: &str = "rox|call-owner-no-team@corp.test";
+const REQUESTER: &str = "rox|call-requester@corp.test";
+const DIRECT_SOURCE_ID: &str = "rox|direct-grantee@corp.test";
 const CHANNEL_SOURCE_ID: &str = "00000000-0000-0000-0000-00000000ca11";
 const TEAM_SOURCE_ID: &str = "00000000-0000-0000-0000-000000007ea1";
 const OWNER_TEAM: Uuid = Uuid::from_u128(0x000000000000000000000000000ca101);
@@ -65,7 +65,7 @@ const LINK_ACCESS_CASES: [LinkAccessCase; 4] = [
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
 
     sqlx::query!(
         r#"

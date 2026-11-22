@@ -2,12 +2,12 @@ use super::*;
 use crate::domain::model::FileChangeKind;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-const OWNER: &str = "macro|changes-owner@example.com";
+const OWNER: &str = "rox|changes-owner@example.com";
 
 /// A session row for the summary row's foreign key, with the user and bot
 /// rows it needs in turn.
 async fn seed_session(pool: &PgPool) -> AgentSessionId {
-    let email = OWNER.strip_prefix("macro|").unwrap_or(OWNER);
+    let email = OWNER.strip_prefix("rox|").unwrap_or(OWNER);
     let rox_user_id = sqlx::query_scalar!(
         r#"
         INSERT INTO rox_user (id, username, email, stripe_customer_id)

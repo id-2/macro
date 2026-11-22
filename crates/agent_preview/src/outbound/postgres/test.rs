@@ -555,7 +555,7 @@ async fn concurrent_credentials_are_single_use_host_bound_and_bounded(pool: PgPo
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_watchers_cannot_renew_past_active_limits(pool: PgPool) {
     let repo = repository(pool.clone());
-    let other = RoxUserIdStr::try_from("macro|second@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("rox|second@example.com".to_owned()).unwrap();
     let limits = WatchLimits {
         sessions: 1,
         viewers: 1,

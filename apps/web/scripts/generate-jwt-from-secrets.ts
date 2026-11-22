@@ -85,7 +85,7 @@ async function generateAccessToken(params: {
     organizationId,
   } = params;
 
-  const macroUserId = `macro|${email}`;
+  const macroUserId = `rox|${email}`;
 
   const payload: Record<string, unknown> = {
     aud: audience,
@@ -122,7 +122,7 @@ async function generateRoxApiToken(params: {
   const { email, privateKey, issuer, expiryMinutes, fusionUserId, organizationId } =
     params;
 
-  const macroUserId = `macro|${email}`;
+  const macroUserId = `rox|${email}`;
 
   const payload: Record<string, unknown> = {
     iss: issuer,
@@ -207,7 +207,7 @@ async function main() {
   const email = values.email!;
   const expiryMinutes = parseInt(values.expiry!, 10);
   const output = values.output as "cookies" | "json" | "env";
-  const macroUserId = `macro|${email}`;
+  const macroUserId = `rox|${email}`;
   const fusionUserId = values["fusion-user-id"] ?? crypto.randomUUID();
   const organizationId = values["organization-id"]
     ? parseInt(values["organization-id"], 10)

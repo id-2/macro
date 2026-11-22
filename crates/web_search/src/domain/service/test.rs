@@ -86,7 +86,7 @@ impl AiAdmissionService for Denied {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|web-search@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|web-search@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

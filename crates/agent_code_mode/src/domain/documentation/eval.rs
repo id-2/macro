@@ -166,7 +166,7 @@ async fn entity_route_evaluation() {
         input_tokens: std::sync::atomic::AtomicU64::new(0),
     });
     let cognition: Arc<dyn Cognition> = jev.clone();
-    let owner = RoxUserIdStr::parse_from_str("macro|eval@example.com").expect("a user id");
+    let owner = RoxUserIdStr::parse_from_str("rox|eval@example.com").expect("a user id");
     let docs = sdk_documentation();
     let (mut recalled, mut expected_total, mut exact, mut spurious, mut loaded_total) =
         (0, 0, 0, 0, 0);

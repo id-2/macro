@@ -1185,7 +1185,7 @@ fn cross_entity_service(
 
 /// An edit receipt for a document entity, minted without an access check.
 fn doc_edit_receipt(entity_id: &str) -> EditReceipt {
-    let user = RoxUserIdStr::parse_from_str("macro|user1@test.com").expect("valid test user id");
+    let user = RoxUserIdStr::parse_from_str("rox|user1@test.com").expect("valid test user id");
     EditReceipt::dangerously_assert_authenticated_user(
         user,
         entity_id,

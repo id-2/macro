@@ -111,7 +111,7 @@ async fn database_row_explanation_is_its_database_grants(pool: PgPool) {
 
     sqlx::query!(
         r#"WITH storage AS (INSERT INTO databases (id) VALUES ($1) RETURNING id)
-           INSERT INTO database_entities (database_id, name, user_id) SELECT id, 'db', 'macro|owner@team.com' FROM storage"#,
+           INSERT INTO database_entities (database_id, name, user_id) SELECT id, 'db', 'rox|owner@team.com' FROM storage"#,
         database_id,
     )
     .execute(&pool)
@@ -172,7 +172,7 @@ async fn insert_database_with_form(pool: &PgPool, audience: &str) -> (Uuid, Uuid
     let table_id = Uuid::now_v7();
     sqlx::query!(
         r#"WITH storage AS (INSERT INTO databases (id) VALUES ($1) RETURNING id)
-           INSERT INTO database_entities (database_id, name, user_id) SELECT id, 'db', 'macro|owner@team.com' FROM storage"#,
+           INSERT INTO database_entities (database_id, name, user_id) SELECT id, 'db', 'rox|owner@team.com' FROM storage"#,
         database_id,
     )
     .execute(pool)
@@ -195,7 +195,7 @@ async fn insert_form(pool: &PgPool, database_id: Uuid, table_id: Uuid, audience:
     sqlx::query!(
         r#"
         INSERT INTO forms (id, name, owner_id, database_id, table_id, audience)
-        VALUES ($1, 'RSVP', 'macro|owner@team.com', $2, $3, $4)
+        VALUES ($1, 'RSVP', 'rox|owner@team.com', $2, $3, $4)
         "#,
         form_id,
         database_id,

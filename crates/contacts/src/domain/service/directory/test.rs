@@ -110,10 +110,10 @@ async fn enriches_only_members_and_scopes_names_and_identity_to_the_viewer() {
     assert_eq!(
         names.requests.lock().unwrap()[0],
         (
-            "macro|first@example.com".into(),
+            "rox|first@example.com".into(),
             vec![
-                "macro|known@example.com".into(),
-                "macro|unknown@example.com".into()
+                "rox|known@example.com".into(),
+                "rox|unknown@example.com".into()
             ]
         )
     );
@@ -148,7 +148,7 @@ async fn oversized_source_page_is_rejected_before_enrichment() {
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(
         Arc::new(Pages(ContactIdPage {
-            contacts: ["macro|first@example.com", "macro|second@example.com"]
+            contacts: ["rox|first@example.com", "rox|second@example.com"]
                 .map(|id| ContactIdEntry::parse(id.into()).unwrap())
                 .to_vec(),
             next_cursor: None,

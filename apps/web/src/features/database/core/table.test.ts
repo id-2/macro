@@ -35,7 +35,7 @@ describe('record title', () => {
 
   it('keeps raw entity IDs out of titles when there is no text column', () => {
     expect(
-      rowTitle({ rowId: 'row', cells: { person: 'macro|ada@example.com' } }, [
+      rowTitle({ rowId: 'row', cells: { person: 'rox|ada@example.com' } }, [
         entity,
       ])
     ).toBe('Linked record');
@@ -56,7 +56,7 @@ describe('record title', () => {
       rowTitle(
         {
           rowId: 'row',
-          cells: { person: 'macro|ada@example.com', name: 'Launch plan' },
+          cells: { person: 'rox|ada@example.com', name: 'Launch plan' },
         },
         [entity, name]
       )
@@ -65,7 +65,7 @@ describe('record title', () => {
       rowTitle(
         {
           rowId: 'row',
-          cells: { person: 'macro|ada@example.com', name: 'Launch plan' },
+          cells: { person: 'rox|ada@example.com', name: 'Launch plan' },
         },
         [name, entity]
       )
@@ -75,7 +75,7 @@ describe('record title', () => {
       rowTitle(
         {
           rowId: 'row',
-          cells: { person: 'macro|ada@example.com', name: 'Launch plan' },
+          cells: { person: 'rox|ada@example.com', name: 'Launch plan' },
         },
         [name, { ...entity, primary: true }]
       )

@@ -84,7 +84,7 @@ fn task_assignment(
             task_id: "task-1".to_string(),
             task_name: Some("Test task".to_string()),
             sub_type: None,
-            assigned_by: RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap(),
+            assigned_by: RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap(),
             sender_profile_picture_url: None,
         }),
         sender_id: None,
@@ -93,7 +93,7 @@ fn task_assignment(
 
 #[tokio::test]
 async fn notification_updates_streams_new_notifications() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -138,13 +138,13 @@ async fn notification_updates_streams_new_notifications() {
     assert_eq!(notification["metadata"]["taskName"], "Test task");
     assert_eq!(
         notification["metadata"]["assignedBy"],
-        "macro|assigner@example.com"
+        "rox|assigner@example.com"
     );
 }
 
 #[tokio::test]
 async fn routine_run_notifications_stream_as_outside_soup() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -206,7 +206,7 @@ async fn routine_run_notifications_stream_as_outside_soup() {
 
 #[tokio::test]
 async fn notification_updates_streams_updated_notifications() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -245,7 +245,7 @@ async fn notification_updates_streams_updated_notifications() {
 
 #[tokio::test]
 async fn notification_updates_streams_cache_deletions() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -289,7 +289,7 @@ async fn notification_updates_streams_cache_deletions() {
 
 #[tokio::test]
 async fn notification_updates_reports_slow_consumers() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::SlowConsumer);
     drop(sender);
     let service = TestSubscriptionService {

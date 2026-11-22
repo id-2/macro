@@ -20,9 +20,9 @@ use std::sync::{
 };
 use tower::ServiceExt;
 
-const FOUND_USER_ID: &str = "macro|found@test.com";
-const NOT_FOUND_USER_ID: &str = "macro|notfound@test.com";
-const SENDER_USER_ID: &str = "macro|sender@test.com";
+const FOUND_USER_ID: &str = "rox|found@test.com";
+const NOT_FOUND_USER_ID: &str = "rox|notfound@test.com";
+const SENDER_USER_ID: &str = "rox|sender@test.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 
 struct MockService;
@@ -37,9 +37,9 @@ impl ContactsService for MockService {
         }
 
         Ok([
-            "macro|contact1@test.com",
-            "macro|contact2@test.com",
-            "macro|contact3@test.com",
+            "rox|contact1@test.com",
+            "rox|contact2@test.com",
+            "rox|contact3@test.com",
         ]
         .into_iter()
         .map(|user_id| RoxUserIdStr::try_from(user_id.to_string()).unwrap())
@@ -65,7 +65,7 @@ impl PeopleSearchService for MockService {
         Ok((0..limit.get())
             .map(|index| {
                 let user_id =
-                    RoxUserIdStr::try_from(format!("macro|person{index}@example.com")).unwrap();
+                    RoxUserIdStr::try_from(format!("rox|person{index}@example.com")).unwrap();
                 PersonMatch {
                     contact: crate::domain::models::contact::Contact {
                         id: crate::domain::models::contact::ContactId::for_viewer(
@@ -186,7 +186,7 @@ fn add_contact_request(token: &str) -> Request<Body> {
         .header(header::AUTHORIZATION, format!("Bearer {token}"))
         .header(header::CONTENT_TYPE, "application/json")
         .body(Body::from(
-            serde_json::json!({"user_id": "macro|recipient@example.com"}).to_string(),
+            serde_json::json!({"user_id": "rox|recipient@example.com"}).to_string(),
         ))
         .unwrap()
 }
@@ -202,9 +202,9 @@ async fn bearer_get_returns_contacts() {
     let body = response.into_body().collect().await.unwrap().to_bytes();
     let body: GetContactsResponse = serde_json::from_slice(&body).unwrap();
     let expected_contacts: HashSet<&str> = [
-        "macro|contact1@test.com",
-        "macro|contact2@test.com",
-        "macro|contact3@test.com",
+        "rox|contact1@test.com",
+        "rox|contact2@test.com",
+        "rox|contact3@test.com",
     ]
     .into_iter()
     .collect();
@@ -328,7 +328,7 @@ async fn search_returns_ranked_people_with_the_default_limit() {
     assert_eq!(
         people[0],
         serde_json::json!({
-            "userId": "macro|person0@example.com",
+            "userId": "rox|person0@example.com",
             "name": "Person Zero",
             "isTeammate": true,
             "isAgent": false,
@@ -337,7 +337,7 @@ async fn search_returns_ranked_people_with_the_default_limit() {
     assert_eq!(
         people[1],
         serde_json::json!({
-            "userId": "macro|person1@example.com",
+            "userId": "rox|person1@example.com",
             "name": null,
             "isTeammate": false,
             "isAgent": true,

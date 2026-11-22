@@ -196,7 +196,7 @@ fn completion_row(link: bool) -> Row {
 fn crm_row() -> Row {
     Row::Crm(CrmOutboxRow {
         team_id: Uuid::from_u128(1),
-        user_id: "macro|owner@example.com".into(),
+        user_id: "rox|owner@example.com".into(),
         traceparent: Some("parent".into()),
     })
 }
@@ -330,7 +330,7 @@ async fn crm_restores_trace_checks_consent_then_sends_deletes_and_commits() {
     let BackfillOperation::PopulateCrmForUser(p) = &s.messages[0].backfill_operation else {
         panic!("crm")
     };
-    assert_eq!(p.rox_id.as_ref(), "macro|owner@example.com");
+    assert_eq!(p.rox_id.as_ref(), "rox|owner@example.com");
 }
 #[tokio::test]
 async fn withdrawn_crm_request_is_deleted_without_sending() {

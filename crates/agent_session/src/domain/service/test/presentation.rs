@@ -80,7 +80,7 @@ async fn presentation_retry_completes_an_interrupted_pair() {
 #[tokio::test]
 async fn presentation_rejects_cross_owner_and_archived_before_actor_delivery() {
     let fx = fixture();
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com")
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com")
         .unwrap()
         .to_owned();
     assert!(matches!(

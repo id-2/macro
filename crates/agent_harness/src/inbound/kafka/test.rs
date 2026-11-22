@@ -377,7 +377,7 @@ fn an_assignment_with_context_prompts_with_instructions_and_carries_the_task() {
             project: None,
         },
         assigned_by: ContextPerson {
-            id: "macro|user@example.com".to_owned(),
+            id: "rox|user@example.com".to_owned(),
             name: "user@example.com".to_owned(),
             email: Some("user@example.com".to_owned()),
         },
@@ -422,7 +422,7 @@ fn a_managed_follow_up_carries_its_context_to_delivery() {
             },
             prompt_message_id: Uuid::from_u128(2),
             sender: ContextPerson {
-                id: "macro|user@example.com".to_owned(),
+                id: "rox|user@example.com".to_owned(),
                 name: "user@example.com".to_owned(),
                 email: Some("user@example.com".to_owned()),
             },
@@ -576,7 +576,7 @@ fn message_with_files(sender: ChannelSender<'static>) -> ChannelMessagePostedMet
 
 fn julia() -> ContextPerson {
     ContextPerson {
-        id: "macro|julia@example.com".to_owned(),
+        id: "rox|julia@example.com".to_owned(),
         name: "Julia".to_owned(),
         email: Some("julia@example.com".to_owned()),
     }

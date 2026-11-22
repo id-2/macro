@@ -7,7 +7,7 @@ use crate::domain::pricing::AiPricing;
 use chrono::{TimeZone, Utc};
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 fn policy(active: bool, limit: i64, ended: bool) -> SettlementPolicy {
@@ -82,7 +82,7 @@ fn mixed_seat_plans_keep_one_allowance_per_seat() {
             .iter()
             .map(|seat| seat.user.as_ref())
             .collect::<Vec<_>>(),
-        vec!["macro|owner@x.com", "macro|a@x.com", "macro|b@x.com"]
+        vec!["rox|owner@x.com", "rox|a@x.com", "rox|b@x.com"]
     );
     // Each seat gets its own plan's at-cost allowance.
     assert_eq!(

@@ -19,7 +19,7 @@ type MessageRef = { readonly channelId: string; readonly id: string };
  * time. Code decides whether it may be placed, and every call and refusal is
  * recorded with who asked and why.
  *
- * - `who` (not empty): a Rox id (`macro|name@example.com`), an email, or a
+ * - `who` (not empty): a Rox id (`rox|name@example.com`), an email, or a
  *   channel id (a DM channel means the person in it).
  * - `why`: one spoken sentence, under 200 characters. It is your first words
  *   when they answer, and the DM they get if they don't.
@@ -69,7 +69,7 @@ export const placeCall = async (
 /**
  * Records that someone said not to be called, or that they may be again.
  *
- * `who` is their Rox id, not empty (`macro|name@example.com`). Nobody on
+ * `who` is their Rox id, not empty (`rox|name@example.com`). Nobody on
  * this list is rung, even on your owner's order. `remove: true` takes them
  * off it.
  */

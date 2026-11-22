@@ -59,7 +59,7 @@ async fn a_guest_who_may_invite_sends_only_new_guests_through_the_partial_patch(
         FakeTokens::ok(),
     )
     .invite_guests(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         vec![
@@ -92,7 +92,7 @@ async fn a_guest_the_organizer_does_not_let_invite_is_refused_before_the_provide
 
     let error = service(guest_repo(NO_INVITES), provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -114,7 +114,7 @@ async fn someone_neither_organizing_nor_invited_is_not_an_attendee() {
 
     let error = service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -142,7 +142,7 @@ async fn a_refusal_from_google_records_the_policy_it_reported() {
         refresh,
     )
     .invite_guests(
-        "macro|user",
+        "rox|user",
         event_id,
         None,
         vec![guest("ada@example.com")],
@@ -170,7 +170,7 @@ async fn a_guest_cannot_add_to_a_guest_list_the_organizer_hides() {
 
     let error = service(guest_repo(HIDDEN_LIST), provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -198,7 +198,7 @@ async fn a_hidden_list_google_reports_is_refused_and_recorded() {
         FakeTokens::ok(),
     )
     .invite_guests(
-        "macro|user",
+        "rox|user",
         event_id,
         None,
         vec![guest("ada@example.com")],
@@ -223,7 +223,7 @@ async fn the_organizer_may_add_to_a_hidden_guest_list() {
 
     service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -251,7 +251,7 @@ async fn a_guests_update_adds_through_the_invite_path_and_keeps_its_other_fields
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -292,7 +292,7 @@ async fn a_guest_cannot_remove_guests_through_an_update() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -326,7 +326,7 @@ async fn a_guest_who_may_modify_still_replaces_the_list() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -353,7 +353,7 @@ async fn an_occurrence_with_its_own_guest_list_is_judged_by_that_list() {
 
     service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -389,7 +389,7 @@ async fn a_guest_copy_is_judged_as_its_own_inbox_while_another_inbox_organizes()
 
     let error = service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -417,7 +417,7 @@ async fn the_provider_hears_only_the_copys_inbox() {
 
     service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -453,7 +453,7 @@ async fn an_outlook_guest_is_refused_before_the_provider() {
 
     let error = service(outlook_repo(ORGANIZER), provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],
@@ -476,7 +476,7 @@ async fn an_outlook_organizer_adds_guests_through_the_provider() {
 
     service(outlook_repo("self@example.com"), provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             vec![guest("ada@example.com")],

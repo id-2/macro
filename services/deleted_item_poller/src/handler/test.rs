@@ -201,11 +201,11 @@ async fn publish_project_purge_events_publishes_separately_keyed_events() {
     let projects = vec![
         ProjectToDelete {
             project_id: "project-one".to_string(),
-            user_id: "macro|owner-one@example.com".to_string(),
+            user_id: "rox|owner-one@example.com".to_string(),
         },
         ProjectToDelete {
             project_id: "project-two".to_string(),
-            user_id: "macro|owner-two@example.com".to_string(),
+            user_id: "rox|owner-two@example.com".to_string(),
         },
     ];
 
@@ -241,7 +241,7 @@ async fn publish_project_purge_events_returns_publication_failures() {
     let event_broker = FakeEventBroker::failing_delivery();
     let projects = vec![ProjectToDelete {
         project_id: "project-one".to_string(),
-        user_id: "macro|owner@example.com".to_string(),
+        user_id: "rox|owner@example.com".to_string(),
     }];
 
     let error = publish_project_purge_events(&event_broker, &projects)
@@ -261,7 +261,7 @@ async fn publish_project_purge_events_rejects_malformed_owners() {
         },
         ProjectToDelete {
             project_id: "project-two".to_string(),
-            user_id: "macro|owner@example.com".to_string(),
+            user_id: "rox|owner@example.com".to_string(),
         },
     ];
 

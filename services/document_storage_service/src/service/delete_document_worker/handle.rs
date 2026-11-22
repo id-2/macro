@@ -122,7 +122,7 @@ pub(super) fn document_and_owner(
         .map(|document_id| document_id.string_value().unwrap_or_default())
         .context("document_id should be a message attribute")?;
 
-    // The `user_id` attribute carries the owner principal (`macro|<email>`,
+    // The `user_id` attribute carries the owner principal (`rox|<email>`,
     // `bot|<uuid>`, or a team UUID); it keeps its historical name on the wire.
     let owner = attributes
         .get("user_id")

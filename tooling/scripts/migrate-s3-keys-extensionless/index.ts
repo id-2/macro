@@ -15,7 +15,7 @@ import { createInterface } from 'readline';
 
 const S3_BUCKET = process.env.S3_BUCKET;
 const DRY_RUN = process.env.DRY_RUN === 'true';
-const PREFIX = process.env.PREFIX ?? 'macro|';
+const PREFIX = process.env.PREFIX ?? 'rox|';
 const CONCURRENCY = parseInt(process.env.CONCURRENCY ?? '20', 10);
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE ?? '100', 10);
 const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : undefined;
@@ -67,7 +67,7 @@ function clearCursor() {
 }
 
 // Matches keys in the format: {owner}/{uuid_v4}/{version_id}.{extension}
-// e.g. macro|user@foo.com/12f9a0ac-d445-45e3-94c1-5e8c02f0a6d8/564457.pdf
+// e.g. rox|user@foo.com/12f9a0ac-d445-45e3-94c1-5e8c02f0a6d8/564457.pdf
 const UUID_V4 = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const VERSION_WITH_EXT_REGEX = new RegExp(`${UUID_V4}/(\\d+)\\..+$`);
 const SKIP_PATTERNS = [

@@ -109,7 +109,7 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
             RETURNING id
         ), owner_profile AS (
             INSERT INTO "User" ("id", "email", "rox_user_id")
-            SELECT 'macro|owner@example.com', 'owner@example.com', id FROM owner_identity
+            SELECT 'rox|owner@example.com', 'owner@example.com', id FROM owner_identity
             RETURNING "id"
         ), agent AS (
             INSERT INTO bots (id, kind, name, handle, has_agent, owner_user_id)
@@ -148,7 +148,7 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agent_session_usage_rows_carry_their_session(pool: PgPool) {
     let service = UsageServiceImpl::new(PgUsageRepo::new(pool.clone()));
-    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap();
     let session = rox_uuid::generate_uuid_v7();
     let other_session = rox_uuid::generate_uuid_v7();
     let one_million_input = UsageAmount::Tokens {
@@ -405,7 +405,7 @@ async fn query_filters_by_user(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
     let mut other = completion(AiFeature::Chat, "claude-opus-4-8", 1, 1);
-    other.user = RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap();
+    other.user = RoxUserIdStr::try_from("rox|someone@example.com".to_string()).unwrap();
     repo.insert_usage(&other, true).await.unwrap();
     repo.insert_usage(&completion(AiFeature::Chat, "claude-opus-4-8", 1, 1), false)
         .await
@@ -414,14 +414,14 @@ async fn query_filters_by_user(pool: PgPool) {
     let only_other = repo
         .query_usage(&UsageApiParams {
             include_users: vec![
-                RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("rox|someone@example.com".to_string()).unwrap(),
             ],
             ..Default::default()
         })
         .await
         .unwrap();
     assert_eq!(only_other.len(), 1);
-    assert_eq!(only_other[0].user.as_ref(), "macro|someone@example.com");
+    assert_eq!(only_other[0].user.as_ref(), "rox|someone@example.com");
 }
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]

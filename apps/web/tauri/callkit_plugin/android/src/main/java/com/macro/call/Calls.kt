@@ -212,8 +212,8 @@ internal object Calls {
         val id = participantId(participant)
         return displayNames[id] ?: participant.name?.takeIf { it.isNotBlank() } ?: id.substringAfter('|')
     }
-    // Same rule as the iOS call UI, so fallback identities don't render as "M" for "macro|...".
-    fun initials(name: String) = name.split(' ', '@', '.', '|').filter { it.isNotBlank() && !it.equals("macro", true) }
+    // Same rule as the iOS call UI, so fallback identities don't render as "M" for "rox|...".
+    fun initials(name: String) = name.split(' ', '@', '.', '|').filter { it.isNotBlank() && !it.equals("rox", true) }
         .take(2).joinToString("") { it.take(1).uppercase() }.ifEmpty { "?" }
     fun localName(media: Room) = displayNames[participantId(media.localParticipant)] ?: "You"
     fun cameraTrack(participant: Participant): VideoTrack? =

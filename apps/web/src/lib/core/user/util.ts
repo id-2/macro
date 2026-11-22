@@ -8,7 +8,7 @@ import type { IUser } from './types';
  * @deprecated Use `roxIdToEmail` with a validated `RoxId` instead.
  */
 export function idToEmail(id: string): string {
-  return id.replace('macro|', '');
+  return id.replace('rox|', '');
 }
 
 /**
@@ -16,7 +16,7 @@ export function idToEmail(id: string): string {
  * @deprecated Use `emailToRoxId` instead for type-safe RoxId creation.
  */
 export function emailToId(email: string): string {
-  return `macro|${email}`;
+  return `rox|${email}`;
 }
 
 export function idToDisplayName(id: string): string {

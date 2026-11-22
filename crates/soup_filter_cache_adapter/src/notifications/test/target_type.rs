@@ -63,7 +63,7 @@ fn web_notification(id: &str, state: &str) -> Value {
         "createdAt": "2025-01-01T00:00:00Z",
         "viewedAt": null,
         "updatedAt": "2025-01-01T00:00:00Z",
-        "senderId": "macro|sender@example.com",
+        "senderId": "rox|sender@example.com",
     })
 }
 

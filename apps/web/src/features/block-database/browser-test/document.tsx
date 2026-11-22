@@ -58,7 +58,7 @@ setGlobalSplitManager({
   },
 } as SplitManager);
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
-  id: 'macro|fixture@example.com',
+  id: 'rox|fixture@example.com',
   authenticated: true,
   permissions: [],
 });

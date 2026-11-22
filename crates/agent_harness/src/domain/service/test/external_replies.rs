@@ -463,7 +463,7 @@ async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_con
 ) {
     let rox_user = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'asker@example.com', 'asker@example.com', 'external-reply-test')", rox_user).execute(&pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|asker@example.com', 'asker@example.com', $1)"#, rox_user).execute(&pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|asker@example.com', 'asker@example.com', $1)"#, rox_user).execute(&pool).await.unwrap();
     use bots::domain::models::{BotOwner, CreateBotRequest};
     use bots::domain::ports::BotRepo;
     let bot = bots::outbound::pg_bots_repo::PgBotsRepo::new(pool.clone())
@@ -528,7 +528,7 @@ async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_con
         .unwrap()
         .dm
         .channel_id;
-    sqlx::query!("INSERT INTO comms_messages (id, sender_id, content, parent_entity_type, parent_entity_id) VALUES ($1, 'macro|asker@example.com', 'hello', 'channel', $2)", source, channel.to_string()).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO comms_messages (id, sender_id, content, parent_entity_type, parent_entity_id) VALUES ($1, 'rox|asker@example.com', 'hello', 'channel', $2)", source, channel.to_string()).execute(&pool).await.unwrap();
     let mut request = open_external_request("/workspace");
     request.id = Some(id);
     request.bot_id = bot;

@@ -99,7 +99,7 @@ async fn claimed_job(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_writes_log_one_row_per_change_and_skip_unchanged_echoes(pool: PgPool) {
-    let owner_id = "macro|changes-upsert@example.com";
+    let owner_id = "rox|changes-upsert@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, link_id).await;
@@ -127,7 +127,7 @@ async fn event_writes_log_one_row_per_change_and_skip_unchanged_echoes(pool: PgP
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_upserts_log_only_visible_changes(pool: PgPool) {
-    let owner_id = "macro|changes-calendar@example.com";
+    let owner_id = "rox|changes-calendar@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let account_id = repo.upsert_google_account(link_id).await.unwrap();
@@ -161,7 +161,7 @@ async fn calendar_upserts_log_only_visible_changes(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_list_reconcile_logs_its_removals_contiguously(pool: PgPool) {
-    let owner_id = "macro|changes-reconcile@example.com";
+    let owner_id = "rox|changes-reconcile@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (key, lease_token, account_id) = claimed_job(&repo, link_id).await;
@@ -233,7 +233,7 @@ async fn a_calendar_list_reconcile_logs_its_removals_contiguously(pool: PgPool) 
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn snapshot_tombstones_and_source_removal_log_deletions(pool: PgPool) {
-    let owner_id = "macro|changes-tombstone@example.com";
+    let owner_id = "rox|changes-tombstone@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (key, lease_token, account_id) = claimed_job(&repo, link_id).await;
@@ -302,7 +302,7 @@ async fn snapshot_tombstones_and_source_removal_log_deletions(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sync_error_badge_logs_when_it_appears_changes_and_clears(pool: PgPool) {
-    let owner_id = "macro|changes-badge@example.com";
+    let owner_id = "rox|changes-badge@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (key, lease_token, account_id) = claimed_job(&repo, link_id).await;
@@ -390,7 +390,7 @@ async fn a_sync_error_badge_logs_when_it_appears_changes_and_clears(pool: PgPool
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnecting_logs_every_calendar_and_event_removal(pool: PgPool) {
-    let owner_id = "macro|changes-disconnect@example.com";
+    let owner_id = "rox|changes-disconnect@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (_account_id, calendar_id, event_id, _channel_id) =
@@ -416,8 +416,8 @@ async fn disconnecting_logs_every_calendar_and_event_removal(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn watermarks_cover_owned_and_delegated_links_only(pool: PgPool) {
-    let owner_id = "macro|changes-owner@example.com";
-    let delegate_id = "macro|changes-delegate@example.com";
+    let owner_id = "rox|changes-owner@example.com";
+    let delegate_id = "rox|changes-delegate@example.com";
     insert_user(&pool, owner_id).await;
     insert_user(&pool, delegate_id).await;
     let shared = insert_link(&pool, owner_id).await;
@@ -463,7 +463,7 @@ async fn watermarks_cover_owned_and_delegated_links_only(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pruning_raises_the_floor_and_forces_stale_clients_to_reset(pool: PgPool) {
-    let owner_id = "macro|changes-prune@example.com";
+    let owner_id = "rox|changes-prune@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, link_id).await;
@@ -512,7 +512,7 @@ async fn pruning_raises_the_floor_and_forces_stale_clients_to_reset(pool: PgPool
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_prune_batch_inside_a_timestamp_tie_removes_the_lowest_sequences(pool: PgPool) {
-    let owner_id = "macro|changes-prune-tie@example.com";
+    let owner_id = "rox|changes-prune-tie@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, link_id).await;
@@ -555,7 +555,7 @@ async fn a_prune_batch_inside_a_timestamp_tie_removes_the_lowest_sequences(pool:
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pruning_drops_counters_of_deleted_links(pool: PgPool) {
-    let owner_id = "macro|changes-orphan@example.com";
+    let owner_id = "rox|changes-orphan@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     provider_ids(&repo, link_id).await;
@@ -694,8 +694,8 @@ async fn assert_replay_matches_reads(repo: &PgCalendarRepository, viewer: &str, 
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replaying_the_log_reproduces_what_the_viewer_reads(pool: PgPool) {
-    let owner_id = "macro|changes-replay@example.com";
-    let delegate_id = "macro|changes-replay-delegate@example.com";
+    let owner_id = "rox|changes-replay@example.com";
+    let delegate_id = "rox|changes-replay-delegate@example.com";
     insert_user(&pool, owner_id).await;
     insert_user(&pool, delegate_id).await;
     let link_id = insert_link(&pool, owner_id).await;

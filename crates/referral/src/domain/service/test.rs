@@ -71,7 +71,7 @@ fn with_parts(
 
 fn referred() -> rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'static>>
 {
-    rox_user_id::user_id::RoxUserId::parse_from_str("macro|new@example.com")
+    rox_user_id::user_id::RoxUserId::parse_from_str("rox|new@example.com")
         .unwrap()
         .lowercase()
 }
@@ -97,8 +97,8 @@ async fn a_first_referral_rewards_the_referrer_and_completes() {
     rewarder
         .expect_reward_referrer()
         .withf(move |referrer, referred, key| {
-            referrer.as_ref() == "macro|referrer@example.com"
-                && referred.as_ref() == "macro|new@example.com"
+            referrer.as_ref() == "rox|referrer@example.com"
+                && referred.as_ref() == "rox|new@example.com"
                 && key == &format!("referral:{tracking_id}")
         })
         .times(1)

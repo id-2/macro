@@ -16,7 +16,7 @@ fn user(id: &str) -> RoxUserIdStr<'_> {
 )]
 async fn stores_and_clears_the_language(pool: Pool<Postgres>) {
     let repo = PgUserLanguageRepo::new(pool);
-    let user_id = user("macro|language@test.com");
+    let user_id = user("rox|language@test.com");
 
     assert_eq!(repo.get_language(&user_id).await.unwrap(), Some(None));
 
@@ -37,7 +37,7 @@ async fn stores_and_clears_the_language(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_user_reads_and_writes_nothing(pool: Pool<Postgres>) {
     let repo = PgUserLanguageRepo::new(pool);
-    let user_id = user("macro|nobody@test.com");
+    let user_id = user("rox|nobody@test.com");
 
     assert_eq!(repo.get_language(&user_id).await.unwrap(), None);
     assert!(

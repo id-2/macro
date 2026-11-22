@@ -4,7 +4,7 @@ use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 
-const OWNER: &str = "macro|bindings@example.com";
+const OWNER: &str = "rox|bindings@example.com";
 
 async fn insert_harness(pool: &PgPool) -> HarnessId {
     let id = rox_uuid::generate_uuid_v7();
@@ -261,7 +261,7 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
     .execute(&pool)
     .await
     .unwrap();
-    let stranger = RoxUserIdStr::try_from("macro|stranger@example.com".to_owned()).unwrap();
+    let stranger = RoxUserIdStr::try_from("rox|stranger@example.com".to_owned()).unwrap();
     let bindings = PgHarnessBindings::new(pool.clone());
 
     let facts = bindings
@@ -296,7 +296,7 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
 async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let coding = BotId::new_from_uuid(insert_bot(&pool, laptop).await);
-    let reader = RoxUserIdStr::try_from("macro|reader@example.com".to_owned()).unwrap();
+    let reader = RoxUserIdStr::try_from("rox|reader@example.com".to_owned()).unwrap();
     let team_id = rox_uuid::generate_uuid_v7();
     for (id, email) in [
         (OWNER, "bindings@example.com"),

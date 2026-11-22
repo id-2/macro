@@ -101,7 +101,7 @@ fn group(id: u64) -> String {
 fn staged(jid: &str, byte: u8) -> StagedPicture {
     StagedPicture {
         account_id: Uuid::from_u128(1),
-        user_id: "macro|owner@example.com".to_owned(),
+        user_id: "rox|owner@example.com".to_owned(),
         jid: jid.to_owned(),
         picture_id: format!("pic-{byte}"),
         bytes: vec![byte],
@@ -144,7 +144,7 @@ async fn staged_pictures_become_the_owners_files_and_a_failure_retries_alone() {
         *files.owners.lock().unwrap(),
         vec![
             (
-                "macro|owner@example.com".to_owned(),
+                "rox|owner@example.com".to_owned(),
                 "image/jpeg".to_owned()
             );
             2

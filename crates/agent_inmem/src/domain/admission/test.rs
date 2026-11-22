@@ -18,7 +18,7 @@ async fn turns_use_the_trusted_owner_and_agent_session_feature() {
         );
         assert_eq!(
             *admission.calls.lock().unwrap(),
-            vec![("macro|owner@rox.one".to_owned(), AiFeature::AgentSession)]
+            vec![("rox|owner@rox.one".to_owned(), AiFeature::AgentSession)]
         );
     }
     assert_eq!(
@@ -51,7 +51,7 @@ async fn turns_admit_as_the_feature_the_session_was_opened_with() {
     assert_eq!(
         *admission.calls.lock().unwrap(),
         vec![(
-            "macro|owner@rox.one".to_owned(),
+            "rox|owner@rox.one".to_owned(),
             AiFeature::NonBillableAgentSession
         )]
     );

@@ -4,10 +4,10 @@ VALUES
     ('a2222222-2222-2222-2222-222222222222', 'user2@user.com', 'user2@user.com', 'cus_12345');
 
 INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "rox_user_id") VALUES
-('macro|user@user.com', 'user@user.com', 'User', 'cus_1234', 'a1111111-1111-1111-1111-111111111111'),
-('macro|user2@user.com', 'user2@user.com', 'User2', 'cus_12345', 'a2222222-2222-2222-2222-222222222222');
+('rox|user@user.com', 'user@user.com', 'User', 'cus_1234', 'a1111111-1111-1111-1111-111111111111'),
+('rox|user2@user.com', 'user2@user.com', 'User2', 'cus_12345', 'a2222222-2222-2222-2222-222222222222');
 
 INSERT INTO "RolesOnUsers" ("userId", "roleId") VALUES
-('macro|user@user.com', 'professional_subscriber'),
-('macro|user@user.com', 'corporate'),
-('macro|user2@user.com', 'corporate');
+('rox|user@user.com', 'professional_subscriber'),
+('rox|user@user.com', 'corporate'),
+('rox|user2@user.com', 'corporate');

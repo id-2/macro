@@ -29,7 +29,7 @@ fn deletion_message(owner: Option<&str>) -> Message {
 #[test]
 fn deletion_message_preserves_owner_for_shared_s3_prefix() {
     for principal in [
-        "macro|user@example.com",
+        "rox|user@example.com",
         "bot|01900000-0000-7000-8000-000000000002",
         "01900000-0000-7000-8000-000000000003",
     ] {

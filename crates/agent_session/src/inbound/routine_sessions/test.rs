@@ -17,7 +17,7 @@ use std::sync::Mutex;
 use tower::ServiceExt;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 const INTERNAL_KEY: &str = "routine-test-internal";
 const OPERATIONS: [&str; 7] = [
     "validate", "prepare", "prompt", "status", "cancel", "delete", "activity",

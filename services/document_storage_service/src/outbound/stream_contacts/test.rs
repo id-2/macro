@@ -51,8 +51,8 @@ impl ContactsPageRepository for FakeRepository {
 async fn contact_pair_is_found_with_one_exact_lookup() {
     let repository = Arc::new(FakeRepository {
         edges: vec![(
-            "macro|changed@example.com".into(),
-            "macro|reader@example.com".into(),
+            "rox|changed@example.com".into(),
+            "rox|reader@example.com".into(),
         )],
         ..Default::default()
     });
@@ -61,8 +61,8 @@ async fn contact_pair_is_found_with_one_exact_lookup() {
     assert!(
         checker
             .is_contact(
-                id("macro|changed@example.com"),
-                id("macro|reader@example.com")
+                id("rox|changed@example.com"),
+                id("rox|reader@example.com")
             )
             .await
             .unwrap()
@@ -70,8 +70,8 @@ async fn contact_pair_is_found_with_one_exact_lookup() {
     assert_eq!(
         *repository.lookups.lock().unwrap(),
         vec![(
-            "macro|changed@example.com".to_string(),
-            vec!["macro|reader@example.com".to_string()]
+            "rox|changed@example.com".to_string(),
+            vec!["rox|reader@example.com".to_string()]
         )]
     );
 }
@@ -82,8 +82,8 @@ async fn non_contact_is_rejected() {
     assert!(
         !checker
             .is_contact(
-                id("macro|changed@example.com"),
-                id("macro|reader@example.com")
+                id("rox|changed@example.com"),
+                id("rox|reader@example.com")
             )
             .await
             .unwrap()

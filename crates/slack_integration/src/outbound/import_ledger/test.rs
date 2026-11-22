@@ -51,7 +51,7 @@ impl CanonicalImportRepo for Canonical {
         kind: ledger::ImportTargetKind,
         existing: Option<Uuid>,
     ) -> LedgerResult<ledger::ImportTargetReservation> {
-        assert_eq!(user.as_ref(), "macro|admin@example.com");
+        assert_eq!(user.as_ref(), "rox|admin@example.com");
         assert_eq!(key.team_id, Uuid::from(team()));
         assert_eq!(key.foreign_id.as_str(), "G123");
         assert_eq!(kind, self.kind);
@@ -115,7 +115,7 @@ async fn translates_binding_without_exposing_ledger_internals() {
 
 #[tokio::test]
 async fn reservation_passes_requester_explicit_team_and_authorized_target_for_every_kind() {
-    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com")
+    let requester = RoxUserIdStr::parse_from_str("rox|admin@example.com")
         .unwrap()
         .into_owned();
     for (source_kind, kind) in [
@@ -173,7 +173,7 @@ fn unexpected_ai_admission_error_fails_closed() {
 
 #[tokio::test]
 async fn ambiguous_mapping_fails_closed_without_target_disclosure() {
-    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com")
+    let requester = RoxUserIdStr::parse_from_str("rox|admin@example.com")
         .unwrap()
         .into_owned();
     let adapter = CanonicalImportLedger::new(Canonical {

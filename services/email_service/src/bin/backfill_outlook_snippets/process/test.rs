@@ -11,7 +11,7 @@ async fn seed(db: &PgPool) {
     let thread = uuid::uuid!("0190a000-0000-7000-8000-0000000000a1");
     let gmail_thread = uuid::uuid!("0190a000-0000-7000-8000-0000000000a2");
     sqlx::query!(
-        "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|outlook@example.com','outlook','outlook@example.com','OUTLOOK'),($2,'macro|gmail@example.com','gmail','gmail@example.com','GMAIL')",
+        "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'rox|outlook@example.com','outlook','outlook@example.com','OUTLOOK'),($2,'rox|gmail@example.com','gmail','gmail@example.com','GMAIL')",
         OUTLOOK_LINK,
         GMAIL_LINK
     )

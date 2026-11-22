@@ -917,7 +917,7 @@ final class NativeLiveKitCallSession: NSObject, RoomDelegate, @unchecked Sendabl
         identity.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
-    /// SID only: identities are `macro|<email>` and names are display names,
+    /// SID only: identities are `rox|<email>` and names are display names,
     /// neither of which may reach the persisted log.
     private func describeParticipant(_ participant: Participant) -> String {
         "participantSid=\(describeOptional(participant.sid)) agent=\(isAgentParticipant(participant))"
@@ -925,8 +925,8 @@ final class NativeLiveKitCallSession: NSObject, RoomDelegate, @unchecked Sendabl
 
     private func fallbackParticipantName(identity: String) -> String {
         let trimmedIdentity = identity.trimmingCharacters(in: .whitespacesAndNewlines)
-        let emailOrIdentity = trimmedIdentity.hasPrefix("macro|")
-            ? String(trimmedIdentity.dropFirst("macro|".count))
+        let emailOrIdentity = trimmedIdentity.hasPrefix("rox|")
+            ? String(trimmedIdentity.dropFirst("rox|".count))
             : trimmedIdentity
         if let localPart = emailOrIdentity.split(separator: "@").first, !localPart.isEmpty {
             return String(localPart)

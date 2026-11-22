@@ -59,9 +59,9 @@ async fn direct_tools_refuse_before_both_provider_branches_and_observation() {
             }
             context.usage_context = UsageContext::system(ai_usage::AiFeature::Automation);
             let first =
-                RequestContext::new("macro|first@example.com".to_owned().try_into().unwrap());
+                RequestContext::new("rox|first@example.com".to_owned().try_into().unwrap());
             let second =
-                RequestContext::new("macro|second@example.com".to_owned().try_into().unwrap());
+                RequestContext::new("rox|second@example.com".to_owned().try_into().unwrap());
             let tool = BashCodeExecution {
                 input: "test".into(),
             };
@@ -169,7 +169,7 @@ async fn independent_tool_uses_authenticated_user_and_records_before_parsing() {
     // Deliberately malformed tool content: usage must survive SDK/result failure.
     let context = context_with_response(r#"{"id":"msg-1","content":42,"usage":{"input_tokens":10,"output_tokens":5,"cache_read_input_tokens":2,"cache_creation_input_tokens":3,"server_tool_use":{"code_execution_requests":1}}}"#, journal.clone()).await;
     let request = RequestContext::new(
-        "macro|authenticated@example.com"
+        "rox|authenticated@example.com"
             .to_owned()
             .try_into()
             .unwrap(),
@@ -211,7 +211,7 @@ async fn recorder_failure_does_not_fail_tool_execution() {
     )
     .await;
     let request = RequestContext::new(
-        "macro|authenticated@example.com"
+        "rox|authenticated@example.com"
             .to_owned()
             .try_into()
             .unwrap(),
@@ -237,7 +237,7 @@ async fn failed_http_response_preserves_reported_usage() {
     )
     .await;
     let request = RequestContext::new(
-        "macro|authenticated@example.com"
+        "rox|authenticated@example.com"
             .to_owned()
             .try_into()
             .unwrap(),
@@ -312,7 +312,7 @@ async fn live_tool_has_no_deadline_but_cancelled_tool_drain_is_bounded() {
             ai_usage::with_tracking(Arc::new(ai_usage::NoOpUsageRecorder), journal.clone());
         let caller = tokio::spawn(async move {
             let request =
-                RequestContext::new("macro|test@example.com".to_owned().try_into().unwrap());
+                RequestContext::new("rox|test@example.com".to_owned().try_into().unwrap());
             invoke_server_tool(
                 &context,
                 &request,
@@ -410,7 +410,7 @@ async fn server_tool_survives_paused_and_unknown_stop_reasons() {
         });
         let context = context_with_response(&body.to_string(), Arc::default()).await;
         let request = RequestContext::new(
-            "macro|authenticated@example.com"
+            "rox|authenticated@example.com"
                 .to_owned()
                 .try_into()
                 .unwrap(),

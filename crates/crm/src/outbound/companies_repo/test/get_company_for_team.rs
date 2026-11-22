@@ -10,7 +10,7 @@ async fn get_company_returns_owned_visible_company_with_contacts(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -45,7 +45,7 @@ async fn get_company_returns_company_with_no_contacts(pool: PgPool) -> anyhow::R
     // A company with zero contacts should still resolve — `contacts` is
     // empty, not the whole record collapsing to None.
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -62,7 +62,7 @@ async fn get_company_returns_company_with_no_contacts(pool: PgPool) -> anyhow::R
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -76,8 +76,8 @@ async fn get_company_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result
 async fn get_company_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@test.com").await?;
-    seed_team(&pool, team_b, "macro|b@test.com").await?;
+    seed_team(&pool, team_a, "rox|a@test.com").await?;
+    seed_team(&pool, team_b, "rox|b@test.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
 
     // Team B fetching team A's company must get None even as admin.
@@ -98,7 +98,7 @@ async fn get_company_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_none_for_hidden_company_member(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     sqlx::query(r#"UPDATE crm_companies SET hidden = TRUE WHERE id = $1"#)
         .bind(company_id)
@@ -116,7 +116,7 @@ async fn get_company_returns_none_for_hidden_company_member(pool: PgPool) -> any
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_admin_sees_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -151,7 +151,7 @@ async fn get_company_filters_hidden_contacts_for_member(pool: PgPool) -> anyhow:
     // Company itself is visible; one of its contacts is hidden.
     // Member: contacts list excludes the hidden one. Admin: both.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -189,7 +189,7 @@ async fn get_company_hydrates_name_and_description_from_primary_domain(
     // Two domains; directory row only on the primary (earliest-created).
     // The handler returns metadata from the primary, not the secondary.
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com", "acmecorp.com"]).await?;
     sqlx::query(
         r#"INSERT INTO crm_domain_directory (domain, name, description)
@@ -226,7 +226,7 @@ async fn get_company_returns_none_for_negative_cache_directory_row(
     // Negative-cache directory row (NULL name/description) must surface
     // as None on the response, not Some("").
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     sqlx::query(
         r#"INSERT INTO crm_domain_directory (domain, name, description)
@@ -249,7 +249,7 @@ async fn get_company_returns_none_for_negative_cache_directory_row(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_without_contacts_skips_the_list(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@owner.test";
+    let owner_id = "rox|owner@owner.test";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.test"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;

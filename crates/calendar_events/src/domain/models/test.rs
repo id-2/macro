@@ -222,7 +222,7 @@ fn default_reminders_stay_out_of_serialized_projections() {
     let starts_at = Utc.with_ymd_and_hms(2026, 8, 10, 14, 0, 0).unwrap();
     let mut event = CalendarEvent {
         id: uuid::Uuid::now_v7(),
-        owner_id: "macro|projection@example.com".to_string(),
+        owner_id: "rox|projection@example.com".to_string(),
         ical_uid: "projection@example.com".to_string(),
         calendar_id: None,
         sources: Vec::new(),

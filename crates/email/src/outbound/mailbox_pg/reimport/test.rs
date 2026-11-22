@@ -10,7 +10,7 @@ async fn imported_link(db: &PgPool) -> MailboxKey {
     let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"
         INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,grant_generation)
-        VALUES ($1,'macro|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
+        VALUES ($1,'rox|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
     "#,link).execute(db).await.unwrap();
     sqlx::query!(r#"
         INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete,next_run_at,import_started_at,import_completed_at)

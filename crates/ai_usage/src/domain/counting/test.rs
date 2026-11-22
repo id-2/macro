@@ -40,7 +40,7 @@ fn feature_classification_preserves_billing_policy() {
 
 #[test]
 fn counting_requires_enabled_policy_billable_feature_and_real_user() {
-    let user = RoxUserIdStr::try_from("macro|quota-test@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|quota-test@example.com").unwrap();
     // A separately parsed system identity must also be exempt, not just the static value.
     let system = RoxUserIdStr::try_from(SYSTEM_USER_ID.as_ref()).unwrap();
 

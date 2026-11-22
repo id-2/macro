@@ -118,7 +118,7 @@ async fn the_table_refuses_an_origin_the_enum_cannot_express(pool: PgPool) {
     let routine_with_a_person = sqlx::query!(
         r#"
         INSERT INTO agent_session_source (id, kind, routine_id, routine_firing, actor_user_id)
-        VALUES ($1, 'routine', $2, 'manual', 'macro|user@example.com')
+        VALUES ($1, 'routine', $2, 'manual', 'rox|user@example.com')
         "#,
         rox_uuid::generate_uuid_v7(),
         rox_uuid::generate_uuid_v7(),

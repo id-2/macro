@@ -12,7 +12,7 @@ vi.mock('@core/constant/featureFlags', () => ({
 const snapshot: AiUsageSnapshot = {
   tier: 'premium',
   unlimited: false,
-  payer: 'macro|payer@example.com',
+  payer: 'rox|payer@example.com',
   can_manage_billing: true,
   seats: 1,
   period_start: '2026-10-01T00:00:00Z',

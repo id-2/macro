@@ -18,7 +18,7 @@ const registration = {
     id: formId,
     name: 'Workshop registration',
     description: 'Tell us who is coming.',
-    ownerId: 'macro|owner@example.test',
+    ownerId: 'rox|owner@example.test',
     databaseId,
     tableId,
     submittedColumnId: null,
@@ -426,7 +426,7 @@ describe('Forms', () => {
     const optionId = '0198a4cc-e138-7670-a308-a6b766603709';
     const permissions = {
       id: '0198a4cc-e138-7670-a308-a6b766603710',
-      owner: 'macro|owner@example.test',
+      owner: 'rox|owner@example.test',
       channelSharePermissions: [],
     };
     const requests: { method: string; path: string; search: string }[] = [];

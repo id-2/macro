@@ -46,7 +46,7 @@ fn copy_of(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owned_inboxes_carry_the_calendars_each_can_write(pool: PgPool) {
-    let owner_id = "macro|organizer-calendar-owned@example.com";
+    let owner_id = "rox|organizer-calendar-owned@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let (account_id, _) = grant_and_provider_ids(&repo, link_id).await;
@@ -84,7 +84,7 @@ async fn owned_inboxes_carry_the_calendars_each_can_write(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_invitation_from_a_secondary_calendar_names_the_organizers_copy(pool: PgPool) {
-    let owner_id = "macro|organizer-calendar-target@example.com";
+    let owner_id = "rox|organizer-calendar-target@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let inbox_email = link_email(&pool, link_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -162,7 +162,7 @@ async fn an_invitation_from_a_secondary_calendar_names_the_organizers_copy(pool:
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_the_inbox_only_reads_lends_its_copy_nothing(pool: PgPool) {
-    let owner_id = "macro|organizer-calendar-reader@example.com";
+    let owner_id = "rox|organizer-calendar-reader@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let inbox_email = link_email(&pool, link_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -339,7 +339,7 @@ async fn copy_titles(repo: &PgCalendarRepository, meeting: &SecondaryMeeting) ->
 async fn an_edit_through_the_organizers_copy_shows_until_the_invitation_catches_up(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
-        SecondaryMeeting::new(&pool, &repo, "macro|organizer-calendar-edit@example.com").await;
+        SecondaryMeeting::new(&pool, &repo, "rox|organizer-calendar-edit@example.com").await;
     let edit_stamp = meeting.edited(meeting.secondary_id, 10).event.updated_at;
 
     repo.upsert_event(CalendarEventWrite::UserMutation(
@@ -409,7 +409,7 @@ async fn an_edit_through_the_organizers_copy_shows_until_the_invitation_catches_
 async fn the_invitation_retakes_content_a_later_change_reached_first(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
-        SecondaryMeeting::new(&pool, &repo, "macro|organizer-calendar-later@example.com").await;
+        SecondaryMeeting::new(&pool, &repo, "rox|organizer-calendar-later@example.com").await;
     repo.upsert_event(CalendarEventWrite::UserMutation(
         meeting.edited(meeting.secondary_id, 10),
     ))
@@ -430,7 +430,7 @@ async fn the_invitation_retakes_content_a_later_change_reached_first(pool: PgPoo
 async fn a_sync_of_the_organizers_copy_leaves_content_to_the_invitation(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
-        SecondaryMeeting::new(&pool, &repo, "macro|organizer-calendar-sync@example.com").await;
+        SecondaryMeeting::new(&pool, &repo, "rox|organizer-calendar-sync@example.com").await;
 
     // A change made outside Rox reaches the organizer's copy by sync.
     repo.upsert_event_fixture(meeting.edited(meeting.secondary_id, 10))
@@ -469,7 +469,7 @@ fn other_meeting(
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_capability_backfill_logs_only_events_a_writable_calendar_organizes(pool: PgPool) {
-    let owner_id = "macro|organizer-calendar-backfill@example.com";
+    let owner_id = "rox|organizer-calendar-backfill@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let inbox_email = link_email(&pool, link_id).await;
     let repo = PgCalendarRepository::new(pool.clone());

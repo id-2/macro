@@ -49,11 +49,11 @@ struct Apps(Mutex<Vec<(AgentSessionId, String)>>);
 impl ConnectedAppTools for Apps {
     async fn accounts(&self, _: AgentSessionId) -> Result<SessionAccounts, CodeModeError> {
         Ok(SessionAccounts {
-            owner: RoxUserIdStr::parse_from_str("macro|owner@example.com")
+            owner: RoxUserIdStr::parse_from_str("rox|owner@example.com")
                 .unwrap()
                 .into_owned(),
             requester: Some(
-                RoxUserIdStr::parse_from_str("macro|asker@example.com")
+                RoxUserIdStr::parse_from_str("rox|asker@example.com")
                     .unwrap()
                     .into_owned(),
             ),
@@ -142,7 +142,7 @@ impl ConnectedAppTools for Apps {
 async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() {
     let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned();
     let apps = Arc::new(Apps::default());
@@ -194,7 +194,7 @@ async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() 
     );
     assert_eq!(
         *apps.0.lock().unwrap(),
-        vec![(session, "macro|owner@example.com".to_owned())]
+        vec![(session, "rox|owner@example.com".to_owned())]
     );
 }
 
@@ -202,7 +202,7 @@ async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() 
 async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
     let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned();
     let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(
@@ -251,7 +251,7 @@ async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
 async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
     let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    let owner = RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned();
     let apps = Arc::new(Apps::default());
@@ -287,7 +287,7 @@ async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
 async fn a_search_ranks_tools_across_apps_and_reports_apps_it_could_not_read() {
     let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("rox|owner@example.com")
         .unwrap()
         .into_owned();
     let service = ConnectedAppService::new(

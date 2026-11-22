@@ -148,15 +148,15 @@ async fn canonical_lookup_keeps_paged_identity_and_viewer_private_names_for_lega
 ) {
     sqlx::query!(
         "DELETE FROM contacts_connections
-         WHERE user1 IN ('macro|external@example.com', 'macro|first@example.com', 'macro|profile@example.com')
-           AND user2 IN ('macro|first@example.com', 'macro|second@example.com', 'macro|profile@example.com')"
+         WHERE user1 IN ('rox|external@example.com', 'rox|first@example.com', 'rox|profile@example.com')
+           AND user2 IN ('rox|first@example.com', 'rox|second@example.com', 'rox|profile@example.com')"
     ).execute(&pool).await.unwrap();
     sqlx::query!(
         "INSERT INTO contacts_connections(user1, user2) VALUES
-         ('macro|EXTERNAL@example.com', 'macro|first@example.com'),
-         ('macro|EXTERNAL@example.com', 'macro|second@example.com'),
-         ('macro|first@example.com', 'macro|profile@EXAMPLE.COM'),
-         ('macro|profile@EXAMPLE.COM', 'macro|second@example.com')"
+         ('rox|EXTERNAL@example.com', 'rox|first@example.com'),
+         ('rox|EXTERNAL@example.com', 'rox|second@example.com'),
+         ('rox|first@example.com', 'rox|profile@EXAMPLE.COM'),
+         ('rox|profile@EXAMPLE.COM', 'rox|second@example.com')"
     )
     .execute(&pool)
     .await

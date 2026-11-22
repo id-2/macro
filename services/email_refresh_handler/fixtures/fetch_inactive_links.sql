@@ -7,7 +7,7 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000001', 'macro|unused_user@example.com', '00000000-0000-0000-0000-0000000a0001',
+VALUES ('00000000-0000-0000-0000-000000000001', 'rox|unused_user@example.com', '00000000-0000-0000-0000-0000000a0001',
         'unused_user@example.com', 'GMAIL', true, NOW() - INTERVAL '40 days', NOW() - INTERVAL '40 days');
 
 -- Thread for link 1 (needed for FK but no history will reference it)
@@ -21,7 +21,7 @@ VALUES ('00000000-0000-0000-0000-0000000b0001', '00000000-0000-0000-0000-0000000
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000002', 'macro|stale_user@example.com', '00000000-0000-0000-0000-0000000a0002',
+VALUES ('00000000-0000-0000-0000-000000000002', 'rox|stale_user@example.com', '00000000-0000-0000-0000-0000000a0002',
         'stale_user@example.com', 'GMAIL', true, NOW() - INTERVAL '100 days', NOW() - INTERVAL '90 days');
 
 -- Thread for link 2
@@ -40,7 +40,7 @@ VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000003', 'macro|active_user@example.com', '00000000-0000-0000-0000-0000000a0003',
+VALUES ('00000000-0000-0000-0000-000000000003', 'rox|active_user@example.com', '00000000-0000-0000-0000-0000000a0003',
         'active_user@example.com', 'GMAIL', true, NOW() - INTERVAL '60 days', NOW() - INTERVAL '5 days');
 
 -- Thread for link 3
@@ -59,7 +59,7 @@ VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000004', 'macro|new_user@example.com', '00000000-0000-0000-0000-0000000a0004',
+VALUES ('00000000-0000-0000-0000-000000000004', 'rox|new_user@example.com', '00000000-0000-0000-0000-0000000a0004',
         'new_user@example.com', 'GMAIL', true, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days');
 
 -- Thread for link 4

@@ -13,7 +13,7 @@ mod retention;
 mod trash;
 
 fn actor() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap()
 }
 fn link() -> Uuid {
     Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap()
@@ -333,7 +333,7 @@ async fn service_authorizes_send_cancel_and_status_before_touching_attempts(
 ) -> anyhow::Result<()> {
     let service = service(pool.clone());
     let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
-    let outsider = RoxUserIdStr::parse_from_str("macro|user2@test.com")?;
+    let outsider = RoxUserIdStr::parse_from_str("rox|user2@test.com")?;
     assert!(
         service
             .send_email(outsider.clone(), link(), attempt, snapshot())

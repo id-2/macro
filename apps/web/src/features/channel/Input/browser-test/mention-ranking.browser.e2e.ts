@@ -64,7 +64,7 @@ for (const mobile of [false, true]) {
     if (mobile) await late.tap();
     else await page.keyboard.press('Enter');
     await expect(page.getByTestId('draft')).toContainText(
-      'macro|person99999@example.com'
+      'rox|person99999@example.com'
     );
     await page.goto(`${url}&scoped`);
     await expect(editor).toBeVisible({ timeout: 60_000 });

@@ -17,7 +17,7 @@ const STATIC_REFERENCE: ImageReference = ImageReference::StaticFile(Uuid::from_u
 fn principal() -> CreationPrincipal {
     CreationPrincipal::BotForUser {
         bot: bot_id::ROX_AI_BOT_ID,
-        user: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        user: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
     }
 }
 
@@ -657,7 +657,7 @@ async fn admitted_service_charges_the_acting_user_before_generating() {
     assert_eq!(
         *admission.admitted.lock().unwrap(),
         [(
-            "macro|owner@example.com".to_string(),
+            "rox|owner@example.com".to_string(),
             AiFeature::ImageGeneration
         )]
     );

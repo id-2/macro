@@ -17,7 +17,7 @@ import { isPeopleSqlRequest, parsePeopleSqlResult } from './sql-protocol';
 
 const REQUEST: PeopleSqlRequest = {
   scope: {
-    identity: 'macro|viewer@example.com',
+    identity: 'rox|viewer@example.com',
     storageGeneration: '00000000-0000-4000-8000-000000000001',
   },
   input: { kind: 'statement', sql: 'SELECT COUNT(*) FROM rox.people' },
@@ -56,7 +56,7 @@ it('validates bounded local requests and the real built-in metadata identifiers'
       ...REQUEST,
       input: {
         kind: 'identities',
-        ids: Array(501).fill('macro|person@example.com'),
+        ids: Array(501).fill('rox|person@example.com'),
       },
     })
   ).toBe(false);

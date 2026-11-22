@@ -99,10 +99,10 @@ async fn absent_links_are_acknowledged_and_lookup_failures_are_retained() {
 async fn reauthentication_notifies_selected_recipients_then_publishes_the_event() {
     let (service, fake) = service();
     fake.0.lock().unwrap().primaries = vec![
-        "macro|delegate@example.com".into(),
+        "rox|delegate@example.com".into(),
         "malformed".into(),
-        "macro|owner@example.com".into(),
-        "macro|delegate@example.com".into(),
+        "rox|owner@example.com".into(),
+        "rox|delegate@example.com".into(),
     ];
     assert!(matches!(
         service
@@ -117,17 +117,17 @@ async fn reauthentication_notifies_selected_recipients_then_publishes_the_event(
         calls[0..2],
         [
             Call::Link(LINK),
-            Call::Primaries("macro|owner@example.com".into(), LINK)
+            Call::Primaries("rox|owner@example.com".into(), LINK)
         ]
     );
     assert_eq!(
         calls[2],
         Call::Notify {
-            owner: "macro|owner@example.com".into(),
+            owner: "rox|owner@example.com".into(),
             email: "owner@example.com".into(),
             recipients: vec![
-                "macro|delegate@example.com".into(),
-                "macro|owner@example.com".into()
+                "rox|delegate@example.com".into(),
+                "rox|owner@example.com".into()
             ],
         }
     );

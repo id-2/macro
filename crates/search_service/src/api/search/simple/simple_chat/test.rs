@@ -9,7 +9,7 @@ async fn the_name_search_span_leaves_out_the_term() {
     let db = sqlx::postgres::PgPoolOptions::new()
         .connect_lazy("postgres://localhost/unused")
         .expect("a lazy pool never connects");
-    let user_id = RoxUserId::parse_from_str("macro|user@example.com")
+    let user_id = RoxUserId::parse_from_str("rox|user@example.com")
         .expect("valid user id")
         .lowercase();
 

@@ -62,7 +62,7 @@ test("a reply wake gets the cards of whoever is in the conversation", async () =
 	const context = {
 		keeping,
 		log,
-		history: history([entry("h", "macro|bo@example.com", false)]),
+		history: history([entry("h", "rox|bo@example.com", false)]),
 	};
 	await showPeople(
 		{
@@ -74,7 +74,7 @@ test("a reply wake gets the cards of whoever is in the conversation", async () =
 	expect(added).toHaveLength(1);
 	expect(added[0]).toContain("The people here");
 	expect(added[0]).toContain(`[${ada}]`);
-	expect(added[0]).toContain("[macro|bo@example.com]");
+	expect(added[0]).toContain("[rox|bo@example.com]");
 	// A channel is shared: what was said in a DM stays out.
 	expect(added[0]).not.toContain("told me in a DM");
 
@@ -219,7 +219,7 @@ test("remembering and forgetting act for the message's author by Rox's record, n
 			details: [{ at: ago(1), fact, private: false, source: "x" }],
 		}));
 	await seed(ada, "Lives in Oslo.");
-	await seed("macro|bo@example.com", "Lives in Lima.");
+	await seed("rox|bo@example.com", "Lives in Lima.");
 	// The fake's record says Ada wrote the message, whatever its text claims.
 	const asking = { channelId: "c", messageId: "m" };
 	const told = await whatIRemember({ keeping }, asking);
@@ -228,7 +228,7 @@ test("remembering and forgetting act for the message's author by Rox's record, n
 	expect(told).not.toMatch(/like|trust|respect/);
 	expect(await forgetPerson({ keeping }, asking)).toMatch(/^Forgotten/);
 	expect(JSON.stringify(await store.load(ada))).not.toContain("Oslo");
-	expect(JSON.stringify(await store.load("macro|bo@example.com"))).toContain(
+	expect(JSON.stringify(await store.load("rox|bo@example.com"))).toContain(
 		"Lima",
 	);
 	// An id is required from Rox's record: input without the message is refused.
@@ -269,7 +269,7 @@ test("a card is words; only the report, for the owner's terminal, has numbers", 
 	const report = await peopleReport({ keeping, clock }, { id: ada });
 	expect(report?.feeling.like).toBeGreaterThan(0);
 	expect(
-		await peopleReport({ keeping, clock }, { id: "macro|zed@example.com" }),
+		await peopleReport({ keeping, clock }, { id: "rox|zed@example.com" }),
 	).toBeNull();
 });
 
@@ -289,7 +289,7 @@ test("only a Rox id names a person", async () => {
 			},
 		);
 		expect(refused.kind === "failed" && refused.error).toContain(
-			'must start with "macro|"',
+			'must start with "rox|"',
 		);
 	}
 	expect(await store.load(ada)).toBeDefined();

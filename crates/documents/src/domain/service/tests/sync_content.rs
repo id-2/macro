@@ -13,7 +13,7 @@ async fn notifications_resolve_the_stored_type_and_preserve_attribution() {
             });
         let (service, broker) = make_test_service_with_event_broker(repo);
         let actor = "bot|00000000-0000-0000-0000-00000000a1a1";
-        let user = "macro|owner@example.com";
+        let user = "rox|owner@example.com";
 
         service
             .publish_sync_content_updated(
@@ -80,7 +80,7 @@ async fn a_batch_of_editors_still_publishes_only_one_search_event() {
     repo.expect_get_basic_document()
         .return_once(|_| Box::pin(std::future::ready(Ok(task_document_context("doc-1")))));
     let (service, broker) = make_test_service_with_event_broker(repo);
-    let editors = ["macro|alice@example.com", "macro|bob@example.com"]
+    let editors = ["rox|alice@example.com", "rox|bob@example.com"]
         .into_iter()
         .map(|actor| crate::domain::events::DocumentSyncEditor {
             agent_correlation_id: None,

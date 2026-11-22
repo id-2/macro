@@ -4,7 +4,7 @@ use chrono::Duration;
 fn account(connected: bool) -> AccountRef {
     AccountRef {
         id: Uuid::from_u128(1),
-        user_id: "macro|alice@example.com".into(),
+        user_id: "rox|alice@example.com".into(),
         identity: Some("15550000001@s.whatsapp.net".into()),
         connected,
         generation: 3,
@@ -17,7 +17,7 @@ fn chat(state: ChatState) -> ChatRef {
         id: Uuid::from_u128(2),
         provider: ExternalChatProvider::WhatsApp,
         remote_id: "120363000000000001@g.us".into(),
-        user_id: "macro|alice@example.com".into(),
+        user_id: "rox|alice@example.com".into(),
         state,
         adopted_at: Utc::now(),
     }

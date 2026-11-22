@@ -15,7 +15,7 @@ mod explain;
 mod hidden_sessions;
 mod latest;
 
-const USER_1: &str = "macro|user-1@test.com";
+const USER_1: &str = "rox|user-1@test.com";
 const DOC_A: &str = "11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const CHAT_A: &str = "22222222-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const PROJECT_A: &str = "aaaaaaaa-ffff-ffff-ffff-ffffffffffff";
@@ -725,7 +725,7 @@ async fn initiatives_surface_when_notified_and_opted_in(
 
 /// An agent session user-1 was notified about, plus one they cannot open.
 async fn seed_agent_sessions(pool: &Pool<Postgres>) -> anyhow::Result<(Uuid, Uuid)> {
-    const USER_2: &str = "macro|user-2@test.com";
+    const USER_2: &str = "rox|user-2@test.com";
     let mine = Uuid::from_u128(0xa5e5_0001);
     let theirs = Uuid::from_u128(0xa5e5_0002);
     for (id, owner) in [(mine, USER_1), (theirs, USER_2)] {

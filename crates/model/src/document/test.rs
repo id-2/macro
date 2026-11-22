@@ -11,7 +11,7 @@ fn test_document_basic_serde_roundtrip() {
     let original = DocumentBasic {
         document_id: "doc-123".to_string(),
         document_name: "Test Document".to_string(),
-        owner: user_owner("macro|test@example.com"),
+        owner: user_owner("rox|test@example.com"),
         file_type: Some("pdf".to_string()),
         sub_type: None,
         branched_from_id: Some("parent-doc-456".to_string()),
@@ -22,7 +22,7 @@ fn test_document_basic_serde_roundtrip() {
     };
 
     let serialized = serde_json::to_value(&original).expect("Failed to serialize DocumentBasic");
-    assert_eq!(serialized["owner"], "macro|test@example.com");
+    assert_eq!(serialized["owner"], "rox|test@example.com");
     let deserialized: DocumentBasic =
         serde_json::from_value(serialized).expect("Failed to deserialize DocumentBasic");
 
@@ -34,7 +34,7 @@ fn test_document_basic_serde_minimal() {
     let original = DocumentBasic {
         document_id: "doc-minimal".to_string(),
         document_name: "Minimal Doc".to_string(),
-        owner: user_owner("macro|user@test.com"),
+        owner: user_owner("rox|user@test.com"),
         file_type: None,
         sub_type: None,
         branched_from_id: None,
@@ -57,7 +57,7 @@ fn test_document_basic_serde_with_deleted_at() {
     let original = DocumentBasic {
         document_id: "doc-deleted".to_string(),
         document_name: "Deleted Doc".to_string(),
-        owner: user_owner("macro|deleted@test.com"),
+        owner: user_owner("rox|deleted@test.com"),
         file_type: Some("docx".to_string()),
         sub_type: None,
         branched_from_id: None,

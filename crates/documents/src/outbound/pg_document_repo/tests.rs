@@ -134,7 +134,7 @@ async fn team_edit_args(repo: &TestRepo, level: Option<AccessLevel>) -> EditDocu
     .unwrap()
     .unwrap();
     EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: TEST_DOCUMENT_ID.to_string(),
         document_name: Some("team-edit".to_string()),
         project_id: None,
@@ -168,14 +168,14 @@ async fn get_user_name_reads_the_name_a_user_set(pool: Pool<Postgres>) {
     .unwrap();
     let repo = test_repo(pool);
     assert_eq!(
-        repo.get_user_name("macro|teammate1@user.com")
+        repo.get_user_name("rox|teammate1@user.com")
             .await
             .unwrap(),
         (Some("Jacob".to_owned()), Some("Beckerman".to_owned()))
     );
     // A user who never set a name has none.
     assert_eq!(
-        repo.get_user_name("macro|teammate2@user.com")
+        repo.get_user_name("rox|teammate2@user.com")
             .await
             .unwrap(),
         (None, None)
@@ -515,7 +515,7 @@ async fn task_creation_failure_rolls_back_all_initialization(pool: Pool<Postgres
         .await
         .unwrap();
     let id = uuid::Uuid::new_v4();
-    let mut args = create_document_args("macro|no-team@user.com", true, Some(TEST_TEAM_ID));
+    let mut args = create_document_args("rox|no-team@user.com", true, Some(TEST_TEAM_ID));
     args.document.id = Some(id);
     args.document.share_with_team = true;
     assert!(
@@ -608,8 +608,8 @@ async fn task_creation_failure_rolls_back_all_initialization(pool: Pool<Postgres
 const TEST_TEAM_ID: uuid::Uuid = uuid::uuid!("a0000000-0000-0000-0000-000000000001");
 const SECOND_TEAM_ID: uuid::Uuid = uuid::uuid!("a0000000-0000-0000-0000-000000000002");
 const TEST_DOCUMENT_ID: &str = "d0000000-0000-0000-0000-000000000001";
-const TEST_DOCUMENT_OWNER_ID: &str = "macro|user@user.com";
-const TEST_DOCUMENT_NON_OWNER_ID: &str = "macro|teammate1@user.com";
+const TEST_DOCUMENT_OWNER_ID: &str = "rox|user@user.com";
+const TEST_DOCUMENT_NON_OWNER_ID: &str = "rox|teammate1@user.com";
 
 fn user_id(user_id: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     rox_user_id::user_id::RoxUserIdStr::parse_from_str(user_id)
@@ -827,7 +827,7 @@ async fn insert_second_team(pool: &Pool<Postgres>) {
     sqlx::query(
         r#"
         INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
-        VALUES ('macro|other@user.com', 'other@user.com', 'stripe_id_other', 1, $1)
+        VALUES ('rox|other@user.com', 'other@user.com', 'stripe_id_other', 1, $1)
         ON CONFLICT DO NOTHING
         "#,
     )
@@ -839,7 +839,7 @@ async fn insert_second_team(pool: &Pool<Postgres>) {
     sqlx::query(
         r#"
         INSERT INTO public."team" ("id", "name", "owner_id")
-        VALUES ($1, 'second-team', 'macro|other@user.com')
+        VALUES ($1, 'second-team', 'rox|other@user.com')
         ON CONFLICT DO NOTHING
         "#,
     )
@@ -851,7 +851,7 @@ async fn insert_second_team(pool: &Pool<Postgres>) {
     sqlx::query(
         r#"
         INSERT INTO public."team_user" ("user_id", "team_id", "team_role")
-        VALUES ('macro|other@user.com', $1, 'owner')
+        VALUES ('rox|other@user.com', $1, 'owner')
         ON CONFLICT DO NOTHING
         "#,
     )
@@ -877,7 +877,7 @@ async fn test_get_document_metadata(pool: Pool<Postgres>) {
     assert_eq!(metadata.document_name, "test_document_name");
     assert_eq!(
         metadata.owner,
-        Owner::from_principal_str("macro|user@user.com").unwrap()
+        Owner::from_principal_str("rox|user@user.com").unwrap()
     );
     assert_eq!(metadata.document_version_id, 1);
     assert_eq!(metadata.file_type, Some("txt".to_string()));
@@ -902,7 +902,7 @@ async fn test_get_basic_document(pool: Pool<Postgres>) {
     assert_eq!(basic.document_name, "test_document_name");
     assert_eq!(
         basic.owner,
-        Owner::from_principal_str("macro|user@user.com").unwrap()
+        Owner::from_principal_str("rox|user@user.com").unwrap()
     );
     assert_eq!(basic.file_type, Some("txt".to_string()));
 
@@ -1194,7 +1194,7 @@ async fn test_get_user_view_location(pool: Pool<Postgres>) {
     // No view location exists
     let location = repo
         .get_user_view_location(
-            "macro|user@user.com",
+            "rox|user@user.com",
             "d0000000-0000-0000-0000-000000000001",
         )
         .await
@@ -1312,7 +1312,7 @@ async fn test_edit_document_name(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: Some("new-name".to_string()),
@@ -1339,7 +1339,7 @@ async fn test_edit_document_set_file_type(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
         project_id: None,
@@ -1366,7 +1366,7 @@ async fn test_edit_document_clear_file_type(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
         project_id: None,
@@ -1393,7 +1393,7 @@ async fn test_edit_document_project(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
@@ -1424,7 +1424,7 @@ async fn test_edit_document_remove_project(pool: Pool<Postgres>) {
 
     // First set a project
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
@@ -1447,7 +1447,7 @@ async fn test_edit_document_remove_project(pool: Pool<Postgres>) {
 
     // Then remove it by passing empty string
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
@@ -1475,7 +1475,7 @@ async fn test_edit_document_public_to_null_revokes_non_owner_access(pool: Pool<P
     insert_non_owner_user_access(&pool).await;
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: TEST_DOCUMENT_ID.to_string(),
         document_name: None,
@@ -1511,7 +1511,7 @@ async fn test_edit_document_public_to_team_revokes_non_owner_access(pool: Pool<P
     insert_non_owner_user_access(&pool).await;
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: TEST_DOCUMENT_ID.to_string(),
         document_name: None,
@@ -1547,7 +1547,7 @@ async fn test_edit_document_omitted_link_share_does_not_revoke(pool: Pool<Postgr
     insert_non_owner_user_access(&pool).await;
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: TEST_DOCUMENT_ID.to_string(),
         document_name: None,
         project_id: None,
@@ -1570,7 +1570,7 @@ async fn test_edit_document_omitted_link_share_does_not_revoke(pool: Pool<Postgr
     assert_eq!(result.link_share_access_level.as_deref(), Some("edit"));
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: TEST_DOCUMENT_ID.to_string(),
         document_name: None,
         project_id: None,
@@ -1608,7 +1608,7 @@ async fn test_edit_document_name_and_project(pool: Pool<Postgres>) {
     insert_non_owner_user_access(&pool).await;
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: Some("renamed".to_string()),
         team_share: None,
@@ -1674,7 +1674,7 @@ async fn test_share_with_team_creates_access_for_team_members(pool: Pool<Postgre
     // Owner row should still be 'owner' (not downgraded)
     let owner_row = rows
         .iter()
-        .find(|r| r.source_id == "macro|user@user.com")
+        .find(|r| r.source_id == "rox|user@user.com")
         .unwrap();
     assert_eq!(owner_row.access_level, Some("owner".to_string()));
 
@@ -1694,7 +1694,7 @@ async fn test_get_team_ids_for_user_returns_empty_when_user_not_on_team(pool: Po
     let repo = test_repo(pool);
 
     let team_ids = repo
-        .get_team_ids_for_user("macro|no-team@user.com")
+        .get_team_ids_for_user("rox|no-team@user.com")
         .await
         .unwrap();
 
@@ -1956,7 +1956,7 @@ async fn test_team_share_no_team_owner(pool: Pool<Postgres>) {
     // Create a document owned by a user without a team
     let metadata = repo
         .create_document(
-            create_document_args("macro|no-team@user.com", false, None),
+            create_document_args("rox|no-team@user.com", false, None),
             md_share_permission(),
         )
         .await
@@ -1993,7 +1993,7 @@ async fn test_share_with_team_skips_user_with_existing_direct_access(pool: Pool<
         r#"
         INSERT INTO entity_access
             (entity_id, entity_type, source_id, source_type, access_level)
-        VALUES ($1, 'document', 'macro|teammate1@user.com', 'user', 'edit')
+        VALUES ($1, 'document', 'rox|teammate1@user.com', 'user', 'edit')
         "#,
         doc_uuid,
     )
@@ -2009,7 +2009,7 @@ async fn test_share_with_team_skips_user_with_existing_direct_access(pool: Pool<
         SELECT access_level::text as "access_level"
         FROM entity_access
         WHERE entity_id = $1 AND entity_type = 'document'
-          AND source_id = 'macro|teammate1@user.com' AND source_type = 'user'
+          AND source_id = 'rox|teammate1@user.com' AND source_type = 'user'
         "#,
         doc_uuid,
     )
@@ -2049,7 +2049,7 @@ async fn test_share_with_owner_team(pool: Pool<Postgres>) {
 
     let owner = rows
         .iter()
-        .find(|r| r.source_id == "macro|user@user.com")
+        .find(|r| r.source_id == "rox|user@user.com")
         .unwrap();
     assert_eq!(owner.access_level, Some("owner".to_string()));
 
@@ -2067,7 +2067,7 @@ async fn test_share_with_owner_team(pool: Pool<Postgres>) {
 async fn test_create_first_task_assigns_team_task_id_one(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
-    let metadata = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let metadata = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     let task_metadata = repo
         .get_team_task_metadata(&metadata.document_id)
         .await
@@ -2088,7 +2088,7 @@ async fn test_get_team_task_number_names_the_team_slug(pool: Pool<Postgres>) {
         .await
         .unwrap();
     let repo = test_repo(pool);
-    let task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
 
     assert_eq!(
         repo.get_team_task_number(&task.document_id).await.unwrap(),
@@ -2111,9 +2111,9 @@ async fn test_get_document_id_by_team_task_number(pool: Pool<Postgres>) {
     insert_second_team(&pool).await;
     let repo = test_repo(pool);
 
-    let first_team_task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let first_team_task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     let second_team_task =
-        create_task_for_team(&repo, "macro|other@user.com", SECOND_TEAM_ID).await;
+        create_task_for_team(&repo, "rox|other@user.com", SECOND_TEAM_ID).await;
 
     assert_eq!(
         repo.get_document_id_by_team_task_number(&TEST_TEAM_ID, 1)
@@ -2143,7 +2143,7 @@ async fn test_create_multiple_tasks_same_team_assigns_sequence(pool: Pool<Postgr
     let repo = test_repo(pool.clone());
 
     for _ in 0..3 {
-        create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+        create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     }
 
     assert_eq!(team_task_numbers(&pool, TEST_TEAM_ID).await, vec![1, 2, 3]);
@@ -2157,9 +2157,9 @@ async fn test_create_tasks_different_teams_have_independent_sequences(pool: Pool
     insert_second_team(&pool).await;
     let repo = test_repo(pool.clone());
 
-    create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
-    create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
-    create_task_for_team(&repo, "macro|other@user.com", SECOND_TEAM_ID).await;
+    create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
+    create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
+    create_task_for_team(&repo, "rox|other@user.com", SECOND_TEAM_ID).await;
 
     assert_eq!(team_task_numbers(&pool, TEST_TEAM_ID).await, vec![1, 2]);
     assert_eq!(team_task_numbers(&pool, SECOND_TEAM_ID).await, vec![1]);
@@ -2176,7 +2176,7 @@ async fn test_concurrent_task_creates_same_team_get_unique_numbers(pool: Pool<Po
     for _ in 0..8 {
         let repo = repo.clone();
         handles.push(tokio::spawn(async move {
-            create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+            create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
         }));
     }
 
@@ -2199,7 +2199,7 @@ async fn test_non_task_document_does_not_create_team_task_row(pool: Pool<Postgre
 
     let metadata = repo
         .create_document(
-            create_document_args("macro|user@user.com", false, Some(TEST_TEAM_ID)),
+            create_document_args("rox|user@user.com", false, Some(TEST_TEAM_ID)),
             md_share_permission(),
         )
         .await
@@ -2222,7 +2222,7 @@ async fn test_task_without_team_id_does_not_create_team_task_row(pool: Pool<Post
 
     let metadata = repo
         .create_document(
-            create_document_args("macro|user@user.com", true, None),
+            create_document_args("rox|user@user.com", true, None),
             md_share_permission(),
         )
         .await
@@ -2242,7 +2242,7 @@ async fn test_task_without_team_id_does_not_create_team_task_row(pool: Pool<Post
 )]
 async fn test_deleting_document_cascades_team_task_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let metadata = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let metadata = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
 
     repo.delete_document_by_id(&metadata.document_id)
         .await
@@ -2296,13 +2296,13 @@ async fn test_delete_document_by_id_removes_entity_row(pool: Pool<Postgres>) {
 )]
 async fn test_copying_task_allocates_new_team_task_number(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let original = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let original = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
 
     let copied = repo
         .copy_document(
             CopyDocumentRepoArgs {
                 original_document: original,
-                owner: Owner::User(user_id("macro|user@user.com")),
+                owner: Owner::User(user_id("rox|user@user.com")),
                 document_name: "copied task".to_string(),
                 file_type: Some(model::document::FileType::Md),
                 team_id: Some(TEST_TEAM_ID),
@@ -2343,7 +2343,7 @@ async fn test_get_branch_name_context_prefers_github_and_team_task(pool: Pool<Po
     sqlx::query!(
         r#"
         INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
-        VALUES ($1, 'macro|user@user.com', $2, 'octocat', '12345')
+        VALUES ($1, 'rox|user@user.com', $2, 'octocat', '12345')
         "#,
         uuid::uuid!("b0000000-0000-0000-0000-000000000001"),
         uuid::uuid!("b0000000-0000-0000-0000-000000000002"),
@@ -2352,9 +2352,9 @@ async fn test_get_branch_name_context_prefers_github_and_team_task(pool: Pool<Po
     .await
     .unwrap();
 
-    let task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     let context = repo
-        .get_branch_name_context(&task.document_id, "macro|user@user.com")
+        .get_branch_name_context(&task.document_id, "rox|user@user.com")
         .await
         .unwrap();
 
@@ -2374,7 +2374,7 @@ async fn test_get_branch_name_context_falls_back_for_unknown_user(pool: Pool<Pos
     let context = repo
         .get_branch_name_context(
             "d0000000-0000-0000-0000-000000000001",
-            "macro|no-team@user.com",
+            "rox|no-team@user.com",
         )
         .await
         .unwrap();
@@ -2391,8 +2391,8 @@ async fn test_get_branch_name_context_falls_back_for_unknown_user(pool: Pool<Pos
 )]
 async fn test_get_github_pull_request_keys_orders_and_parses(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
-    let other_task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
+    let other_task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     let task_short_id = short_id_for_document_id(&task.document_id);
     let other_task_short_id = short_id_for_document_id(&other_task.document_id);
     let created_at = chrono::DateTime::parse_from_rfc3339("2026-01-01T00:00:00Z")
@@ -2499,7 +2499,7 @@ async fn test_edit_document_channel_share_creates_user_item_access(pool: Pool<Po
     let channel_id = "c0000000-0000-0000-0000-000000000001";
 
     repo.edit_document(EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
@@ -2575,7 +2575,7 @@ async fn test_edit_document_channel_share_idempotent(pool: Pool<Postgres>) {
     let channel_id = "c0000000-0000-0000-0000-000000000001";
 
     let make_args = || EditDocumentRepoArgs {
-        actor_id: "macro|owner@example.com".to_string(),
+        actor_id: "rox|owner@example.com".to_string(),
         team_share: None,
         document_id: "d0000000-0000-0000-0000-000000000001".to_string(),
         document_name: None,
@@ -3570,8 +3570,8 @@ async fn test_get_github_pull_request_task_links_returns_requested_keys_oldest_f
     pool: Pool<Postgres>,
 ) {
     let repo = test_repo(pool.clone());
-    let task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
-    let other_task = create_task_for_team(&repo, "macro|user@user.com", TEST_TEAM_ID).await;
+    let task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
+    let other_task = create_task_for_team(&repo, "rox|user@user.com", TEST_TEAM_ID).await;
     let task_short_id = short_id_for_document_id(&task.document_id);
     let other_task_short_id = short_id_for_document_id(&other_task.document_id);
     let created_at = chrono::DateTime::parse_from_rfc3339("2026-01-01T00:00:00Z")

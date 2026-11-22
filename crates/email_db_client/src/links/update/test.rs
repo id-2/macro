@@ -10,7 +10,7 @@ use sqlx::{Pool, Postgres};
 async fn insert_test_link(pool: &Pool<Postgres>, email: &str) -> anyhow::Result<Uuid> {
     let link = Link {
         id: rox_uuid::generate_uuid_v7(),
-        rox_id: RoxUserIdStr::try_from(format!("macro|{email}"))?,
+        rox_id: RoxUserIdStr::try_from(format!("rox|{email}"))?,
         fusionauth_user_id: "22222222-2222-2222-2222-222222222222".to_string(),
         email_address: EmailStr::try_from(email.to_string())?,
         provider: UserProvider::Gmail,

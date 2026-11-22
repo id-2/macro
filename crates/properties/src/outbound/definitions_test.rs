@@ -12,15 +12,15 @@ use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 fn user_1() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap()
 }
 
 fn user_2() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user2@test.com").unwrap()
 }
 
 fn user_3() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user3@test.com").unwrap()
 }
 
 fn team_1() -> Uuid {
@@ -502,7 +502,7 @@ async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow
     // options, never another user's personal set.
     let sets = property_definition_queries::get_caller_tag_definitions_with_options(
         &pool,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
     )
     .await?;
     assert_eq!(sets.len(), 2);
@@ -522,7 +522,7 @@ async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow
     // A teammate without a personal set only gets the team set.
     let sets = property_definition_queries::get_caller_tag_definitions_with_options(
         &pool,
-        "macro|user3@test.com",
+        "rox|user3@test.com",
     )
     .await?;
     assert_eq!(sets.len(), 1);
@@ -531,7 +531,7 @@ async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow
     // user2 only gets their own personal set (Team 2 has no tag set).
     let sets = property_definition_queries::get_caller_tag_definitions_with_options(
         &pool,
-        "macro|user2@test.com",
+        "rox|user2@test.com",
     )
     .await?;
     assert_eq!(sets.len(), 1);
@@ -638,7 +638,7 @@ async fn a_database_binds_system_own_team_and_its_own_definitions_only(
     let bindable = |id: Uuid| {
         let repo = repo.clone();
         async move {
-            repo.get_bindable_property_definition(id, "macro|user1@test.com", database_id)
+            repo.get_bindable_property_definition(id, "rox|user1@test.com", database_id)
                 .await
                 .map(|definition| definition.map(|definition| definition.id))
         }

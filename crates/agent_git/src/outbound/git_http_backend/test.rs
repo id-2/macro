@@ -29,7 +29,7 @@ async fn git(path: &std::path::Path, args: &[&str], input: &[u8]) -> std::proces
 
 async fn target(root: &std::path::Path) -> (RepoDirectories, RoxUserIdStr<'static>) {
     let directories = RepoDirectories::new(root.to_path_buf());
-    let agent = RoxUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("rox|agent@example.com".to_owned()).unwrap();
     BareRepoStore::new(directories.clone())
         .create_repo(
             &agent,

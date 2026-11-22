@@ -78,7 +78,7 @@ fn record(user_id: &RoxUserIdStr<'static>) -> ActivityRecord {
 
 #[tokio::test]
 async fn activity_updates_streams_recorded_events() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(ActivitySubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -114,7 +114,7 @@ async fn activity_updates_streams_recorded_events() {
 
 #[tokio::test]
 async fn activity_updates_streams_content_free_invalidation() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(ActivitySubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -146,7 +146,7 @@ async fn activity_updates_streams_content_free_invalidation() {
 
 #[tokio::test]
 async fn activity_updates_reports_slow_consumers() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap();
     let (sender, subscription) = subscription(ActivitySubscriptionExit::SlowConsumer);
     drop(sender);
     let service = TestSubscriptionService {

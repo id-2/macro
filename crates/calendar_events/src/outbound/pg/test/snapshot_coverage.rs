@@ -2,7 +2,7 @@ use super::*;
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_calendars_require_strict_full_verification_and_old_writes_revoke_it(pool: PgPool) {
-    let owner = "macro|empty-snapshot@example.com";
+    let owner = "rox|empty-snapshot@example.com";
     let link = insert_link(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let grant = repo

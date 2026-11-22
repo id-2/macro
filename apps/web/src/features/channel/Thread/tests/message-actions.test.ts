@@ -87,7 +87,7 @@ describe('message-actions helpers', () => {
   const threadReply = {
     id: 'reply-1',
     content: 'first line\nsecond line',
-    sender_id: 'macro|sender@example.com',
+    sender_id: 'rox|sender@example.com',
     thread_id: 'thread-1',
   };
 
@@ -99,7 +99,7 @@ describe('message-actions helpers', () => {
         existingValue: 'draft',
       })
     ).toBe(
-      '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"reply-1","targetThreadId":"thread-1","displayText":"first line second line","senderId":"macro|sender@example.com"}</m-reply-target>\n\ndraft'
+      '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"reply-1","targetThreadId":"thread-1","displayText":"first line second line","senderId":"rox|sender@example.com"}</m-reply-target>\n\ndraft'
     );
   });
 
@@ -176,7 +176,7 @@ describe('message-actions helpers', () => {
     const agentSessionReply = {
       ...threadReply,
       content:
-        '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"earlier-reply","targetThreadId":"thread-1","displayText":"earlier preview","senderId":"macro|earlier@example.com"}</m-reply-target>\n\n<m-magic-chip>{"agentSessionId":"session-1","promptedMessage":{"turn":0,"author":"user"},"status":"booting"}</m-magic-chip>',
+        '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"earlier-reply","targetThreadId":"thread-1","displayText":"earlier preview","senderId":"rox|earlier@example.com"}</m-reply-target>\n\n<m-magic-chip>{"agentSessionId":"session-1","promptedMessage":{"turn":0,"author":"user"},"status":"booting"}</m-magic-chip>',
     };
 
     expect(
@@ -201,7 +201,7 @@ describe('message-actions helpers', () => {
         message: {
           ...threadReply,
           content:
-            '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"earlier-reply","targetThreadId":"thread-1","displayText":"earlier preview","senderId":"macro|earlier@example.com"}</m-reply-target>\n\nmy response',
+            '<m-reply-target>{"parent":{"type":"channel","id":"channel-1"},"targetMessageId":"earlier-reply","targetThreadId":"thread-1","displayText":"earlier preview","senderId":"rox|earlier@example.com"}</m-reply-target>\n\nmy response',
         },
       })
     ).toContain('"displayText":"my response"');

@@ -25,7 +25,7 @@ fn a_pipeline_without_a_record_type_starts_like_a_new_database() {
         "name": "Hiring"
     }))
     .unwrap();
-    let creator = RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
+    let creator = RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap();
     let blueprint = pipeline_blueprint(Uuid::nil(), creator, input, vec!["Lead".to_owned()]);
     assert_eq!(blueprint.record_type, None);
     let [name] = blueprint.database.columns.as_slice() else {
@@ -57,7 +57,7 @@ fn an_insert_with_client_row_ids_still_names_its_primary_records() {
     let pipeline = Pipeline {
         id: Uuid::nil(),
         team_id: Uuid::nil(),
-        user_id: "macro|owner@example.com".to_owned(),
+        user_id: "rox|owner@example.com".to_owned(),
         name: "Renewals".to_owned(),
         record_type: Some(PipelineRecordType::Company),
         commercial_fields: Default::default(),

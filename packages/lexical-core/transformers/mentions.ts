@@ -70,8 +70,8 @@ export const I_USER_MENTION: TextMatchTransformer = {
         throw new Error('Missing or invalid userId');
       }
       let email = typeof data.email === 'string' ? data.email : '';
-      if (!email && data.userId.startsWith('macro|')) {
-        email = data.userId.slice('macro|'.length);
+      if (!email && data.userId.startsWith('rox|')) {
+        email = data.userId.slice('rox|'.length);
       }
 
       const displayName =

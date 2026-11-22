@@ -10,7 +10,7 @@ use messages::domain::{
     ports::{CrmParentFacts, CrmParentReader},
 };
 
-const OWNER: &str = "macro|crm-lookup-owner@example.com";
+const OWNER: &str = "rox|crm-lookup-owner@example.com";
 
 async fn seed_team(pool: &PgPool) -> Uuid {
     let team_id = Uuid::now_v7();

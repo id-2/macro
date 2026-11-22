@@ -43,7 +43,7 @@ pub enum TeamAgentStatus {
 #[cfg_attr(feature = "inbound", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TeamAgent {
-    /// The agent's Rox user id (`macro|<email>`).
+    /// The agent's Rox user id (`rox|<email>`).
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
     pub user_id: RoxUserIdStr<'static>,
     /// Team the agent belongs to.

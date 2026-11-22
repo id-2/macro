@@ -105,7 +105,7 @@ impl AiAdmissionService for Denied {
     }
 }
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|universal-input@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|universal-input@example.com".to_owned()).unwrap()
 }
 fn request() -> ExtractInputRequest {
     ExtractInputRequest {

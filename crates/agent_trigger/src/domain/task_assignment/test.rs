@@ -84,7 +84,7 @@ fn creation_and_new_assignments_include_only_added_agents() {
 
     updated.previous_value = updated.value.clone();
     updated.value = value(&[
-        "macro|human@example.com",
+        "rox|human@example.com",
         "bot|00000000-0000-0000-0000-00000000b07a",
         "bot|00000000-0000-0000-0000-00000000b07b",
         "bot|00000000-0000-0000-0000-00000000b07b",
@@ -104,7 +104,7 @@ fn unchanged_saves_removals_and_human_only_assignments_do_not_start_work() {
     assert!(TaskAssignment::from_update(Uuid::now_v7(), &updated).is_none());
     updated.value = None;
     assert!(TaskAssignment::from_update(Uuid::now_v7(), &updated).is_none());
-    updated.value = value(&["macro|human@example.com", "bot|invalid"]);
+    updated.value = value(&["rox|human@example.com", "bot|invalid"]);
     assert!(TaskAssignment::from_update(Uuid::now_v7(), &updated).is_none());
     updated.previous_value = None;
     assert!(TaskAssignment::from_update(Uuid::now_v7(), &updated).is_none());

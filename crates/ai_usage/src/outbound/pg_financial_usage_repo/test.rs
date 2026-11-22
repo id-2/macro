@@ -239,7 +239,7 @@ async fn conflicting_replays_and_direct_mutation_cannot_replace_facts(pool: PgPo
     let admission = prepare(&repo).await;
     repo.admit(admission.clone()).await.unwrap();
     let mut changed = admission.request.clone();
-    changed.user = RoxUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap();
+    changed.user = RoxUserIdStr::try_from("rox|other@example.com".to_owned()).unwrap();
     assert!(matches!(
         repo.prepare(changed, admission.rate.clone()).await,
         Err(FinancialError::ReplayConflict {

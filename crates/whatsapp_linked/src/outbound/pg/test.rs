@@ -36,9 +36,9 @@ fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
-const ALICE: &str = "macro|alice@example.com";
-const BOB: &str = "macro|bob@example.com";
-const CAROL: &str = "macro|carol@example.com";
+const ALICE: &str = "rox|alice@example.com";
+const BOB: &str = "rox|bob@example.com";
+const CAROL: &str = "rox|carol@example.com";
 const ALICE_JID: &str = "15550000001@s.whatsapp.net";
 const BOB_JID: &str = "15550000002@s.whatsapp.net";
 const CUSTOMER_JID: &str = "15558880001@s.whatsapp.net";
@@ -73,7 +73,7 @@ fn services(pool: &PgPool) -> (Linked, SessionService, Arc<PgWhatsAppRepository>
 }
 
 async fn user(pool: &PgPool, id: &str) {
-    let email = id.trim_start_matches("macro|");
+    let email = id.trim_start_matches("rox|");
     let rox_user = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",

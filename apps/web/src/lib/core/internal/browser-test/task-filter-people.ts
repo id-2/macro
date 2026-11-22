@@ -4,27 +4,27 @@ import { createSignal } from 'solid-js';
 
 const people = [
   {
-    userId: 'macro|late@example.com',
+    userId: 'rox|late@example.com',
     email: 'late@example.com',
     name: 'Late Person',
   },
   {
-    userId: 'macro|one@example.com',
+    userId: 'rox|one@example.com',
     email: 'one@example.com',
     name: 'Ambiguous One',
   },
   {
-    userId: 'macro|two@example.com',
+    userId: 'rox|two@example.com',
     email: 'two@example.com',
     name: 'Ambiguous Two',
   },
   {
-    userId: 'macro|comma@example.com',
+    userId: 'rox|comma@example.com',
     email: 'comma@example.com',
     name: 'Family, Given',
   },
   {
-    userId: 'macro|alias@example.com',
+    userId: 'rox|alias@example.com',
     email: 'alias@example.com',
     name: 'target@example.com',
   },
@@ -40,7 +40,7 @@ export async function fetchContactReferencePage(
   setReferenceRequests((old) => [...old, variables]);
   if (!variables.search) throw new Error('Reference search is required');
   const label = variables.search.toLowerCase();
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   return {
     user: {
       id: viewer,

@@ -178,7 +178,7 @@ async fn adds_the_saved_event_of_the_named_message_as_the_viewer() {
     ));
     let imported = importer.imported.lock().unwrap();
     assert_eq!(imported.len(), 1);
-    assert_eq!(imported[0].0, "macro|reader@example.com");
+    assert_eq!(imported[0].0, "rox|reader@example.com");
     assert_eq!(imported[0].1.ical_uid, "meeting@example.com");
     assert_eq!(imported[0].2, Some(calendar_id));
 }

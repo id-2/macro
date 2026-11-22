@@ -4,7 +4,7 @@ use super::*;
 
 #[sqlx::test]
 async fn counts_live_and_soft_deleted_documents(pool: Pool<Postgres>) {
-    let owner = "macro|owner@example.com";
+    let owner = "rox|owner@example.com";
     for id in ["live-document", "deleted-document"] {
         sqlx::query!(
             r#"INSERT INTO "Document" (id, name, owner, "fileType") VALUES ($1, 'doc', $2, 'md')"#,

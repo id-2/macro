@@ -6,7 +6,7 @@ use crate::domain::error::AgentSessionError;
 use crate::domain::pull_request_links::SessionPullRequestLinkRepo;
 use crate::domain::work_registration::{WorkEndReason, WorkRegistrationRepo};
 
-const AGENT: &str = "macro|registered-agent@example.com";
+const AGENT: &str = "rox|registered-agent@example.com";
 
 async fn end_state(pool: &PgPool, session: AgentSessionId) -> Vec<Option<String>> {
     sqlx::query_scalar!(

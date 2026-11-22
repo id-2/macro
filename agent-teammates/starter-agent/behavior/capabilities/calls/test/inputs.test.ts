@@ -100,7 +100,7 @@ test("placeCall and askOntoCall refuse, naming the key, while calls have no spee
 	await refuses(
 		"placeCall",
 		context,
-		{ who: "macro|ada@example.com", why: "a reason" },
+		{ who: "rox|ada@example.com", why: "a reason" },
 		noVoice,
 	);
 	await refuses(

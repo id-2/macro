@@ -3,7 +3,7 @@ use rox_user_id::cowlike::CowLike;
 use models_properties::{EntityType, shared::entity_reference::EntityReference};
 
 fn viewer() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|me@example.com")
+    RoxUserIdStr::parse_from_str("rox|me@example.com")
         .unwrap()
         .into_owned()
 }
@@ -64,9 +64,9 @@ fn a_single_valued_field_refuses_several_values() {
 fn people_are_me_an_email_or_a_user_id() {
     let owner = field(FieldKind::Person);
     for (input, id) in [
-        ("me", "macro|me@example.com"),
-        ("Sam@Example.com", "macro|sam@example.com"),
-        ("macro|sam@example.com", "macro|sam@example.com"),
+        ("me", "rox|me@example.com"),
+        ("Sam@Example.com", "rox|sam@example.com"),
+        ("rox|sam@example.com", "rox|sam@example.com"),
     ] {
         assert_eq!(
             cell_value(&owner, &one(input), &viewer()),
@@ -132,12 +132,12 @@ fn stored_cells_read_back_as_labels_and_ids() {
         None
     );
     let owner = PropertyValue::EntityRef(vec![EntityReference::new(
-        "macro|sam@example.com",
+        "rox|sam@example.com",
         EntityType::User,
     )]);
     assert_eq!(
         field_value(&field(FieldKind::Person), &owner),
-        Some(FieldValue::References(vec!["macro|sam@example.com".into()]))
+        Some(FieldValue::References(vec!["rox|sam@example.com".into()]))
     );
 }
 
@@ -158,7 +158,7 @@ fn filters_match_any_wanted_value_and_empty_cells() {
     assert!(matches(&stage, None, &one("Closed"), &viewer()).is_err());
 
     let owner = PropertyValue::EntityRef(vec![EntityReference::new(
-        "macro|me@example.com",
+        "rox|me@example.com",
         EntityType::User,
     )]);
     assert_eq!(

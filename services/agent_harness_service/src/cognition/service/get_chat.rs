@@ -78,7 +78,7 @@ mod tests {
         let chat = get_chat(&ctx, "chat-three", "user").await.unwrap();
 
         assert_eq!(chat.id, "chat-three".to_string());
-        assert_eq!(chat.user_id, "macro|user@user.com".to_string());
+        assert_eq!(chat.user_id, "rox|user@user.com".to_string());
         assert_eq!(chat.name, "test-chat 3".to_string());
         assert!(chat.model.is_some(), "some model");
 

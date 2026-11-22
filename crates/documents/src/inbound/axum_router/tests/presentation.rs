@@ -40,7 +40,7 @@ fn deck_router(
     *documents.file_type.lock().unwrap() = Some(file_type);
     // Someone else's document, so the caller's access is checked.
     *documents.document_owner.lock().unwrap() =
-        Some(Owner::from_principal_str("macro|file-owner@example.com").unwrap());
+        Some(Owner::from_principal_str("rox|file-owner@example.com").unwrap());
     let deck = Arc::new(MemoryDeck {
         versions: Mutex::new(vec![DECK.to_vec()]),
     });

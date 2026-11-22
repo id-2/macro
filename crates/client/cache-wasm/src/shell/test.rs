@@ -539,7 +539,7 @@ fn projected_realtime_document_data(
             "__typename": "SoupUpdated",
             "item": projected_document_item(
                 document_id,
-                "macro|user@example.com",
+                "rox|user@example.com",
                 is_email_attachment,
                 None,
                 2,
@@ -559,7 +559,7 @@ fn partial_document_mutation_data(document_id: &str) -> serde_json::Value {
                         "__typename": "GraphqlSoupDocument",
                         "id": document_id,
                         "displayName": "Mutation document",
-                        "ownerId": "macro|user@example.com"
+                        "ownerId": "rox|user@example.com"
                     }
                 }]
             }]
@@ -595,7 +595,7 @@ fn optimistic_document_data(document_id: &str) -> serde_json::Value {
                         "__typename": "GraphqlSoupDocument",
                         "id": document_id,
                         "displayName": "Optimistic document",
-                        "ownerId": "macro|user@example.com",
+                        "ownerId": "rox|user@example.com",
                         "projectId": null,
                         "fileType": "md",
                         "createdAt": "2026-01-01T00:00:00.000Z",
@@ -714,7 +714,7 @@ fn my_tasks_filter(owner: &str) -> serde_json::Value {
 }
 
 fn production_documents_preset_filters() -> Vec<(&'static str, serde_json::Value)> {
-    let owner = "macro|user@example.com";
+    let owner = "rox|user@example.com";
     let not_task = serde_json::json!({
         "not": { "literal": { "subType": "TASK" } }
     });
@@ -940,8 +940,8 @@ async fn operations_preserve_js_boundary_interner_and_ordering() {
 #[wasm_bindgen_test(async)]
 async fn soup_updated_v3_supplements_advance_revision_and_recompute_documents_presets_locally() {
     const SCOPE: &str = "cache-wasm-realtime-documents-v3";
-    const OWNER: &str = "macro|user@example.com";
-    const OTHER_OWNER: &str = "macro|shared@example.com";
+    const OWNER: &str = "rox|user@example.com";
+    const OTHER_OWNER: &str = "rox|shared@example.com";
     const INITIAL: &str = "00000000-0000-0000-0000-000000000001";
     const ORDINARY: &str = "00000000-0000-0000-0000-000000000002";
     const SHARED: &str = "00000000-0000-0000-0000-000000000003";
@@ -1077,7 +1077,7 @@ async fn server_baseline_reconciliation_survives_notification_stubs_and_deletion
         Some("Soup".into()),
         js(serde_json::json!({"input": {"initial": {"limit": 100}}})),
         js(
-            serde_json::json!({"user": {"id": "macro|user@example.com", "soup": {
+            serde_json::json!({"user": {"id": "rox|user@example.com", "soup": {
                 "nextCursor": null, "items": [{"__typename": "GraphqlSoupDocument", "id": STUB}]
             }}}),
         ),
@@ -1088,12 +1088,12 @@ async fn server_baseline_reconciliation_survives_notification_stubs_and_deletion
         write_context(None), SOUP_UPDATES_WITH_PROJECTION_SUBSCRIPTION.into(),
         Some("SoupUpdatesWithProjection".into()), js(serde_json::json!({})),
         js(serde_json::json!({"soupUpdates": [
-            {"__typename": "SoupUpdated", "item": projected_document_item(A, "macro|user@example.com", false, None, 10)},
-            {"__typename": "SoupUpdated", "item": projected_document_item(B, "macro|user@example.com", false, None, 30)}
+            {"__typename": "SoupUpdated", "item": projected_document_item(A, "rox|user@example.com", false, None, 10)},
+            {"__typename": "SoupUpdated", "item": projected_document_item(B, "rox|user@example.com", false, None, 30)}
         ]})), None,
     )).await;
     let mut request = documents_preset_filter(
-        serde_json::json!({"literal": {"owner": "macro|user@example.com"}}),
+        serde_json::json!({"literal": {"owner": "rox|user@example.com"}}),
     );
     request["limit"] = serde_json::json!(1);
     let exact: serde_json::Value =
@@ -1119,7 +1119,7 @@ async fn server_baseline_reconciliation_survives_notification_stubs_and_deletion
 #[wasm_bindgen_test(async)]
 async fn soup_updated_v3_recomputes_my_tasks_importance_and_status_locally() {
     const SCOPE: &str = "cache-wasm-realtime-my-tasks-v3";
-    const VIEWER: &str = "macro|viewer@example.com";
+    const VIEWER: &str = "rox|viewer@example.com";
     const OWNER_TASK: &str = "00000000-0000-0000-0000-000000000011";
     const ASSIGNED_TASK: &str = "00000000-0000-0000-0000-000000000012";
     const COMPLETED_TASK: &str = "00000000-0000-0000-0000-000000000013";
@@ -1160,7 +1160,7 @@ async fn soup_updated_v3_recomputes_my_tasks_importance_and_status_locally() {
     let updates = [
         projected_document_item_with_facts(
             ASSIGNED_TASK,
-            "macro|other@example.com",
+            "rox|other@example.com",
             false,
             true,
             vec![status(2)],
@@ -1169,7 +1169,7 @@ async fn soup_updated_v3_recomputes_my_tasks_importance_and_status_locally() {
         ),
         projected_document_item_with_facts(
             COMPLETED_TASK,
-            "macro|other@example.com",
+            "rox|other@example.com",
             false,
             true,
             vec![status(4)],
@@ -1227,7 +1227,7 @@ async fn backfill_supplement_failure_does_not_commit_or_advance_revision() {
                         "nextCursor": "next",
                         "items": [projected_document_item(
                             FIRST,
-                            "macro|user@example.com",
+                            "rox|user@example.com",
                             false,
                             None,
                             10,
@@ -1256,7 +1256,7 @@ async fn backfill_supplement_failure_does_not_commit_or_advance_revision() {
                         "id": INVALID,
                         "cacheProjection": null,
                         "displayName": "Invalid backfill item",
-                        "ownerId": "macro|user@example.com"
+                        "ownerId": "rox|user@example.com"
                     }]
                 }
             }

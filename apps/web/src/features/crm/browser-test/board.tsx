@@ -97,7 +97,7 @@ const names: Record<string, string> = {
   acme: 'Acme International Manufacturing',
   borealis: 'Borealis',
   northstar: 'Northstar',
-  'macro|owner@example.com': 'Alex Morgan',
+  'rox|owner@example.com': 'Alex Morgan',
 };
 const table = {
   id: '00000000-0000-0000-0000-000000000009',
@@ -144,7 +144,7 @@ function BoardFixture() {
                 '00000000-0000-0000-0000-000000000001': 'acme',
                 '00000000-0000-0000-0000-000000000002': 'New lead',
                 '00000000-0000-0000-0000-000000000003':
-                  'macro|owner@example.com',
+                  'rox|owner@example.com',
                 '00000000-0000-0000-0000-000000000004': 14400,
                 '00000000-0000-0000-0000-000000000005':
                   'Review the proposal with the finance and operations teams before the next call.',
@@ -156,7 +156,7 @@ function BoardFixture() {
                 '00000000-0000-0000-0000-000000000001': 'borealis',
                 '00000000-0000-0000-0000-000000000002': 'New lead',
                 '00000000-0000-0000-0000-000000000003':
-                  'macro|owner@example.com',
+                  'rox|owner@example.com',
                 '00000000-0000-0000-0000-000000000004': 0,
                 '00000000-0000-0000-0000-000000000005': null,
               },

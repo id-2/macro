@@ -88,7 +88,7 @@ describe('runOperation', () => {
         googleMeet: false,
         enabled: true,
         mode: 'individual',
-        hosts: ['macro|owner@example.com'],
+        hosts: ['rox|owner@example.com'],
         beforeMinutes: 0,
         afterMinutes: 0,
         noticeMinutes: 60,

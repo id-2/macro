@@ -91,7 +91,7 @@ fn signed_unsubscribe_roundtrips_against_request_url() {
     );
     unsigned
         .query_pairs_mut()
-        .append_pair("id", "macro|user@example.com");
+        .append_pair("id", "rox|user@example.com");
     let signed = SignedUrl::new(unsigned, secret.clone());
 
     let reconstructed =

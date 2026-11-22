@@ -72,7 +72,7 @@ async fn the_public_api_never_ensures_or_deletes_an_owned_surface() {
     let svc = service_with(empty.clone(), MockSurfaceInitializer::new());
     let err = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             initiative_receipt(id),
             id,
             String::new(),
@@ -85,7 +85,7 @@ async fn the_public_api_never_ensures_or_deletes_an_owned_surface() {
     let repo = MemRepo::holding(ready_initiative_surface(id));
     let svc = service_with(repo.clone(), MockSurfaceInitializer::new());
     let err = svc
-        .delete_surface(&user("macro|a@b.c"), initiative_receipt(id), id)
+        .delete_surface(&user("rox|a@b.c"), initiative_receipt(id), id)
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::AccessDenied));
@@ -99,7 +99,7 @@ async fn the_public_api_mints_tokens_for_an_owned_surface() {
     let svc = service_with(repo, MockSurfaceInitializer::new());
 
     let token = svc
-        .mint_token(&user("macro|a@b.c"), initiative_receipt(id), id)
+        .mint_token(&user("rox|a@b.c"), initiative_receipt(id), id)
         .await
         .unwrap();
     let claims: model::document::DocumentPermissionsToken =

@@ -35,7 +35,7 @@ export type Person = z.infer<typeof Person>;
 
 export const blank = (id: string, name = ''): Person => ({
   id,
-  name: name === '' ? id.replace(/^macro\|/, '') : name,
+  name: name === '' ? id.replace(/^rox\|/, '') : name,
   events: [],
   details: [],
 });

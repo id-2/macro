@@ -459,7 +459,7 @@ fn soup_document_with_is_completed(
         appearance: None,
         id,
         document_version_id: 1,
-        owner_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+        owner_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
         name: Default::default(),
         file_type: None,
         sha: None,
@@ -515,7 +515,7 @@ fn channel_thread_message(
     ChannelMessage {
         id: thread_id,
         channel_id,
-        sender_id: "macro|test@example.com".to_string(),
+        sender_id: "rox|test@example.com".to_string(),
         bot_profile: None,
         content: "thread parent".to_string(),
         created_at: DateTime::default(),
@@ -528,7 +528,7 @@ fn channel_thread_message(
             latest_reply_at: Some(DateTime::default() + Days::new(1)),
             preview: vec![ThreadReply {
                 id: reply_id,
-                sender_id: "macro|other@example.com".to_string(),
+                sender_id: "rox|other@example.com".to_string(),
                 bot_profile: None,
                 content: "thread reply".to_string(),
                 created_at: DateTime::default() + Days::new(1),
@@ -546,7 +546,7 @@ fn channel_thread_message(
 
 #[tokio::test]
 async fn simple_soup_includes_channel_threads() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let channel_id = Uuid::from_u128(0xaaaa);
     let thread_id = Uuid::from_u128(0xbbbb);
     let reply_id = Uuid::from_u128(0xcccc);
@@ -609,7 +609,7 @@ async fn simple_soup_includes_channel_threads() {
 
 #[tokio::test]
 async fn simple_soup_includes_call_records() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let call_id = Uuid::from_u128(0xca11);
     let channel_id = Uuid::from_u128(0xc4a2);
     let call_query_service = RecordingCallRecordQueryService::new(vec![call_record(
@@ -669,7 +669,7 @@ async fn simple_soup_includes_call_records() {
 
 #[tokio::test]
 async fn simple_soup_uses_channel_thread_filters_without_touching_channel_filters() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let thread_id = Uuid::from_u128(0xbbbb);
     let comms_service = RecordingCommsService::new(Vec::new());
 
@@ -726,7 +726,7 @@ async fn simple_soup_uses_channel_thread_filters_without_touching_channel_filter
 
 #[tokio::test]
 async fn simple_soup_includes_foreign_entities() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let foreign_entity_id = Uuid::from_u128(2);
     let pull_request_listing = RecordingPullRequestListing::new(vec![
         foreign_entity_for_source(
@@ -803,7 +803,7 @@ async fn simple_soup_includes_foreign_entities() {
 
 #[tokio::test]
 async fn simple_soup_passes_the_github_pull_request_filter_to_the_listing() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let pull_request_listing = RecordingPullRequestListing::new(Vec::new());
     let mut soup_mock = MockSoupRepo::new();
     soup_mock
@@ -858,7 +858,7 @@ async fn simple_soup_passes_the_github_pull_request_filter_to_the_listing() {
 
 #[tokio::test]
 async fn ascending_simple_soup_lists_pull_requests_oldest_first() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let pull_request_listing = RecordingPullRequestListing::new(Vec::new());
     let mut soup_mock = MockSoupRepo::new();
     soup_mock
@@ -902,7 +902,7 @@ async fn ascending_simple_soup_lists_pull_requests_oldest_first() {
 
 #[tokio::test]
 async fn frecency_soup_does_not_query_foreign_entities() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let pull_request_listing = RecordingPullRequestListing::new(vec![pull_request_for_source(
         Uuid::from_u128(42),
         user.as_ref(),
@@ -968,7 +968,7 @@ async fn frecency_soup_does_not_query_foreign_entities() {
 
 #[tokio::test]
 async fn team_receipt_contributes_team_foreign_entity_source_id() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let team_id = Uuid::from_u128(100);
     let pull_request_listing = RecordingPullRequestListing::new(Vec::new());
 
@@ -1027,7 +1027,7 @@ async fn team_receipt_contributes_team_foreign_entity_source_id() {
 
 #[tokio::test]
 async fn crm_filters_without_team_receipt_are_rejected() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
 
     let hidden_companies_filter = EntityFilters {
         crm_company_filters: item_filters::CrmCompanyFilters {
@@ -1077,7 +1077,7 @@ async fn crm_filters_without_team_receipt_are_rejected() {
 
 #[tokio::test]
 async fn foreign_entity_filter_suppresses_non_matching_foreign_entities() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let pull_request_listing = RecordingPullRequestListing::new(vec![pull_request_for_source(
         Uuid::from_u128(1),
         user.as_ref(),
@@ -1146,7 +1146,7 @@ async fn it_should_not_query_frecency() {
                         user_id,
                         cursor: SimpleSortQuery::NoFilter(Query::Sort(SimpleSortMethod::ViewedUpdated, ())),
                     } => {
-                        assert_eq!(user_id.as_ref(), "macro|test@example.com");
+                        assert_eq!(user_id.as_ref(), "rox|test@example.com");
                         true
                     }
                 )
@@ -1186,7 +1186,7 @@ async fn it_should_not_query_frecency() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1215,7 +1215,7 @@ async fn properties_are_populated_once_after_pagination() {
         });
     soup_mock
         .expect_populate_properties()
-        .withf(|user_id, items| user_id.as_ref() == "macro|test@example.com" && items.len() == 20)
+        .withf(|user_id, items| user_id.as_ref() == "rox|test@example.com" && items.len() == 20)
         .times(1)
         .returning(|_, items| {
             Box::pin(async move {
@@ -1248,7 +1248,7 @@ async fn properties_are_populated_once_after_pagination() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1286,7 +1286,7 @@ async fn frecency_is_populated_once_after_pagination() {
     frecency
         .expect_get_frecencies_by_ids()
         .withf(|request| {
-            request.user_id.as_ref() == "macro|test@example.com" && request.ids.len() == 20
+            request.user_id.as_ref() == "rox|test@example.com" && request.ids.len() == 20
         })
         .times(1)
         .returning(|request| {
@@ -1322,7 +1322,7 @@ async fn frecency_is_populated_once_after_pagination() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1391,7 +1391,7 @@ async fn properties_and_frecency_are_composed_after_pagination() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1462,7 +1462,7 @@ async fn grouped_properties_are_populated_by_the_service() {
                 SimpleSortMethod::ViewedUpdated.into(),
                 EntityFilterAst::mock_empty(),
             ),
-            user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
             grouping: GroupingConfig {
                 field: GroupByField::EntityType,
                 group_key: None,
@@ -1547,7 +1547,7 @@ fn grouped_request() -> GroupedSortRequest<'static> {
             SimpleSortMethod::UpdatedAt.into(),
             EntityFilterAst::mock_empty(),
         ),
-        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         grouping: GroupingConfig {
             field: GroupByField::EntityType,
             group_key: None,
@@ -1608,7 +1608,7 @@ async fn it_should_query_frecency() {
         .expect_get_top_entities()
         .times(1)
         .withf(|req| {
-            assert_eq!(req.user_id.as_ref(), "macro|test@example.com");
+            assert_eq!(req.user_id.as_ref(), "rox|test@example.com");
             assert_eq!(req.limit, 500);
             true
         })
@@ -1636,7 +1636,7 @@ async fn it_should_query_frecency() {
                     user_id,
                     entities,
                 } => {
-                    assert_eq!(user_id.as_ref(), "macro|test@example.com");
+                    assert_eq!(user_id.as_ref(), "rox|test@example.com");
                     dbg!(&entities);
                     assert_eq!(entities.len(), 500);
                     true
@@ -1673,7 +1673,7 @@ async fn it_should_query_frecency() {
             soup_type: SoupType::UnExpanded,
             limit: u16::MAX,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1693,7 +1693,7 @@ async fn it_should_sort_frecency_descending() {
         .expect_get_top_entities()
         .times(1)
         .withf(|req| {
-            assert_eq!(req.user_id.as_ref(), "macro|test@example.com");
+            assert_eq!(req.user_id.as_ref(), "rox|test@example.com");
             assert_eq!(req.limit, 500);
             true
         })
@@ -1721,7 +1721,7 @@ async fn it_should_sort_frecency_descending() {
                     user_id,
                     entities,
                 } => {
-                    assert_eq!(user_id.as_ref(), "macro|test@example.com");
+                    assert_eq!(user_id.as_ref(), "rox|test@example.com");
                     assert_eq!(entities.len(), 500);
                     true
                 }
@@ -1758,7 +1758,7 @@ async fn it_should_sort_frecency_descending() {
             soup_type: SoupType::UnExpanded,
             limit: u16::MAX,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1857,7 +1857,7 @@ async fn frecency_should_fallback() {
             soup_type: SoupType::UnExpanded,
             limit: 100,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -1941,7 +1941,7 @@ async fn frecency_should_paginate() {
             soup_type: SoupType::UnExpanded,
             limit: 100,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2035,7 +2035,7 @@ async fn frecency_should_resume_cursor() {
                 },
                 filter: Default::default(),
             }),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2137,7 +2137,7 @@ async fn frecency_fallback_cursor_should_resume() {
                 },
                 filter: Default::default(),
             }),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2171,7 +2171,7 @@ async fn cursor_should_return_simple_sort() {
                         user_id,
                         cursor: SimpleSortQuery::NoFilter(Query::Sort(SimpleSortMethod::ViewedUpdated, ())),
                     } => {
-                        assert_eq!(user_id.as_ref(), "macro|test@example.com");
+                        assert_eq!(user_id.as_ref(), "rox|test@example.com");
                         true
                     }
                 )
@@ -2207,7 +2207,7 @@ async fn cursor_should_return_simple_sort() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2277,7 +2277,7 @@ async fn cursor_should_return_frecency() {
             soup_type: SoupType::UnExpanded,
             limit: 100,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2340,7 +2340,7 @@ async fn it_should_return_is_completed_true_for_completed_tasks() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2390,7 +2390,7 @@ async fn it_should_return_is_completed_false_for_incomplete_tasks() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2440,7 +2440,7 @@ async fn it_should_return_is_completed_none_for_non_tasks() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2502,7 +2502,7 @@ async fn it_should_preserve_is_completed_for_mixed_items() {
                 SimpleSortMethod::ViewedUpdated,
                 EntityFilters::default(),
             ),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2583,7 +2583,7 @@ async fn it_should_preserve_is_completed_in_by_ids_queries() {
             soup_type: SoupType::UnExpanded,
             limit: 3,
             cursor: SoupQuery::new_sort_frecency(Frecency, EntityFilters::default()),
-            user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         },
         None,
     )
@@ -2612,7 +2612,7 @@ async fn it_should_preserve_is_completed_in_by_ids_queries() {
 
 #[tokio::test]
 async fn touched_soup_orders_by_touch_and_drops_unhydrated() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let doc_1 = Uuid::from_u128(1);
     let doc_2 = Uuid::from_u128(2);
     let ghost = Uuid::from_u128(3);
@@ -2671,7 +2671,7 @@ async fn touched_soup_orders_by_touch_and_drops_unhydrated() {
                 Ok(vec![SoupItem::Project(models_soup::project::SoupProject {
                     id: project,
                     name: 'p'.to_string(),
-                    owner_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+                    owner_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
                     parent_id: None,
                     created_at: Default::default(),
                     updated_at: Default::default(),
@@ -2743,7 +2743,7 @@ async fn touched_soup_orders_by_touch_and_drops_unhydrated() {
 
 #[tokio::test]
 async fn touched_soup_projection_preserves_authoritative_attachment_facts() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let attachment = Uuid::from_u128(1);
     let ordinary_document = Uuid::from_u128(2);
     let base: DateTime<Utc> = DateTime::default();
@@ -2857,7 +2857,7 @@ async fn touched_soup_projection_preserves_authoritative_attachment_facts() {
 /// the expanded feed, whose by-ids query omits project rows by design).
 #[tokio::test]
 async fn unexpanded_touched_hydrates_projects_in_the_main_query() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let doc = Uuid::from_u128(1);
     let project = Uuid::from_u128(2);
     let base: DateTime<Utc> = DateTime::default();
@@ -2898,7 +2898,7 @@ async fn unexpanded_touched_hydrates_projects_in_the_main_query() {
                     SoupItem::Project(models_soup::project::SoupProject {
                         id: project,
                         name: 'p'.to_string(),
-                        owner_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+                        owner_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
                         parent_id: None,
                         created_at: Default::default(),
                         updated_at: Default::default(),
@@ -2944,7 +2944,7 @@ async fn unexpanded_touched_hydrates_projects_in_the_main_query() {
 
 #[tokio::test]
 async fn touched_soup_full_page_builds_keyset_cursor() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let base: DateTime<Utc> = DateTime::default();
     let ids: Vec<Uuid> = (1..=20).map(Uuid::from_u128).collect();
     let last_id = *ids.last().unwrap();
@@ -3054,7 +3054,7 @@ impl EmailPreviewServiceReadOnly for RecordingEmailPreviewService {
 /// and a view-filtered hydration would silently drop them from the page.
 #[tokio::test]
 async fn touched_soup_hydrates_emails_with_the_unfiltered_view() {
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let thread = Uuid::from_u128(7);
     let link = Uuid::from_u128(8);
     let base: DateTime<Utc> = DateTime::default();
@@ -3162,7 +3162,7 @@ async fn touched_soup_rejects_unfoldable_filters() {
                 soup_type: SoupType::Expanded,
                 limit: 20,
                 cursor: SoupQuery::new_sort_touched(filters),
-                user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+                user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
             },
             None,
         )
@@ -3189,7 +3189,7 @@ fn notified_request(
         soup_type: SoupType::Expanded,
         limit,
         cursor: SoupQuery::new_sort_notified(filters),
-        user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
     }
 }
 
@@ -3258,7 +3258,7 @@ async fn notified_soup_refills_after_hydration_drops_and_ends_when_exhausted() {
                 Ok(vec![SoupItem::Project(models_soup::project::SoupProject {
                     id: project,
                     name: 'p'.to_string(),
-                    owner_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+                    owner_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
                     parent_id: None,
                     created_at: Default::default(),
                     updated_at: Default::default(),
@@ -3465,7 +3465,7 @@ async fn notified_soup_hydrates_channels_and_emails_with_the_request_tree() {
             ..Default::default()
         },
         channel_thread_filters: ChannelThreadFilters {
-            participant_ids: vec!["macro|test@example.com".to_string()],
+            participant_ids: vec!["rox|test@example.com".to_string()],
             ..Default::default()
         },
         email_filters: item_filters::EmailFilters {

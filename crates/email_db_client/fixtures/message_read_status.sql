@@ -8,12 +8,12 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000e11', 'macro|read_status_user@example.com', '00000000-0000-0000-0000-000000000e11',
+VALUES ('00000000-0000-0000-0000-000000000e11', 'rox|read_status_user@example.com', '00000000-0000-0000-0000-000000000e11',
         'read_status_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 -- Second link, owned by a different fusion user than its rox_id implies
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000e12', 'macro|shared_mailbox@example.com', '00000000-0000-0000-0000-0000000000ff',
+VALUES ('00000000-0000-0000-0000-000000000e12', 'rox|shared_mailbox@example.com', '00000000-0000-0000-0000-0000000000ff',
         'shared_mailbox@example.com', 'GMAIL', true, NOW(), NOW());
 
 ------------------------------------------------------------

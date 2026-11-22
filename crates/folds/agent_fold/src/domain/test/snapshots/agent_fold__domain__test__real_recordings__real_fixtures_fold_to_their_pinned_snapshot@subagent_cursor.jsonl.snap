@@ -10,14 +10,14 @@ input_file: crates/folds/agent_fold/fixtures/real/subagent_cursor.jsonl
         ),
         author: User {
             user_id: Some(
-                macro|eric@example.com,
+                rox|eric@example.com,
             ),
         },
         request_id: None,
         parts: NonEmpty {
             inner: [
                 Text {
-                    text: "<m-agent-context>{\"version\":1,\"text\":\"Prior message 1:\\nSender: macro|julia@example.com\\nContent: Hey \\u003cm-user-mention>{\\\"userId\\\":\\\"macro|wolf@example.com\\\",\\\"email\\\":\\\"wolf@example.com\\\"}\\u003c/m-user-mention>,\\n\\nWelcome to Macro, we're excited for you to try it out.\\n\\nThis is your own personal support Channel, with \\u003cm-user-mention>{\\\"userId\\\":\\\"macro|jacob@example.com\\\",\\\"email\\\":\\\"jacob@example.com\\\"}\\u003c/m-user-mention> (ceo) and \\u003cm-user-mention>{\\\"userId\\\":\\\"macro|teo@example.com\\\",\\\"email\\\":\\\"teo@example.com\\\"}\\u003c/m-user-mention> (cto) and me (julia).\\n\\nIf you have any feedback or find any bugs let us know here.\"}</m-agent-context>\n\n<m-user-mention>{\"userId\":\"bot|00000000-0000-0000-0000-00000000c5c5\",\"email\":\"Cursor\",\"displayName\":\"Cursor\"}</m-user-mention> spawn a subagent to use python to take the  integral of x^2 dx between 1 and 5",
+                    text: "<m-agent-context>{\"version\":1,\"text\":\"Prior message 1:\\nSender: rox|julia@example.com\\nContent: Hey \\u003cm-user-mention>{\\\"userId\\\":\\\"rox|wolf@example.com\\\",\\\"email\\\":\\\"wolf@example.com\\\"}\\u003c/m-user-mention>,\\n\\nWelcome to Macro, we're excited for you to try it out.\\n\\nThis is your own personal support Channel, with \\u003cm-user-mention>{\\\"userId\\\":\\\"rox|jacob@example.com\\\",\\\"email\\\":\\\"jacob@example.com\\\"}\\u003c/m-user-mention> (ceo) and \\u003cm-user-mention>{\\\"userId\\\":\\\"rox|teo@example.com\\\",\\\"email\\\":\\\"teo@example.com\\\"}\\u003c/m-user-mention> (cto) and me (julia).\\n\\nIf you have any feedback or find any bugs let us know here.\"}</m-agent-context>\n\n<m-user-mention>{\"userId\":\"bot|00000000-0000-0000-0000-00000000c5c5\",\"email\":\"Cursor\",\"displayName\":\"Cursor\"}</m-user-mention> spawn a subagent to use python to take the  integral of x^2 dx between 1 and 5",
                 },
             ],
         },

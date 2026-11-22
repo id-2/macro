@@ -15,7 +15,7 @@ async fn mcp(
     headers: HeaderMap,
     Json(body): Json<Value>,
 ) -> axum::response::Response {
-    assert_eq!(headers["x-pd-external-user-id"], "macro|caller@example.com");
+    assert_eq!(headers["x-pd-external-user-id"], "rox|caller@example.com");
     assert_eq!(headers["x-pd-app-slug"], "linear");
     let method = body["method"].as_str().unwrap().to_owned();
     calls.lock().unwrap().push(method.clone());

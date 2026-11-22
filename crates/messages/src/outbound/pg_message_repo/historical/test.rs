@@ -13,7 +13,7 @@ use crate::domain::{
     ports::MessageRepository,
 };
 
-const USER: &str = "macro|historical@example.com";
+const USER: &str = "rox|historical@example.com";
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn read_targets_validate_live_roots_and_preserve_orphan_structure(pool: PgPool) {

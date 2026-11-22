@@ -51,13 +51,13 @@ describe("who counts as a colleague", () => {
 		expect(isOwnAddress("agent@example.org", who)).toBe(false);
 	});
 	test("at a public provider only the owner counts: anyone can have an address there", () => {
-		const public_ = whoOf(`my-agent@${provider}`, `macro|bo@${provider}`);
+		const public_ = whoOf(`my-agent@${provider}`, `rox|bo@${provider}`);
 		expect(public_.domain).toBeUndefined();
 		expect(isColleagueAddress(`bo@${provider}`, public_)).toBe(true);
 		expect(isColleagueAddress(`stranger@${provider}`, public_)).toBe(false);
 	});
 	test("an owner id without an address makes nobody a colleague", () => {
-		const nobody = whoOf("agent@example.com", "macro|not-an-address");
+		const nobody = whoOf("agent@example.com", "rox|not-an-address");
 		expect(nobody.owner).toBeUndefined();
 		expect(nobody.domain).toBeUndefined();
 		expect(isColleagueAddress("ada@example.com", nobody)).toBe(false);

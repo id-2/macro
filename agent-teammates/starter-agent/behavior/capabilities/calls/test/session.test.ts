@@ -260,15 +260,15 @@ test("a line from someone else's listener turns the agent to them; the linked pe
 		time: stillTime(),
 		flush,
 	});
-	expect(await turns.overheard("macro|a", "Ann", "hello")).toBe(false);
+	expect(await turns.overheard("rox|a", "Ann", "hello")).toBe(false);
 	expect(
-		await turns.overheard("macro|b", "Bo", "Sam, can you hear me too?"),
+		await turns.overheard("rox|b", "Bo", "Sam, can you hear me too?"),
 	).toBe(true);
 	expect(events).toEqual([
 		[
 			"turn.heard",
 			{
-				who: "macro|b",
+				who: "rox|b",
 				text: "Sam, can you hear me too?",
 				forAgent: true,
 				p: 0.97,
@@ -377,7 +377,7 @@ test("the brain is told how much of its answer they heard", () => {
 
 const ann = (humans: number) => ({
 	humans: () => humans,
-	current: () => ["macro|a", "Ann"] as const,
+	current: () => ["rox|a", "Ann"] as const,
 });
 const userSays = (text: string) => {
 	const chat = new llm.ChatContext();
@@ -415,10 +415,10 @@ test("the brain gets a speaker's card the first time they speak, and only then",
 	});
 	await read(turns.reply(userSays("hello")));
 	await read(turns.reply(userSays("and again")));
-	expect(asked).toEqual([["macro|a", true]]);
+	expect(asked).toEqual([["rox|a", true]]);
 	expect(asks).toEqual([
-		"You like Ann.\n\nAnn [macro|a] says to you: hello",
-		"Ann [macro|a] says to you: and again",
+		"You like Ann.\n\nAnn [rox|a] says to you: hello",
+		"Ann [rox|a] says to you: and again",
 	]);
 });
 
@@ -438,8 +438,8 @@ test("a card that is slow doesn't hold its answer: it goes with their next line"
 	await read(turns.reply(userSays("still there?")));
 	expect(cardWaitMs).toBeLessThanOrEqual(500);
 	expect(asks).toEqual([
-		"Ann [macro|a] says to you: hello",
-		"You like Ann.\n\nAnn [macro|a] says to you: still there?",
+		"Ann [rox|a] says to you: hello",
+		"You like Ann.\n\nAnn [rox|a] says to you: still there?",
 	]);
 });
 
@@ -452,7 +452,7 @@ test("a line not for the agent is logged and not answered; it reaches the brain 
 	await read(turns.reply(userSays("Sam, are you there?")));
 	expect(events.slice(0, 3)).toEqual(["turn.heard", "turn.heard", "turn.ask"]);
 	expect(asks).toEqual([
-		"Said on the call since you last spoke:\nAnn: so anyway, lunch?\n\nAnn [macro|a] says to you: Sam, are you there?",
+		"Said on the call since you last spoke:\nAnn: so anyway, lunch?\n\nAnn [rox|a] says to you: Sam, are you there?",
 	]);
 });
 
@@ -479,7 +479,7 @@ test("a real session replies through the brain (it needs an llm object to reply 
 		),
 	});
 	const result = await session.run({ userInput: "can you hear me" }).wait();
-	expect(asks).toEqual(["Ann [macro|a] says to you: can you hear me"]);
+	expect(asks).toEqual(["Ann [rox|a] says to you: can you hear me"]);
 	expect(
 		result.events.some(
 			(event) => event.type === "message" && event.item.textContent === "Okay.",

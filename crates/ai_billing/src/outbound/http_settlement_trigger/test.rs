@@ -9,7 +9,7 @@ async fn settle_requests_carry_the_camel_case_user_id() {
         .and(path("/internal/ai-billing/settle"))
         .and(header("x-internal-auth-key", "key"))
         .and(body_json(
-            serde_json::json!({"userId": "macro|payer@x.com"}),
+            serde_json::json!({"userId": "rox|payer@x.com"}),
         ))
         .respond_with(ResponseTemplate::new(204))
         .expect(1)
@@ -17,5 +17,5 @@ async fn settle_requests_carry_the_camel_case_user_id() {
         .await;
 
     let client = AuthServiceClient::new("key".to_string(), server.uri());
-    client.settle_ai_billing("macro|payer@x.com").await.unwrap();
+    client.settle_ai_billing("rox|payer@x.com").await.unwrap();
 }

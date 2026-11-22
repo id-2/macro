@@ -6,8 +6,8 @@ use uuid::Uuid;
 
 use super::*;
 
-const AGENT: &str = "macro|agent@example.com";
-const PERSON: &str = "macro|person@example.com";
+const AGENT: &str = "rox|agent@example.com";
+const PERSON: &str = "rox|person@example.com";
 
 fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).unwrap()
@@ -74,7 +74,7 @@ async fn is_agent_reads_the_account_flag(pool: PgPool) {
     assert_eq!(repo.is_agent(&user(AGENT)).await.unwrap(), Some(true));
     assert_eq!(repo.is_agent(&user(PERSON)).await.unwrap(), Some(false));
     assert_eq!(
-        repo.is_agent(&user("macro|nobody@example.com"))
+        repo.is_agent(&user("rox|nobody@example.com"))
             .await
             .unwrap(),
         None

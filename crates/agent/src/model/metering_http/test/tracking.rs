@@ -48,7 +48,7 @@ async fn no_funding_or_rates_are_required_and_request_budgets_are_unchanged() {
     // No financial capability, funding authorization or provider support profile.
     let context = MeteringContext::tracking_only(
         journal.clone(),
-        usage("macro|opted-out@example.com", AiFeature::Chat),
+        usage("rox|opted-out@example.com", AiFeature::Chat),
     );
     let transport = Transport::new(anthropic_response());
     let client = MeteredHttpClient::new(transport.clone(), "anthropic", WireProtocol::Anthropic);
@@ -94,11 +94,11 @@ async fn concurrent_users_and_excluded_features_keep_immutable_attribution() {
     );
     let a = MeteringContext::tracking_only(
         journal.clone(),
-        usage("macro|a@example.com", AiFeature::ChatRename),
+        usage("rox|a@example.com", AiFeature::ChatRename),
     );
     let b = MeteringContext::tracking_only(
         journal.clone(),
-        usage("macro|b@example.com", AiFeature::Import),
+        usage("rox|b@example.com", AiFeature::Import),
     );
     let (a, b) = tokio::join!(
         a.scope(client.send::<_, Bytes>(request())),
@@ -108,11 +108,11 @@ async fn concurrent_users_and_excluded_features_keep_immutable_attribution() {
     b.unwrap();
     let begins = journal.begins.lock().unwrap();
     assert_eq!(begins.len(), 2);
-    assert!(begins.iter().any(|r| r.user.as_ref() == "macro|a@example.com" && r.feature == AiFeature::ChatRename));
+    assert!(begins.iter().any(|r| r.user.as_ref() == "rox|a@example.com" && r.feature == AiFeature::ChatRename));
     assert!(
         begins
             .iter()
-            .any(|r| r.user.as_ref() == "macro|b@example.com" && r.feature == AiFeature::Import)
+            .any(|r| r.user.as_ref() == "rox|b@example.com" && r.feature == AiFeature::Import)
     );
     assert_ne!(begins[0].run_id, begins[1].run_id);
 }
@@ -125,7 +125,7 @@ async fn recorder_failure_never_becomes_denial_or_stops_later_attempts() {
     });
     let context = MeteringContext::tracking_only(
         journal.clone(),
-        usage("macro|exhausted@example.com", AiFeature::Chat),
+        usage("rox|exhausted@example.com", AiFeature::Chat),
     );
     let transport = Transport::new(anthropic_response());
     let client = MeteredHttpClient::new(transport.clone(), "anthropic", WireProtocol::Anthropic);
@@ -238,7 +238,7 @@ async fn captured_financial_session_cannot_be_downgraded_by_an_observational_rec
             MockCompletionModel::new([MockTurn::text("must not execute")]),
         ))
         .await;
-    let caller_usage = usage("macro|other@example.com", AiFeature::Automation);
+    let caller_usage = usage("rox|other@example.com", AiFeature::Automation);
     for caller in [
         MeteringContext::tracking_only(Arc::new(Observations::default()), caller_usage.clone()),
         MeteringContext::new(
@@ -261,8 +261,8 @@ async fn captured_financial_session_cannot_be_downgraded_by_an_observational_rec
 async fn legacy_scope_does_not_disable_injected_observation_and_children_can_inherit_it() {
     let journal = Arc::new(Observations::default());
     let recorder = ai_usage::with_tracking(Arc::new(ai_usage::NoOpUsageRecorder), journal.clone());
-    let parent_usage = usage("macro|a@example.com", AiFeature::Chat);
-    let child_usage = usage("macro|b@example.com", AiFeature::ChatRename);
+    let parent_usage = usage("rox|a@example.com", AiFeature::Chat);
+    let child_usage = usage("rox|b@example.com", AiFeature::ChatRename);
     let legacy = MeteringContext::new(
         FinancialMode::Legacy,
         FinancialCapability::Unavailable,
@@ -302,8 +302,8 @@ async fn legacy_scope_does_not_disable_injected_observation_and_children_can_inh
 async fn scope_bridge_preserves_financial_mode_and_rebinds_observational_children() {
     let journal = Arc::new(Observations::default());
     let recorder = ai_usage::with_tracking(Arc::new(ai_usage::NoOpUsageRecorder), journal.clone());
-    let parent_usage = usage("macro|a@example.com", AiFeature::Automation);
-    let child_usage = usage("macro|b@example.com", AiFeature::Import);
+    let parent_usage = usage("rox|a@example.com", AiFeature::Automation);
+    let child_usage = usage("rox|b@example.com", AiFeature::Import);
     let parent = MeteringContext::for_operation(recorder.as_ref(), &parent_usage).unwrap();
     let client = MeteredHttpClient::new(
         Transport::new(anthropic_response()),

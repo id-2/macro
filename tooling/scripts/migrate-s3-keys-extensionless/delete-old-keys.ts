@@ -15,7 +15,7 @@ import { createInterface } from "readline";
 
 const S3_BUCKET = process.env.S3_BUCKET;
 const DRY_RUN = process.env.DRY_RUN === "true";
-const PREFIX = process.env.PREFIX ?? "macro|";
+const PREFIX = process.env.PREFIX ?? "rox|";
 const CONCURRENCY = parseInt(process.env.CONCURRENCY ?? "20", 10);
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE ?? "1000", 10);
 const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : undefined;

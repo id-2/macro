@@ -10,11 +10,11 @@ import { changeViewer, lookupIds, lookupSizes } from './network';
 
 /** Real scoped label source and inline controls; task/document loading is supplied. */
 export function TaskListLabelFixture() {
-  changeViewer('macro|viewer@example.com');
+  changeViewer('rox|viewer@example.com');
   const [refs, setRefs] = createSignal([
     ...Array.from(
       { length: 501 },
-      (_, index) => `macro|person${index}@example.com`
+      (_, index) => `rox|person${index}@example.com`
     ),
     'invalid-user',
   ]);
@@ -45,15 +45,15 @@ export function TaskListLabelFixture() {
       />
       <button
         class="mt-20"
-        onClick={() => setRefs(['macro|person999@example.com'])}
+        onClick={() => setRefs(['rox|person999@example.com'])}
       >
         Replace references
       </button>
       <output hidden data-testid="inline-names">
         {JSON.stringify([
-          name('macro|person0@example.com'),
-          name('macro|person500@example.com'),
-          name('macro|person999@example.com'),
+          name('rox|person0@example.com'),
+          name('rox|person500@example.com'),
+          name('rox|person999@example.com'),
         ])}
       </output>
       <output hidden data-testid="inline-lookup-sizes">

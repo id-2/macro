@@ -6,7 +6,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 #[test]
 fn bots_answering_each_other_count_one_hop_per_turn_since_the_last_person() {
     let person = ChannelSender::new_from_user(
-        RoxUserIdStr::parse_from_str("macro|hops@rox.one")
+        RoxUserIdStr::parse_from_str("rox|hops@rox.one")
             .expect("a valid user id")
             .into_owned(),
     );

@@ -4,7 +4,7 @@ use chrono::DateTime;
 fn activity(id: u128) -> TimelineActivity {
     TimelineActivity {
         id: Uuid::from_u128(id),
-        actor_id: "macro|author@example.com".into(),
+        actor_id: "rox|author@example.com".into(),
         occurred_at: DateTime::from_timestamp(1_000, 0).unwrap(),
         action: "picture_changed".into(),
         payload: None,
@@ -21,7 +21,7 @@ fn message(id: u128) -> MessageListItem {
             id,
             parent: MessageParent::Channel(Uuid::from_u128(100)),
             thread_id: None,
-            sender_id: ChannelSender::try_from("macro|author@example.com".to_owned()).unwrap(),
+            sender_id: ChannelSender::try_from("rox|author@example.com".to_owned()).unwrap(),
             bot_profile: None,
             mentions: vec![],
             imported_author: None,
@@ -37,7 +37,7 @@ fn message(id: u128) -> MessageListItem {
         },
         state: ThreadState {
             root_id: id,
-            user_id: "macro|author@example.com".into(),
+            user_id: "rox|author@example.com".into(),
             resolved: false,
             anchor: None,
             created_at: at,

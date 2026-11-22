@@ -54,7 +54,7 @@ async fn check_read_access_and_mentions(pool: PgPool, kind: ConversationKind) {
         users: &directory,
         channels: &names,
     };
-    let literal = r#"`<m-user-mention>{"userId":"macro|other@example.com"}</m-user-mention>`"#;
+    let literal = r#"`<m-user-mention>{"userId":"rox|other@example.com"}</m-user-mention>`"#;
     let converted = converter.convert_with_references(literal, false).unwrap();
     assert!(converted.user_mentions.is_empty());
     let mut batch = batch(
@@ -195,10 +195,10 @@ type Access = EntityAccessServiceImpl<PgAccessRepository>;
 type Sink = ChannelImportSink<Access>;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|t17@example.com").unwrap()
 }
 fn other() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap()
 }
 fn authorizer(pool: &PgPool) -> WorkerAuthorizer<Access> {
     WorkerAuthorizer::new(
@@ -217,9 +217,9 @@ async fn team(pool: &PgPool) -> TeamId {
     let account = Uuid::now_v7();
     let team = Uuid::now_v7();
     sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 't17', 't17@example.com', 't17-customer')", account).execute(pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|t17@example.com', 't17@example.com', $1)"#, account).execute(pool).await.unwrap();
-    sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Atomic history', 'macro|t17@example.com')", team).execute(pool).await.unwrap();
-    sqlx::query!("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1, 'macro|t17@example.com', 'owner')", team).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|t17@example.com', 't17@example.com', $1)"#, account).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Atomic history', 'rox|t17@example.com')", team).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1, 'rox|t17@example.com', 'owner')", team).execute(pool).await.unwrap();
     team.try_into().unwrap()
 }
 
@@ -602,7 +602,7 @@ async fn new_dm_has_exact_pair_and_no_importing_admin(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::DirectMessage, 0).await;
     let mut plan = plan(&pool, &context).await;
-    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::parse_from_str("rox|stranger@example.com").unwrap();
     plan.owner = other();
     plan.members = HashSet::from([other(), stranger]);
     let sink = sink(&pool);
@@ -747,7 +747,7 @@ async fn unrelated_dm_pair_is_not_granted_provenance_and_pair_races_fail_closed(
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::DirectMessage, 0).await;
     let mut plan = plan(&pool, &context).await;
-    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::parse_from_str("rox|stranger@example.com").unwrap();
     plan.owner = other();
     plan.members = HashSet::from([other(), stranger.clone()]);
     let pair = DmPair::new(other(), stranger.clone()).unwrap();

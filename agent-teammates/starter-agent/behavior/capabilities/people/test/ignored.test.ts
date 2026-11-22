@@ -22,7 +22,7 @@ test("nothing under the people directory is tracked", () => {
 test("anything written there is ignored, so no commit can ever add it", () => {
 	expect(directory).toBe("state/private/people");
 	for (const name of [
-		"macro%7Cada%40example.com.json",
+		"rox%7Cada%40example.com.json",
 		"pending/x.jsonl",
 		".lock",
 	])

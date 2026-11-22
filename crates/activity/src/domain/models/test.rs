@@ -9,7 +9,7 @@ fn user(id: &str) -> RoxUserIdStr<'static> {
 
 #[test]
 fn every_action_maps_to_stable_columns() {
-    let participant = Actor::new_from_user(user("macro|sarah@example.com"));
+    let participant = Actor::new_from_user(user("rox|sarah@example.com"));
     // Every variant, pinned: these strings and payload shapes are the
     // durable storage contract and must never change for existing tags.
     let cases: Vec<(Action, &str, Option<serde_json::Value>)> = vec![
@@ -65,12 +65,12 @@ fn every_action_maps_to_stable_columns() {
                 participant: participant.clone(),
             }),
             "participant_added",
-            Some(json!({ "participant": "macro|sarah@example.com" })),
+            Some(json!({ "participant": "rox|sarah@example.com" })),
         ),
         (
             Action::ParticipantRemoved(ParticipantChange { participant }),
             "participant_removed",
-            Some(json!({ "participant": "macro|sarah@example.com" })),
+            Some(json!({ "participant": "rox|sarah@example.com" })),
         ),
         (
             Action::CallStarted(CallStart {
@@ -192,7 +192,7 @@ fn activity_ids_are_deterministic_per_event_and_ordinal() {
 
 #[test]
 fn attribution_direct_leaves_subject_on_the_actor() {
-    let actor = Actor::new_from_user(user("macro|teo@example.com"));
+    let actor = Actor::new_from_user(user("rox|teo@example.com"));
     let attribution = Attribution::direct(actor.clone());
 
     assert_eq!(attribution.actor(), actor);
@@ -208,13 +208,13 @@ fn attribution_direct_leaves_subject_on_the_actor() {
         Utc::now(),
     );
     assert_eq!(activity.actor, actor);
-    assert_eq!(activity.subject_id, "macro|teo@example.com");
+    assert_eq!(activity.subject_id, "rox|teo@example.com");
 }
 
 #[test]
 fn attribution_delegated_keeps_actor_and_scopes_the_subject() {
-    let actor = Actor::new_from_user(user("macro|agent@example.com"));
-    let subject = user("macro|teo@example.com");
+    let actor = Actor::new_from_user(user("rox|agent@example.com"));
+    let subject = user("rox|teo@example.com");
     let attribution = Attribution::delegated(actor.clone(), subject.clone());
 
     assert_eq!(attribution.actor(), actor);
@@ -230,12 +230,12 @@ fn attribution_delegated_keeps_actor_and_scopes_the_subject() {
         Utc::now(),
     );
     assert_eq!(activity.actor, actor);
-    assert_eq!(activity.subject_id, "macro|teo@example.com");
+    assert_eq!(activity.subject_id, "rox|teo@example.com");
 }
 
 #[test]
 fn creation_principal_attributes_the_mechanical_actor() {
-    let teo = user("macro|teo@example.com");
+    let teo = user("rox|teo@example.com");
     let bot = bot_id::BotId::new_from_uuid(Uuid::from_u128(0xB07A));
     let team_bot = bot_id::NonSystemBotId::new(bot).unwrap();
 
@@ -249,7 +249,7 @@ fn creation_principal_attributes_the_mechanical_actor() {
         team: Uuid::from_u128(9),
     });
 
-    assert_eq!(by_user.actor().as_ref(), "macro|teo@example.com");
+    assert_eq!(by_user.actor().as_ref(), "rox|teo@example.com");
     assert_eq!(by_user.on_behalf_of(), None);
     assert_eq!(
         for_user.actor().as_ref(),
@@ -268,28 +268,28 @@ fn subject_is_the_actor_unless_delegated() {
     let direct = Activity::common(
         Uuid::from_u128(1),
         0,
-        Actor::new_from_user(user("macro|teo@example.com")),
+        Actor::new_from_user(user("rox|teo@example.com")),
         None,
         EntityType::Document,
         "doc-1",
         CommonAction::Edited,
         Utc::now(),
     );
-    assert_eq!(direct.subject_id, "macro|teo@example.com");
-    assert_eq!(direct.actor.as_ref(), "macro|teo@example.com");
+    assert_eq!(direct.subject_id, "rox|teo@example.com");
+    assert_eq!(direct.actor.as_ref(), "rox|teo@example.com");
 
     let delegated = Activity::common(
         Uuid::from_u128(2),
         0,
-        Actor::new_from_user(user("macro|other@example.com")),
-        Some(user("macro|teo@example.com")),
+        Actor::new_from_user(user("rox|other@example.com")),
+        Some(user("rox|teo@example.com")),
         EntityType::Document,
         "doc-1",
         CommonAction::Edited,
         Utc::now(),
     );
-    assert_eq!(delegated.subject_id, "macro|teo@example.com");
-    assert_eq!(delegated.actor.as_ref(), "macro|other@example.com");
+    assert_eq!(delegated.subject_id, "rox|teo@example.com");
+    assert_eq!(delegated.actor.as_ref(), "rox|other@example.com");
 }
 
 #[test]
@@ -310,7 +310,7 @@ fn from_domain_projects_the_owning_kind_and_action() {
     let activity = Activity::from_domain(
         Uuid::from_u128(3),
         0,
-        Actor::new_from_user(user("macro|teo@example.com")),
+        Actor::new_from_user(user("rox|teo@example.com")),
         None,
         FixtureActivity {
             id: "chan-1".to_string(),

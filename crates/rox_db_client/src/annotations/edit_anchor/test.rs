@@ -5,7 +5,7 @@ use sqlx::{PgPool, types::Uuid};
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn test_edit_pdf_free_comment_anchor_success(pool: PgPool) {
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
     let uuid = Uuid::try_parse("91111111-1111-1111-1111-111111111111").unwrap();
 
     let request = EditPdfPlaceableCommentAnchorRequest {
@@ -41,7 +41,7 @@ async fn test_edit_pdf_free_comment_anchor_success(pool: PgPool) {
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn test_edit_pdf_free_comment_anchor_not_found(pool: PgPool) {
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
     let uuid = Uuid::new_v4(); // Non-existent UUID
 
     let request = EditPdfPlaceableCommentAnchorRequest {
@@ -71,7 +71,7 @@ async fn test_edit_pdf_free_comment_anchor_not_found(pool: PgPool) {
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn test_edit_pdf_free_comment_anchor_invalid_permissions(pool: PgPool) {
-    let unauthorized_user = "macro|unauthorized_user@user.com";
+    let unauthorized_user = "rox|unauthorized_user@user.com";
     let uuid = Uuid::try_parse("91111111-1111-1111-1111-111111111111").unwrap();
 
     let request = EditPdfPlaceableCommentAnchorRequest {
@@ -104,7 +104,7 @@ async fn test_edit_pdf_free_comment_anchor_invalid_permissions(pool: PgPool) {
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn test_edit_pdf_free_comment_anchor_no_update_attempt(pool: PgPool) {
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
     let uuid = Uuid::try_parse("91111111-1111-1111-1111-111111111111").unwrap();
 
     let request = EditPdfPlaceableCommentAnchorRequest {
@@ -137,7 +137,7 @@ async fn test_edit_pdf_free_comment_anchor_no_update_attempt(pool: PgPool) {
 
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("message_annotations")))]
 async fn test_edit_pdf_free_comment_anchor_keeps_existing_values(pool: PgPool) {
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
     let uuid = Uuid::try_parse("91111111-1111-1111-1111-111111111111").unwrap();
 
     let request = EditPdfPlaceableCommentAnchorRequest {

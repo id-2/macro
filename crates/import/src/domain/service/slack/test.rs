@@ -140,7 +140,7 @@ impl EntityCreator for Harness {
 }
 
 fn fixture() -> (RoxUserIdStr<'static>, ImportEntity, ImportTargetKey) {
-    let user = RoxUserIdStr::try_from("macro|onboarder@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|onboarder@example.com".to_string()).unwrap();
     let key = ImportTargetKey {
         team_id: Uuid::now_v7(),
         foreign_id: SlackConversationId::new("C0123456789").unwrap(),
@@ -171,7 +171,7 @@ impl Harness {
     async fn archive(&self, key: &ImportTargetKey) -> Uuid {
         // A different admin uses the same namespace and silently ensures the
         // target, just as the archive worker does through its channel port.
-        let admin = RoxUserIdStr::try_from("macro|archiver@example.com".to_string()).unwrap();
+        let admin = RoxUserIdStr::try_from("rox|archiver@example.com".to_string()).unwrap();
         let target = self
             .reserve_target(&admin, key, ImportTargetKind::Team, None)
             .await

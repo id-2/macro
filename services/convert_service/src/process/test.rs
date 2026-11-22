@@ -376,7 +376,7 @@ mod conversion_table {
             FileType::Pdf
         );
         assert_eq!(
-            resolve_file_type(None, "macro|a.b@c.com/doc/upgraded.PPTX").unwrap(),
+            resolve_file_type(None, "rox|a.b@c.com/doc/upgraded.PPTX").unwrap(),
             FileType::Pptx
         );
         assert_eq!(
@@ -389,7 +389,7 @@ mod conversion_table {
     fn versioned_keys_need_explicit_types() {
         assert!(resolve_file_type(None, "owner/doc/12").is_err());
         // A dotted owner segment is not an extension.
-        assert!(resolve_file_type(None, "macro|first.last@rox.one/doc/12").is_err());
+        assert!(resolve_file_type(None, "rox|first.last@rox.one/doc/12").is_err());
     }
 }
 

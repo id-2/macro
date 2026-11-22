@@ -14,12 +14,12 @@ const timestamp = '2026-10-23T12:00:00Z';
 const messages = [
   {
     id: 'julia-message',
-    sender: 'macro|julia@rox.one',
+    sender: 'rox|julia@rox.one',
     content: 'Julia shared the budget for next quarter.',
   },
   {
     id: 'john-message',
-    sender: 'macro|john@example.com',
+    sender: 'rox|john@example.com',
     content: 'John reviewed the budget forecast.',
   },
 ];

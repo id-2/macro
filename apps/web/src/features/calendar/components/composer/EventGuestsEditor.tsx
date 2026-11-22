@@ -15,7 +15,7 @@ export function guestDisplayName(guest: SelectedEventEditorGuest) {
 }
 
 function guestKey(guest: SelectedEventEditorGuest): string {
-  return `macro|${guestEmail(guest).toLowerCase()}`;
+  return `rox|${guestEmail(guest).toLowerCase()}`;
 }
 
 function guestToUser(guest: SelectedEventEditorGuest): IUser {

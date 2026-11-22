@@ -1024,7 +1024,7 @@ export function DocumentPreviewContent(props: DocumentPreviewContentProps) {
                           >
                             {(owner) =>
                               getDisplayName(tryRoxId(owner())) ||
-                              owner().replace('macro|', '')
+                              owner().replace('rox|', '')
                             }
                           </Show>
                           <Show

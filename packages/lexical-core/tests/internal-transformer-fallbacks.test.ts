@@ -97,8 +97,8 @@ describe('internal transformer fallbacks', () => {
   });
 
   it.each([
-    ['{"userId":"macro|user@example.com"}', '@user'],
-    ['{"userId":"macro|user@example.com","displayName":"Example"}', '@Example'],
+    ['{"userId":"rox|user@example.com"}', '@user'],
+    ['{"userId":"rox|user@example.com","displayName":"Example"}', '@Example'],
   ])('imports ID-only user mentions: %s', async (payload, text) => {
     const editor = await importMarkdown(
       `<m-user-mention>${payload}</m-user-mention>`
@@ -111,7 +111,7 @@ describe('internal transformer fallbacks', () => {
         : null;
       expect($isUserMentionNode(node)).toBe(true);
       if (!$isUserMentionNode(node)) throw new Error('Missing user mention');
-      expect(node.getUserId()).toBe('macro|user@example.com');
+      expect(node.getUserId()).toBe('rox|user@example.com');
       expect(node.getEmail()).toBe('user@example.com');
       expect(node.getTextContent()).toBe(text);
     });

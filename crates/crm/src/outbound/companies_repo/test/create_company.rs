@@ -10,7 +10,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_inserts_company_and_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -48,7 +48,7 @@ async fn create_company_inserts_company_and_domain(pool: PgPool) -> anyhow::Resu
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_without_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -67,7 +67,7 @@ async fn create_company_without_domain(pool: PgPool) -> anyhow::Result<()> {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_name_overrides_directory_name(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
 
     // Directory already resolved a different (global) name for the
@@ -104,7 +104,7 @@ async fn create_company_name_overrides_directory_name(pool: PgPool) -> anyhow::R
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_rejects_duplicate_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
     insert_company(&pool, team_id, true, &["acme.example.com"]).await?;
 
@@ -127,8 +127,8 @@ async fn create_company_rejects_duplicate_domain(pool: PgPool) -> anyhow::Result
 async fn create_company_allows_same_domain_on_another_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|owner-a@example.com").await?;
-    seed_team(&pool, team_b, "macro|owner-b@example.com").await?;
+    seed_team(&pool, team_a, "rox|owner-a@example.com").await?;
+    seed_team(&pool, team_b, "rox|owner-b@example.com").await?;
     enable_crm_for_team(&pool, team_a).await?;
     enable_crm_for_team(&pool, team_b).await?;
     insert_company(&pool, team_a, true, &["acme.example.com"]).await?;
@@ -144,7 +144,7 @@ async fn create_company_allows_same_domain_on_another_team(pool: PgPool) -> anyh
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_is_available_without_email_consent(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     // CRM records are available without a legacy settings row or email consent.
 
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -163,7 +163,7 @@ async fn create_company_is_available_without_email_consent(pool: PgPool) -> anyh
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_reuses_manually_created_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner = "macro|owner@example.com";
+    let owner = "rox|owner@example.com";
     seed_team(&pool, team_id, owner).await?;
     enable_crm_for_team(&pool, team_id).await?;
     let link_id = insert_email_link(&pool, owner, "owner@example.com").await?;
@@ -208,7 +208,7 @@ async fn populate_reuses_manually_created_company(pool: PgPool) -> anyhow::Resul
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn soup_listing_uses_name_override(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
 
     sqlx::query(r#"INSERT INTO crm_domain_directory (domain, name) VALUES ($1, $2)"#)
@@ -230,7 +230,7 @@ async fn soup_listing_uses_name_override(pool: PgPool) -> anyhow::Result<()> {
     let listed = repo
         .list_companies_for_soup(
             &team_id,
-            "macro|owner@example.com",
+            "rox|owner@example.com",
             &[],
             None,
             crate::domain::companies_repo::CrmCompanyListSort::UpdatedAt,
@@ -254,7 +254,7 @@ async fn name_only_company_accepts_personal_email_without_inference(
     use entity_access::domain::models::MemberTeamRole;
 
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team_id).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let service = CrmServiceImpl::new(repo.clone(), NoOpCompanyMetadataResolver);
@@ -302,7 +302,7 @@ async fn name_only_company_accepts_personal_email_without_inference(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn name_only_company_does_not_require_contribution(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@example.com").await?;
+    seed_team(&pool, team_id, "rox|owner@example.com").await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let company = repo
         .create_company_for_team(&team_id, None, "Acme", Utc::now())

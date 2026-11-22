@@ -20,7 +20,7 @@ fn parent_identifiers_are_validated_and_round_trip() {
         );
     }
     for (kind, id) in [
-        ("user", "macro|example@example.com"),
+        ("user", "rox|example@example.com"),
         ("channel", "not-a-uuid"),
         ("initiative", "not-a-uuid"),
         ("project", "0194e3b0-121a-7000-8000-000000000003"),

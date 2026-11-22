@@ -235,7 +235,7 @@ impl Fixture {
     fn new() -> Self {
         let session = AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7());
         let execution = ExecutionId::mint();
-        let owner = RoxUserIdStr::parse_from_str("macro|reviews@macro.local")
+        let owner = RoxUserIdStr::parse_from_str("rox|reviews@macro.local")
             .unwrap()
             .into_owned();
         let store = Arc::new(Store::default());
@@ -327,7 +327,7 @@ impl Fixture {
 #[tokio::test]
 async fn owner_receipt_execution_and_archive_are_enforced_before_creation() {
     let f = Fixture::new();
-    let stranger = RoxUserIdStr::parse_from_str("macro|other@macro.local")
+    let stranger = RoxUserIdStr::parse_from_str("rox|other@macro.local")
         .unwrap()
         .into_owned();
     assert!(matches!(
@@ -1290,7 +1290,7 @@ async fn an_oversized_view_is_turned_back() {
 #[tokio::test]
 async fn a_view_is_presented_only_by_its_session_and_execution() {
     let f = Fixture::new();
-    let stranger = RoxUserIdStr::parse_from_str("macro|other@macro.local")
+    let stranger = RoxUserIdStr::parse_from_str("rox|other@macro.local")
         .unwrap()
         .into_owned();
     let input = |execution_id| PresentView {

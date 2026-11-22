@@ -224,7 +224,7 @@ async fn get_for_user_returns_matching_user_and_team_sources(pool: PgPool) {
         &repo,
         "user-visible-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -240,7 +240,7 @@ async fn get_for_user_returns_matching_user_and_team_sources(pool: PgPool) {
         &repo,
         "unrelated-pr",
         "github_pull_request",
-        "macro|other@example.com",
+        "rox|other@example.com",
         "user",
     )
     .await;
@@ -249,7 +249,7 @@ async fn get_for_user_returns_matching_user_and_team_sources(pool: PgPool) {
         .get_foreign_entities_for_user(
             None,
             vec![
-                SourceId::user("macro|user@example.com"),
+                SourceId::user("rox|user@example.com"),
                 SourceId::team(team_id),
             ],
             10,
@@ -273,7 +273,7 @@ async fn get_for_user_empty_sources_returns_empty(pool: PgPool) {
         &repo,
         "user-visible-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -299,7 +299,7 @@ async fn get_for_user_dedupes_duplicate_source_grants(pool: PgPool) {
         &repo,
         "shared-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -334,7 +334,7 @@ async fn get_for_user_dedupes_duplicate_source_grants(pool: PgPool) {
         .get_foreign_entities_for_user(
             None,
             vec![
-                SourceId::user("macro|user@example.com"),
+                SourceId::user("rox|user@example.com"),
                 SourceId::team(team_id),
             ],
             10,
@@ -354,7 +354,7 @@ async fn get_for_user_paginates_by_created_at(pool: PgPool) {
         &repo,
         "first-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -362,7 +362,7 @@ async fn get_for_user_paginates_by_created_at(pool: PgPool) {
         &repo,
         "second-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -370,7 +370,7 @@ async fn get_for_user_paginates_by_created_at(pool: PgPool) {
         &repo,
         "third-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -403,7 +403,7 @@ async fn get_for_user_paginates_by_created_at(pool: PgPool) {
     let first_page = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             2,
             list_query(SimpleSortMethod::CreatedAt),
         )
@@ -412,7 +412,7 @@ async fn get_for_user_paginates_by_created_at(pool: PgPool) {
     let second_page = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             2,
             cursor_query(&first_page[1], SimpleSortMethod::CreatedAt),
         )
@@ -430,7 +430,7 @@ async fn get_for_user_paginates_by_updated_at(pool: PgPool) {
         &repo,
         "first-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -438,7 +438,7 @@ async fn get_for_user_paginates_by_updated_at(pool: PgPool) {
         &repo,
         "second-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -446,7 +446,7 @@ async fn get_for_user_paginates_by_updated_at(pool: PgPool) {
         &repo,
         "third-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -479,7 +479,7 @@ async fn get_for_user_paginates_by_updated_at(pool: PgPool) {
     let first_page = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             2,
             list_query(SimpleSortMethod::UpdatedAt),
         )
@@ -488,7 +488,7 @@ async fn get_for_user_paginates_by_updated_at(pool: PgPool) {
     let second_page = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             2,
             cursor_query(&first_page[1], SimpleSortMethod::UpdatedAt),
         )
@@ -506,7 +506,7 @@ async fn get_for_user_applies_foreign_entity_filters(pool: PgPool) {
         &repo,
         "github-pr",
         "github_pull_request",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -514,7 +514,7 @@ async fn get_for_user_applies_foreign_entity_filters(pool: PgPool) {
         &repo,
         "linear-issue",
         "linear_issue",
-        "macro|user@example.com",
+        "rox|user@example.com",
         "user",
     )
     .await;
@@ -525,7 +525,7 @@ async fn get_for_user_applies_foreign_entity_filters(pool: PgPool) {
     let source_matches = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             10,
             filter_query(source_filter),
         )
@@ -538,7 +538,7 @@ async fn get_for_user_applies_foreign_entity_filters(pool: PgPool) {
     let not_linear_matches = repo
         .get_foreign_entities_for_user(
             None,
-            vec![SourceId::user("macro|user@example.com")],
+            vec![SourceId::user("rox|user@example.com")],
             10,
             filter_query(not_linear_filter),
         )
@@ -628,7 +628,7 @@ fn includes_me_filter() -> LiteralTree<ForeignEntityLiteral> {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_includes_me_matches_nothing(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
     insert_github_link(&pool, rox_id, "42").await;
     insert_pr_with_participants(&repo, "involved-pr", rox_id, Some(&["42"])).await;
 
@@ -648,7 +648,7 @@ async fn get_for_user_includes_me_matches_nothing(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_rejects_negated_and_nested_includes_me(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool);
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
     insert_pr_with_participants(&repo, "involved-pr", rox_id, Some(&["42"])).await;
 
     let filters = [
@@ -730,7 +730,7 @@ fn notification_states_filter(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_done_filters_by_done_state(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
 
     let done =
         insert_foreign_entity_for_source(&repo, "done-pr", "github_pull_request", rox_id, "user")
@@ -788,7 +788,7 @@ async fn get_for_user_notification_done_filters_by_done_state(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_seen_filters_by_seen_state(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
 
     let seen =
         insert_foreign_entity_for_source(&repo, "seen-pr", "github_pull_request", rox_id, "user")
@@ -837,7 +837,7 @@ async fn get_for_user_notification_seen_filters_by_seen_state(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_done_composes_with_source(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
 
     let github = insert_foreign_entity_for_source(
         &repo,
@@ -879,8 +879,8 @@ async fn get_for_user_notification_done_composes_with_source(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_done_scopes_to_requesting_user(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
-    let other_id = "macro|other@example.com";
+    let rox_id = "rox|user@example.com";
+    let other_id = "rox|other@example.com";
 
     let entity = insert_foreign_entity_for_source(
         &repo,
@@ -911,7 +911,7 @@ async fn get_for_user_notification_done_scopes_to_requesting_user(pool: PgPool) 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_filter_without_requesting_user_returns_empty(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
 
     let entity =
         insert_foreign_entity_for_source(&repo, "done-pr", "github_pull_request", rox_id, "user")
@@ -936,7 +936,7 @@ async fn get_for_user_notification_filter_without_requesting_user_returns_empty(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_for_user_notification_state_and_requires_each_witness(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
-    let rox_id = "macro|user@example.com";
+    let rox_id = "rox|user@example.com";
 
     let entity =
         insert_foreign_entity_for_source(&repo, "done-pr", "github_pull_request", rox_id, "user")

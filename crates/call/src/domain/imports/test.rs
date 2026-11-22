@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 const CALL_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b6c7);
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@test.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@test.com".to_string()).unwrap()
 }
 
 struct FixedRepo;

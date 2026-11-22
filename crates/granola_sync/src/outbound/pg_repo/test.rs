@@ -5,7 +5,7 @@ fn connection() -> Connection {
     Connection {
         id: rox_uuid::generate_uuid_v7(),
         namespace: rox_uuid::generate_uuid_v7(),
-        user_id: RoxUserIdStr::parse_from_str("macro|granola-a@test.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|granola-a@test.com")
             .unwrap()
             .into_owned(),
         account_id: "apn_test".into(),

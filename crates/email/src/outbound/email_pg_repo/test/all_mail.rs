@@ -11,7 +11,7 @@ async fn all_mail_excludes_spam_and_trash_before_pagination(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     for (link, mixed, archived) in [
         (
             uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
@@ -88,7 +88,7 @@ async fn all_mail_cache_and_draft_baselines_exclude_spam_and_trash(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     let mixed = [
         uuid::uuid!("0b000000-0000-0000-0000-000000000102"),
         uuid::uuid!("0b000000-0000-0000-0000-000000000202"),
@@ -155,7 +155,7 @@ async fn all_mail_keeps_provider_drafts_without_received_or_sent_dates(
     .await?;
     assert_eq!(timestamp, Some(created_at));
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     let projections = repo
         .thread_mail_projections_by_ids(viewer.clone(), &[thread])
         .await?;
@@ -227,14 +227,14 @@ async fn all_mail_excludes_synced_rox_drafts_in_junk_and_trash(
     sqlx::query!(
         r#"INSERT INTO email_mailbox_drafts
             (message_id, link_id, generation, actor_id, desired_content, state)
-            VALUES ($1, $2, 1, 'macro|mail@example.com', '{}'::jsonb, 'synced')"#,
+            VALUES ($1, $2, 1, 'rox|mail@example.com', '{}'::jsonb, 'synced')"#,
         message,
         link
     )
     .execute(&pool)
     .await?;
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("rox|mail@example.com")?;
     for mailbox_state in [
         serde_json::json!({"in_junk": true}),
         serde_json::json!({"in_trash": true}),

@@ -73,7 +73,7 @@ async fn tools_always_use_the_authenticated_request_identity() {
         service: service.clone(),
         sessions: service.clone(),
     });
-    let caller = RoxUserIdStr::try_from("macro|requester@example.com".to_owned()).unwrap();
+    let caller = RoxUserIdStr::try_from("rox|requester@example.com".to_owned()).unwrap();
     let request = RequestContext::new(caller.clone());
     let listed = ListCodingAgents {}
         .call(context.clone(), request.clone())
@@ -109,13 +109,13 @@ async fn tools_always_use_the_authenticated_request_identity() {
 fn tools_reject_an_ai_supplied_user_identity() {
     assert!(
         serde_json::from_value::<ListCodingAgents>(serde_json::json!({
-            "user_id": "macro|another@example.com"
+            "user_id": "rox|another@example.com"
         }))
         .is_err()
     );
     assert!(
         serde_json::from_value::<ListAgentUpdates>(
-            serde_json::json!({"user_id": "macro|another@example.com"})
+            serde_json::json!({"user_id": "rox|another@example.com"})
         )
         .is_err()
     );
@@ -123,7 +123,7 @@ fn tools_reject_an_ai_supplied_user_identity() {
         serde_json::from_value::<DispatchCodingAgent>(serde_json::json!({
             "agent_id": rox_uuid::generate_uuid_v7(),
             "prompt": "Fix the bug",
-            "user_id": "macro|another@example.com"
+            "user_id": "rox|another@example.com"
         }))
         .is_err()
     );

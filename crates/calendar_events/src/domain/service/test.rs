@@ -390,7 +390,7 @@ fn valid_upsert() -> CalendarEventUpsert {
     CalendarEventUpsert {
         event: CalendarEvent {
             id: event_id,
-            owner_id: "macro|calendar@example.com".to_string(),
+            owner_id: "rox|calendar@example.com".to_string(),
             ical_uid: "meeting@example.com".to_string(),
             calendar_id: None,
             sources: Vec::new(),
@@ -801,7 +801,7 @@ async fn backfill_refresh_reports_source_and_calendar_ooo_changes() {
                     job_id: Uuid::now_v7(),
                     email_link_id: Uuid::now_v7(),
                 },
-                "macro|calendar@example.com",
+                "rox|calendar@example.com",
                 "secret",
                 OccurrenceRange::maintenance_horizon(Utc::now()),
                 &mut report,
@@ -1011,7 +1011,7 @@ async fn push_unsupported_watch_is_recorded_and_the_account_completes() {
         coordinator
             .run(
                 key,
-                "macro|calendar@example.com",
+                "rox|calendar@example.com",
                 "secret",
                 OccurrenceRange::maintenance_horizon(Utc::now()),
                 &mut report,
@@ -1055,7 +1055,7 @@ async fn one_failed_calendar_is_isolated_and_the_account_completes() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1110,7 +1110,7 @@ async fn every_calendar_failing_fails_the_run_for_retry() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1153,7 +1153,7 @@ async fn a_reauth_signal_on_one_calendar_fails_the_run_immediately() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1204,7 +1204,7 @@ async fn a_wholesale_failure_prefers_a_retryable_error() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1245,7 +1245,7 @@ async fn google_coordinator_owns_claim_and_completion_lifecycle() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::historical_sync(Utc::now()),
             &mut report,
@@ -1337,7 +1337,7 @@ async fn retiring_a_regular_meeting_leaves_team_ooo_rows_alone() {
     for sync_retirements in [
         vec![RetiredCalendarEvent {
             event_id: Uuid::now_v7(),
-            owner_id: "macro|owner".to_string(),
+            owner_id: "rox|owner".to_string(),
             deleted: true,
             team_ooo_changed: false,
         }],
@@ -1361,7 +1361,7 @@ async fn retiring_a_regular_meeting_leaves_team_ooo_rows_alone() {
                     job_id: Uuid::now_v7(),
                     email_link_id: Uuid::now_v7(),
                 },
-                "macro|calendar@example.com",
+                "rox|calendar@example.com",
                 "secret",
                 OccurrenceRange::historical_sync(Utc::now()),
                 &mut report,
@@ -1385,14 +1385,14 @@ async fn a_cancelled_provider_event_publishes_a_deletion() {
         sync_retirements: vec![
             RetiredCalendarEvent {
                 event_id: removed,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: true,
                 team_ooo_changed: true,
             },
             // Another source still backs this one, so its row was rewritten.
             RetiredCalendarEvent {
                 event_id: survivor,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: false,
                 team_ooo_changed: false,
             },
@@ -1415,7 +1415,7 @@ async fn a_cancelled_provider_event_publishes_a_deletion() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::historical_sync(Utc::now()),
             &mut report,
@@ -1515,7 +1515,7 @@ async fn freshly_synced_system_calendars_are_skipped() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1595,7 +1595,7 @@ async fn a_fresh_system_calendar_keeps_a_failing_calendar_isolated() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -1665,7 +1665,7 @@ async fn google_coordinator_surfaces_lease_loss_while_work_is_running() {
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::historical_sync(Utc::now()),
             &mut GoogleBackfillRunReport::default(),
@@ -1695,7 +1695,7 @@ async fn google_coordinator_keeps_calendar_permission_health_separate_from_gmail
                 job_id: Uuid::now_v7(),
                 email_link_id: Uuid::now_v7(),
             },
-            "macro|calendar@example.com",
+            "rox|calendar@example.com",
             "secret",
             OccurrenceRange::historical_sync(Utc::now()),
             &mut GoogleBackfillRunReport::default(),
@@ -1921,7 +1921,7 @@ async fn invalid_normalized_calendar_never_commits_coverage_or_its_token() {
         coordinator
             .run(
                 key,
-                "macro|calendar@example.com",
+                "rox|calendar@example.com",
                 "secret",
                 OccurrenceRange::maintenance_horizon(Utc::now()),
                 &mut report,
@@ -1967,7 +1967,7 @@ async fn failure_to_persist_calendar_quarantine_fails_the_account_run() {
                     job_id: Uuid::now_v7(),
                     email_link_id: Uuid::now_v7(),
                 },
-                "macro|calendar@example.com",
+                "rox|calendar@example.com",
                 "secret",
                 OccurrenceRange::maintenance_horizon(Utc::now()),
                 &mut report,
@@ -1984,7 +1984,7 @@ fn forward_export(
 ) -> crate::domain::ics::CalendarEventExport {
     crate::domain::ics::CalendarEventExport {
         access,
-        owner_id: "macro|guest@example.com".to_string(),
+        owner_id: "rox|guest@example.com".to_string(),
         event_type: EventType::Default,
         ical_uid: "meeting@example.com".to_string(),
         sequence: 2,
@@ -2064,7 +2064,7 @@ async fn event_forward_publishes_a_google_organizers_event_from_the_requested_co
     };
 
     let forward = forward_service(export, forwarded, requested)
-        .event_forward("macro|guest@example.com", requested, &invitees())
+        .event_forward("rox|guest@example.com", requested, &invitees())
         .await
         .unwrap()
         .expect("the requester's own copy can be forwarded");
@@ -2093,7 +2093,7 @@ async fn event_forward_invites_the_recipients_to_an_outside_organizers_meeting()
     };
 
     let forward = forward_service(export, outside_invitation(), requested)
-        .event_forward("macro|guest@example.com", requested, &invitees())
+        .event_forward("rox|guest@example.com", requested, &invitees())
         .await
         .unwrap()
         .expect("the requester's own copy can be forwarded");
@@ -2165,7 +2165,7 @@ async fn event_forward_falls_back_to_the_event_file_without_evidence_of_an_outsi
     for (case, export, forwarded) in cases {
         let requested = Uuid::now_v7();
         let forward = forward_service(export, forwarded, requested)
-            .event_forward("macro|guest@example.com", requested, &invitees())
+            .event_forward("rox|guest@example.com", requested, &invitees())
             .await
             .unwrap()
             .expect("the requester's own copy can be forwarded");
@@ -2194,7 +2194,7 @@ async fn event_forward_refuses_an_event_none_of_the_requesters_inboxes_holds() {
     });
 
     let forward = service
-        .event_forward("macro|guest@example.com", Uuid::now_v7(), &invitees())
+        .event_forward("rox|guest@example.com", Uuid::now_v7(), &invitees())
         .await
         .unwrap();
 
@@ -2214,7 +2214,7 @@ async fn event_forward_refuses_a_copy_the_export_no_longer_resolves_as_owned() {
     });
 
     let forward = service
-        .event_forward("macro|guest@example.com", requested, &invitees())
+        .event_forward("rox|guest@example.com", requested, &invitees())
         .await
         .unwrap();
 

@@ -6,8 +6,8 @@ use uuid::Uuid;
 
 const CH1: Uuid = Uuid::from_u128(0x11111111_1111_1111_1111_111111111111);
 const CH3: Uuid = Uuid::from_u128(0x33333333_3333_3333_3333_333333333333);
-const USER1: &str = "macro|user1@test.com";
-const USER2: &str = "macro|user2@test.com";
+const USER1: &str = "rox|user1@test.com";
+const USER2: &str = "rox|user2@test.com";
 const DOC: &str = "doc-1";
 const OTHER_DOC: &str = "doc-2";
 

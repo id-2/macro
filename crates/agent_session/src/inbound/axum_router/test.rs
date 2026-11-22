@@ -90,8 +90,8 @@ fn openapi_separates_a_missing_session_from_a_refused_one() {
 
 const BOT_TOKEN: &str = "mbot_self_test";
 const HARNESS_TOKEN: &str = "mhns_self_test";
-const OWNER: &str = "macro|owner@example.com";
-const STRANGER: &str = "macro|stranger@example.com";
+const OWNER: &str = "rox|owner@example.com";
+const STRANGER: &str = "rox|stranger@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0x7EA3);
 
 #[derive(Clone, Default)]
@@ -1944,7 +1944,7 @@ fn an_agents_program_is_not_a_user_principal() {
             agent_via: None,
             rox_user_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             user_context: model_user::UserContext {
-                user_id: "macro|owner@example.com".to_owned(),
+                user_id: "rox|owner@example.com".to_owned(),
                 fusion_user_id: "fusion-owner".to_owned(),
                 permissions: None,
                 organization_id: None,

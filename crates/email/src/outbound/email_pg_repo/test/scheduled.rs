@@ -12,7 +12,7 @@ fn identity() -> (Uuid, Uuid) {
 }
 
 fn actor() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap()
 }
 
 fn future() -> ScheduleChange {
@@ -167,7 +167,7 @@ async fn service_authorizes_actor_and_validates_future_time(
         sent_undo_delay_secs: 5,
     };
     let (link, message) = identity();
-    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@test.com")?;
+    let stranger = RoxUserIdStr::parse_from_str("rox|stranger@test.com")?;
     assert!(matches!(
         service
             .change_schedule(stranger, link, message, future(), None, 0)

@@ -257,7 +257,7 @@ async fn route_evaluation() {
         .iter()
         .map(|skill| (skill.document_id.to_string(), skill.name.clone()))
         .collect();
-    let owner = RoxUserIdStr::parse_from_str("macro|eval@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("rox|eval@example.com").unwrap();
 
     let mut shipped_exact = 0usize;
     let mut exact = [0usize; THRESHOLDS.len()];

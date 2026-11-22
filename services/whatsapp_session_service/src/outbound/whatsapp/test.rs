@@ -58,7 +58,7 @@ impl<Connector: SessionConnector> SessionConnector for Tee<Connector> {
 }
 
 async fn insert_pairing_account(pool: &PgPool) -> Uuid {
-    let user_id = "macro|whatsapp-owner";
+    let user_id = "rox|whatsapp-owner";
     sqlx::query!(
         r#"
         WITH new_rox_user AS (
@@ -216,7 +216,7 @@ async fn a_phone_scanning_the_qr_links_the_account_through_the_encrypted_store(p
     .unwrap();
     sqlx::query!(
         r#"INSERT INTO whatsapp_pairing (id, account_id, user_id, generation, state, expires_at)
-        VALUES ($1, $2, 'macro|whatsapp-owner', 1, 'waiting', now() + interval '5 minutes')"#,
+        VALUES ($1, $2, 'rox|whatsapp-owner', 1, 'waiting', now() + interval '5 minutes')"#,
         Uuid::now_v7(),
         account,
     )

@@ -309,7 +309,7 @@ async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool
             VALUES ('99999999-9999-9999-9999-999999999999'::uuid, 'owner3', 'owner3@test.com', 'cus_test3')
         ), new_user AS (
             INSERT INTO "User" (id, email, rox_user_id)
-            VALUES ('macro|owner3@user.com', 'owner3@test.com', '99999999-9999-9999-9999-999999999999'::uuid)
+            VALUES ('rox|owner3@user.com', 'owner3@test.com', '99999999-9999-9999-9999-999999999999'::uuid)
             RETURNING id
         ), new_team AS (
             INSERT INTO team (id, name, owner_id, slug)
@@ -317,7 +317,7 @@ async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool
             RETURNING id
         ), new_doc AS (
             INSERT INTO "Document" (id, name, "fileType", owner)
-            VALUES ('22222222-2222-2222-2222-222222222222', 'Other Task', 'md', 'macro|owner2@user.com')
+            VALUES ('22222222-2222-2222-2222-222222222222', 'Other Task', 'md', 'rox|owner2@user.com')
             RETURNING id
         ), new_task AS (
             INSERT INTO team_task (team_id, document_id, task_num)
@@ -465,7 +465,7 @@ async fn test_get_rox_ids_by_github_user_ids_found(pool: Pool<Postgres>) {
 
     assert_eq!(
         links.get("12345"),
-        Some(&vec!["macro|user@user.com".to_string()])
+        Some(&vec!["rox|user@user.com".to_string()])
     );
 }
 
@@ -495,7 +495,7 @@ async fn test_get_rox_ids_by_github_user_ids_fans_out_to_multiple_users(pool: Po
         "#,
     )
     .bind(Uuid::new_v4())
-    .bind("macro|user2@user.com")
+    .bind("rox|user2@user.com")
     .bind(
         "cccccccc-cccc-cccc-cccc-cccccccccccc"
             .parse::<Uuid>()
@@ -519,8 +519,8 @@ async fn test_get_rox_ids_by_github_user_ids_fans_out_to_multiple_users(pool: Po
     assert_eq!(
         rox_ids,
         vec![
-            "macro|user2@user.com".to_string(),
-            "macro|user@user.com".to_string(),
+            "rox|user2@user.com".to_string(),
+            "rox|user@user.com".to_string(),
         ]
     );
 }
@@ -538,7 +538,7 @@ async fn test_get_rox_ids_by_github_logins_matches_case_insensitively(pool: Pool
     sqlx::query!(
         r#"
         INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
-        VALUES ('11111111-2222-3333-4444-555555555555'::uuid, 'macro|user2@user.com', 'cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'TestUser', '54321')
+        VALUES ('11111111-2222-3333-4444-555555555555'::uuid, 'rox|user2@user.com', 'cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'TestUser', '54321')
         "#
     )
     .execute(&pool)
@@ -561,13 +561,13 @@ async fn test_get_rox_ids_by_github_logins_matches_case_insensitively(pool: Pool
     assert_eq!(
         testuser_ids,
         vec![
-            "macro|user2@user.com".to_string(),
-            "macro|user@user.com".to_string()
+            "rox|user2@user.com".to_string(),
+            "rox|user@user.com".to_string()
         ]
     );
     assert_eq!(
         links.get("solo"),
-        Some(&vec!["macro|solo@user.com".to_string()])
+        Some(&vec!["rox|solo@user.com".to_string()])
     );
     assert!(!links.contains_key("unlinked"));
 }
@@ -592,7 +592,7 @@ async fn test_get_rox_ids_by_github_logins_empty_input(pool: Pool<Postgres>) {
 async fn test_get_user_team_ids(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
-    let team_ids = repo.get_user_team_ids("macro|user@user.com").await.unwrap();
+    let team_ids = repo.get_user_team_ids("rox|user@user.com").await.unwrap();
     assert_eq!(team_ids.len(), 1);
     assert_eq!(
         team_ids[0],
@@ -602,7 +602,7 @@ async fn test_get_user_team_ids(pool: Pool<Postgres>) {
     );
 
     let team_ids2 = repo
-        .get_user_team_ids("macro|user2@user.com")
+        .get_user_team_ids("rox|user2@user.com")
         .await
         .unwrap();
     assert_eq!(team_ids2.len(), 1);
@@ -621,7 +621,7 @@ async fn test_get_user_team_ids(pool: Pool<Postgres>) {
 async fn test_get_user_team_ids_no_teams(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
-    let team_ids = repo.get_user_team_ids("macro|solo@user.com").await.unwrap();
+    let team_ids = repo.get_user_team_ids("rox|solo@user.com").await.unwrap();
 
     assert!(team_ids.is_empty());
 }
@@ -691,7 +691,7 @@ async fn test_get_team_member_ids(pool: Pool<Postgres>) {
 
     insert_user_account(
         &pool,
-        "macro|zeta@user.com",
+        "rox|zeta@user.com",
         "11111111-1111-1111-1111-111111111111".parse().unwrap(),
         "zeta",
         "zeta@test.com",
@@ -700,7 +700,7 @@ async fn test_get_team_member_ids(pool: Pool<Postgres>) {
     .await;
     insert_user_account(
         &pool,
-        "macro|alpha@user.com",
+        "rox|alpha@user.com",
         "22222222-2222-2222-2222-222222222222".parse().unwrap(),
         "alpha",
         "alpha@test.com",
@@ -716,8 +716,8 @@ async fn test_get_team_member_ids(pool: Pool<Postgres>) {
         "cus_invalid",
     )
     .await;
-    insert_team_member(&pool, team_id, "macro|zeta@user.com").await;
-    insert_team_member(&pool, team_id, "macro|alpha@user.com").await;
+    insert_team_member(&pool, team_id, "rox|zeta@user.com").await;
+    insert_team_member(&pool, team_id, "rox|alpha@user.com").await;
     insert_team_member(&pool, team_id, "github-user-without-macro-prefix").await;
 
     let empty_team_id = "44444444-4444-4444-4444-444444444444"
@@ -731,7 +731,7 @@ async fn test_get_team_member_ids(pool: Pool<Postgres>) {
     )
     .bind(empty_team_id)
     .bind("Empty Team")
-    .bind("macro|solo@user.com")
+    .bind("rox|solo@user.com")
     .execute(&pool)
     .await
     .unwrap();
@@ -743,9 +743,9 @@ async fn test_get_team_member_ids(pool: Pool<Postgres>) {
     assert_eq!(
         member_ids,
         vec![
-            "macro|alpha@user.com".to_string(),
-            "macro|user@user.com".to_string(),
-            "macro|zeta@user.com".to_string(),
+            "rox|alpha@user.com".to_string(),
+            "rox|user@user.com".to_string(),
+            "rox|zeta@user.com".to_string(),
         ]
     );
 
@@ -848,7 +848,7 @@ async fn test_upsert_installation_sources_idempotent_user_source(pool: Pool<Post
     let repo = PgGithubSyncRepo::new(pool.clone());
 
     let sources = vec![GithubAppInstallationSource::User(
-        "macro|solo@user.com".to_string(),
+        "rox|solo@user.com".to_string(),
     )];
 
     repo.upsert_installation_sources("654321", &sources)
@@ -864,7 +864,7 @@ async fn test_upsert_installation_sources_idempotent_user_source(pool: Pool<Post
         rows,
         vec![(
             "654321".to_string(),
-            "macro|solo@user.com".to_string(),
+            "rox|solo@user.com".to_string(),
             "user".to_string(),
         )]
     );
@@ -883,7 +883,7 @@ async fn test_delete_installation_sources_removes_all_sources(pool: Pool<Postgre
 
     let sources = vec![
         GithubAppInstallationSource::Team("dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap()),
-        GithubAppInstallationSource::User("macro|solo@user.com".to_string()),
+        GithubAppInstallationSource::User("rox|solo@user.com".to_string()),
     ];
     repo.upsert_installation_sources("123456", &sources)
         .await
@@ -942,7 +942,7 @@ async fn test_upsert_installation_request_replaces_earlier_request(pool: Pool<Po
         .unwrap();
     repo.upsert_installation_request(
         "777",
-        &GithubAppInstallationSource::User("macro|user@user.com".to_string()),
+        &GithubAppInstallationSource::User("rox|user@user.com".to_string()),
     )
     .await
     .unwrap();
@@ -951,7 +951,7 @@ async fn test_upsert_installation_request_replaces_earlier_request(pool: Pool<Po
     assert_eq!(
         repo.get_installation_request("777").await.unwrap(),
         Some(GithubAppInstallationSource::User(
-            "macro|user@user.com".to_string()
+            "rox|user@user.com".to_string()
         ))
     );
 }
@@ -966,7 +966,7 @@ async fn test_installation_requests_are_scoped_by_github_user(pool: Pool<Postgre
         .unwrap();
     repo.upsert_installation_request(
         "888",
-        &GithubAppInstallationSource::User("macro|user@user.com".to_string()),
+        &GithubAppInstallationSource::User("rox|user@user.com".to_string()),
     )
     .await
     .unwrap();
@@ -977,7 +977,7 @@ async fn test_installation_requests_are_scoped_by_github_user(pool: Pool<Postgre
     assert_eq!(
         repo.get_installation_request("888").await.unwrap(),
         Some(GithubAppInstallationSource::User(
-            "macro|user@user.com".to_string()
+            "rox|user@user.com".to_string()
         ))
     );
 }

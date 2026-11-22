@@ -168,7 +168,7 @@ impl AggregateFrecency {
     pub fn new_mock(entity: Entity<'static>, frecency_score: f64) -> Self {
         AggregateFrecency {
             id: AggregateId {
-                user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
                 entity,
             },
             data: FrecencyData {

@@ -233,7 +233,7 @@ async fn record_with_policy(
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|payer@example.com".to_string()).unwrap()
 }
 
 #[tokio::test]

@@ -22,12 +22,12 @@ use std::sync::{Arc, Mutex};
 mod agent_dm;
 mod agent_enabled;
 
-const USER_OWNER: &str = "macro|bot-owner@example.com";
-const USER_OTHER: &str = "macro|bot-other@example.com";
-const TEAM_MEMBER: &str = "macro|bot-team-member@example.com";
-const TEAM_ADMIN: &str = "macro|bot-team-admin@example.com";
-const TEAM_OWNER: &str = "macro|bot-team-owner@example.com";
-const TEAM_OTHER: &str = "macro|bot-team-other@example.com";
+const USER_OWNER: &str = "rox|bot-owner@example.com";
+const USER_OTHER: &str = "rox|bot-other@example.com";
+const TEAM_MEMBER: &str = "rox|bot-team-member@example.com";
+const TEAM_ADMIN: &str = "rox|bot-team-admin@example.com";
+const TEAM_OWNER: &str = "rox|bot-team-owner@example.com";
+const TEAM_OTHER: &str = "rox|bot-team-other@example.com";
 fn user_id(value: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
@@ -225,7 +225,7 @@ fn assert_no_token_material(payload: &Value, known_token: Option<&str>) {
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
+    let email = user_id.strip_prefix("rox|").unwrap_or(user_id);
     let stripe_customer_id = format!("stripe_{rox_user_id}");
 
     sqlx::query(

@@ -263,7 +263,7 @@ async fn external_chat_mentions_let_the_channel_read_the_chat(pool: PgPool) {
 /// share it either, while a session from anywhere else still is.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_conversation_session_references_grant_nothing(pool: PgPool) {
-    const OWNER: &str = "macro|dm-owner@example.com";
+    const OWNER: &str = "rox|dm-owner@example.com";
     let conversation_id = Uuid::now_v7();
     let bot_id = Uuid::now_v7();
     let private_session_id = Uuid::now_v7();

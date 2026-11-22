@@ -128,7 +128,7 @@ async fn notified_query_explain_local(pool: Pool<Postgres>) -> anyhow::Result<()
     .execute(&pool)
     .await?;
     sqlx::query!(
-        "INSERT INTO user_notification (user_id, notification_id, created_at, sent, state) SELECT 'macro|user-2@test.com', id, created_at, TRUE, 'unseen' FROM notification WHERE id = ANY($1::uuid[])",
+        "INSERT INTO user_notification (user_id, notification_id, created_at, sent, state) SELECT 'rox|user-2@test.com', id, created_at, TRUE, 'unseen' FROM notification WHERE id = ANY($1::uuid[])",
         &unrelated_notification_ids,
     )
     .execute(&pool)

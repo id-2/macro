@@ -9,7 +9,7 @@ UPDATE email_links SET provider = 'OUTLOOK' WHERE id = 'aaaaaaaa-aaaa-aaaa-aaaa-
 UPDATE email_messages SET internal_date_ts = created_at WHERE link_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
 INSERT INTO email_mailbox_commands (id, link_id, generation, actor_id, intent, status)
-VALUES ('cccccccc-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 1, 'macro|user1@test.com', '{}'::jsonb, 'pending');
+VALUES ('cccccccc-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 1, 'rox|user1@test.com', '{}'::jsonb, 'pending');
 
 INSERT INTO email_pending_mailbox_state (message_id, attribute, command_id, desired)
 VALUES

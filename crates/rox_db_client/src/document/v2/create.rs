@@ -346,7 +346,7 @@ mod tests {
             r#"INSERT INTO "Project" ("id", "name", "userId") VALUES ($1, $2, $3)"#,
             "project-one",
             "name",
-            "macro|user@user.com"
+            "rox|user@user.com"
         )
         .execute(&pool)
         .await?;
@@ -359,7 +359,7 @@ mod tests {
                 id: None,
                 sha: "sha",
                 document_name: "document-name",
-                user_id: RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap(),
                 file_type: Some(FileType::Pdf),
                 project_id: Some("project-one"),
                 project_name: None,
@@ -379,7 +379,7 @@ mod tests {
         assert_eq!(document_metadata.document_name, "document-name".to_string());
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
         assert_eq!(document_metadata.project_id.as_deref(), Some("project-one"));
         assert_eq!(document_metadata.project_name.as_deref(), Some("name"));
@@ -392,7 +392,7 @@ mod tests {
                 id: None,
                 sha: "sha",
                 document_name: "document-name",
-                user_id: RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap(),
                 file_type: Some(FileType::Docx),
                 project_id: None,
                 project_name: None,
@@ -412,7 +412,7 @@ mod tests {
         assert_eq!(document_metadata.document_name, "document-name".to_string());
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
 
         Ok(())
@@ -424,7 +424,7 @@ mod tests {
             r#"INSERT INTO "Project" ("id", "name", "userId") VALUES ($1, $2, $3)"#,
             "project-one",
             "name",
-            "macro|user@user.com"
+            "rox|user@user.com"
         )
         .execute(&pool)
         .await?;
@@ -437,7 +437,7 @@ mod tests {
                 id: Some("20f603c2-99db-aaaa-0000-1d8b9f95a52f"),
                 sha: "sha",
                 document_name: "document-name",
-                user_id: RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap(),
                 file_type: Some(FileType::Pdf),
                 project_id: Some("project-one"),
                 project_name: None,
@@ -460,7 +460,7 @@ mod tests {
         assert_eq!(document_metadata.document_name, "document-name".to_string());
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
         assert_eq!(document_metadata.project_id.as_deref(), Some("project-one"));
         assert_eq!(document_metadata.project_name.as_deref(), Some("name"));
@@ -473,7 +473,7 @@ mod tests {
                 id: Some("20f603c2-99db-4f02-aaaa-1d8b9f95a52f"),
                 sha: "sha",
                 document_name: "document-name",
-                user_id: RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap(),
                 file_type: Some(FileType::Docx),
                 project_id: None,
                 project_name: None,
@@ -496,7 +496,7 @@ mod tests {
         assert_eq!(document_metadata.document_name, "document-name".to_string());
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
 
         Ok(())
@@ -506,7 +506,7 @@ mod tests {
     #[sqlx::test(fixtures(path = "../../../fixtures", scripts("basic_user_with_documents")))]
     async fn test_insert_document_with_duplicate_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
         let test_id = "duplicate-document-id";
-        let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+        let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
         // First, create a document with the test ID
         let mut transaction = pool.begin().await?;

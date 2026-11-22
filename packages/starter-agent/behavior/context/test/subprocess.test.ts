@@ -13,7 +13,7 @@ import { childEnvironment } from '../children.ts';
 import { type Relay, startRelay } from '../relay.ts';
 
 const realKey = 'mak_real_key_never_in_a_script';
-const agentId = 'macro|agent@example.com';
+const agentId = 'rox|agent@example.com';
 const packageRoot = join(import.meta.dir, '..', '..', '..');
 const linked = [
   'cli.ts',

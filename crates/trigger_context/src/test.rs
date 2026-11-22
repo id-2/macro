@@ -16,7 +16,7 @@ fn a_channel_follow_up_has_a_stable_wire_shape() {
             },
             prompt_message_id: Uuid::parse_str("00000000-0000-0000-0000-000000000003").unwrap(),
             sender: ContextPerson {
-                id: "macro|julia@example.com".to_owned(),
+                id: "rox|julia@example.com".to_owned(),
                 name: "Julia".to_owned(),
                 email: Some("julia@example.com".to_owned()),
             },
@@ -31,7 +31,7 @@ fn a_channel_follow_up_has_a_stable_wire_shape() {
                 messages: vec![ContextMessage {
                     id: Uuid::parse_str("00000000-0000-0000-0000-000000000003").unwrap(),
                     author: ContextPerson {
-                        id: "macro|julia@example.com".to_owned(),
+                        id: "rox|julia@example.com".to_owned(),
                         name: "Julia".to_owned(),
                         email: Some("julia@example.com".to_owned()),
                     },
@@ -57,7 +57,7 @@ fn a_channel_follow_up_has_a_stable_wire_shape() {
             },
             "prompt_message_id": "00000000-0000-0000-0000-000000000003",
             "sender": {
-                "id": "macro|julia@example.com",
+                "id": "rox|julia@example.com",
                 "name": "Julia",
                 "email": "julia@example.com"
             },
@@ -72,7 +72,7 @@ fn a_channel_follow_up_has_a_stable_wire_shape() {
                 "messages": [{
                     "id": "00000000-0000-0000-0000-000000000003",
                     "author": {
-                        "id": "macro|julia@example.com",
+                        "id": "rox|julia@example.com",
                         "name": "Julia",
                         "email": "julia@example.com"
                     },
@@ -101,12 +101,12 @@ fn a_started_call_has_a_stable_wire_shape() {
             channel_name: Some("eng".to_owned()),
             started_at: Utc.with_ymd_and_hms(2026, 10, 8, 14, 0, 0).unwrap(),
             started_by: ContextPerson {
-                id: "macro|julia@example.com".to_owned(),
+                id: "rox|julia@example.com".to_owned(),
                 name: "julia@example.com".to_owned(),
                 email: Some("julia@example.com".to_owned()),
             },
             participants: vec![ContextPerson {
-                id: "macro|julia@example.com".to_owned(),
+                id: "rox|julia@example.com".to_owned(),
                 name: "julia@example.com".to_owned(),
                 email: Some("julia@example.com".to_owned()),
             }],
@@ -122,12 +122,12 @@ fn a_started_call_has_a_stable_wire_shape() {
             "channel_name": "eng",
             "started_at": "2026-10-08T14:00:00Z",
             "started_by": {
-                "id": "macro|julia@example.com",
+                "id": "rox|julia@example.com",
                 "name": "julia@example.com",
                 "email": "julia@example.com"
             },
             "participants": [
-                {"id": "macro|julia@example.com", "name": "julia@example.com", "email": "julia@example.com"}
+                {"id": "rox|julia@example.com", "name": "julia@example.com", "email": "julia@example.com"}
             ]
         }
     });
@@ -148,7 +148,7 @@ fn an_ended_call_has_a_stable_wire_shape() {
             ended_at: Utc.with_ymd_and_hms(2026, 10, 8, 14, 30, 0).unwrap(),
             participants: vec![
                 ContextPerson {
-                    id: "macro|julia@example.com".to_owned(),
+                    id: "rox|julia@example.com".to_owned(),
                     name: "julia@example.com".to_owned(),
                     email: Some("julia@example.com".to_owned()),
                 },
@@ -177,7 +177,7 @@ fn an_ended_call_has_a_stable_wire_shape() {
             "started_at": "2026-10-08T14:00:00Z",
             "ended_at": "2026-10-08T14:30:00Z",
             "participants": [
-                {"id": "macro|julia@example.com", "name": "julia@example.com", "email": "julia@example.com"},
+                {"id": "rox|julia@example.com", "name": "julia@example.com", "email": "julia@example.com"},
                 {"id": "guest_1", "name": "Sam (Acme)"}
             ],
             "transcript": [
@@ -212,7 +212,7 @@ fn a_task_assignment_has_a_stable_wire_shape() {
             }),
         },
         assigned_by: ContextPerson {
-            id: "macro|julia@example.com".to_owned(),
+            id: "rox|julia@example.com".to_owned(),
             name: "Julia".to_owned(),
             email: Some("julia@example.com".to_owned()),
         },
@@ -239,7 +239,7 @@ fn a_task_assignment_has_a_stable_wire_shape() {
             }
         },
         "assigned_by": {
-            "id": "macro|julia@example.com",
+            "id": "rox|julia@example.com",
             "name": "Julia",
             "email": "julia@example.com"
         },
@@ -256,7 +256,7 @@ fn a_task_assignment_has_a_stable_wire_shape() {
 
 fn julia() -> ContextPerson {
     ContextPerson {
-        id: "macro|julia@example.com".to_owned(),
+        id: "rox|julia@example.com".to_owned(),
         name: "Julia".to_owned(),
         email: Some("julia@example.com".to_owned()),
     }
@@ -290,7 +290,7 @@ fn a_message_attachment_has_a_stable_wire_shape() {
     let wire = json!({
         "id": "00000000-0000-0000-0000-000000000001",
         "author": {
-            "id": "macro|julia@example.com",
+            "id": "rox|julia@example.com",
             "name": "Julia",
             "email": "julia@example.com"
         },

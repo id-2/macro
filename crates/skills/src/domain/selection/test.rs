@@ -153,7 +153,7 @@ impl SkillService for Skills {
 }
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|fixture@example.com").unwrap()
 }
 
 fn ids(selection: &SkillSelection) -> Vec<u128> {

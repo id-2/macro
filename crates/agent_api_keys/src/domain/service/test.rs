@@ -86,7 +86,7 @@ impl AgentKeyRepo for FakeRepo {
     }
 }
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 fn user(id: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(id.to_owned()).expect("user id")
@@ -266,7 +266,7 @@ async fn only_the_agents_owner_or_its_team_spends_its_key() {
     *service.repo.agent.lock().expect("lock") = Some(personal);
     assert!(
         service
-            .usable_key(bot, &user("macro|someone-else@example.com"))
+            .usable_key(bot, &user("rox|someone-else@example.com"))
             .await
             .expect("read")
             .is_none(),
@@ -278,10 +278,10 @@ async fn only_the_agents_owner_or_its_team_spends_its_key() {
         ..agent("in-memory", "anthropic/claude-sonnet-5-5")
     };
     *service.repo.agent.lock().expect("lock") = Some(team);
-    *service.repo.team_members.lock().expect("lock") = vec!["macro|member@example.com".to_owned()];
+    *service.repo.team_members.lock().expect("lock") = vec!["rox|member@example.com".to_owned()];
     assert!(
         service
-            .usable_provider(bot, &user("macro|member@example.com"))
+            .usable_provider(bot, &user("rox|member@example.com"))
             .await
             .expect("read")
             .is_some(),
@@ -289,7 +289,7 @@ async fn only_the_agents_owner_or_its_team_spends_its_key() {
     );
     assert!(
         service
-            .usable_provider(bot, &user("macro|outsider@example.com"))
+            .usable_provider(bot, &user("rox|outsider@example.com"))
             .await
             .expect("read")
             .is_none(),

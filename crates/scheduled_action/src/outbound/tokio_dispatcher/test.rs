@@ -11,7 +11,7 @@ fn only_enabled_cron_actions_get_a_timer() {
     let id = rox_uuid::generate_uuid_v7();
     let mut action = ScheduledAction {
         id: Some(id),
-        owner: Owner::from_principal_str("macro|dispatcher@test.com").unwrap(),
+        owner: Owner::from_principal_str("rox|dispatcher@test.com").unwrap(),
         name: "routine".into(),
         trigger: ActionTrigger::Cron {
             schedule: Schedule::from_cron("* * * * * *".into()).unwrap(),

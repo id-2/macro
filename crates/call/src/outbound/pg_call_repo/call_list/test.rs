@@ -18,8 +18,8 @@ use crate::domain::models::{CallDiscussion, CallRecord, CallRecordPage};
 use crate::domain::ports::CallRepository;
 use crate::outbound::pg_call_repo::PgCallRepo;
 
-const VIEWER: &str = "macro|viewer@example.com";
-const OTHER: &str = "macro|other@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
+const OTHER: &str = "rox|other@example.com";
 
 const CH_MEMBER: Uuid = Uuid::from_u128(0xc1);
 const CH_OTHER: Uuid = Uuid::from_u128(0xc2);

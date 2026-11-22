@@ -83,7 +83,7 @@ async fn inserting_into_a_concurrently_deleted_thread_is_retryable(pool: PgPool)
     let thread_db_id = Uuid::now_v7();
     sqlx::query(
         "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
-         VALUES ($1, 'macro|deleted-thread@example.com', 'fa-user', 'deleted-thread@example.com', 'GMAIL')",
+         VALUES ($1, 'rox|deleted-thread@example.com', 'fa-user', 'deleted-thread@example.com', 'GMAIL')",
     )
     .bind(link_id)
     .execute(&pool)
@@ -265,7 +265,7 @@ async fn insert_email_link(pool: &PgPool) -> (Uuid, String) {
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
-        "macro|stale-cursor@example.com",
+        "rox|stale-cursor@example.com",
         email_address,
     )
     .execute(pool)

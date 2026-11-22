@@ -49,7 +49,7 @@ describe('agents', () => {
             name: 'Cursor session',
             archivedBy: null,
             archivedAt: null,
-            ownerId: 'macro|owner@example.com',
+            ownerId: 'rox|owner@example.com',
             sandboxSize: 'default',
             status: { kind: 'no_messages' },
             workspace: '/workspace',

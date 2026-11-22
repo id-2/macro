@@ -91,7 +91,7 @@ async fn parent_age_controls_all_states_and_cascades_to_receipts(pool: PgPool) {
     .into_iter()
     .enumerate()
     {
-        let user = format!("macro|retention-{i}@test.com");
+        let user = format!("rox|retention-{i}@test.com");
         for notification in [old, fresh] {
             // A fresh recipient on an expired parent must expire; an old
             // recipient on a fresh parent must survive. Include soft deletes.
@@ -115,7 +115,7 @@ async fn parent_age_controls_all_states_and_cascades_to_receipts(pool: PgPool) {
     }
     // Settings with similar names are not notification history.
     sqlx::query!(
-        "INSERT INTO user_mute_notification (user_id) VALUES ('macro|retention-0@test.com')"
+        "INSERT INTO user_mute_notification (user_id) VALUES ('rox|retention-0@test.com')"
     )
     .execute(&pool)
     .await
@@ -194,7 +194,7 @@ async fn locked_parents_are_revisited_and_advisory_lock_is_transaction_scoped(po
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cascade_lock_timeout_rolls_back_entire_batch_and_allows_retry(pool: PgPool) {
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
-    sqlx::query!("INSERT INTO user_notification (user_id, notification_id) VALUES ('macro|locked@test.com', $1)", old)
+    sqlx::query!("INSERT INTO user_notification (user_id, notification_id) VALUES ('rox|locked@test.com', $1)", old)
         .execute(&pool).await.unwrap();
     let mut tx = pool.begin().await.unwrap();
     sqlx::query!(
@@ -222,7 +222,7 @@ async fn deletion_notifies_every_recipient_in_byte_bounded_chunks(pool: PgPool) 
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
     // Multibyte addresses ensure the trigger measures bytes, not characters.
     let users: Vec<_> = (0..500)
-        .map(|i| format!("macro|retention-é-{i}@test.com"))
+        .map(|i| format!("rox|retention-é-{i}@test.com"))
         .collect();
     sqlx::query!(
         "INSERT INTO user_notification (user_id, notification_id) SELECT unnest($1::text[]), $2",

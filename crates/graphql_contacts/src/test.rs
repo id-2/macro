@@ -103,7 +103,7 @@ async fn search_and_exact_lookups_are_validated_and_scoped_to_the_root_viewer() 
     let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let response = schema.execute(Request::new(r#"{ user {
         contacts(search: "  CAFÉ   PLN ") { nextCursor }
-        contactsByUserIds(userIds: ["macro|PERSON@example.com", "macro|person@example.com"]) { userId }
+        contactsByUserIds(userIds: ["rox|PERSON@example.com", "rox|person@example.com"]) { userId }
         contactsByEmails(emails: ["PERSON@example.com", "person@example.com"]) { userId }
         empty: contactsByEmails(emails: []) { id }
     } }"#).data(viewer.clone())).await;
@@ -119,7 +119,7 @@ async fn search_and_exact_lookups_are_validated_and_scoped_to_the_root_viewer() 
         assert_eq!(
             lookups
                 .iter()
-                .filter(|ids| ids.as_slice() == ["macro|person@example.com"])
+                .filter(|ids| ids.as_slice() == ["rox|person@example.com"])
                 .count(),
             2
         );
@@ -146,7 +146,7 @@ async fn search_and_exact_lookups_are_validated_and_scoped_to_the_root_viewer() 
         ),
         (
             "query($ids:[ID!]!){user{contactsByUserIds(userIds:$ids){id}}}",
-            serde_json::json!({"ids": vec!["macro|person@example.com"; 501]}),
+            serde_json::json!({"ids": vec!["rox|person@example.com"; 501]}),
         ),
         (
             "query($emails:[String!]!){user{contactsByEmails(emails:$emails){id}}}",
@@ -195,7 +195,7 @@ async fn reference_matching_is_additive_validated_and_delegated_to_the_domain() 
     for field in ["ordinary", "first", "address", "any"] {
         assert_eq!(
             data["user"][field]["nodes"][0]["userId"],
-            "macro|person@example.com"
+            "rox|person@example.com"
         );
     }
     for field in ["exact", "notFirst"] {
@@ -283,7 +283,7 @@ async fn enriched_rows_and_empty_pages_preserve_opaque_continuations() {
         assert_eq!(page["nodes"].as_array().unwrap().len(), usize::from(!empty));
         if !empty {
             assert_eq!(page["nodes"][0]["email"], "person@example.com");
-            assert_eq!(page["nodes"][0]["userId"], "macro|person@example.com");
+            assert_eq!(page["nodes"][0]["userId"], "rox|person@example.com");
             assert_eq!(page["nodes"][0]["name"], "Person");
             assert_ne!(page["nodes"][0]["id"], page["nodes"][0]["userId"]);
         }
@@ -301,9 +301,9 @@ async fn enriched_rows_and_empty_pages_preserve_opaque_continuations() {
         assert_eq!(
             *reader.requests.lock().unwrap(),
             [
-                ("macro|viewer@example.com".into(), None, 100),
+                ("rox|viewer@example.com".into(), None, 100),
                 (
-                    "macro|viewer@example.com".into(),
+                    "rox|viewer@example.com".into(),
                     Some("legacy-position".into()),
                     500
                 ),

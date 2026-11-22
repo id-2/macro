@@ -86,7 +86,7 @@ export const fromBase64 = (data: string): string =>
 	);
 
 /** The agent's mailbox is agent@example.com, and its owner is owner@example.com: everyone at example.com is a colleague. */
-export const who = whoOf("agent@example.com", "macro|owner@example.com");
+export const who = whoOf("agent@example.com", "rox|owner@example.com");
 
 export const raw = (over: Over = {}): RawMail => {
 	const from = over.from ?? "Ada <ada@example.com>";

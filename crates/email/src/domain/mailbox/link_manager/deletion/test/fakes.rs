@@ -11,7 +11,7 @@ use uuid::Uuid;
 pub(super) const LINK: Uuid = Uuid::from_u128(1);
 pub(super) const TEAM: Uuid = Uuid::from_u128(2);
 pub(super) const MINTED: Uuid = Uuid::from_u128(3);
-pub(super) const OWNER: &str = "macro|owner@example.com";
+pub(super) const OWNER: &str = "rox|owner@example.com";
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) enum Call {

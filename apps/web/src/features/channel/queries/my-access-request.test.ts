@@ -26,7 +26,7 @@ const pending: ChannelAccessRequestState = {
   request: {
     id: 'request-1',
     channel_id: 'channel-1',
-    requester_id: 'macro|requester@example.com',
+    requester_id: 'rox|requester@example.com',
     status: 'pending',
     created_at: '2026-10-21T12:00:00Z',
   },

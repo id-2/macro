@@ -198,7 +198,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by session owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
+            "description": "Filter by session owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
           }
         }
       },
@@ -1223,7 +1223,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by chat owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by chat owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -1588,7 +1588,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by document owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by document owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -2820,7 +2820,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by initiative owner principal — a user ('macro|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
+            "description": "Filter by initiative owner principal — a user ('rox|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
           }
         }
       },
@@ -2868,7 +2868,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by project owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by project owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",

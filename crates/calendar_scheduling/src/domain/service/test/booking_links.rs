@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::booking_links::{BookingLinkDraft, BookingLinks};
 
-const USER: &str = "macro|booking-host@example.com";
+const USER: &str = "rox|booking-host@example.com";
 
 #[tokio::test]
 async fn discovery_is_read_only_and_finds_paused_links_by_public_text() {
@@ -129,7 +129,7 @@ async fn edit_preserves_other_links_hours_and_profile_and_rejects_stale_changes(
     assert!(matches!(
         service
             .edit_link(
-                "macro|other@example.com",
+                "rox|other@example.com",
                 None,
                 first.event_type_id,
                 saved.revision,
@@ -166,7 +166,7 @@ async fn invalid_drafts_and_non_members_do_not_write() {
         Err(Error::Invalid(_))
     ));
     let mut forged = draft();
-    forged.event.hosts = vec!["macro|other@example.com".into()];
+    forged.event.hosts = vec!["rox|other@example.com".into()];
     assert!(matches!(
         service.create_link(USER, None, forged).await,
         Err(Error::Invalid(_))

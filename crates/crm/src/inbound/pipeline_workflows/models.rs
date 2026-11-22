@@ -27,7 +27,7 @@ use crate::domain::{
 pub struct FieldValueInput {
     /// The field's name, ignoring case.
     pub field: String,
-    /// One value: an option label, a person as "me", an email or a macro|
+    /// One value: an option label, a person as "me", an email or a rox|
     /// user id, a number, true/false, or a date.
     #[serde(default)]
     pub value: Option<String>,
@@ -71,7 +71,7 @@ pub enum EntryFieldValue {
     Labels(Vec<String>),
     /// URLs.
     Links(Vec<String>),
-    /// Rox ids: people as macro| user ids, records or other items.
+    /// Rox ids: people as rox| user ids, records or other items.
     References(Vec<String>),
 }
 

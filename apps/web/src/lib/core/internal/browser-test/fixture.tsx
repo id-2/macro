@@ -80,7 +80,7 @@ function App() {
           policyVersion: PEOPLE_POLICY_VERSION,
           people: ids.map((id) => ({
             recordKey: `GraphqlContact:${id}`,
-            userId: `macro|${viewer()}-${id}@example.com`,
+            userId: `rox|${viewer()}-${id}@example.com`,
             email: `${viewer()}-${id}@example.com`,
             name: id === 99999 ? 'Rare person' : `Person ${id}`,
             matchRank: 0,
@@ -105,7 +105,7 @@ function App() {
           recordKey,
           record: {
             id: `scoped-${id}`,
-            userId: `macro|${viewer()}-${id}@example.com`,
+            userId: `rox|${viewer()}-${id}@example.com`,
             email: `${viewer()}-${id}@example.com`,
             name: id === '99999' ? 'Rare person' : `Person ${id}`,
           },

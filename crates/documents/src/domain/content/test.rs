@@ -8,7 +8,7 @@ fn document(file_type: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: DOCUMENT.to_string(),
         document_name: "Poster".to_string(),
-        owner: Owner::from_principal_str("macro|owner@user.com").unwrap(),
+        owner: Owner::from_principal_str("rox|owner@user.com").unwrap(),
         file_type: Some(file_type.to_string()),
         sub_type: None,
         branched_from_id: None,

@@ -10,11 +10,11 @@ fn harness(id: HarnessId, connected: bool) -> Harness {
         kind: "roxd".into(),
         name: "Private runtime behind a shared persona".into(),
         owner: HarnessOwner::User {
-            user_id: "macro|persona-owner@example.com".into(),
+            user_id: "rox|persona-owner@example.com".into(),
         },
         access: HarnessAccess::Owner,
         shared_team_ids: Vec::new(),
-        created_by: "macro|persona-owner@example.com".into(),
+        created_by: "rox|persona-owner@example.com".into(),
         created_at: "2026-10-02T00:00:00Z".parse().unwrap(),
         updated_at: "2026-10-02T00:00:00Z".parse().unwrap(),
         connected,

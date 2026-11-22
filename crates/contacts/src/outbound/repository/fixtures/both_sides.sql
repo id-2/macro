@@ -1,6 +1,6 @@
 INSERT INTO contacts_connections(user1, user2) VALUES
-  ('macro|a@example.com', 'macro|m@example.com'),
-  ('macro|b@example.com', 'macro|m@example.com'),
-  ('macro|m@example.com', 'macro|x@example.com'),
-  ('macro|m@example.com', 'macro|z@example.com'),
-  ('macro|a@example.com', 'macro|b@example.com');
+  ('rox|a@example.com', 'rox|m@example.com'),
+  ('rox|b@example.com', 'rox|m@example.com'),
+  ('rox|m@example.com', 'rox|x@example.com'),
+  ('rox|m@example.com', 'rox|z@example.com'),
+  ('rox|a@example.com', 'rox|b@example.com');

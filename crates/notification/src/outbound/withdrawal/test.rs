@@ -25,7 +25,7 @@ async fn withdrawal_prevents_delayed_notification_creation(pool: PgPool) {
         notification_entity: EntityType::Document.with_entity_str("document"),
         secondary_notification_entity: None,
         sender_id: None,
-        recipient_ids: HashSet::from([RoxUserIdStr::try_from("macro|owner@test.com").unwrap()]),
+        recipient_ids: HashSet::from([RoxUserIdStr::try_from("rox|owner@test.com").unwrap()]),
         notification: TaggedContent::new(PendingAccess),
     };
     assert!(

@@ -32,7 +32,7 @@ use crate::domain::{
 
 use super::{GithubSyncRouterState, github_sync_router};
 
-const USER_ID: &str = "macro|github-installer@example.com";
+const USER_ID: &str = "rox|github-installer@example.com";
 
 #[derive(Clone)]
 struct TestAuthorizationService;

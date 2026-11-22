@@ -55,7 +55,7 @@ import {
 } from './entity-action-context';
 import { makeDeleteAction } from './make-delete-action';
 
-const ME = 'macro|me@rox.one';
+const ME = 'rox|me@rox.one';
 
 const entity = (
   type: EntityData['type'],
@@ -472,7 +472,7 @@ describe('makeDeleteAction.canExecute', () => {
     expect(canExecute(entity('agent_session'))).toBe(true);
     expect(
       canExecute(
-        entity('agent_session', { ownerId: 'macro|other@example.com' })
+        entity('agent_session', { ownerId: 'rox|other@example.com' })
       )
     ).toBe(false);
   });
@@ -482,7 +482,7 @@ describe('makeDeleteAction.canExecute', () => {
   });
 
   it('refuses entities owned by someone else', () => {
-    expect(canExecute(entity('document', { ownerId: 'macro|other' }))).toBe(
+    expect(canExecute(entity('document', { ownerId: 'rox|other' }))).toBe(
       false
     );
   });
@@ -498,7 +498,7 @@ describe('makeDeleteAction.canExecute', () => {
       blockName: 'channel',
       channelType: 'team',
       teamId: 'team-a',
-      ownerId: 'macro|other@example.com',
+      ownerId: 'rox|other@example.com',
     });
     expect(blockChannel && action.canExecute(blockChannel)).toBe(true);
     for (const channelType of [
@@ -513,7 +513,7 @@ describe('makeDeleteAction.canExecute', () => {
           entity('channel', {
             channelType,
             teamId: 'team-a',
-            ownerId: 'macro|other@example.com',
+            ownerId: 'rox|other@example.com',
           })
         )
       ).toBe(channelType === 'team');
@@ -523,7 +523,7 @@ describe('makeDeleteAction.canExecute', () => {
         entity('channel', {
           channelType: 'team',
           teamId: 'team-b',
-          ownerId: 'macro|other@example.com',
+          ownerId: 'rox|other@example.com',
         })
       )
     ).toBe(false);
@@ -531,7 +531,7 @@ describe('makeDeleteAction.canExecute', () => {
       action.canExecute(
         entity('channel', {
           channelType: 'team',
-          ownerId: 'macro|other@example.com',
+          ownerId: 'rox|other@example.com',
         })
       )
     ).toBe(false);
@@ -540,7 +540,7 @@ describe('makeDeleteAction.canExecute', () => {
         entity('channel', {
           channelType: 'team',
           teamId: 'team-a',
-          ownerId: 'macro|other@example.com',
+          ownerId: 'rox|other@example.com',
         })
       )
     ).toBe(false);

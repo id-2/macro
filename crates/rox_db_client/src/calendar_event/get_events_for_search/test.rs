@@ -1,10 +1,10 @@
 use super::*;
 
-const OWNER: &str = "macro|search-share-owner@example.com";
-const MEMBER: &str = "macro|search-share-member@example.com";
-const ATTENDEE: &str = "macro|search-share-attendee@example.com";
-const FORMER: &str = "macro|search-share-former@example.com";
-const STRANGER: &str = "macro|search-share-stranger@example.com";
+const OWNER: &str = "rox|search-share-owner@example.com";
+const MEMBER: &str = "rox|search-share-member@example.com";
+const ATTENDEE: &str = "rox|search-share-attendee@example.com";
+const FORMER: &str = "rox|search-share-former@example.com";
+const STRANGER: &str = "rox|search-share-stranger@example.com";
 
 async fn insert_event(
     pool: &Pool<Postgres>,

@@ -218,13 +218,13 @@ describe('compileToAst', () => {
     const ast = compileToAst(
       queryStateFrom({
         exclude: {
-          channelThreadRootSenderId: ['macro|me@example.com'],
+          channelThreadRootSenderId: ['rox|me@example.com'],
         },
       })
     );
 
     expect(ast.cthf).toEqual({
-      '!': { l: { RootSender: 'macro|me@example.com' } },
+      '!': { l: { RootSender: 'rox|me@example.com' } },
     });
   });
 

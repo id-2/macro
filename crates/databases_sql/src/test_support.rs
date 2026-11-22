@@ -48,9 +48,9 @@ use uuid::Uuid;
 
 use crate::service::DatabasesSql;
 
-pub(crate) const OWNER: &str = "macro|owner@rox.one";
-pub(crate) const VIEWER: &str = "macro|viewer@rox.one";
-pub(crate) const STRANGER: &str = "macro|stranger@rox.one";
+pub(crate) const OWNER: &str = "rox|owner@rox.one";
+pub(crate) const VIEWER: &str = "rox|viewer@rox.one";
+pub(crate) const STRANGER: &str = "rox|stranger@rox.one";
 
 pub(crate) fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).expect("valid user id")

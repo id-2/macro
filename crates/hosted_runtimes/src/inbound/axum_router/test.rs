@@ -54,7 +54,7 @@ struct Authorization;
 impl RoxAuthorizationService for Authorization {
     async fn authorize(&self, _jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
-            user_id: "macro|admin@example.com".to_owned(),
+            user_id: "rox|admin@example.com".to_owned(),
             fusion_user_id: Uuid::from_u128(1).to_string(),
             permissions: None,
             organization_id: None,
@@ -353,13 +353,13 @@ async fn finishing_setup_follows_the_team_admin_role_not_the_buyer() {
     for (role, buyer, expected) in [
         (
             TeamRole::Admin,
-            "macro|someone-else@example.com",
+            "rox|someone-else@example.com",
             StatusCode::OK,
         ),
         // The admin-only extractor refuses as every admin route does.
         (
             TeamRole::Member,
-            "macro|admin@example.com",
+            "rox|admin@example.com",
             StatusCode::UNAUTHORIZED,
         ),
     ] {

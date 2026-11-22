@@ -23,7 +23,7 @@ function invite(lastSentHoursAgo: number): TeamInviteDetails {
     email: 'teammate@acme.com',
     team_id: 'team-1',
     team_role: 'member',
-    invited_by: 'macro|owner@acme.com',
+    invited_by: 'rox|owner@acme.com',
     created_at: lastSent,
     last_sent_at: lastSent,
     is_agent: false,

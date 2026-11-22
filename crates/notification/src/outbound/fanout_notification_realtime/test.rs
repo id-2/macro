@@ -26,7 +26,7 @@ impl NotificationRealtimePublisher for RecordingPublisher {
 fn payload() -> NotificationStatusPayload<'static> {
     NotificationStatusPayload::UserNotifications {
         user: rox_user_id::user_id::RoxUserIdStr::try_from(
-            "macro|recipient@example.com".to_string(),
+            "rox|recipient@example.com".to_string(),
         )
         .expect("valid user ID"),
         updates: Vec::new(),

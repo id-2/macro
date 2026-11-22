@@ -7,7 +7,7 @@ export type ChannelConfig = {
   channelId: string;
   /** Bot API key (mbot_...), sent as x-rox-bot-token. */
   botToken: string;
-  /** The bot owner's user id (`macro|<email>`); the bot acts as this user. */
+  /** The bot owner's user id (`rox|<email>`); the bot acts as this user. */
   actingUserId: string;
   /** Rox environment. Defaults to prod. */
   env?: Env;

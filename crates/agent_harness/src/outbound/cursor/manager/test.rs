@@ -98,7 +98,7 @@ impl AgentSessionRepo for StubSessions {
             repo_branch: self.repo_branch.clone(),
             id,
             owner_id: model_owner::Owner::User(
-                RoxUserIdStr::try_from("macro|owner@rox.one".to_owned())
+                RoxUserIdStr::try_from("rox|owner@rox.one".to_owned())
                     .expect("valid user id"),
             ),
             thread_id: None,

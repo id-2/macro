@@ -44,8 +44,8 @@
     "name": "user",
     "kind": "user-mention",
     "source": "<@U1>",
-    "native": "<m-user-mention>{\"userId\":\"macro|alice+slack@example.com\",\"email\":\"alice+slack@example.com\"}</m-user-mention>",
-    "payload": {"userId":"macro|alice+slack@example.com","email":"alice+slack@example.com"}
+    "native": "<m-user-mention>{\"userId\":\"rox|alice+slack@example.com\",\"email\":\"alice+slack@example.com\"}</m-user-mention>",
+    "payload": {"userId":"rox|alice+slack@example.com","email":"alice+slack@example.com"}
   },
   {
     "name": "channel",
@@ -78,8 +78,8 @@
   {
     "name": "inline-code",
     "kind": "inert",
-    "source": "`<m-user-mention>{\"userId\":\"macro|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>`",
-    "native": "`<m-user-mention>{\"userId\":\"macro|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>`"
+    "source": "`<m-user-mention>{\"userId\":\"rox|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>`",
+    "native": "`<m-user-mention>{\"userId\":\"rox|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>`"
   },
   {
     "name": "fenced-code",
@@ -102,7 +102,7 @@
   {
     "name": "source-tag",
     "kind": "inert",
-    "source": "<m-user-mention>{\"userId\":\"macro|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>",
-    "native": "&lt;m\\-user\\-mention&gt;{\"userId\":\"macro\\|fake@example\\.com\",\"email\":\"fake@example\\.com\"}&lt;/m\\-user\\-mention&gt;"
+    "source": "<m-user-mention>{\"userId\":\"rox|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>",
+    "native": "&lt;m\\-user\\-mention&gt;{\"userId\":\"rox\\|fake@example\\.com\",\"email\":\"fake@example\\.com\"}&lt;/m\\-user\\-mention&gt;"
   }
 ]

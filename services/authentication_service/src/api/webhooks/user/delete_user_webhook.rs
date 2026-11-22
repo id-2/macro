@@ -167,7 +167,7 @@ async fn delete_user(
         .in_current_span()
     });
 
-    // `user_ids` are `User.id` profile ids (`macro|<email>`), so look them up by
+    // `user_ids` are `User.id` profile ids (`rox|<email>`), so look them up by
     // id rather than by the email column.
     let user_info_futures = user_ids
         .clone()

@@ -30,7 +30,7 @@ async fn human_membership_admin_visibility_and_literal_search_are_authoritative(
             .is_empty()
     );
     // The immutable creator can leave; current human admins retain team-owned data.
-    sqlx::query!("UPDATE password_item_entities SET user_id='macro|departed@example.test' WHERE team_id=$1 AND id=$2",team.0,record.metadata.id.0)
+    sqlx::query!("UPDATE password_item_entities SET user_id='rox|departed@example.test' WHERE team_id=$1 AND id=$2",team.0,record.metadata.id.0)
         .execute(&repository.pool).await.expect("departed creator fixture");
     assert_eq!(
         repository
@@ -97,7 +97,7 @@ async fn account_classification_and_current_role_facts_come_from_postgres(pool: 
     let (repository, actor, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
     let missing =
-        RoxUserIdStr::parse_from_str("macro|missing@example.test").expect("missing fixture");
+        RoxUserIdStr::parse_from_str("rox|missing@example.test").expect("missing fixture");
     assert!(
         repository
             .is_human(&actor.user_id)

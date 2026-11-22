@@ -189,11 +189,11 @@ fn folds_an_interrupted_turn() {
 #[test]
 fn folds_session_controls_as_typed_parts() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"_macro/context_summary","params":{"sessionId":"s","text":"Earlier, the user chose opus.","replaces":0}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
     ));
 
     let messages = fold(log);
@@ -236,11 +236,11 @@ fn folds_session_controls_as_typed_parts() {
 #[test]
 fn a_model_change_puts_later_output_below_the_line() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Before the switch."}}}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"After the switch."}}}}}"#,
         "\n",
@@ -295,9 +295,9 @@ fn a_model_change_puts_later_output_below_the_line() {
 #[test]
 fn a_model_change_before_the_reply_keeps_the_reply_below_the_line() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"m","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Working on opus."}}}}}"#,
         "\n",
@@ -335,7 +335,7 @@ fn a_model_change_before_the_reply_keeps_the_reply_below_the_line() {
 #[test]
 fn a_session_applied_model_does_not_draw_a_line() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look around"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Looking."}}}}}"#,
         "\n",
@@ -362,7 +362,7 @@ fn a_session_applied_model_does_not_draw_a_line() {
 #[test]
 fn compaction_shows_when_the_agent_reports_one_not_when_asked() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"c","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"/compact"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"c","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"/compact"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"What should I compact?"}}}}}"#,
         "\n",
@@ -372,7 +372,7 @@ fn compaction_shows_when_the_agent_reports_one_not_when_asked() {
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"c","result":{"stopReason":"end_turn"}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"n","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"next"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"n","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"next"}]}}}"#,
     ));
 
     let messages = fold(log);
@@ -410,7 +410,7 @@ fn compaction_shows_when_the_agent_reports_one_not_when_asked() {
 #[test]
 fn a_compaction_before_the_agent_speaks_opens_the_reply() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"c","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"a long paste"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"c","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"a long paste"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"_macro/context_summary","params":{"sessionId":"s","text":"Earlier work.","through":"c","replaces":2}}}"#,
         "\n",
@@ -448,9 +448,9 @@ fn a_compaction_before_the_agent_speaks_opens_the_reply() {
 #[test]
 fn a_stop_before_the_agent_speaks_still_settles_the_turn() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"do a big job"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"do a big job"}]}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"p","result":{"stopReason":"cancelled"}}}"#,
     ));
@@ -479,11 +479,11 @@ fn a_stop_before_the_agent_speaks_still_settles_the_turn() {
 #[test]
 fn a_stop_after_the_agent_speaks_stamps_the_message_it_has() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"do a big job"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"do a big job"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"agent_thought_chunk","content":{"type":"text","text":"hmm"}}}}}"#,
         "\n",
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","method":"session/cancel","params":{"sessionId":"s"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"p","result":{"stopReason":"cancelled"}}}"#,
     ));
@@ -503,7 +503,7 @@ fn a_stop_after_the_agent_speaks_stamps_the_message_it_has() {
 #[test]
 fn a_rejected_control_reports_the_runtime_error() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"claude-fable-5"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"claude-fable-5"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","error":{"code":-32602,"message":"Invalid params: model not found: claude-fable-5"}}}"#,
     ));
@@ -529,7 +529,7 @@ fn a_rejected_control_reports_the_runtime_error() {
 #[test]
 fn an_accepted_control_resolves_and_the_same_frame_moves_the_metadata() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","method":"session/set_config_option","params":{"sessionId":"s","configId":"model","value":"opus"}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"01920000-0000-7000-8000-0000000000a1","result":{"configOptions":[{"id":"model","name":"Model","type":"select","currentValue":"opus","options":[{"value":"opus","name":"Opus"}]}]}}}"#,
     ));
@@ -1021,7 +1021,7 @@ fn a_turn_that_had_started_talking_fails_in_place() {
 }
 
 const LINKED_PROMPT: &str = concat!(
-    r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":["#,
+    r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":["#,
     r#"{"type":"text","text":"what is wrong "},"#,
     r#"{"type":"text","text":"in this screenshot?"},"#,
     r#"{"type":"resource_link","uri":"https://static.example/file/11111111-1111-4111-8111-111111111111","name":"screenshot.png","mimeType":"image/png","size":2048},"#,
@@ -1066,7 +1066,7 @@ fn a_prompt_with_attached_files_folds_them_as_parts() {
 #[test]
 fn a_prompt_of_only_attached_files_still_derives_a_user_message() {
     let log = parse_log(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"resource_link","uri":"https://static.example/file/1","name":"a.png","mimeType":"image/png"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"resource_link","uri":"https://static.example/file/1","name":"a.png","mimeType":"image/png"}]}}}"#,
     );
     let messages = fold(log);
     assert_eq!(messages.len(), 1);
@@ -1131,7 +1131,7 @@ fn replayed_user_chunks_keep_attached_files() {
 #[test]
 fn an_image_frame_folds_to_an_attachment() {
     let log = parse_log(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look"},{"type":"image","data":"aW1n","mimeType":"image/png","uri":"https://cdn.example/cat.png"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"look"},{"type":"image","data":"aW1n","mimeType":"image/png","uri":"https://cdn.example/cat.png"}]}}}"#,
     );
     let messages = fold(log);
     assert_eq!(
@@ -1154,7 +1154,7 @@ fn an_image_frame_folds_to_an_attachment() {
 #[test]
 fn an_image_chunk_after_the_prompt_is_part_of_the_prompt() {
     let log = parse_log(concat!(
-        r#"{"direction":"to_runtime","user_id":"macro|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"https://cdn.example/cat.png"}]}}}"#,
+        r#"{"direction":"to_runtime","user_id":"rox|user@example.com","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"https://cdn.example/cat.png"}]}}}"#,
         "\n",
         r#"{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"user_message_chunk","content":{"type":"image","data":"aW1n","mimeType":"image/jpeg","uri":"https://cdn.example/cat.png"}}}}}"#,
     ));

@@ -14,7 +14,7 @@ use crate::domain::ports::TaskDedupNotifier;
 use crate::domain::service::TaskDedupService;
 use crate::outbound::judge::LocalDuplicateJudge;
 
-const OWNER: &str = "macro|user@user.com";
+const OWNER: &str = "rox|user@user.com";
 const TEAM_ID: Uuid = uuid::uuid!("a0000000-0000-0000-0000-000000000001");
 const TASK_ONE: &str = "d1000000-0000-0000-0000-000000000001";
 const TASK_TWO: &str = "d1000000-0000-0000-0000-000000000002";

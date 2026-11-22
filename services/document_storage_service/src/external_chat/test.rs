@@ -2,7 +2,7 @@ use super::*;
 
 /// A test person's typed id.
 fn person(name: &str) -> RoxUserIdStr<'static> {
-    format!("macro|{name}@example.com")
+    format!("rox|{name}@example.com")
         .try_into()
         .expect("test user ids are valid")
 }

@@ -38,9 +38,9 @@ use crate::{
     },
 };
 
-const USER_ID: &str = "macro|team-member@example.com";
-const ACT_AS_USER_ID: &str = "macro|internal-team-member@example.com";
-const DSS_DEFAULT_USER_ID: &str = "macro|INTERNAL@rox.one";
+const USER_ID: &str = "rox|team-member@example.com";
+const ACT_AS_USER_ID: &str = "rox|internal-team-member@example.com";
+const DSS_DEFAULT_USER_ID: &str = "rox|INTERNAL@rox.one";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const TEAM_ID: Uuid = Uuid::from_u128(0x6d67fd9b_9906_40aa_9c0e_cab546cb80ad);
 

@@ -24,7 +24,7 @@ use crate::domain::models::{
 };
 use crate::domain::ports::{CellStore, ColumnDefinitionStore, DatabasesService};
 
-const DUPLICATOR: &str = "macro|duplicator@rox.one";
+const DUPLICATOR: &str = "rox|duplicator@rox.one";
 
 fn duplicator() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(DUPLICATOR)

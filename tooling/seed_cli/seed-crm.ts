@@ -141,7 +141,7 @@ try {
     throw new Error(
       'Enable CRM for this local account’s team in Settings → CRM, then rerun.'
     );
-  const owner = `macro|${email}`;
+  const owner = `rox|${email}`;
   const companies = await readSoup<Company>(
     { crmCompanyFilter: { literal: { hidden: false } } },
     '... on GraphqlSoupCrmCompany { id domains }'

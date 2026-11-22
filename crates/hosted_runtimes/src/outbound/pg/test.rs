@@ -38,14 +38,14 @@ async fn insert_team(pool: &PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|owner@example.com', 'owner@example.com', $1)"#,
         rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Computers', 'macro|owner@example.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Computers', 'rox|owner@example.com')",
         TEAM,
     )
     .execute(pool)
@@ -71,7 +71,7 @@ fn standard(id: u128) -> NewReservation {
         funding: Funding::Stripe {
             price_id: stripe::PriceId::from_str("price_standard").unwrap(),
         },
-        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
         extra_items: vec![],
         provision_traceparent: None,
         agent: None,
@@ -645,13 +645,13 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|buyer@example.com', 'buyer@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|buyer@example.com', 'buyer@example.com', $1)"#,
         buyer_rox_user,
     )
     .execute(&pool)
     .await
     .unwrap();
-    let buyer = RoxUserIdStr::try_from("macro|buyer@example.com".to_owned()).unwrap();
+    let buyer = RoxUserIdStr::try_from("rox|buyer@example.com".to_owned()).unwrap();
     let reservation = reserve(
         &repo,
         NewReservation {
@@ -673,7 +673,7 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
         },
     )
     .await;
-    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'macro|buyer@example.com'"#)
+    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'rox|buyer@example.com'"#)
         .execute(&pool)
         .await
         .unwrap();
@@ -688,7 +688,7 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
             .unwrap()
             .created_by
             .as_ref(),
-        "macro|buyer@example.com"
+        "rox|buyer@example.com"
     );
 }
 
@@ -752,27 +752,27 @@ async fn awake_computers_are_those_awake_with_a_harness(pool: PgPool) {
         VALUES ('00000000-0000-7000-8000-00000000b0b0', 'awake-host', 9, 9);
         INSERT INTO harnesses (id, name, owner_user_id, created_by, computer_id)
         VALUES
-            ('00000000-0000-7000-8000-0000000000a1', 'Awake', 'macro|owner@example.com',
-                'macro|owner@example.com', '00000000-0000-7000-8000-0000000000c1'),
-            ('00000000-0000-7000-8000-0000000000a2', 'Asleep', 'macro|owner@example.com',
-                'macro|owner@example.com', '00000000-0000-7000-8000-0000000000c2');
+            ('00000000-0000-7000-8000-0000000000a1', 'Awake', 'rox|owner@example.com',
+                'rox|owner@example.com', '00000000-0000-7000-8000-0000000000c1'),
+            ('00000000-0000-7000-8000-0000000000a2', 'Asleep', 'rox|owner@example.com',
+                'rox|owner@example.com', '00000000-0000-7000-8000-0000000000c2');
         INSERT INTO hosted_runtime
             (id, team_id, name, size, vcpus, memory_gib, disk_gib, catalog_entry, state,
              created_by, price_id, purchase_key, host_id, awake, harness_id)
         VALUES
             ('00000000-0000-7000-8000-0000000000c1', '00000000-0000-7000-8000-0000000000aa',
                 'Awake', 'standard', 4, 8, 100, 'standard@2026-11', '{}',
-                'macro|owner@example.com', 'price_standard', 'buy-1',
+                'rox|owner@example.com', 'price_standard', 'buy-1',
                 '00000000-0000-7000-8000-00000000b0b0', true,
                 '00000000-0000-7000-8000-0000000000a1'),
             ('00000000-0000-7000-8000-0000000000c2', '00000000-0000-7000-8000-0000000000aa',
                 'Asleep', 'standard', 4, 8, 100, 'standard@2026-11', '{}',
-                'macro|owner@example.com', 'price_standard', 'buy-2',
+                'rox|owner@example.com', 'price_standard', 'buy-2',
                 '00000000-0000-7000-8000-00000000b0b0', false,
                 '00000000-0000-7000-8000-0000000000a2'),
             ('00000000-0000-7000-8000-0000000000c3', '00000000-0000-7000-8000-0000000000aa',
                 'Unenrolled', 'standard', 4, 8, 100, 'standard@2026-11', '{}',
-                'macro|owner@example.com', 'price_standard', 'buy-3',
+                'rox|owner@example.com', 'price_standard', 'buy-3',
                 '00000000-0000-7000-8000-00000000b0b0', true, NULL);
         "#,
     )

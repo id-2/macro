@@ -890,7 +890,7 @@ pub fn enrollment(computer_id: ComputerId, agent: bool) -> crate::domain::enroll
         traceparent: None,
         agent: agent.then(|| crate::domain::agent::AgentEnrollment {
             agent_user_id: rox_user_id::user_id::RoxUserIdStr::try_from(
-                "macro|agent@example.com".to_owned(),
+                "rox|agent@example.com".to_owned(),
             )
             .unwrap(),
             env: crate::domain::agent::AgentEnv::default(),

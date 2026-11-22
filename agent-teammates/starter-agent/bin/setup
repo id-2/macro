@@ -71,7 +71,7 @@ zone=$(ask "Your time zone" "$(timedatectl show -p Timezone --value 2>/dev/null 
 bun -e '
   const [file, owner, me, timeZone] = process.argv.slice(1);
   await Bun.write(file, JSON.stringify({
-    owner: `macro|${owner}`, me: `macro|${me}`,
+    owner: `rox|${owner}`, me: `rox|${me}`,
     name: "Agent", email: me, timeZone, model: "claude-opus-5-5",
   }, null, "\t") + "\n");
 ' "$settings" "$owner" "$me" "$zone"

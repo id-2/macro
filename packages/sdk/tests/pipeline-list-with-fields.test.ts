@@ -19,7 +19,7 @@ test('listWithFields returns every pipeline with its fields, stages and version 
           recordType: 'company',
           sharing: 'team',
           grant: 'edit',
-          userId: 'macro|owner@example.test',
+          userId: 'rox|owner@example.test',
           teamId: 'team',
           databaseId: 'database',
           tableId: 'table',

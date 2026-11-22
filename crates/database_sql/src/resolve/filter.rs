@@ -287,12 +287,12 @@ fn typed_entity(column: &Column, target: EntityKind, lit: Literal) -> Result<Str
         _ => Err(ResolveError::TypeMismatch {
             column: column.name.clone(),
             expected: "entity",
-            hint: "give an id like 'macro|sam@example.com', not a name",
+            hint: "give an id like 'rox|sam@example.com', not a name",
         }),
     }
 }
 
-/// Rox entity ids are either a UUID or `<kind>|<rest>` (`macro|sam@example.com`,
+/// Rox entity ids are either a UUID or `<kind>|<rest>` (`rox|sam@example.com`,
 /// `bot|<uuid>`). A bare name is what an agent writes when it has not looked
 /// the person up.
 fn is_entity_id(text: &str) -> bool {

@@ -46,8 +46,8 @@ use crate::{
 /// Date-range grouping, sort routing, and nullable continuation coverage.
 
 static CURSOR: &str = "eyJpZCI6ImUzNmM5MTJlLTU2M2MtNDIxZS1iMTAzLWE0YjAwY2ZmMzBlZSIsImxpbWl0IjoxMDAsInZhbCI6eyJzb3J0X3R5cGUiOiJ1cGRhdGVkX2F0IiwibGFzdF92YWwiOiIyMDI1LTExLTA3VDE5OjEyOjU5Ljc4MFoifSwiZmlsdGVyIjp7fX0=";
-const USER_ID: &str = "macro|test@example.com";
-const INTERNAL_USER_ID: &str = "macro|internal@example.com";
+const USER_ID: &str = "rox|test@example.com";
+const INTERNAL_USER_ID: &str = "rox|internal@example.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 
 #[derive(Debug)]
@@ -320,7 +320,7 @@ impl EmailService for MockEmail {
     ) -> Result<Option<email::domain::models::Link>, email::domain::models::EmailErr> {
         Ok(Some(email::domain::models::Link {
             id: Uuid::new_v4(),
-            rox_id: RoxUserIdStr::parse_from_str("macro|example@test.com").unwrap(),
+            rox_id: RoxUserIdStr::parse_from_str("rox|example@test.com").unwrap(),
             fusionauth_user_id: String::new(),
             email_address: EmailStr::try_from("example@test.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,
@@ -1420,7 +1420,7 @@ async fn it_can_filter_chat_owners() {
 },
 "chat_filters": {
 "owners": [
-"macro|rahul@rox.one"
+"rox|rahul@rox.one"
 ]
 },
 "emailView": "all",
@@ -1454,7 +1454,7 @@ async fn it_can_filter_chat_owners() {
     let filter: EntityFilters = serde_json::from_value(arg.filter).unwrap();
     assert_eq!(
         filter.chat_filters.owners,
-        vec!["macro|rahul@rox.one".to_string()]
+        vec!["rox|rahul@rox.one".to_string()]
     );
 }
 
@@ -1861,7 +1861,7 @@ fn ast_endpoint_email_crm_domains_stamps_scope_and_ands_into_tree() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1890,7 +1890,7 @@ fn ast_endpoint_email_crm_addresses_stamps_scope() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1919,7 +1919,7 @@ fn ast_endpoint_email_crm_both_lists_rejected() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1941,7 +1941,7 @@ fn ast_endpoint_empty_crm_lists_leaves_scope_none() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1976,7 +1976,7 @@ fn ast_endpoint_crm_ands_with_existing_freeform_ef() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -2053,7 +2053,7 @@ fn ast_endpoint_crm_domains_are_lowercased_in_scope() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };

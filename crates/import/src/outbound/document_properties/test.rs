@@ -38,7 +38,7 @@ fn resolver_prefers_compatible_system_definition_after_incompatible_custom_defin
     let mut incompatible_custom = system_definition();
     incompatible_custom.id = Uuid::from_u128(1);
     incompatible_custom.owner = PropertyOwner::User {
-        user_id: "macro|import-test@example.com".to_string(),
+        user_id: "rox|import-test@example.com".to_string(),
     };
     incompatible_custom.data_type = DataType::String;
     incompatible_custom.is_system = false;

@@ -115,7 +115,7 @@ async fn server(replies: Vec<Reply>) -> Server {
 
 fn selection() -> ValidateRoutineSession {
     ValidateRoutineSession {
-        owner: RoxUserIdStr::parse_from_str("macro|routine@rox.one").unwrap(),
+        owner: RoxUserIdStr::parse_from_str("rox|routine@rox.one").unwrap(),
         bot_id: BotId::new_from_uuid(generate_uuid_v7()),
         model: Some("selected/runtime-model".into()),
         mcp_servers: vec![bots::domain::models::AgentMcpServer {
@@ -160,7 +160,7 @@ async fn all_commands_use_internal_auth_and_domain_wire_contract_at_both_prefixe
                 routine_id: Uuid::nil(),
                 name: "Morning digest".into(),
                 owner: ContextPerson {
-                    id: "macro|dana@example.com".into(),
+                    id: "rox|dana@example.com".into(),
                     name: "dana@example.com".into(),
                     email: Some("dana@example.com".into()),
                 },

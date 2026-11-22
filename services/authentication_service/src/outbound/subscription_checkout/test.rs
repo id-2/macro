@@ -11,7 +11,7 @@ use teams::domain::model::SeatPlan;
 
 fn request() -> CheckoutRequest<'static> {
     CheckoutRequest {
-        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         plan: SeatPlan::Premium,
         onboarding_trial: true,
         success_url: "https://rox.one/app/onboarding?subscriptionSuccess=true".into(),
@@ -53,7 +53,7 @@ fn trial_keeps_team_and_conversion_metadata() {
     input.metadata.insert("team_id".into(), "team-test".into());
     input
         .metadata
-        .insert("owner_id".into(), "macro|test@example.com".into());
+        .insert("owner_id".into(), "rox|test@example.com".into());
     input
         .metadata
         .insert("ga_client_id".into(), "test-client".into());

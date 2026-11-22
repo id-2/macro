@@ -18,7 +18,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|user@rox.one";
+const OWNER: &str = "rox|user@rox.one";
 
 /// A consumer provider; no reserved example domain is one.
 const PERSONAL_DOMAIN: &str = "gmail.com";
@@ -218,7 +218,7 @@ async fn an_added_address_must_be_free_across_the_team(pool: PgPool) -> anyhow::
 
     // Another team's contacts never conflict.
     let foreign = Uuid::now_v7();
-    seed_team(&pool, foreign, "macro|other@example.org").await?;
+    seed_team(&pool, foreign, "rox|other@example.org").await?;
     enable_crm_for_team(&pool, foreign).await?;
     let foreign_contact = repo
         .create_contact_for_team(&foreign, None, "Other", Utc::now())

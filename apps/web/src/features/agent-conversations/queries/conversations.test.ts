@@ -61,7 +61,7 @@ function agentTyping(action: 'start' | 'stop') {
       thread_id: null,
       agent: { session_id: 'session', phase: 'working' },
     },
-    'macro|me@example.com'
+    'rox|me@example.com'
   );
 }
 

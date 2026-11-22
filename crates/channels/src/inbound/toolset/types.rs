@@ -183,7 +183,7 @@ pub struct ToolThreadReply {
     pub id: Uuid,
     /// Parent thread id.
     pub thread_id: Uuid,
-    /// Sender id: `macro|<email>` for a person, `bot|<id>` for a bot.
+    /// Sender id: `rox|<email>` for a person, `bot|<id>` for a bot.
     pub sender_id: String,
     /// The sender's name as the app shows it, for the same sender as
     /// `senderId`. Absent when a person has no profile name.
@@ -266,7 +266,7 @@ pub struct ToolChannelMessage {
     pub id: Uuid,
     /// Channel id.
     pub channel_id: Uuid,
-    /// Sender id: `macro|<email>` for a person, `bot|<id>` for a bot.
+    /// Sender id: `rox|<email>` for a person, `bot|<id>` for a bot.
     pub sender_id: String,
     /// The sender's name as the app shows it, for the same sender as
     /// `senderId`. Absent when a person has no profile name.

@@ -95,7 +95,7 @@ fn tokens_not_issued_by_fusionauth_for_this_application_are_rejected() {
         agent_correlation_id: None,
         agent_session_id: None,
         fusionauth_id: "fusion-user".into(),
-        rox_user_id: "macro|user@example.com".into(),
+        rox_user_id: "rox|user@example.com".into(),
         organization_id: None,
         issuer: "macro-api.test".into(),
         private_key: tests::PRIVATE_KEY.into(),

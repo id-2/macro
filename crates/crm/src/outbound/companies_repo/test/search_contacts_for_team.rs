@@ -29,7 +29,7 @@ async fn search_contacts_matches_email_or_name_most_recent_first(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -70,7 +70,7 @@ async fn search_contacts_matches_email_or_name_most_recent_first(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_contacts_treats_like_wildcards_literally(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -91,9 +91,9 @@ async fn search_contacts_is_team_scoped_and_hides_hidden_rows_from_members(
 ) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    let owner_a = "macro|a@test.com";
+    let owner_a = "rox|a@test.com";
     seed_team(&pool, team_a, owner_a).await?;
-    seed_team(&pool, team_b, "macro|b@test.com").await?;
+    seed_team(&pool, team_b, "rox|b@test.com").await?;
     let visible_company = insert_company(&pool, team_a, true, &["acme.com"]).await?;
     let hidden_company = insert_company(&pool, team_a, true, &["globex.com"]).await?;
     let link_id = insert_email_link(&pool, owner_a, "a@macro.test").await?;

@@ -17,7 +17,7 @@ fn document(file_type: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: DOCUMENT.into(),
         document_name: "Notes".into(),
-        owner: Owner::from_principal_str("macro|editor@example.com").unwrap(),
+        owner: Owner::from_principal_str("rox|editor@example.com").unwrap(),
         file_type: Some(file_type.into()),
         sub_type: None,
         branched_from_id: None,
@@ -29,7 +29,7 @@ fn document(file_type: &str) -> DocumentBasic {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    "macro|editor@example.com".to_owned().try_into().unwrap()
+    "rox|editor@example.com".to_owned().try_into().unwrap()
 }
 
 fn edit_receipt(document_id: &str) -> EntityAccessReceipt<EditAccessLevel> {
@@ -54,7 +54,7 @@ impl AiAdmissionService for Refuse {
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
-            assert_eq!(caller.as_ref(), "macro|editor@example.com");
+            assert_eq!(caller.as_ref(), "rox|editor@example.com");
             assert_eq!(feature, AiFeature::AiEditing);
             Err(self.0)
         })
@@ -83,7 +83,7 @@ async fn instructions_run_editdocuments_pipeline_and_return_the_revision() {
             let claims = decode_permission_token(token, SECRET).unwrap();
             assert_eq!(
                 claims.user_id.map(|user| user.as_ref().to_string()),
-                Some("macro|editor@example.com".to_string())
+                Some("rox|editor@example.com".to_string())
             );
             assert_eq!(claims.access_level, AccessLevel::Edit);
             assert_eq!(instructions, "Replace Q3 with Q4 in the plan");
@@ -348,7 +348,7 @@ async fn bot_instructions_carry_the_user_and_bot_in_the_token_and_the_bot_name_o
             let claims = decode_permission_token(token, SECRET).unwrap();
             assert_eq!(
                 claims.user_id.map(|user| user.as_ref().to_string()),
-                Some("macro|editor@example.com".to_string())
+                Some("rox|editor@example.com".to_string())
             );
             assert_eq!(
                 claims.actor,

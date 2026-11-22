@@ -1,6 +1,6 @@
 use super::*;
 
-const TEAMMATE_ID: &str = "macro|teammate@example.com";
+const TEAMMATE_ID: &str = "rox|teammate@example.com";
 
 /// A teammate's edit, as ingestion records it.
 fn teammates_edit(id: u128) -> activity::ActivityRecord {

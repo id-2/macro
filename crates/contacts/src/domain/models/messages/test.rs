@@ -24,7 +24,7 @@ fn explicit_connections_are_a_separate_message_shape() {
 #[test]
 fn consumer_deserializes_existing_nodes_message() {
     let message: ContactsMessage = serde_json::from_str(
-        r#"{"users":["macro|owner@example.com","macro|contact@example.com"]}"#,
+        r#"{"users":["rox|owner@example.com","rox|contact@example.com"]}"#,
     )
     .unwrap();
 
@@ -34,7 +34,7 @@ fn consumer_deserializes_existing_nodes_message() {
 #[test]
 fn consumer_rejects_message_with_both_shapes() {
     let message = serde_json::from_str::<ContactsMessage>(
-        r#"{"users":["macro|owner@example.com"],"connections":[]}"#,
+        r#"{"users":["rox|owner@example.com"],"connections":[]}"#,
     );
 
     assert!(message.is_err());
@@ -43,7 +43,7 @@ fn consumer_rejects_message_with_both_shapes() {
 #[test]
 fn consumer_deserializes_explicit_connections_message() {
     let message: ContactsMessage = serde_json::from_str(
-        r#"{"connections":[{"first":"macro|owner@example.com","second":"macro|contact@example.com"}]}"#,
+        r#"{"connections":[{"first":"rox|owner@example.com","second":"rox|contact@example.com"}]}"#,
     )
     .unwrap();
 

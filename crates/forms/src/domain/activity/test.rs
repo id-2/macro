@@ -28,10 +28,10 @@ fn created_maps_to_a_created_activity_of_the_creator_at_creation_time() {
     let event = envelope(FormTopicEvent::Created(FormCreatedMetadata {
         form_id: FORM_ID.parse().unwrap(),
         database_id: DatabaseId::from_uuid(Uuid::from_u128(0xdb)),
-        owner: user("macro|creator@example.com"),
+        owner: user("rox|creator@example.com"),
         name: "Q4 offsite RSVP".to_string(),
         created_at,
-        attribution: EventAttribution::user(user("macro|creator@example.com")),
+        attribution: EventAttribution::user(user("rox|creator@example.com")),
     }));
 
     let Ingest::Insert(activities) = event.event.ingest(event.event_id) else {
@@ -42,7 +42,7 @@ fn created_maps_to_a_created_activity_of_the_creator_at_creation_time() {
     assert_eq!(activity.action, Action::Created);
     assert_eq!(activity.entity_type, EntityType::Form);
     assert_eq!(activity.entity_id, FORM_ID);
-    assert_eq!(activity.subject_id, "macro|creator@example.com");
+    assert_eq!(activity.subject_id, "rox|creator@example.com");
     assert_eq!(activity.occurred_at, created_at);
     assert_eq!(activity.id, activity_id(event.event_id, 0));
 }
@@ -53,16 +53,16 @@ fn renames_restores_and_sharing_are_edits_and_a_signed_in_response_is_responded(
     let events = [
         FormTopicEvent::Renamed(FormRenamedMetadata {
             form_id: FORM_ID.parse().unwrap(),
-            attribution: Some(EventAttribution::user(user("macro|editor@example.com"))),
+            attribution: Some(EventAttribution::user(user("rox|editor@example.com"))),
             name: "Renamed".to_string(),
         }),
         FormTopicEvent::Restored(FormChangedMetadata {
             form_id: FORM_ID.parse().unwrap(),
-            attribution: Some(EventAttribution::user(user("macro|editor@example.com"))),
+            attribution: Some(EventAttribution::user(user("rox|editor@example.com"))),
         }),
         FormTopicEvent::SharingChanged(FormChangedMetadata {
             form_id: FORM_ID.parse().unwrap(),
-            attribution: Some(EventAttribution::user(user("macro|editor@example.com"))),
+            attribution: Some(EventAttribution::user(user("rox|editor@example.com"))),
         }),
     ];
     for event in events {
@@ -71,14 +71,14 @@ fn renames_restores_and_sharing_are_edits_and_a_signed_in_response_is_responded(
             panic!("an attributed change is activity");
         };
         assert_eq!(activities[0].action, Action::Edited);
-        assert_eq!(activities[0].subject_id, "macro|editor@example.com");
+        assert_eq!(activities[0].subject_id, "rox|editor@example.com");
     }
 
     let response = envelope(FormTopicEvent::ResponseSubmitted(
         FormResponseSubmittedMetadata {
             form_id: FORM_ID.parse().unwrap(),
             response_id: FormResponseId::from_uuid(Uuid::from_u128(0xe1)),
-            respondent: Some(user("macro|respondent@example.com")),
+            respondent: Some(user("rox|respondent@example.com")),
             row_id: Some(RowId::from_uuid(Uuid::from_u128(0x40))),
             submitted_at,
         },
@@ -88,8 +88,8 @@ fn renames_restores_and_sharing_are_edits_and_a_signed_in_response_is_responded(
     };
     assert_eq!(activities.len(), 1);
     assert_eq!(activities[0].action, Action::Responded);
-    assert_eq!(activities[0].actor.as_ref(), "macro|respondent@example.com");
-    assert_eq!(activities[0].subject_id, "macro|respondent@example.com");
+    assert_eq!(activities[0].actor.as_ref(), "rox|respondent@example.com");
+    assert_eq!(activities[0].subject_id, "rox|respondent@example.com");
     assert_eq!(activities[0].entity_type, EntityType::Form);
     assert_eq!(activities[0].occurred_at, submitted_at);
 }

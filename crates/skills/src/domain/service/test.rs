@@ -91,7 +91,7 @@ impl SkillLister for FakeLister {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|user@example.com".to_string()).unwrap()
 }
 
 fn skill(id: u128, name: &str, updated_at_secs: Option<i64>) -> SkillSummary {

@@ -9,7 +9,7 @@ async fn channel_owner_can_delete_every_channel_type() {
         ChannelType::DirectMessage,
     ] {
         let channel_id = Uuid::now_v7();
-        let repo = FakeMutationRepo::new(channel_id, "macro|owner@example.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|owner@example.com");
         repo.state.lock().unwrap().channel_type = channel_type;
         let events = FakeEvents::default();
         let svc = mutation_service(
@@ -18,7 +18,7 @@ async fn channel_owner_can_delete_every_channel_type() {
             FakeReferenceSharing::default(),
         );
 
-        svc.delete_channel(sender("macro|owner@example.com"), channel_id)
+        svc.delete_channel(sender("rox|owner@example.com"), channel_id)
             .await
             .unwrap();
 
@@ -33,7 +33,7 @@ async fn channel_owner_can_delete_every_channel_type() {
 async fn only_admins_of_the_channels_own_team_can_delete_without_ownership() {
     let channel_team = Uuid::now_v7();
     let other_team = Uuid::now_v7();
-    let actor = "macro|member@example.com";
+    let actor = "rox|member@example.com";
     for (channel_type, team_id, role_team, role, allowed) in [
         (
             ChannelType::Team,
@@ -100,7 +100,7 @@ async fn only_admins_of_the_channels_own_team_can_delete_without_ownership() {
         ),
     ] {
         let channel_id = Uuid::now_v7();
-        let repo = FakeMutationRepo::new(channel_id, "macro|owner@example.com");
+        let repo = FakeMutationRepo::new(channel_id, "rox|owner@example.com");
         {
             let mut state = repo.state.lock().unwrap();
             state.channel_type = channel_type;
@@ -138,13 +138,13 @@ async fn only_admins_of_the_channels_own_team_can_delete_without_ownership() {
 #[tokio::test]
 async fn channel_admin_is_not_a_team_admin() {
     let channel_id = Uuid::now_v7();
-    let repo = FakeMutationRepo::new(channel_id, "macro|owner@example.com");
+    let repo = FakeMutationRepo::new(channel_id, "rox|owner@example.com");
     {
         let mut state = repo.state.lock().unwrap();
         state.channel_type = ChannelType::Team;
         state.channel_team_id = Some(Uuid::now_v7());
         state.participants[1].role = ParticipantRole::Admin;
-        state.participants[1].user_id = "macro|member@example.com".to_string();
+        state.participants[1].user_id = "rox|member@example.com".to_string();
     }
     let svc = mutation_service(
         repo.clone(),
@@ -153,7 +153,7 @@ async fn channel_admin_is_not_a_team_admin() {
     );
 
     let result = svc
-        .delete_channel(sender("macro|member@example.com"), channel_id)
+        .delete_channel(sender("rox|member@example.com"), channel_id)
         .await;
 
     assert!(matches!(result, Err(ChannelMutationErr::Forbidden(_))));
@@ -169,8 +169,8 @@ async fn permanent_delete_checks_team_authority_after_view_access() {
     for allowed in [true, false] {
         let channel_id = Uuid::now_v7();
         let team_id = Uuid::now_v7();
-        let actor = "macro|member@example.com";
-        let repo = FakeMutationRepo::new(channel_id, "macro|owner@example.com");
+        let actor = "rox|member@example.com";
+        let repo = FakeMutationRepo::new(channel_id, "rox|owner@example.com");
         {
             let mut state = repo.state.lock().unwrap();
             state.channel_type = ChannelType::Team;

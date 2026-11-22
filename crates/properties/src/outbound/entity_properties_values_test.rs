@@ -150,7 +150,7 @@ async fn get_entity_properties_entity_references(pool: Pool<Postgres>) -> anyhow
         panic!("Expected EntityReference value");
     };
     assert_eq!(refs.len(), 1);
-    assert_eq!(refs[0].entity_id, "macro|user1@test.com");
+    assert_eq!(refs[0].entity_id, "rox|user1@test.com");
     assert_eq!(refs[0].entity_type, EntityType::User);
 
     // Multiple entity references on doc2.
@@ -169,8 +169,8 @@ async fn get_entity_properties_entity_references(pool: Pool<Postgres>) -> anyhow
     };
     assert_eq!(refs.len(), 2);
     let user_ids: Vec<&str> = refs.iter().map(|r| r.entity_id.as_str()).collect();
-    assert!(user_ids.contains(&"macro|user1@test.com"));
-    assert!(user_ids.contains(&"macro|user2@test.com"));
+    assert!(user_ids.contains(&"rox|user1@test.com"));
+    assert!(user_ids.contains(&"rox|user2@test.com"));
 
     // Null entity reference on doc3.
     let properties = entity_properties_get_query::get_entity_properties_values(
@@ -384,9 +384,9 @@ async fn get_bulk_filtered_includes_caller_visible_tags(
     // user1 sees the requested id plus their own and their team's tags,
     // never another user's personal tags.
     let user1 =
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap();
     let user3 =
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user3@test.com").unwrap();
 
     let ids = tagdoc_definition_ids(&pool, &[priority], Some(&user1)).await?;
     assert_eq!(ids.len(), 3);
@@ -430,7 +430,7 @@ async fn get_entity_properties_scopes_tags_to_viewer(pool: Pool<Postgres>) -> an
         &pool,
         "tagdoc1",
         EntityType::Document,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
     )
     .await?;
     let ids: Vec<Uuid> = props.iter().map(|p| p.property_definition_id).collect();
@@ -445,7 +445,7 @@ async fn get_entity_properties_scopes_tags_to_viewer(pool: Pool<Postgres>) -> an
         &pool,
         "tagdoc1",
         EntityType::Document,
-        "macro|user2@test.com",
+        "rox|user2@test.com",
     )
     .await?;
     let ids: Vec<Uuid> = props.iter().map(|p| p.property_definition_id).collect();
@@ -615,11 +615,11 @@ async fn get_bulk_filtered_includes_viewer_team_deal_stage(
     let team1_region = Uuid::parse_str("dd333333-3333-3333-3333-333333333333")?;
     let customer_option = Uuid::parse_str("0dd11111-1111-1111-1111-111111111112")?;
     let user1 =
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap();
     let user2 =
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user2@test.com").unwrap();
     let user3 =
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user3@test.com").unwrap();
 
     // Each viewer sees only their own team's Deal Stage.
     assert_eq!(

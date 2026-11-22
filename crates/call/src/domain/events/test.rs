@@ -31,7 +31,7 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
             CallTopicEvent::Started(CallStartedMetadata {
                 call_id: uuid(CALL_ID),
                 channel_id: Some(uuid(CHANNEL_ID)),
-                created_by: user_id("macro|creator@example.com"),
+                created_by: user_id("rox|creator@example.com"),
                 created_at: timestamp("2026-07-27T18:01:02Z"),
                 recording_enabled: true,
             }),
@@ -40,7 +40,7 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
                 "metadata": {
                     "call_id": CALL_ID,
                     "channel_id": CHANNEL_ID,
-                    "created_by": "macro|creator@example.com",
+                    "created_by": "rox|creator@example.com",
                     "created_at": "2026-07-27T18:01:02Z",
                     "recording_enabled": true,
                 },
@@ -51,14 +51,14 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
                 channel_thread: false,
                 call_id: uuid(CALL_ID),
                 channel_id: Some(uuid(CHANNEL_ID)),
-                created_by: user_id("macro|creator@example.com"),
+                created_by: user_id("rox|creator@example.com"),
                 started_at: timestamp("2026-07-27T18:01:02Z"),
                 ended_at: timestamp("2026-07-27T18:03:07Z"),
                 duration_ms: None,
                 participant_count: 2,
                 participants: vec![
-                    user_id("macro|creator@example.com"),
-                    user_id("macro|guest@example.com"),
+                    user_id("rox|creator@example.com"),
+                    user_id("rox|guest@example.com"),
                 ],
                 has_recording: true,
                 archive_reason: CallArchiveReason::LastParticipantLeft,
@@ -68,12 +68,12 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
                 "metadata": {
                     "call_id": CALL_ID,
                     "channel_id": CHANNEL_ID,
-                    "created_by": "macro|creator@example.com",
+                    "created_by": "rox|creator@example.com",
                     "started_at": "2026-07-27T18:01:02Z",
                     "ended_at": "2026-07-27T18:03:07Z",
                     "duration_ms": null,
                     "participant_count": 2,
-                    "participants": ["macro|creator@example.com", "macro|guest@example.com"],
+                    "participants": ["rox|creator@example.com", "rox|guest@example.com"],
                     "has_recording": true,
                     "archive_reason": "last_participant_left",
                     "channel_thread": false,
@@ -84,7 +84,7 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
             CallTopicEvent::RecordUpdated(CallRecordUpdatedMetadata {
                 call_id: uuid(CALL_ID),
                 channel_id: Some(uuid(CHANNEL_ID)),
-                actor_user_id: Some(user_id("macro|editor@example.com")),
+                actor_user_id: Some(user_id("rox|editor@example.com")),
                 custom_name: Some("Weekly planning".to_string()),
                 share_with_team: None,
             }),
@@ -93,7 +93,7 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
                 "metadata": {
                     "call_id": CALL_ID,
                     "channel_id": CHANNEL_ID,
-                    "actor_user_id": "macro|editor@example.com",
+                    "actor_user_id": "rox|editor@example.com",
                     "custom_name": "Weekly planning",
                     "share_with_team": null,
                 },
@@ -145,13 +145,13 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
         (
             CallTopicEvent::RecordImported(CallRecordImportedMetadata {
                 call_id: uuid(CALL_ID),
-                owner: user_id("macro|owner@example.com"),
+                owner: user_id("rox|owner@example.com"),
             }),
             json!({
                 "event_type": "call.record_imported",
                 "metadata": {
                     "call_id": CALL_ID,
-                    "owner": "macro|owner@example.com",
+                    "owner": "rox|owner@example.com",
                 },
             }),
         ),
@@ -225,7 +225,7 @@ fn archived_events_published_before_participants_decode_without_them() {
         "metadata": {
             "call_id": CALL_ID,
             "channel_id": CHANNEL_ID,
-            "created_by": "macro|creator@example.com",
+            "created_by": "rox|creator@example.com",
             "started_at": "2026-07-27T18:01:02Z",
             "ended_at": "2026-07-27T18:03:07Z",
             "duration_ms": 125_000,

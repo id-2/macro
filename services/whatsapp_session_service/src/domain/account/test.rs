@@ -264,7 +264,7 @@ impl WhatsAppSession for FakeSession {
 
 /// A user with an account in `pairing` and a live pairing transaction.
 async fn insert_pairing_account(pool: &PgPool) -> (Uuid, Uuid) {
-    let user_id = "macro|whatsapp-owner";
+    let user_id = "rox|whatsapp-owner";
     sqlx::query!(
         r#"
         WITH new_rox_user AS (

@@ -36,7 +36,7 @@ async fn guest_chat_checks_room_call_type_and_both_membership_sources() {
         rtc.expect_verify_access_token().returning(move |_| {
             Ok(VerifiedRingToken {
                 identity: if scenario == "member" {
-                    "macro|member@example.com".into()
+                    "rox|member@example.com".into()
                 } else {
                     guest_id.to_string()
                 },
@@ -61,7 +61,7 @@ async fn guest_chat_checks_room_call_type_and_both_membership_sources() {
                             id: call_id,
                             channel_id: (scenario == "channel").then(Uuid::now_v7),
                             room_name: "guest-room".into(),
-                            created_by: "macro|owner@example.com".into(),
+                            created_by: "rox|owner@example.com".into(),
                             created_at: Utc::now(),
                             egress_id: None,
                         }))

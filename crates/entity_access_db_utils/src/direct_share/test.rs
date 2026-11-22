@@ -9,7 +9,7 @@ use sqlx::PgPool;
 async fn project_grant_skips_legacy_children_and_preserves_modern_grants(pool: PgPool) {
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner, "projectId")
-        VALUES ('legacy-document-id', 'Legacy document', 'macro|owner@example.com',
+        VALUES ('legacy-document-id', 'Legacy document', 'rox|owner@example.com',
             '20000000-0000-0000-0000-000000000003')"#
     )
     .execute(&pool)
@@ -20,7 +20,7 @@ async fn project_grant_skips_legacy_children_and_preserves_modern_grants(pool: P
         &mut tx,
         &rox_uuid::Uuid::from_u128(0x20000000000000000000000000000001),
         EntityType::Project,
-        &RoxUserIdStr::parse_from_str("macro|reader@example.com").unwrap(),
+        &RoxUserIdStr::parse_from_str("rox|reader@example.com").unwrap(),
         Some(AccessLevel::Comment),
         true,
     )
@@ -29,7 +29,7 @@ async fn project_grant_skips_legacy_children_and_preserves_modern_grants(pool: P
     tx.commit().await.unwrap();
     let grants = sqlx::query!(
         r#"SELECT entity_id, entity_type, access_level AS "access_level: AccessLevel"
-        FROM entity_access WHERE source_type = 'user' AND source_id = 'macro|reader@example.com'
+        FROM entity_access WHERE source_type = 'user' AND source_id = 'rox|reader@example.com'
         ORDER BY entity_id"#
     )
     .fetch_all(&pool)
@@ -54,10 +54,10 @@ async fn a_computer_harness_has_no_direct_sharing_facts(pool: PgPool) {
         r#"
         INSERT INTO harnesses (id, name, owner_user_id, created_by, computer_id)
         VALUES
-            ('00000000-0000-0000-0000-0000000000a1', 'Laptop', 'macro|owner@example.com',
-                'macro|owner@example.com', NULL),
-            ('00000000-0000-0000-0000-0000000000a2', 'Computer', 'macro|owner@example.com',
-                'macro|owner@example.com', '00000000-0000-0000-0000-0000000000c1')
+            ('00000000-0000-0000-0000-0000000000a1', 'Laptop', 'rox|owner@example.com',
+                'rox|owner@example.com', NULL),
+            ('00000000-0000-0000-0000-0000000000a2', 'Computer', 'rox|owner@example.com',
+                'rox|owner@example.com', '00000000-0000-0000-0000-0000000000c1')
         "#
     )
     .execute(&pool)

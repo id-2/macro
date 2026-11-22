@@ -11,7 +11,7 @@ describe('hydrateUserEvent', () => {
     const event = {
       event_type: 'user.picture_changed',
       metadata: {
-        user_id: 'macro|owner@example.com',
+        user_id: 'rox|owner@example.com',
         file_id: 'file-1',
         url: 'https://static.example.com/file/file-1',
       },
@@ -20,7 +20,7 @@ describe('hydrateUserEvent', () => {
     const hydrated = hydrateUserEvent(client, event);
 
     expect(hydrated?.event_type).toBe('user.picture_changed');
-    expect(hydrated?.user.id).toBe('macro|owner@example.com');
+    expect(hydrated?.user.id).toBe('rox|owner@example.com');
     expect(hydrated?.image?.id).toBe('file-1');
     expect(hydrated?.image?.url).toBe('https://static.example.com/file/file-1');
   });
@@ -29,7 +29,7 @@ describe('hydrateUserEvent', () => {
     for (const file_id of [null, undefined]) {
       const event = {
         event_type: 'user.picture_changed',
-        metadata: { user_id: 'macro|owner@example.com', file_id, url: null },
+        metadata: { user_id: 'rox|owner@example.com', file_id, url: null },
       } as UserEvent;
 
       expect(hydrateUserEvent(client, event)?.image).toBeUndefined();

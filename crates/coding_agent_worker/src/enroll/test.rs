@@ -377,10 +377,10 @@ fn an_agent_computer_gets_its_brains_environment_file() {
     let env_path = directory.path().join("var/lib/roxd/agent.env");
     let agent: hosted_runtimes::domain::agent::AgentEnrollment = serde_json::from_str(
         r#"{
-            "agent_user_id": "macro|sam-rivera-abc123@agents.macro.invalid",
+            "agent_user_id": "rox|sam-rivera-abc123@agents.macro.invalid",
             "env": {
                 "ROX_API_KEY": "mak_secret",
-                "ROX_REPO_URL": "http://agent-git:8111/macro%7Csam.git",
+                "ROX_REPO_URL": "http://agent-git:8111/rox%7Csam.git",
                 "ODD_VALUE": "a \"quoted\" \\ value"
             }
         }"#,
@@ -394,7 +394,7 @@ fn an_agent_computer_gets_its_brains_environment_file() {
         std::fs::read_to_string(&env_path).unwrap(),
         concat!(
             "ROX_API_KEY=\"mak_secret\"\n",
-            "ROX_REPO_URL=\"http://agent-git:8111/macro%7Csam.git\"\n",
+            "ROX_REPO_URL=\"http://agent-git:8111/rox%7Csam.git\"\n",
             "ODD_VALUE=\"a \\\"quoted\\\" \\\\ value\"\n",
         )
     );

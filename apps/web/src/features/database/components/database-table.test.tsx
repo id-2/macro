@@ -25,10 +25,10 @@ vi.mock('@property/utils/focus', () => ({
     setTimeout(() => element()?.focus(), 100),
 }));
 vi.mock('../../../lib/core/user/index', () => ({
-  tryRoxId: (id: string) => (id.startsWith('macro|') ? id : undefined),
-  roxIdToEmail: (id: string) => id.slice(6),
+  tryRoxId: (id: string) => (id.startsWith('rox|') ? id : undefined),
+  roxIdToEmail: (id: string) => id.slice(4),
   getDisplayNameParts: (id: string | undefined) =>
-    id === 'macro|alex@example.com'
+    id === 'rox|alex@example.com'
       ? { firstName: 'Alex', lastName: 'Rivera', fullName: 'Alex Rivera' }
       : { firstName: '', lastName: '', fullName: '' },
   getInitials: (first: string, last: string, email: string) =>
@@ -905,20 +905,20 @@ describe('presence and reveal', () => {
     const onCellFocus = vi.fn();
     const [remoteUsers, setRemoteUsers] = createSignal([
       {
-        userId: 'macro|alex@example.com',
+        userId: 'rox|alex@example.com',
         rowId: 'two',
         columnId: 'notes',
         editing: false,
       },
       {
-        userId: 'macro|sam@example.com',
+        userId: 'rox|sam@example.com',
         rowId: 'one',
         columnId: 'name',
         editing: true,
       },
-      { userId: 'macro|pat@example.com', editing: false },
+      { userId: 'rox|pat@example.com', editing: false },
       {
-        userId: 'macro|lee@example.com',
+        userId: 'rox|lee@example.com',
         rowId: 'two',
         columnId: 'name',
         editing: false,
@@ -961,7 +961,7 @@ describe('presence and reveal', () => {
     const alexCell = alexTag.closest<HTMLElement>('[data-grid-cell]')!;
     expect(alexCell.dataset.gridRow).toBe('1');
     expect(alexCell.dataset.gridColumn).toBe('2');
-    expect(alexCell.dataset.remoteUsers).toBe('macro|alex@example.com');
+    expect(alexCell.dataset.remoteUsers).toBe('rox|alex@example.com');
     // The outline is an overlay, so the cell itself gains no border.
     expect(alexCell.style.borderTop).toBe('');
     const alexOutline = alexCell.querySelector<HTMLElement>(

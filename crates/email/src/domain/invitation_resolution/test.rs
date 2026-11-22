@@ -134,7 +134,7 @@ async fn composed_service_resolves_the_authorized_threads_saved_invitations() {
 
     assert_eq!(
         *calls.lock().unwrap(),
-        [("macro|reader@example.com".into(), 1)]
+        [("rox|reader@example.com".into(), 1)]
     );
     assert_eq!(result.len(), 1);
     assert!(matches!(

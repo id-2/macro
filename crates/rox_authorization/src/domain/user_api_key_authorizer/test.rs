@@ -9,7 +9,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 const API_KEY: &str = "mak_test_secret";
-const USER_ID: &str = "macro|api-key@example.com";
+const USER_ID: &str = "rox|api-key@example.com";
 const FUSION_USER_ID: &str = "fusion-api-key-user";
 const ORGANIZATION_ID: i32 = 42;
 
@@ -112,7 +112,7 @@ async fn a_manager_key_acts_as_the_managed_account_and_names_its_holder() {
     let grant_id = Uuid::now_v7();
     let credential = AccountManagerCredential {
         grant_id,
-        manager_user_id: RoxUserIdStr::try_from("macro|agent@example.com".to_string())
+        manager_user_id: RoxUserIdStr::try_from("rox|agent@example.com".to_string())
             .expect("valid Rox user id"),
     };
     let mut repo = FakeRepo::found();

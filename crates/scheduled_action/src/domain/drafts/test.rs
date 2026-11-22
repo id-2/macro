@@ -14,7 +14,7 @@ use crate::domain::models::{ActionConfiguration, ActionKind, CreatedItem};
 use crate::domain::ports::{HandedBack, StaleDraft};
 use rox_uuid::Uuid;
 
-pub(super) const OWNER: &str = "macro|owner@example.com";
+pub(super) const OWNER: &str = "rox|owner@example.com";
 pub(super) const BUG_REPORTS: &str = "every time a message gets sent in bug-reports make a task";
 
 pub(super) fn owner() -> RoxUserIdStr<'static> {

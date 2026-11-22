@@ -20,7 +20,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|self',
+  useUserId: () => () => 'rox|self',
   useIsAuthenticated: () => () => true,
 }));
 vi.mock('@queries/calendar/sync', () => ({
@@ -45,7 +45,7 @@ beforeEach(() => {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   testQueryClient.setQueryData(authKeys.userInfo.queryKey, {
-    id: 'macro|self',
+    id: 'rox|self',
     authenticated: true,
   });
 });

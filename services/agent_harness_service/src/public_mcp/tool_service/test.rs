@@ -699,7 +699,7 @@ mod code_mode {
         assert_eq!(
             *runs.0.lock().unwrap(),
             [(
-                format!("macro|{USER}"),
+                format!("rox|{USER}"),
                 "export async function main() { return {data: 1}; }".to_owned()
             )]
         );

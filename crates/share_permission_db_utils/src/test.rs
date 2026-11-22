@@ -13,15 +13,15 @@ async fn get_team_default_link_share_returns_the_team_preference(
     // Note: `team_user` has a unique constraint on `user_id`, so the defensive
     // multi-team tie-break in the query cannot be exercised with fixtures.
     assert_eq!(
-        get_team_default_link_share(&pool, "macro|team-scope@user.com").await?,
+        get_team_default_link_share(&pool, "rox|team-scope@user.com").await?,
         Some(TeamLinkShareDefault(Some(LinkShare::Team)))
     );
     assert_eq!(
-        get_team_default_link_share(&pool, "macro|public-scope@user.com").await?,
+        get_team_default_link_share(&pool, "rox|public-scope@user.com").await?,
         Some(TeamLinkShareDefault(Some(LinkShare::Public)))
     );
     assert_eq!(
-        get_team_default_link_share(&pool, "macro|off-scope@user.com").await?,
+        get_team_default_link_share(&pool, "rox|off-scope@user.com").await?,
         Some(TeamLinkShareDefault(None))
     );
 
@@ -36,11 +36,11 @@ async fn get_team_default_link_share_returns_none_without_a_team(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     assert_eq!(
-        get_team_default_link_share(&pool, "macro|no-team@user.com").await?,
+        get_team_default_link_share(&pool, "rox|no-team@user.com").await?,
         None
     );
     assert_eq!(
-        get_team_default_link_share(&pool, "macro|unknown@user.com").await?,
+        get_team_default_link_share(&pool, "rox|unknown@user.com").await?,
         None
     );
 

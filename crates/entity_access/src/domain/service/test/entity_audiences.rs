@@ -3,7 +3,7 @@ use crate::domain::ports::EntityAudienceLookup;
 
 #[tokio::test]
 async fn many_documents_share_one_grant_lookup_and_keep_every_spelling() {
-    let users = vec![user_id("macro|alice@corp.test")];
+    let users = vec![user_id("rox|alice@corp.test")];
     let repo = MockRepo::new().with_document_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo.clone());
 
@@ -35,7 +35,7 @@ async fn many_documents_share_one_grant_lookup_and_keep_every_spelling() {
 
 #[tokio::test]
 async fn ids_that_are_not_uuids_are_left_out_without_failing_the_rest() {
-    let users = vec![user_id("macro|alice@corp.test")];
+    let users = vec![user_id("rox|alice@corp.test")];
     let repo = MockRepo::new().with_document_users(users.clone());
     let service = EntityAccessServiceImpl::new(repo.clone());
 
@@ -80,7 +80,7 @@ async fn ids_that_are_not_uuids_are_left_out_without_failing_the_rest() {
 
 #[tokio::test]
 async fn kinds_with_their_own_audience_and_single_entities_resolve_one_at_a_time() {
-    let users = vec![user_id("macro|alice@corp.test")];
+    let users = vec![user_id("rox|alice@corp.test")];
     let repo = MockRepo::new()
         .with_thread_users(users.clone())
         .with_document_users(users.clone());

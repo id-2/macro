@@ -15,7 +15,7 @@ use crate::domain::mapping::WebhookColumn;
 use crate::domain::models::{NewWebhook, PayloadProblem};
 use crate::domain::token;
 
-const ALICE: &str = "macro|alice@acme.com";
+const ALICE: &str = "rox|alice@acme.com";
 const DATABASE: DatabaseId = DatabaseId::from_uuid(Uuid::from_u128(1));
 const OTHER_DATABASE: DatabaseId = DatabaseId::from_uuid(Uuid::from_u128(2));
 const MEETINGS: TableId = TableId::from_uuid(Uuid::from_u128(10));

@@ -78,7 +78,7 @@ impl CalendarTeamService for FakeService {
 
 fn request() -> RequestContext {
     RequestContext::new(
-        RoxUserIdStr::try_from("macro|requester@example.com".to_string()).unwrap(),
+        RoxUserIdStr::try_from("rox|requester@example.com".to_string()).unwrap(),
     )
 }
 
@@ -111,7 +111,7 @@ async fn delegates_identity_and_selection_without_inventing_free_windows() {
     assert!(result.free_windows.is_none());
     assert_eq!(result.unknown_user_ids, vec!["unknown-person"]);
     let requests = service.requests.lock().unwrap();
-    assert_eq!(requests[0].0, "macro|requester@example.com");
+    assert_eq!(requests[0].0, "rox|requester@example.com");
     assert_eq!(requests[0].2, Some(vec!["unknown-person".to_string()]));
 }
 

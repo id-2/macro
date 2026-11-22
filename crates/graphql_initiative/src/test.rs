@@ -563,13 +563,13 @@ async fn mutation_replies_use_primary_state_and_preserve_viewed_metadata() {
     let replica = RecordingSoupService::replica();
     let schema = schema_with_soup(api.clone(), replica.clone());
     let response = schema.execute(Request::new(format!(
-        "mutation {{ first: updateInitiative(initiativeId: \"{PROJECT_ID}\", input: {{ name: \"First\", memberIds: [\"macro|first@example.com\"] }}) {{ __typename id displayName memberIds metadata {{ viewedAt }} }} second: updateInitiative(initiativeId: \"{PROJECT_ID}\", input: {{ name: \"Second\", memberIds: [\"macro|second@example.com\"] }}) {{ __typename id displayName memberIds metadata {{ viewedAt }} }} }}"
+        "mutation {{ first: updateInitiative(initiativeId: \"{PROJECT_ID}\", input: {{ name: \"First\", memberIds: [\"rox|first@example.com\"] }}) {{ __typename id displayName memberIds metadata {{ viewedAt }} }} second: updateInitiative(initiativeId: \"{PROJECT_ID}\", input: {{ name: \"Second\", memberIds: [\"rox|second@example.com\"] }}) {{ __typename id displayName memberIds metadata {{ viewedAt }} }} }}"
     )).data(user())).await;
     assert!(response.errors.is_empty(), "{:?}", response.errors);
     let data = response.data.into_json().unwrap();
     for (alias, name, member) in [
-        ("first", "First", "macro|first@example.com"),
-        ("second", "Second", "macro|second@example.com"),
+        ("first", "First", "rox|first@example.com"),
+        ("second", "Second", "rox|second@example.com"),
     ] {
         assert_eq!(data[alias]["__typename"], "GraphqlSoupInitiative");
         assert_eq!(data[alias]["id"], PROJECT_ID);
@@ -590,7 +590,7 @@ async fn mutation_replies_use_primary_state_and_preserve_viewed_metadata() {
     assert_eq!(data["user"]["initiative"]["displayName"], "Second");
     assert_eq!(
         data["user"]["initiative"]["memberIds"][0],
-        "macro|second@example.com"
+        "rox|second@example.com"
     );
     assert!(replica.calls.lock().unwrap().is_empty());
 }
@@ -673,7 +673,7 @@ async fn detail_loaders_isolate_viewers_failures_and_subsequent_reads() {
             .lock()
             .unwrap()
             .iter()
-            .any(|viewer| viewer == "macro|other@example.com")
+            .any(|viewer| viewer == "rox|other@example.com")
     );
 
     *api.name.lock().unwrap() = Some("Updated after first read".into());

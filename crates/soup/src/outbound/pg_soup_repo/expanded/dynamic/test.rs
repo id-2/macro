@@ -356,7 +356,7 @@ async fn grouped_query_explain_local(pool: PgPool) -> anyhow::Result<()> {
         .collect::<Vec<_>>();
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner, "createdAt", "updatedAt")
-        SELECT id, 'explain task', 'macro|user-1@test.com', '2026-01-01', '2026-01-02'
+        SELECT id, 'explain task', 'rox|user-1@test.com', '2026-01-01', '2026-01-02'
         FROM unnest($1::text[]) id ON CONFLICT DO NOTHING"#,
         &ids,
     )
@@ -367,12 +367,12 @@ async fn grouped_query_explain_local(pool: PgPool) -> anyhow::Result<()> {
         &ids[..120],
     ).execute(&pool).await?;
     sqlx::query!(
-        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) SELECT id::uuid, 'document', 'macro|user-1@test.com', 'user', 'view' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
+        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) SELECT id::uuid, 'document', 'rox|user-1@test.com', 'user', 'view' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
         &ids,
     ).execute(&pool).await?;
     // Also exercise duplicate direct + inherited grants over the larger corpus.
     sqlx::query!(
-        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level, granted_from_project_id) SELECT id::uuid, 'document', 'macro|user-1@test.com', 'user', 'view', 'aaaaaaaa-ffff-ffff-ffff-ffffffffffff' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
+        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level, granted_from_project_id) SELECT id::uuid, 'document', 'rox|user-1@test.com', 'user', 'view', 'aaaaaaaa-ffff-ffff-ffff-ffffffffffff' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
         &ids,
     ).execute(&pool).await?;
     sqlx::query!("ANALYZE").execute(&pool).await?;
@@ -455,7 +455,7 @@ async fn grouped_query_explain_local(pool: PgPool) -> anyhow::Result<()> {
                     reason = "explains SQL generated from the AST and grouping"
                 )]
                 let query = sqlx::query_scalar::<_, serde_json::Value>(&sql)
-                    .bind("macro|user-1@test.com")
+                    .bind("rox|user-1@test.com")
                     .bind(sort.to_string())
                     .bind(50_i64)
                     .bind(timestamp)
@@ -578,7 +578,7 @@ async fn seed_background_initiatives(pool: &PgPool, count: i32) -> anyhow::Resul
     .await?;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-        SELECT 'macro|background-' || n || '@paths.test', 'background-' || n || '@paths.test',
+        SELECT 'rox|background-' || n || '@paths.test', 'background-' || n || '@paths.test',
             ('a2000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid
         FROM generate_series(1, $1::int) n"#,
         count
@@ -594,7 +594,7 @@ async fn seed_background_initiatives(pool: &PgPool, count: i32) -> anyhow::Resul
     sqlx::query!(
         r#"INSERT INTO initiative (id, name, owner_user_id, share_permission_id)
         SELECT ('a8000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid, 'Background ' || n,
-            'macro|background-' || n || '@paths.test', 'background-share-' || n
+            'rox|background-' || n || '@paths.test', 'background-share-' || n
         FROM generate_series(1, $1::int) n"#,
         count
     )
@@ -669,7 +669,7 @@ async fn initiative_listing_reads_the_callers_initiatives_not_the_table(
 
     let plan = explain_first_page(
         &pool,
-        "macro|viewer@paths.test",
+        "rox|viewer@paths.test",
         &initiative_listing(Expr::val(InitiativeLiteral::Include)),
     )
     .await?;
@@ -693,7 +693,7 @@ async fn initiatives_named_by_id_check_access_per_row(pool: PgPool) -> anyhow::R
     seed_background_initiatives(&pool, 5_000).await?;
     sqlx::query!(
         r#"INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-        SELECT id, 'initiative', 'macro|viewer@paths.test', 'user', 'view'
+        SELECT id, 'initiative', 'rox|viewer@paths.test', 'user', 'view'
         FROM initiative WHERE name LIKE 'Background %'"#
     )
     .execute(&pool)
@@ -728,7 +728,7 @@ async fn initiatives_named_by_id_check_access_per_row(pool: PgPool) -> anyhow::R
     for (label, initiatives) in named {
         let plan = explain_first_page(
             &pool,
-            "macro|viewer@paths.test",
+            "rox|viewer@paths.test",
             &initiative_listing(initiatives),
         )
         .await?;

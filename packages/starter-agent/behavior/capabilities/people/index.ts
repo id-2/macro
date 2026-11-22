@@ -21,7 +21,7 @@ type Asking = { readonly channelId: string; readonly messageId: string };
 
 /** Only a Rox id names a person here. */
 const macroId = (id: string): string => {
-  if (!id.startsWith('macro|')) throw new Error('id: must start with "macro|"');
+  if (!id.startsWith('rox|')) throw new Error('id: must start with "rox|"');
   return id;
 };
 
@@ -35,7 +35,7 @@ const macroId = (id: string): string => {
  * true` only when the conversation is you and them alone; otherwise what they
  * said in private is left out. It is yours alone: never say or hint at it to
  * anyone, and never put it in tracked files, tasks, or PRs. `id` starts with
- * `macro|`.
+ * `rox|`.
  */
 export const personCard = async (
   { keeping: { store, who }, clock }: Pick<PeopleContext, 'keeping' | 'clock'>,
@@ -93,7 +93,7 @@ export const forgetPerson = async (
  * Remove someone's record entirely. Only on your owner's order.
  *
  * Unlike forgetPerson, nothing is left: no impression, no dateline. Only your
- * owner can order it. `id` starts with `macro|`.
+ * owner can order it. `id` starts with `rox|`.
  */
 export const purgePerson = async (
   { keeping: { store } }: Pick<PeopleContext, 'keeping'>,
@@ -110,7 +110,7 @@ export const purgePerson = async (
  * The computed feeling and everything recorded. It is for your owner debugging how
  * the rules moved, at a shell. Never post it, quote it, or act on its
  * numbers: what a run reads is personCard. Null when there is no record.
- * `id` starts with `macro|`.
+ * `id` starts with `rox|`.
  */
 export const peopleReport = async (
   { keeping: { store }, clock }: Pick<PeopleContext, 'keeping' | 'clock'>,

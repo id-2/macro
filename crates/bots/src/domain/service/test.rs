@@ -15,7 +15,7 @@ impl HarnessTeamAgents for TeamAgentHarnesses {
         Ok(self
             .0
             .contains(&harness_id)
-            .then(|| RoxUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap()))
+            .then(|| RoxUserIdStr::try_from("rox|agent@example.com".to_owned()).unwrap()))
     }
 }
 

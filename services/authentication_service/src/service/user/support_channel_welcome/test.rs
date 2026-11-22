@@ -33,7 +33,7 @@ fn user_id(email: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-const NEW_USER_MENTION: &str = "<m-user-mention>{\"userId\":\"macro|new.user@example.com\",\"email\":\"new.user@example.com\"}</m-user-mention>";
+const NEW_USER_MENTION: &str = "<m-user-mention>{\"userId\":\"rox|new.user@example.com\",\"email\":\"new.user@example.com\"}</m-user-mention>";
 
 fn expected_welcome() -> String {
     format!(
@@ -42,7 +42,7 @@ fn expected_welcome() -> String {
             "\n",
             "Welcome to Rox, we're excited for you to try it out.\n",
             "\n",
-            "This is your own personal support Channel, with <m-user-mention>{{\"userId\":\"macro|jacob@rox.one\",\"email\":\"jacob@rox.one\"}}</m-user-mention> (ceo) and <m-user-mention>{{\"userId\":\"macro|teo@rox.one\",\"email\":\"teo@rox.one\"}}</m-user-mention> (cto) and me (julia).\n",
+            "This is your own personal support Channel, with <m-user-mention>{{\"userId\":\"rox|jacob@rox.one\",\"email\":\"jacob@rox.one\"}}</m-user-mention> (ceo) and <m-user-mention>{{\"userId\":\"rox|teo@rox.one\",\"email\":\"teo@rox.one\"}}</m-user-mention> (cto) and me (julia).\n",
             "\n",
             "If you have any feedback or find any bugs let us know here.",
         ),

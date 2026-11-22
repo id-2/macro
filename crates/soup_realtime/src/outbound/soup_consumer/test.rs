@@ -10,7 +10,7 @@ struct TestMessage {
 
 impl MessageParts for TestMessage {
     fn key(&self) -> Option<&str> {
-        Some("macro|user@example.com")
+        Some("rox|user@example.com")
     }
 
     fn payload(&self) -> Option<&[u8]> {
@@ -35,7 +35,7 @@ fn declared_topic_decoder_rejects_unsupported_schema_versions() {
             "schema_version": 1,
             "event_type": "soup.updated",
             "metadata": [
-                "macro|user@example.com",
+                "rox|user@example.com",
                 {
                     "entity_type": "document",
                     "entity_id": "00000000-0000-0000-0000-000000000001"

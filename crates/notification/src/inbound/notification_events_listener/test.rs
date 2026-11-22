@@ -40,7 +40,7 @@ async fn instrumentation_preserves_valid_recipients_and_skips_invalid_values() {
             r#"{
         "type":"user_notification_deletes",
         "notificationId":"00000000-0000-7000-8000-000000000001",
-        "userIds":["macro|valid@example.com","invalid"]
+        "userIds":["rox|valid@example.com","invalid"]
     }"#,
         )
         .await;
@@ -70,7 +70,7 @@ async fn failed_publication_does_not_prevent_processing_the_next_event() {
             .handle_payload(
                 &serde_json::json!({
                     "type":"user_notification_deletes", "notificationId":id,
-                    "userIds":["macro|valid@example.com"]
+                    "userIds":["rox|valid@example.com"]
                 })
                 .to_string(),
             )

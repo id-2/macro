@@ -31,8 +31,8 @@ use crate::domain::ports::{CreateFormCommand, FormsService};
 use crate::domain::sharing::FormSharingService;
 use crate::inbound::axum_router::{FormsRouterState, forms_router};
 
-pub(super) const OWNER: &str = "macro|owner@forms-router.test";
-pub(super) const RESPONDENT: &str = "macro|respondent@forms-router.test";
+pub(super) const OWNER: &str = "rox|owner@forms-router.test";
+pub(super) const RESPONDENT: &str = "rox|respondent@forms-router.test";
 pub(super) const AGENT: bot_id::BotId = bot_id::BotId::TEST_A;
 pub(super) const FORM: FormId = FormId::from_uuid(Uuid::from_u128(0xf0));
 pub(super) const ROW: RowId = RowId::from_uuid(Uuid::from_u128(0x40));

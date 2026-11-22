@@ -594,7 +594,7 @@ fn date_property_filters_use_server_queries_instead_of_partial_local_matches() {
                 LocalCompileOutcome::Unsupported(UnsupportedReason::GlobalProperties),
             );
             assert_eq!(
-                properties::compile_mail(&ast, request(), "inbox", &[], "macro|viewer@example.com")
+                properties::compile_mail(&ast, request(), "inbox", &[], "rox|viewer@example.com")
                     .unwrap(),
                 LocalCompileOutcome::Unsupported(UnsupportedReason::GlobalProperties),
             );

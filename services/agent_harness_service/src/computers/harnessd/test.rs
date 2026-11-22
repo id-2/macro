@@ -12,7 +12,7 @@ fn computer() -> ComputerId {
 }
 
 fn signer() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap()
 }
 
 /// A plausible expiry, the same for every call on a day.

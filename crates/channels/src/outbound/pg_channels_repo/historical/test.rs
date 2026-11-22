@@ -32,7 +32,7 @@ impl ChannelEventDispatcher for CreationEvents {
 }
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 fn timestamp(seconds: i64) -> DateTime<Utc> {
@@ -72,7 +72,7 @@ async fn historical_replay_preserves_settings_roles_leavers_and_live_activity(po
             .created
     );
     sqlx::query!(
-        "UPDATE comms_channel_participants SET role = 'admin', left_at = $2 WHERE channel_id = $1 AND user_id = 'macro|a@example.com'",
+        "UPDATE comms_channel_participants SET role = 'admin', left_at = $2 WHERE channel_id = $1 AND user_id = 'rox|a@example.com'",
         request.id, timestamp(2_000),
     ).execute(&pool).await.unwrap();
     repo.advance_historical_activity(request.id, timestamp(4_000))
@@ -108,7 +108,7 @@ async fn historical_replay_preserves_settings_roles_leavers_and_live_activity(po
         request.id,
     ).fetch_one(&pool).await.unwrap();
     assert_eq!(row.name.as_deref(), Some("source name"));
-    assert_eq!(row.owner_id, "macro|admin@example.com");
+    assert_eq!(row.owner_id, "rox|admin@example.com");
     assert_eq!(row.team_id, None);
     assert!(!row.auto_join_team);
     assert_eq!(row.created_at, timestamp(1_000));
@@ -124,21 +124,21 @@ async fn historical_replay_preserves_settings_roles_leavers_and_live_activity(po
     assert_eq!(members.len(), 4);
     let leaver = members
         .iter()
-        .find(|p| p.user_id == "macro|a@example.com")
+        .find(|p| p.user_id == "rox|a@example.com")
         .unwrap();
     assert_eq!(leaver.role, ParticipantRole::Admin);
     assert_eq!(leaver.joined_at, timestamp(1_000));
     assert_eq!(leaver.left_at, Some(timestamp(2_000)));
     let owner = members
         .iter()
-        .find(|p| p.user_id == "macro|admin@example.com")
+        .find(|p| p.user_id == "rox|admin@example.com")
         .unwrap();
     assert_eq!(owner.role, ParticipantRole::Owner);
     assert_eq!(owner.joined_at, timestamp(1_000));
     assert_eq!(owner.left_at, None);
     let added = members
         .iter()
-        .find(|p| p.user_id == "macro|c@example.com")
+        .find(|p| p.user_id == "rox|c@example.com")
         .unwrap();
     assert_eq!(added.joined_at, timestamp(500));
     assert_eq!(
@@ -217,7 +217,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
         .unwrap();
     // Legacy corruption includes even a departed third member.
     sqlx::query!(
-        "INSERT INTO comms_channel_participants (channel_id, user_id, role, left_at) VALUES ($1, 'macro|third@example.com', 'member', NOW())",
+        "INSERT INTO comms_channel_participants (channel_id, user_id, role, left_at) VALUES ($1, 'rox|third@example.com', 'member', NOW())",
         malformed.id,
     ).execute(&pool).await.unwrap();
     let exact = repo
@@ -239,7 +239,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
     // Simulate pre-lock duplicate DMs, including a historical leaver.
     let duplicate_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
-        "INSERT INTO comms_channels (id, owner_id, channel_type, created_at) VALUES ($1, 'macro|a@example.com', 'direct_message', $2)",
+        "INSERT INTO comms_channels (id, owner_id, channel_type, created_at) VALUES ($1, 'rox|a@example.com', 'direct_message', $2)",
         duplicate_id, timestamp(1_000),
     ).execute(&pool).await.unwrap();
     sqlx::query!(

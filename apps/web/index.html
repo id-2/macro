@@ -126,7 +126,12 @@
           const ink = theme.ink || (lightness > 0.6 ? "oklch(0.16 0 0)" : lightness >= 0 ? "oklch(1 0 0)" : "");
           if (ink) shell.style.setProperty("--bs-ink", ink);
         }
-        if (localStorage.getItem("macro:login") !== "true") {
+        const legacyLogin = localStorage.getItem("macro:login");
+        if (legacyLogin !== null) {
+          localStorage.setItem("rox:login", legacyLogin);
+          localStorage.removeItem("macro:login");
+        }
+        if (localStorage.getItem("rox:login") !== "true") {
           shell.style.background = "var(--bs-page)";
           shell.innerHTML = `<img class="bs-mark" src="%ASSETS_PATH%/rox-mark.png" alt="" width="1024" height="1024" />`;
         } else {

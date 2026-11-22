@@ -10,7 +10,7 @@ const executionId = '0198a4cc-e138-7670-a308-a6b766602788';
 const fixture: ReviewRecord_Serialize = {
   id: '0198a4cc-e138-7670-a308-a6b766602799',
   sessionId: '0198a4cc-e138-7670-a308-a6b766602700',
-  actingUser: 'macro|owner@example.test',
+  actingUser: 'rox|owner@example.test',
   executionId,
   presentedAt: null,
   decision: null,

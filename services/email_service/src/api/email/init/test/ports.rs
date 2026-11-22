@@ -57,7 +57,7 @@ impl<S: tracing::Subscriber> Layer<S> for Logs {
 fn unavailable_login_email_preserves_the_original_error_log_and_typed_refusal() {
     for (user, cause) in [
         ("missing-delimiter", "invalid user id format"),
-        ("macro|", "empty email in user id"),
+        ("rox|", "empty email in user id"),
     ] {
         let logs = Logs::default();
         let subscriber = tracing_subscriber::registry().with(logs.clone());
@@ -166,7 +166,7 @@ async fn conflict_lookup_failure_retains_legacy_context_without_publishing() {
     };
     let link = Link {
         id: Uuid::from_u128(1),
-        rox_id: "macro|owner@example.com".to_owned().try_into().unwrap(),
+        rox_id: "rox|owner@example.com".to_owned().try_into().unwrap(),
         fusionauth_user_id: "fusion-owner".into(),
         email_address: "inbox@example.com".to_owned().try_into().unwrap(),
         provider: UserProvider::Gmail,

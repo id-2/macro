@@ -708,7 +708,7 @@ export function notesParts(
   });
   if (!entries.length) return;
   const comments = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<comments xmlns="${MAIN}"><authors><author>Macro</author></authors><commentList>${entries
+<comments xmlns="${MAIN}"><authors><author>Rox</author></authors><commentList>${entries
     .map(
       ({ address, note }) =>
         `<comment ref="${address}" authorId="0"><text><r><t xml:space="preserve">${xml(note)}</t></r></text></comment>`

@@ -417,12 +417,12 @@ async fn followup_uses_delegated_inbox_and_rechecks_revocation(
         ('d1000000-0000-0000-0000-000000000002', 'delegate', 'delegate@test.com', 'followup_delegate')"#).execute(&pool).await?;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES
-        ('macro|user1@test.com', 'user1@test.com', 'd1000000-0000-0000-0000-000000000001'),
-        ('macro|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#
+        ('rox|user1@test.com', 'user1@test.com', 'd1000000-0000-0000-0000-000000000001'),
+        ('rox|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#
     )
     .execute(&pool)
     .await?;
-    sqlx::query!("INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('macro|delegate@test.com', 'macro|user1@test.com', $1)", link).execute(&pool).await?;
+    sqlx::query!("INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('rox|delegate@test.com', 'rox|user1@test.com', $1)", link).execute(&pool).await?;
     let mailbox = service(pool.clone());
     let delegate = RoxUserIdStr::try_from_email("delegate@test.com")?;
     assert_eq!(

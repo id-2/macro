@@ -118,7 +118,7 @@ fn in_lists_nested_ors_and_has_push_as_one_expression() {
         &catalog(),
         select(
             "SELECT name FROM crm.deals
-             WHERE (stage IN ('Won', 'Lead') OR owner = 'macro|sam@example.com')
+             WHERE (stage IN ('Won', 'Lead') OR owner = 'rox|sam@example.com')
                AND tags HAS 'vip'
                AND name LIKE 'A%'",
         ),
@@ -153,7 +153,7 @@ fn in_lists_nested_ors_and_has_push_as_one_expression() {
                                 property_definition_id: OWNER,
                                 entity_type: None,
                                 value: PropertyMatchValue::EntityRef(
-                                    EntityRefId::new("macro|sam@example.com".into()).unwrap()
+                                    EntityRefId::new("rox|sam@example.com".into()).unwrap()
                                 )
                             }),
                         ),
@@ -190,7 +190,7 @@ fn negations_stay_residual_because_soup_not_keeps_empty_cells() {
         &catalog(),
         select(
             "SELECT name FROM crm.deals
-             WHERE stage != 'Won' AND tags NOT HAS 'vip' AND owner NOT IN ('macro|sam@example.com') AND done = TRUE",
+             WHERE stage != 'Won' AND tags NOT HAS 'vip' AND owner NOT IN ('rox|sam@example.com') AND done = TRUE",
         ),
     );
 
@@ -224,7 +224,7 @@ fn negations_stay_residual_because_soup_not_keeps_empty_cells() {
                 },
                 Filter::In {
                     column: OWNER,
-                    values: vec![Value::Entity("macro|sam@example.com".into())],
+                    values: vec![Value::Entity("rox|sam@example.com".into())],
                     negated: true,
                 },
                 Filter::Comparison {
@@ -248,7 +248,7 @@ fn count_per_select_group_needs_no_rows() {
     let plan = split(
         &catalog(),
         select(
-            "SELECT stage, COUNT(*) FROM crm.deals WHERE owner = 'macro|sam@example.com' GROUP BY stage ORDER BY 2 DESC",
+            "SELECT stage, COUNT(*) FROM crm.deals WHERE owner = 'rox|sam@example.com' GROUP BY stage ORDER BY 2 DESC",
         ),
     );
 
@@ -267,7 +267,7 @@ fn count_per_select_group_needs_no_rows() {
                         property_definition_id: OWNER,
                         entity_type: None,
                         value: PropertyMatchValue::EntityRef(
-                            EntityRefId::new("macro|sam@example.com".into()).unwrap()
+                            EntityRefId::new("rox|sam@example.com".into()).unwrap()
                         )
                     })),
                     group_by: STAGE,
@@ -654,7 +654,7 @@ fn propf_serializes_to_the_soup_wire_form() {
     let plan = split(
         &catalog(),
         select(
-            "SELECT name FROM crm.deals WHERE stage = 'Won' AND owner = 'macro|sam@example.com'",
+            "SELECT name FROM crm.deals WHERE stage = 'Won' AND owner = 'rox|sam@example.com'",
         ),
     );
     let GqlQuery::Soup {
@@ -669,7 +669,7 @@ fn propf_serializes_to_the_soup_wire_form() {
         serde_json::json!({
             "&": [
                 { "l": { "pd": "00000000-0000-0000-0000-000000000003", "v": { "so": "00000000-0000-0000-0000-000000000030" } } },
-                { "l": { "pd": "00000000-0000-0000-0000-000000000005", "v": { "er": "macro|sam@example.com" } } }
+                { "l": { "pd": "00000000-0000-0000-0000-000000000005", "v": { "er": "rox|sam@example.com" } } }
             ]
         })
     );

@@ -124,8 +124,8 @@ fn no_invites_projection() -> Option<serde_json::Value> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_organizers_policy_reaches_every_rox_held_guest_copy(pool: PgPool) {
-    let organizer_id = "macro|policy-organizer@example.com";
-    let guest_id = "macro|policy-guest@example.com";
+    let organizer_id = "rox|policy-organizer@example.com";
+    let guest_id = "rox|policy-guest@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let guest_link = insert_link(&pool, guest_id).await;
     let claiming_link = insert_link(&pool, guest_id).await;
@@ -238,8 +238,8 @@ async fn an_organizers_policy_reaches_every_rox_held_guest_copy(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_guest_copy_keeps_its_organizers_policy_over_a_stale_one(pool: PgPool) {
-    let organizer_id = "macro|stale-organizer@example.com";
-    let guest_id = "macro|stale-guest@example.com";
+    let organizer_id = "rox|stale-organizer@example.com";
+    let guest_id = "rox|stale-guest@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let guest_link = insert_link(&pool, guest_id).await;
     let organizer = link_email(&pool, organizer_link).await;
@@ -293,8 +293,8 @@ async fn a_guest_copy_keeps_its_organizers_policy_over_a_stale_one(pool: PgPool)
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_secondary_calendars_copy_decides_the_policy_of_its_meeting(pool: PgPool) {
-    let organizer_id = "macro|secondary-organizer@example.com";
-    let guest_id = "macro|secondary-guest@example.com";
+    let organizer_id = "rox|secondary-organizer@example.com";
+    let guest_id = "rox|secondary-guest@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let guest_link = insert_link(&pool, guest_id).await;
     let organizer_inbox = link_email(&pool, organizer_link).await;
@@ -354,8 +354,8 @@ async fn a_secondary_calendars_copy_decides_the_policy_of_its_meeting(pool: PgPo
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_the_inbox_only_reads_decides_nothing(pool: PgPool) {
-    let reader_id = "macro|policy-reader@example.com";
-    let guest_id = "macro|policy-reader-guest@example.com";
+    let reader_id = "rox|policy-reader@example.com";
+    let guest_id = "rox|policy-reader-guest@example.com";
     let reader_link = insert_link(&pool, reader_id).await;
     let guest_link = insert_link(&pool, guest_id).await;
     let repo = PgCalendarRepository::new(pool.clone());

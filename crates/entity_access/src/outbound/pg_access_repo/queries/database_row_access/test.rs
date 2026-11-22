@@ -4,8 +4,8 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@team.com";
-const MEMBER: &str = "macro|member@team.com";
+const OWNER: &str = "rox|owner@team.com";
+const MEMBER: &str = "rox|member@team.com";
 const MEMBER_TEAM: &str = "00000000-0000-0000-0000-0000000ea001";
 
 /// A database with one table and one row; returns `(database_id, row_id)`.

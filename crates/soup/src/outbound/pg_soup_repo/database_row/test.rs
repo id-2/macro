@@ -38,11 +38,11 @@ const DEAL_3: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000003);
 const NOTE: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000005);
 
 fn viewer() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap()
+    RoxUserIdStr::parse_from_str("rox|viewer@databases.test").unwrap()
 }
 
 fn stranger() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|stranger@databases.test").unwrap()
+    RoxUserIdStr::parse_from_str("rox|stranger@databases.test").unwrap()
 }
 
 /// Rows only: every other kind the dynamic query reads is ruled out the way
@@ -81,7 +81,7 @@ async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
     let items = expanded_dynamic_cursor_soup(
         &pool,
         ExpandedDynamicCursorArgs {
-            user_id: RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("rox|viewer@databases.test").unwrap(),
             limit: 20,
             cursor: Query::Sort(
                 SimpleSortMethod::CreatedAt.into(),
@@ -124,7 +124,7 @@ async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
                 table_id: DEALS,
                 database_id: CRM,
                 position: "c".into(),
-                owner_id: Owner::from_principal_str("macro|owner@databases.test").unwrap(),
+                owner_id: Owner::from_principal_str("rox|owner@databases.test").unwrap(),
                 created_by: None,
                 created_at: "2026-01-03T00:00:00Z".parse().unwrap(),
                 updated_at: "2026-01-05T00:00:00Z".parse().unwrap(),
@@ -135,8 +135,8 @@ async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
                 table_id: DEALS,
                 database_id: CRM,
                 position: "a".into(),
-                owner_id: Owner::from_principal_str("macro|owner@databases.test").unwrap(),
-                created_by: Some("macro|owner@databases.test".into()),
+                owner_id: Owner::from_principal_str("rox|owner@databases.test").unwrap(),
+                created_by: Some("rox|owner@databases.test".into()),
                 created_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 updated_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 extra: (),
@@ -470,7 +470,7 @@ async fn grant_the_stranger_a_crm_form(
     sqlx::query!(
         r#"
         INSERT INTO forms (id, name, owner_id, database_id, table_id, trashed_at, responses_visible)
-        VALUES ($1, 'Deal intake', 'macro|owner@databases.test', $2, $3, CASE WHEN $4 THEN now() END, $5)
+        VALUES ($1, 'Deal intake', 'rox|owner@databases.test', $2, $3, CASE WHEN $4 THEN now() END, $5)
         "#,
         form_id,
         CRM,

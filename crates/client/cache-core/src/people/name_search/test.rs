@@ -7,9 +7,9 @@ use crate::{
 
 #[test]
 fn complete_addresses_and_identities_never_match_another_persons_name() {
-    let target = RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap();
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
-    for input in ["person@example.com", "macro|PERSON@example.com"] {
+    let target = RoxUserIdStr::parse_from_str("rox|person@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
+    for input in ["person@example.com", "rox|PERSON@example.com"] {
         let query = NameSearch::new(input).unwrap();
         assert_eq!(
             query.classify("another label", &target),
@@ -17,15 +17,15 @@ fn complete_addresses_and_identities_never_match_another_persons_name() {
         );
         assert_eq!(query.classify(input, &other), None);
     }
-    let extension = RoxUserIdStr::parse_from_str("macro|person@example.com.example.com").unwrap();
+    let extension = RoxUserIdStr::parse_from_str("rox|person@example.com.example.com").unwrap();
     assert_eq!(
         NameSearch::new("person@example.com")
             .unwrap()
             .classify("person@example.com", &extension),
         None
     );
-    assert!(NameSearch::new("MACRO|person@example.com").is_err());
-    assert!(NameSearch::new("macro|not-an-address").is_err());
+    assert!(NameSearch::new("ROX|person@example.com").is_err());
+    assert!(NameSearch::new("rox|not-an-address").is_err());
     assert_eq!(
         NameSearch::new("person@")
             .unwrap()
@@ -42,7 +42,7 @@ fn complete_addresses_and_identities_never_match_another_persons_name() {
 
 #[test]
 fn recent_keys_sort_signed_times_then_identity_without_index_row_ids() {
-    let users = ["macro|a@example.com", "macro|b@example.com"];
+    let users = ["rox|a@example.com", "rox|b@example.com"];
     let mut entries = vec![];
     for time in [i64::MIN, -1, 0, 1, i64::MAX] {
         for id in users {
@@ -91,8 +91,8 @@ fn byte_prefix_bounds_preserve_unicode_and_literal_characters() {
 
 #[test]
 fn indexed_words_are_bounded_with_explicit_overflow_and_sparse_scoped_ranks() {
-    let viewer = "macro|viewer@example.com";
-    let user = RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap();
+    let viewer = "rox|viewer@example.com";
+    let user = RoxUserIdStr::parse_from_str("rox|person@example.com").unwrap();
     let epoch = Uuid::from_u128(7);
     let dm = Uuid::from_u128(8);
     let name = (0..=projection::MAX_NAME_WORDS)
@@ -137,7 +137,7 @@ fn indexed_words_are_bounded_with_explicit_overflow_and_sparse_scoped_ranks() {
     assert!(
         crate::people::sql::projection::project(
             viewer,
-            &contact_key("macro|other@example.com", user.as_ref()),
+            &contact_key("rox|other@example.com", user.as_ref()),
             &record
         )
         .unwrap()

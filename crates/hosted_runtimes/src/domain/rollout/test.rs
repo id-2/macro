@@ -3,7 +3,7 @@ use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
 
 #[tokio::test]
 async fn computer_rollout_requires_an_explicit_successful_flag_for_the_caller() {
-    let user = RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap();
     assert!(!ComputerRollout::default().enabled(&user).await);
     for (result, expected) in [
         (Ok(FlagSnapshot::default()), false),
@@ -29,7 +29,7 @@ async fn computer_rollout_requires_an_explicit_successful_flag_for_the_caller() 
         assert_eq!(rollout.enabled(&user).await, expected);
         assert!(
             !rollout
-                .enabled(&RoxUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap())
+                .enabled(&RoxUserIdStr::try_from("rox|other@example.com".to_owned()).unwrap())
                 .await
         );
     }

@@ -2,7 +2,7 @@ use super::*;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn actor() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|outlook-test@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|outlook-test@example.com").unwrap()
 }
 async fn category(db: &PgPool, link: Uuid) -> Uuid {
     let id = Uuid::now_v7();
@@ -14,7 +14,7 @@ async fn category(db: &PgPool, link: Uuid) -> Uuid {
 async fn removing_category_is_durable_and_foreign_inbox_cannot_queue_cleanup(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let label = category(&db, link).await;
-    let outsider = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let outsider = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     assert!(repo.delete_label(&outsider, link, label).await.is_err());
     assert!(
         repo.claim_settings(Uuid::now_v7(), true, true)
@@ -192,7 +192,7 @@ async fn paused_outlook_settings_do_not_run_until_writes_resume(db: PgPool) {
 async fn category_creation_is_durable_paused_and_fenced_by_deletion(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let mailbox = repo.accessible(&actor(), link).await.unwrap();
-    let outsider = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let outsider = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     assert!(
         repo.queue_label_creation(&outsider, mailbox, "New category")
             .await
@@ -347,7 +347,7 @@ async fn pending_settings_status_tracks_confirmation_and_current_grant(db: PgPoo
     assert_eq!(repo.pending_operations(current).await.unwrap().len(), 1);
     assert!(
         repo.accessible(
-            &RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("rox|stranger@example.com").unwrap(),
             link
         )
         .await

@@ -9,7 +9,7 @@ use stream::domain::{
 use tokio::sync::broadcast::{self, Receiver};
 use tokio_util::task::TaskTracker;
 
-pub const ADMISSION_TEST_USER: &str = "macro|admission@example.com";
+pub const ADMISSION_TEST_USER: &str = "rox|admission@example.com";
 
 pub struct TestAdmission {
     pub result: Result<(), ai_billing::AiAdmissionError>,

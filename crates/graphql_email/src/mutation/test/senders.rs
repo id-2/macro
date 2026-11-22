@@ -66,7 +66,7 @@ async fn send_returns_confirmed_identity_without_fallible_post_commit_hydration(
         vec![(Some("resident@example.com".to_owned()), Some(false))]
     );
     assert!(
-        matches!(&service.calls.lock().unwrap()[0], CapturedMutation::Draft { user_id, link_id: Some(id), .. } if user_id == "macro|viewer@example.com" && *id == inbox_id)
+        matches!(&service.calls.lock().unwrap()[0], CapturedMutation::Draft { user_id, link_id: Some(id), .. } if user_id == "rox|viewer@example.com" && *id == inbox_id)
     );
 }
 

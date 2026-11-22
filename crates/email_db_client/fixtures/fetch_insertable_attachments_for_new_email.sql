@@ -17,12 +17,12 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-00000000001a', 'macro|user@rox.one', '00000000-0000-0000-0000-00000000001a',
+VALUES ('00000000-0000-0000-0000-00000000001a', 'rox|user@rox.one', '00000000-0000-0000-0000-00000000001a',
         'user@rox.one', 'GMAIL', true, NOW(), NOW());
 
 -- Link B intentionally has no email_contacts row for its own address.
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-00000000002a', 'macro|missing-self@example.net', '00000000-0000-0000-0000-00000000002a',
+VALUES ('00000000-0000-0000-0000-00000000002a', 'rox|missing-self@example.net', '00000000-0000-0000-0000-00000000002a',
         'missing-self@example.net', 'GMAIL', true, NOW(), NOW());
 
 ------------------------------------------------------------

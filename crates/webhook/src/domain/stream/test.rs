@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast;
 use uuid::Uuid;
 
-const SUBSCRIBER_ID: &str = "macro|reader@example.com";
+const SUBSCRIBER_ID: &str = "rox|reader@example.com";
 const DOCUMENT_ID: &str = "11111111-1111-1111-1111-111111111111";
 const OTHER_DOCUMENT_ID: &str = "22222222-2222-2222-2222-222222222222";
 const TEAM_WORKSPACE_ID: &str = "33333333-3333-3333-3333-333333333333";
@@ -63,7 +63,7 @@ async fn private_call_event_streams_only_to_the_recipient() {
         .send(StreamCandidateEvent {
             event: normalized("call.invited", DOCUMENT_ID),
             audience: StreamAudience::User {
-                user_id: "macro|other@example.com".to_string(),
+                user_id: "rox|other@example.com".to_string(),
             },
         })
         .unwrap();
@@ -657,7 +657,7 @@ async fn wildcard_stream_preserves_entity_id_filters() {
     assert_eq!(delivered[0].entity_id, DOCUMENT_ID);
 }
 
-const CHANGED_USER_ID: &str = "macro|changed@example.com";
+const CHANGED_USER_ID: &str = "rox|changed@example.com";
 
 fn picture_candidate(team_workspace_ids: &[&str]) -> StreamCandidateEvent {
     let mut audiences = vec![StreamAudience::ContactsOf {
@@ -792,7 +792,7 @@ async fn team_stream_does_not_get_contact_audience() {
     assert_eq!(*contacts.calls.lock().unwrap(), 0);
 }
 
-const TEAMMATE_ID: &str = "macro|teammate@example.com";
+const TEAMMATE_ID: &str = "rox|teammate@example.com";
 
 /// A composer request to a bot's own runtime, asked by `requester`.
 fn requested_session_candidate(requester: &str) -> StreamCandidateEvent {
@@ -882,7 +882,7 @@ async fn a_requested_session_reaches_the_requesters_user_stream() {
     assert_ne!(first.event_name, "webhook.created");
 }
 
-const BUYER_ID: &str = "macro|buyer@example.com";
+const BUYER_ID: &str = "rox|buyer@example.com";
 
 /// A team computer's runtime streams as its buyer; a teammate's request to it
 /// still reaches that stream.

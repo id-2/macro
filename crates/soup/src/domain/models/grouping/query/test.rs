@@ -14,7 +14,7 @@ fn continuation_uses_requested_limit_not_initial_group_size() {
     })
     .type_erase();
     let request = GroupedSortRequest::continue_from(
-        RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap(),
         cursor,
         GroupingConfig::new(models_grouping::GroupByField::EntityType).with_group_key("document"),
         Some(100),

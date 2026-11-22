@@ -23,7 +23,7 @@ const fixture = vi.hoisted(() => ({
 }));
 let queryClient: QueryClient;
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|self@example.com',
+  useUserId: () => () => 'rox|self@example.com',
   useIsAuthenticated: () => () => true,
 }));
 
@@ -45,7 +45,7 @@ vi.mock('./link', async () => {
     useNonPrimaryEmailLinkIdHeader: () => (id: string) => id,
     useEmailLinksQuery: () =>
       useQuery(() => ({
-        queryKey: emailKeys.links('macro|self@example.com').queryKey,
+        queryKey: emailKeys.links('rox|self@example.com').queryKey,
         enabled: false,
       })),
   };
@@ -54,12 +54,12 @@ vi.mock('./link', async () => {
 function accounts(signature: string, replySignature = true): MailAccountsQuery {
   return {
     user: {
-      id: 'macro|self@example.com',
+      id: 'rox|self@example.com',
       emailLinks: [
         {
           id: 'inbox-1',
           provider: 'GMAIL',
-          roxId: 'macro|self@example.com',
+          roxId: 'rox|self@example.com',
           emailAddress: 'self@example.com',
           photoUrl: null,
           isPrimary: true,
@@ -175,10 +175,10 @@ beforeEach(() => {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   queryClient.setQueryData(authKeys.userInfo.queryKey, {
-    id: 'macro|self@example.com',
+    id: 'rox|self@example.com',
     authenticated: true,
   });
-  queryClient.setQueryData(emailKeys.links('macro|self@example.com').queryKey, {
+  queryClient.setQueryData(emailKeys.links('rox|self@example.com').queryKey, {
     links: [
       {
         id: 'inbox-1',
@@ -250,7 +250,7 @@ describe('email settings account reconciliation', () => {
     catalog.goOffline();
     catalog.newClient();
     queryClient.removeQueries({
-      queryKey: emailKeys.links('macro|self@example.com').queryKey,
+      queryKey: emailKeys.links('rox|self@example.com').queryKey,
     });
     const reopened = mountComposerAccounts();
     await vi.waitFor(() =>
@@ -278,7 +278,7 @@ describe('email settings account reconciliation', () => {
     expect(fixture.patchSettings).toHaveBeenCalledOnce();
     expect(
       queryClient.getQueryData(
-        emailKeys.links('macro|self@example.com').queryKey
+        emailKeys.links('rox|self@example.com').queryKey
       )
     ).toMatchObject({
       links: [{ id: 'inbox-1', settings: { signature: 'Saved signature' } }],

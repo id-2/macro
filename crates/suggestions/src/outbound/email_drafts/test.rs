@@ -5,8 +5,8 @@ use sqlx::PgPool;
 use super::*;
 use crate::outbound::pg_suggestion_repo::test::insert_user;
 
-const OWNER: &str = "macro|drafts-owner@example.com";
-const TEAMMATE: &str = "macro|drafts-teammate@example.com";
+const OWNER: &str = "rox|drafts-owner@example.com";
+const TEAMMATE: &str = "rox|drafts-teammate@example.com";
 
 fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).unwrap()

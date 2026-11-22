@@ -19,7 +19,7 @@ INSERT INTO
         "rox_user_id"
     ) (
         SELECT
-            'macro|user@user.com',
+            'rox|user@user.com',
             'user@user.com',
             'stripe_id',
             1,
@@ -32,7 +32,7 @@ INSERT INTO
             'd0000000-0000-0000-0000-000000000001',
             'test_document_name',
             'txt',
-            'macro|user@user.com'
+            'rox|user@user.com'
     );
 
 INSERT INTO
@@ -56,7 +56,7 @@ INSERT INTO
             'd0000000-0000-0000-0000-000000000002',
             'test_document_name',
             'pdf',
-            'macro|user@user.com'
+            'rox|user@user.com'
     );
 
 INSERT INTO
@@ -71,39 +71,39 @@ INSERT INTO
         SELECT
             'd0000000-0000-0000-0000-100000000001',
             'test_project_name',
-            'macro|user@user.com'
+            'rox|user@user.com'
     );
 
 -- Additional users for team sharing tests
 INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
-    (SELECT 'macro|teammate1@user.com', 'teammate1@user.com', 'stripe_id_t1', 1, 'a2222222-2222-2222-2222-222222222222');
+    (SELECT 'rox|teammate1@user.com', 'teammate1@user.com', 'stripe_id_t1', 1, 'a2222222-2222-2222-2222-222222222222');
 
 INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
-    (SELECT 'macro|teammate2@user.com', 'teammate2@user.com', 'stripe_id_t2', 1, 'a3333333-3333-3333-3333-333333333333');
+    (SELECT 'rox|teammate2@user.com', 'teammate2@user.com', 'stripe_id_t2', 1, 'a3333333-3333-3333-3333-333333333333');
 
 -- A user that belongs to no team (team-share edge case tests)
 INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id") VALUES
     ('a4444444-4444-4444-4444-444444444444', 'noteam', 'no-team@user.com', 'stripe_id_nt');
 
 INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
-    (SELECT 'macro|no-team@user.com', 'no-team@user.com', 'stripe_id_nt', 1, 'a4444444-4444-4444-4444-444444444444');
+    (SELECT 'rox|no-team@user.com', 'no-team@user.com', 'stripe_id_nt', 1, 'a4444444-4444-4444-4444-444444444444');
 
 -- Team and team_user for sharing tests
 INSERT INTO public."team" ("id", "name", "owner_id")
-    VALUES ('a0000000-0000-0000-0000-000000000001', 'test-team', 'macro|user@user.com');
+    VALUES ('a0000000-0000-0000-0000-000000000001', 'test-team', 'rox|user@user.com');
 
 INSERT INTO public."team_user" ("user_id", "team_id", "team_role")
-    VALUES ('macro|user@user.com', 'a0000000-0000-0000-0000-000000000001', 'owner');
+    VALUES ('rox|user@user.com', 'a0000000-0000-0000-0000-000000000001', 'owner');
 
 INSERT INTO public."team_user" ("user_id", "team_id", "team_role")
-    VALUES ('macro|teammate1@user.com', 'a0000000-0000-0000-0000-000000000001', 'member');
+    VALUES ('rox|teammate1@user.com', 'a0000000-0000-0000-0000-000000000001', 'member');
 
 INSERT INTO public."team_user" ("user_id", "team_id", "team_role")
-    VALUES ('macro|teammate2@user.com', 'a0000000-0000-0000-0000-000000000001', 'member');
+    VALUES ('rox|teammate2@user.com', 'a0000000-0000-0000-0000-000000000001', 'member');
 
 -- Owner access for document-one (used in share_with_team tests)
 INSERT INTO public.entity_access (entity_id, entity_type, source_id, source_type, access_level)
-    VALUES ('d0000000-0000-0000-0000-000000000001', 'document', 'macro|user@user.com', 'user', 'owner');
+    VALUES ('d0000000-0000-0000-0000-000000000001', 'document', 'rox|user@user.com', 'user', 'owner');
 
 -- Share permissions for document-one
 INSERT INTO public."SharePermission" ("id", "linkShare", "linkShareAccessLevel", "createdAt", "updatedAt")
@@ -114,12 +114,12 @@ INSERT INTO public."DocumentPermission" ("documentId", "sharePermissionId")
 
 -- Channel and participants for channel share permission tests
 INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES
-    ('c0000000-0000-0000-0000-000000000001', 'test-channel', 'private', 'macro|user@user.com');
+    ('c0000000-0000-0000-0000-000000000001', 'test-channel', 'private', 'rox|user@user.com');
 
 INSERT INTO comms_channel_participants (user_id, channel_id, role) VALUES
-    ('macro|user@user.com', 'c0000000-0000-0000-0000-000000000001', 'owner'),
-    ('macro|teammate1@user.com', 'c0000000-0000-0000-0000-000000000001', 'member'),
-    ('macro|teammate2@user.com', 'c0000000-0000-0000-0000-000000000001', 'member');
+    ('rox|user@user.com', 'c0000000-0000-0000-0000-000000000001', 'owner'),
+    ('rox|teammate1@user.com', 'c0000000-0000-0000-0000-000000000001', 'member'),
+    ('rox|teammate2@user.com', 'c0000000-0000-0000-0000-000000000001', 'member');
 
 -- Share permissions for document-two
 INSERT INTO public."SharePermission" ("id", "linkShare", "linkShareAccessLevel", "createdAt", "updatedAt")
@@ -134,7 +134,7 @@ INSERT INTO public."Document" ("id", "name", "fileType", "owner", "projectId") (
         'd0000000-0000-0000-0000-000000000003',
         'project_child_doc',
         'txt',
-        'macro|user@user.com',
+        'rox|user@user.com',
         'd0000000-0000-0000-0000-100000000001'
 );
 
@@ -153,7 +153,7 @@ INSERT INTO public."Project" ("id", "name", "userId", "parentId") (
     SELECT
         'd0000000-0000-0000-0000-100000000002',
         'child_project',
-        'macro|user@user.com',
+        'rox|user@user.com',
         'd0000000-0000-0000-0000-100000000001'
 );
 
@@ -163,7 +163,7 @@ INSERT INTO public."Document" ("id", "name", "fileType", "owner", "projectId", "
         'd0000000-0000-0000-0000-000000000004',
         'deleted_project_doc',
         'txt',
-        'macro|user@user.com',
+        'rox|user@user.com',
         'd0000000-0000-0000-0000-100000000001',
         NOW()
 );

@@ -5,8 +5,8 @@ fn target_authority_never_overrides_visibility_or_namespace() {
     let team = Uuid::now_v7().try_into().unwrap();
     let other_team = Uuid::now_v7().try_into().unwrap();
     let pair = HashSet::from([
-        RoxUserIdStr::parse_from_str("macro|one@example.com").unwrap(),
-        RoxUserIdStr::parse_from_str("macro|two@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|one@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|two@example.com").unwrap(),
     ]);
     for source in [
         ConversationKind::PublicChannel,

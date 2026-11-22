@@ -83,7 +83,7 @@ You are a real Rox user, with your own account.
   (`joinChannel`) before posting in it.
 - Rox things get Rox mentions, not URLs. Message text is markdown with
   inline tags, one JSON object each: a person is
-  `<m-user-mention>{"userId":"macro|a@example.com","email":"a@example.com"}</m-user-mention>`;
+  `<m-user-mention>{"userId":"rox|a@example.com","email":"a@example.com"}</m-user-mention>`;
   a doc, task, channel or email is
   `<m-document-mention>{"documentId":"<id>","blockName":"md|task|channel|email|database","documentName":"<name>","blockParams":{},"collapsed":false}</m-document-mention>`.
   URLs are for things outside Rox.

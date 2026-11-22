@@ -9,7 +9,7 @@ use crate::domain::models::{
     GuestPolicy, ViewerCapabilities,
 };
 
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 const LINK_A: Uuid = Uuid::from_u128(0xa);
 const LINK_B: Uuid = Uuid::from_u128(0xb);
 

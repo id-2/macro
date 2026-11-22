@@ -22,7 +22,7 @@ fn ready() -> SetupNotice {
             0x0000_0000_0000_7000_8000_0000_0000_0c0c,
         ))),
         computer_name: "Build box".to_owned(),
-        buyer: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        buyer: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
         agent: None,
         outcome: SetupOutcome::Ready,
     }
@@ -120,7 +120,7 @@ impl TeamAgentRepository for Agents {
 
 fn ada(created_by: Option<&str>) -> TeamAgentRecord {
     TeamAgentRecord {
-        user_id: RoxUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap(),
+        user_id: RoxUserIdStr::try_from("rox|ada@agents.macro.invalid".to_owned()).unwrap(),
         team_id: Uuid::from_u128(2),
         created_by: created_by.map(|inviter| RoxUserIdStr::try_from(inviter.to_owned()).unwrap()),
         persona_seed: PersonaSeed {
@@ -136,7 +136,7 @@ fn ada(created_by: Option<&str>) -> TeamAgentRecord {
 
 fn agent_ready() -> SetupNotice {
     SetupNotice {
-        agent: Some(RoxUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap()),
+        agent: Some(RoxUserIdStr::try_from("rox|ada@agents.macro.invalid".to_owned()).unwrap()),
         ..ready()
     }
 }
@@ -155,23 +155,23 @@ async fn a_plain_computers_notice_goes_to_its_buyer_without_an_agent() {
     assert_eq!(sent.len(), 1);
     assert_eq!(
         sent[0]["req"]["recipient_ids"],
-        json!(["macro|owner@example.com"])
+        json!(["rox|owner@example.com"])
     );
     assert_eq!(sent[0]["req"]["notification"]["content"].get("agent"), None);
 }
 
 #[tokio::test]
 async fn an_agent_computers_notice_goes_to_the_agents_inviter_by_the_agents_name() {
-    let sent = sent(agent_ready(), vec![ada(Some("macro|inviter@example.com"))]).await;
+    let sent = sent(agent_ready(), vec![ada(Some("rox|inviter@example.com"))]).await;
 
     assert_eq!(sent.len(), 1);
     assert_eq!(
         sent[0]["req"]["recipient_ids"],
-        json!(["macro|inviter@example.com"])
+        json!(["rox|inviter@example.com"])
     );
     assert_eq!(
         sent[0]["req"]["notification"]["content"]["agent"],
-        json!({ "userId": "macro|ada@agents.macro.invalid", "name": "Ada" })
+        json!({ "userId": "rox|ada@agents.macro.invalid", "name": "Ada" })
     );
 }
 

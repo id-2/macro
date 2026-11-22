@@ -16,6 +16,6 @@ export interface SearchedPerson {
   isTeammate: boolean;
   /** Resolved name, as the contact directory shows it; null when unknown. */
   name?: SearchedPersonName;
-  /** The person's user ID (`macro|<email>`). */
+  /** The person's user ID (`rox|<email>`). */
   userId: string;
 }

@@ -95,7 +95,7 @@ fn team_receipt_hidden_gate_derives_from_team_role() {
     use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
     let team = team_uuid();
-    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("rox|user@example.com")
         .unwrap()
         .into_owned();
     let receipt_with_role = |role: TeamRole| {

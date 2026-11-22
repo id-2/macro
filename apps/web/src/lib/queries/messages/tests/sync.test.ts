@@ -53,7 +53,7 @@ const message = (
   id,
   parent,
   thread_id,
-  sender_id: 'macro|a@example.com',
+  sender_id: 'rox|a@example.com',
   content: id,
   created_at: time,
   updated_at: time,
@@ -63,7 +63,7 @@ const message = (
 });
 const state = {
   root_id: 'root',
-  user_id: 'macro|a@example.com',
+  user_id: 'rox|a@example.com',
   created_at: time,
   updated_at: time,
   resolved: false,
@@ -185,7 +185,7 @@ describe.each([
       ...reply,
       content: 'edited',
       mentions: [{ entity_type: 'document', entity_id: 'doc' }],
-      reactions: [{ emoji: '👍', users: ['macro|a@example.com'] }],
+      reactions: [{ emoji: '👍', users: ['rox|a@example.com'] }],
     };
     applyMessage(edit, 'edited');
     const root = timelineMessages(
@@ -259,14 +259,14 @@ describe.each([
 
     handleMessageEvent({
       parent,
-      actor: 'macro|b@example.com',
+      actor: 'rox|b@example.com',
       change: {
         type: 'reaction_changed',
         emoji: '👍',
         added: true,
         message: {
           ...message(parent, 'fourth', 'root'),
-          reactions: [{ emoji: '👍', users: ['macro|b@example.com'] }],
+          reactions: [{ emoji: '👍', users: ['rox|b@example.com'] }],
         },
       },
     });
@@ -297,7 +297,7 @@ describe.each([
     applyMessage(
       {
         ...reply,
-        reactions: [{ emoji: '👍', users: ['macro|b@example.com'] }],
+        reactions: [{ emoji: '👍', users: ['rox|b@example.com'] }],
       },
       'reaction_changed'
     );
@@ -307,7 +307,7 @@ describe.each([
     ).toEqual([
       expect.objectContaining({
         content: 'new content',
-        reactions: [{ emoji: '👍', users: ['macro|b@example.com'] }],
+        reactions: [{ emoji: '👍', users: ['rox|b@example.com'] }],
       }),
     ]);
     expect(
@@ -379,7 +379,7 @@ describe.each([
     seed();
     handleMessageEvent({
       parent,
-      actor: 'macro|b@example.com',
+      actor: 'rox|b@example.com',
       nonce: null,
       change: {
         type: 'posted',
@@ -437,7 +437,7 @@ describe.each([
         ...message(parent, 'newer-root'),
         sender_id: 'bot|00000000-0000-0000-0000-000000000001',
         bot_profile: { name: 'Bingus', avatar_url: null },
-        triggered_by: 'macro|b@example.com',
+        triggered_by: 'rox|b@example.com',
       };
       mocks.thread.mockResolvedValue({
         root: agentRoot,
@@ -464,7 +464,7 @@ describe.each([
       const agentSender = expect.objectContaining({
         type: 'bot',
         name: 'Bingus',
-        triggered_by: 'macro|b@example.com',
+        triggered_by: 'rox|b@example.com',
       });
       expect(newestRoot().sender).toEqual(agentSender);
       if (type !== 'channel') {
@@ -514,7 +514,7 @@ describe.each([
     const invalidate = vi.spyOn(testQueryClient, 'invalidateQueries');
     handleMessageEvent({
       parent,
-      actor: 'macro|b@example.com',
+      actor: 'rox|b@example.com',
       nonce: null,
       change: {
         type: 'posted',
@@ -558,7 +558,7 @@ describe.each([
     const invalidate = vi.spyOn(testQueryClient, 'invalidateQueries');
     handleMessageEvent({
       parent,
-      actor: 'macro|a@example.com',
+      actor: 'rox|a@example.com',
       nonce: 'own-send',
       change: {
         type: 'posted',
@@ -692,7 +692,7 @@ describe.each([
           ...message(parent, 'reply', 'root'),
           sender_id: agent,
           bot_profile: { name: 'Bingus', avatar_url: null },
-          triggered_by: 'macro|b@example.com',
+          triggered_by: 'rox|b@example.com',
         },
         message(parent, 'human-reply', 'root'),
       ],
@@ -707,9 +707,9 @@ describe.each([
       expect.objectContaining({
         type: 'bot',
         name: 'Bingus',
-        triggered_by: 'macro|b@example.com',
+        triggered_by: 'rox|b@example.com',
       }),
-      { type: 'user', id: 'macro|a@example.com', triggered_by: undefined },
+      { type: 'user', id: 'rox|a@example.com', triggered_by: undefined },
     ]);
   });
   it('skips the sender nonce and scopes ephemeral typing to the parent and root', () => {
@@ -717,7 +717,7 @@ describe.each([
     registerNonce(MessageNonceKeys.MESSAGE, 'own-send');
     handleMessageEvent({
       parent,
-      actor: 'macro|a@example.com',
+      actor: 'rox|a@example.com',
       nonce: 'own-send',
       change: {
         type: 'posted',
@@ -732,13 +732,13 @@ describe.each([
     handleMessageEvent(
       {
         parent,
-        actor: 'macro|b@example.com',
+        actor: 'rox|b@example.com',
         nonce: null,
         change: { type: 'typing', active: true, thread_id: null },
       },
-      'macro|a@example.com'
+      'rox|a@example.com'
     );
-    expect([...getTypingUsers(parent)]).toEqual(['macro|b@example.com']);
+    expect([...getTypingUsers(parent)]).toEqual(['rox|b@example.com']);
     expect([...getTypingUsers(other)]).toEqual([]);
   });
 });
@@ -751,7 +751,7 @@ describe('live timeline activity', () => {
   });
   const activity = {
     id: 'renamed',
-    actor_id: 'macro|a@example.com',
+    actor_id: 'rox|a@example.com',
     occurred_at: '2026-09-09T00:00:01Z',
     action: 'renamed',
     payload: { to: 'Planning' },

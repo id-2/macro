@@ -6,11 +6,11 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000f01', 'macro|pending_user@example.com', '00000000-0000-0000-0000-000000000f01',
+VALUES ('00000000-0000-0000-0000-000000000f01', 'rox|pending_user@example.com', '00000000-0000-0000-0000-000000000f01',
         'pending_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000f02', 'macro|other_pending_user@example.com', '00000000-0000-0000-0000-000000000f02',
+VALUES ('00000000-0000-0000-0000-000000000f02', 'rox|other_pending_user@example.com', '00000000-0000-0000-0000-000000000f02',
         'other_pending_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 ------------------------------------------------------------

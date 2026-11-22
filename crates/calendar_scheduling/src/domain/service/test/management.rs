@@ -123,7 +123,7 @@ async fn management_tools_read_save_and_reject_stale_or_unauthorized_writes() {
     };
     let tools = booking_management_toolset();
     let request =
-        || RequestContext::new(serde_json::from_value(json!("macro|host@example.com")).unwrap());
+        || RequestContext::new(serde_json::from_value(json!("rox|host@example.com")).unwrap());
     // A personal read does not depend on externally supplied actor IDs.
     let personal = tools
         .try_tool_call(

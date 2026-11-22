@@ -20,7 +20,7 @@ use uuid::Uuid;
     )
 )]
 async fn test_unexpanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     let get_item_ids =
         |items: &[SoupItem]| -> Vec<Uuid> { items.iter().map(|item| item.id()).collect() };
@@ -103,7 +103,7 @@ async fn test_unexpanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow
     )
 )]
 async fn test_unexpanded_generic_mixed_types_sorting(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     // --- Helper to extract IDs for easy comparison ---
     let get_item_ids =
@@ -221,7 +221,7 @@ async fn test_unexpanded_generic_mixed_types_sorting(pool: Pool<Postgres>) -> an
     )
 )]
 async fn test_get_user_items_unexpanded_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
     let result = unexpanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -291,7 +291,7 @@ async fn test_get_user_items_unexpanded_cursor(pool: Pool<Postgres>) -> anyhow::
     )
 )]
 async fn test_unexpanded_soup_by_ids(pool: Pool<Postgres>) {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     // Request specific items in a specific order
     let entities = [
@@ -339,7 +339,7 @@ async fn test_unexpanded_soup_by_ids(pool: Pool<Postgres>) {
     )
 )]
 async fn it_should_be_empty(pool: Pool<Postgres>) {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
     // Test with empty entity list
     let empty_result = unexpanded_soup_by_ids(&pool, user_id.copied(), [])
         .await
@@ -372,7 +372,7 @@ async fn it_should_be_empty(pool: Pool<Postgres>) {
     )
 )]
 async fn test_unexpanded_soup_by_ids_simple(pool: Pool<Postgres>) {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     // Request documents in a specific order
     let entities = [
@@ -415,7 +415,7 @@ async fn test_unexpanded_soup_by_ids_simple(pool: Pool<Postgres>) {
     )
 )]
 async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     // Request all items, but only those with explicit access should be returned
     let entities = [
@@ -430,7 +430,7 @@ async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> any
     assert_eq!(items.len(), 3, "Should have access to all three items");
 
     // Test with a different user who might not have access
-    let other_user_id = RoxUserIdStr::parse_from_str("macro|other@user.com").unwrap();
+    let other_user_id = RoxUserIdStr::parse_from_str("rox|other@user.com").unwrap();
     let other_items = unexpanded_soup_by_ids(&pool, other_user_id, &entities).await?;
 
     // Other user shouldn't have access to any items (based on typical fixture setup)
@@ -452,7 +452,7 @@ async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> any
     )
 )]
 async fn test_is_completed_field(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap();
 
     let result = unexpanded_generic_cursor_soup(
         &pool,

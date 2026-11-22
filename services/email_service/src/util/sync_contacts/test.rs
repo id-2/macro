@@ -36,7 +36,7 @@ impl RoxEventBroker for RecordingEventBroker {
 }
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid owner")
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).expect("valid owner")
 }
 
 fn thread_ids(count: usize) -> Vec<Uuid> {
@@ -204,7 +204,7 @@ fn link_for(rox_id: &str, email: &str) -> Link {
 
 #[test]
 fn address_book_connections_cover_saved_contacts_and_skip_noise() {
-    let link = link_for("macro|owner@acme.com", "owner@acme.com");
+    let link = link_for("rox|owner@acme.com", "owner@acme.com");
     let contacts = vec![
         other_contact(Some("Alice@Acme.com"), Some("Alice")),
         other_contact(Some("alice@acme.com"), Some("Alice again")),
@@ -223,7 +223,7 @@ fn address_book_connections_cover_saved_contacts_and_skip_noise() {
         .collect();
     assert_eq!(
         second,
-        vec!["macro|alice@acme.com", "macro|friend@gmail.com"]
+        vec!["rox|alice@acme.com", "rox|friend@gmail.com"]
     );
     assert!(
         connections

@@ -14,7 +14,7 @@ vi.mock('@queries/client', () => ({
 
 const meeting: ActiveMeeting = {
   id: 'live-meeting',
-  createdBy: 'macro|maya@example.com',
+  createdBy: 'rox|maya@example.com',
   title: 'Design catch-up',
   shareToken: 'private-share-token',
   callId: 'live-call',

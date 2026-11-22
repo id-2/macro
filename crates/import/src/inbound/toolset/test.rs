@@ -6,7 +6,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
+    RoxUserIdStr::try_from("rox|tester@rox.one".to_string()).expect("valid test user id")
 }
 
 fn row(source: ImportSource, status: ImportStatus) -> ImportEntity {
@@ -158,7 +158,7 @@ async fn imported_writes_require_an_entity_id() {
 #[tokio::test]
 async fn teammate_dedup_response_tells_the_agent_not_to_duplicate() {
     let teammate_row = ImportEntity {
-        user_id: "macro|teammate@rox.one".into(),
+        user_id: "rox|teammate@rox.one".into(),
         ..row(ImportSource::Linear, ImportStatus::Imported)
     };
     let stager = Arc::new(MockStager {

@@ -67,7 +67,7 @@ fn a_top_level_message_that_mentions_you_is_one_mention_row() {
     // the message's thread.
     let listed = channel_rows(&[
         channel_mention(1, CHANNEL, ROOT, None, 1),
-        document_mention(2, ROOT, None, "macro|other@example.com", 1),
+        document_mention(2, ROOT, None, "rox|other@example.com", 1),
     ]);
     assert_eq!(
         shape(&listed),
@@ -107,7 +107,7 @@ fn a_channel_splits_into_its_top_level_row_and_thread_rows() {
         channel_invite(3, CHANNEL, 3),
         // A plain chip in a top-level message rides with that message.
         channel_send(4, CHANNEL, 0x102, 4),
-        document_mention(5, 0x102, None, "macro|other@example.com", 4),
+        document_mention(5, 0x102, None, "rox|other@example.com", 4),
         // Reactions inside a thread belong to the thread.
         channel_reaction(6, CHANNEL, 0x103, Some(ROOT), 5),
     ]);
@@ -178,7 +178,7 @@ fn document_mentions_show_only_your_documents() {
     assert_eq!(
         shape(&channel_rows(&[
             document_mention(1, 0x100, None, USER, 1),
-            document_mention(2, 0x101, None, "macro|other@example.com", 2),
+            document_mention(2, 0x101, None, "rox|other@example.com", 2),
         ])),
         vec![(InboxRowType::ChannelMessages, vec![uuid(1)], vec![uuid(2)])]
     );
@@ -395,7 +395,7 @@ fn each_access_request_and_task_is_its_own_row() {
         3,
         entity(EntityType::Document, DOC),
         "task_assigned",
-        json!({ "taskId": uuid(DOC), "taskName": "Ship", "assignedBy": "macro|other@example.com" }),
+        json!({ "taskId": uuid(DOC), "taskName": "Ship", "assignedBy": "rox|other@example.com" }),
         3,
         NotificationState::Seen,
     );
@@ -608,11 +608,11 @@ fn requests_offer_their_answers_on_the_request() {
 fn rows_say_who_they_are_from() {
     let mut mention = channel_mention(1, CHANNEL, ROOT, None, 1);
     std::sync::Arc::make_mut(&mut mention).sender_id =
-        Some(RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap());
+        Some(RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap());
     assert_eq!(
         channel_rows(&[mention])[0].actor,
         Some(InboxActor::User(
-            RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap()
+            RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap()
         ))
     );
 

@@ -47,7 +47,7 @@ fn user_access_scope_preserves_organization_and_converts_to_receipt_scope() {
         serde_json::to_value(receipt_scope).unwrap(),
         serde_json::json!({
             "scope": "user",
-            "acting_user": "macro|bot-user@example.com"
+            "acting_user": "rox|bot-user@example.com"
         })
     );
 }
@@ -125,7 +125,7 @@ fn user_scoped_bot_auth_serializes_bot_scope_and_acting_user() {
         serde_json::json!({
             "bot_id": "bot|00000000-0000-0000-0000-000000000123",
             "scope": "user",
-            "acting_user": "macro|bot-user@example.com"
+            "acting_user": "rox|bot-user@example.com"
         })
     );
 }

@@ -19,8 +19,8 @@ const DESIGN_DECKS: &str = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
 const HOLLIS_DM: &str = "cccccccc-cccc-cccc-cccc-cccccccccccc";
 const UNKNOWN_BOT_DM: &str = "dddddddd-dddd-dddd-dddd-dddddddddddd";
 
-const MEMBER: &str = "macro|member@test.com";
-const GABRIEL: &str = "macro|gabriel@test.com";
+const MEMBER: &str = "rox|member@test.com";
+const GABRIEL: &str = "rox|gabriel@test.com";
 
 fn user(id: &str) -> RoxUserId<Lowercase<'_>> {
     RoxUserId::parse_from_str(id).unwrap().lowercase()
@@ -60,7 +60,7 @@ async fn member_sees_matching_channels_but_non_member_does_not(
 
     let non_member_results = search_channel_names(
         &pool,
-        &user("macro|nonmember@test.com"),
+        &user("rox|nonmember@test.com"),
         ChannelNameSearchScope::default(),
         "Rox".to_string(),
         false,
@@ -137,7 +137,7 @@ async fn partial_matches_substrings_while_exact_requires_a_complete_token(
 async fn former_participant_cannot_find_channel(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let results = search_channel_names(
         &pool,
-        &user("macro|former@test.com"),
+        &user("rox|former@test.com"),
         ChannelNameSearchScope::default(),
         "Rox".to_string(),
         false,

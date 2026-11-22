@@ -34,11 +34,11 @@ use model_user::UserContext;
 use rootcause::Report;
 
 const DOCUMENT_ID: &str = "document-1";
-const OWNER_ID: &str = "macro|owner@example.com";
-const USER_ID: &str = "macro|user@example.com";
-const STANDARD_ACT_AS_ID: &str = "macro|standard-internal@example.com";
-const LEGACY_ACT_AS_ID: &str = "macro|legacy-internal@example.com";
-const DEFAULT_INTERNAL_ID: &str = "macro|default-internal@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const STANDARD_ACT_AS_ID: &str = "rox|standard-internal@example.com";
+const LEGACY_ACT_AS_ID: &str = "rox|legacy-internal@example.com";
+const DEFAULT_INTERNAL_ID: &str = "rox|default-internal@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const OWNER_ACTING_BOT_TOKEN: &str = "owner-acting-bot-token";
 

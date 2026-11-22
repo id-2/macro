@@ -184,10 +184,10 @@ const human = (actor: string): Editor => ({ actor, on_behalf_of: null });
 
 it('attaches unique accepted editors to the existing snapshot notification', async () => {
   const id = await seed();
-  await connect(id, 'macro|owner@example.com', 'bot|idle-agent');
-  const viewer = await connect(id, 'macro|viewer@example.com', undefined, 'view');
-  const alice = await connect(id, 'macro|alice@example.com');
-  const bob = await connect(id, 'macro|bob@example.com');
+  await connect(id, 'rox|owner@example.com', 'bot|idle-agent');
+  const viewer = await connect(id, 'rox|viewer@example.com', undefined, 'view');
+  const alice = await connect(id, 'rox|alice@example.com');
+  const bob = await connect(id, 'rox|bob@example.com');
   modes.set(id, 'hold_snapshot');
   await send(alice, [change(alice), change(alice)]);
   await edit(bob);
@@ -202,14 +202,14 @@ it('attaches unique accepted editors to the existing snapshot notification', asy
   await waitForBatches(id, 1);
   expect(batches(id)[0].editors).toHaveLength(2);
   expect(batches(id)[0].editors).toEqual(expect.arrayContaining([
-    human('macro|alice@example.com'), human('macro|bob@example.com'),
+    human('rox|alice@example.com'), human('rox|bob@example.com'),
   ]));
   expect(snapshotText(snapshots.get(id)!.at(-1)!)).not.toContain('Forbidden');
 }, 20_000);
 
 it('reports ongoing editors in later snapshots but excludes replayed operations', async () => {
   const id = await seed();
-  const alice = await connect(id, 'macro|ongoing@example.com');
+  const alice = await connect(id, 'rox|ongoing@example.com');
   const anonymous = await connect(id, null);
   const replay = await edit(alice);
   await waitForBatches(id, 1);
@@ -222,15 +222,15 @@ it('reports ongoing editors in later snapshots but excludes replayed operations'
   await edit(alice);
   await waitForBatches(id, 2);
   expect(batches(id)).toEqual([
-    { editors: [human('macro|ongoing@example.com')] },
-    { editors: [human('macro|ongoing@example.com')] },
+    { editors: [human('rox|ongoing@example.com')] },
+    { editors: [human('rox|ongoing@example.com')] },
   ]);
 }, 30_000);
 
 it('preserves agent subjects and excludes anonymous editors on last leave', async () => {
   const id = await seed();
-  const aliceAgent = await connect(id, 'macro|alice@example.com', 'bot|document-agent');
-  const bobAgent = await connect(id, 'macro|bob@example.com', 'bot|document-agent');
+  const aliceAgent = await connect(id, 'rox|alice@example.com', 'bot|document-agent');
+  const bobAgent = await connect(id, 'rox|bob@example.com', 'bot|document-agent');
   const anonymous = await connect(id, null);
   await edit(aliceAgent);
   await edit(bobAgent);
@@ -239,22 +239,22 @@ it('preserves agent subjects and excludes anonymous editors on last leave', asyn
   await waitForBatches(id, 1);
   expect(batches(id)[0].editors).toHaveLength(2);
   expect(batches(id)[0].editors).toEqual(expect.arrayContaining([
-    { actor: 'bot|document-agent', on_behalf_of: 'macro|alice@example.com' },
-    { actor: 'bot|document-agent', on_behalf_of: 'macro|bob@example.com' },
+    { actor: 'bot|document-agent', on_behalf_of: 'rox|alice@example.com' },
+    { actor: 'bot|document-agent', on_behalf_of: 'rox|bob@example.com' },
   ]));
 }, 20_000);
 
 it('keeps lifecycle notifications empty when opening and closing without edits', async () => {
   const id = await seed();
-  const viewer = await connect(id, 'macro|viewer@example.com', undefined, 'view');
+  const viewer = await connect(id, 'rox|viewer@example.com', undefined, 'view');
   viewer.getWebSocket().close();
   await expect.poll(() => notifications.get(id)!.length, { timeout: 12_000 }).toBeGreaterThan(1);
   expect(notifications.get(id)!.every(({ editors }) => editors.length === 0)).toBe(true);
 }, 20_000);
 
 it.each([
-  { user: 'macro|http-human@example.com', actor: undefined },
-  { user: 'macro|http-owner@example.com', actor: 'bot|http-agent' },
+  { user: 'rox|http-human@example.com', actor: undefined },
+  { user: 'rox|http-owner@example.com', actor: 'bot|http-agent' },
 ])('includes $user attribution in both HTTP and websocket snapshot notifications', async ({ user, actor }) => {
   const id = await seed();
   const token = tokenFor(id, user, actor);
@@ -285,8 +285,8 @@ it.each([
 
 it('keeps ACKs, broadcasts, and snapshot saves working while DSS notifications stall or fail', async () => {
   const id = await seed();
-  const editor = await connect(id, 'macro|unblocked@example.com');
-  const observer = await connect(id, 'macro|observer@example.com', undefined, 'view');
+  const editor = await connect(id, 'rox|unblocked@example.com');
+  const observer = await connect(id, 'rox|observer@example.com', undefined, 'view');
   modes.set(id, 'hold_notification');
   await edit(editor);
   await receiveUpdate(observer);
@@ -313,12 +313,12 @@ it('keeps ACKs, broadcasts, and snapshot saves working while DSS notifications s
 
 it('retries with the legacy empty body only when older DSS rejects editor fields', async () => {
   const id = await seed();
-  const editor = await connect(id, 'macro|legacy@example.com');
+  const editor = await connect(id, 'rox|legacy@example.com');
   modes.set(id, 'legacy');
   await edit(editor);
   await expect.poll(() => rawNotifications.get(id)!.length, { timeout: 12_000 }).toBe(3);
   expect(rawNotifications.get(id)!.slice(1)).toEqual([
-    { editors: [human('macro|legacy@example.com')] },
+    { editors: [human('rox|legacy@example.com')] },
     {},
   ]);
 }, 20_000);

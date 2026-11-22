@@ -4,7 +4,7 @@ use serde_json::{Value, json};
 
 use super::*;
 
-const ACTING_USER_ID: &str = "macro|acting@example.com";
+const ACTING_USER_ID: &str = "rox|acting@example.com";
 
 fn create_router(non_user_owners: NonUserOwners) -> (Router, MockService) {
     let service = MockService::default();
@@ -112,7 +112,7 @@ async fn create_chat_records_user_owner() {
     assert_eq!(response, (StatusCode::OK, json!({ "id": "test-chat-id" })));
     assert_eq!(
         service.created_owners(),
-        vec![user_owner("macro|test@example.com")]
+        vec![user_owner("rox|test@example.com")]
     );
 }
 

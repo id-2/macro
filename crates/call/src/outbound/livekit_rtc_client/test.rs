@@ -150,7 +150,7 @@ fn receive_webhook_accepts_livekit_agent_participant_identity() {
 
 #[test]
 fn receive_webhook_parses_rox_user_participant_identity() {
-    let event = receive_participant_joined(&client(), "macro|alice@example.com")
+    let event = receive_participant_joined(&client(), "rox|alice@example.com")
         .expect("user join must parse identity");
 
     assert_eq!(
@@ -158,7 +158,7 @@ fn receive_webhook_parses_rox_user_participant_identity() {
             .participant_identity
             .as_ref()
             .map(|identity| identity.as_ref()),
-        Some("macro|alice@example.com")
+        Some("rox|alice@example.com")
     );
 }
 

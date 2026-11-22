@@ -59,7 +59,7 @@ async fn a_server_that_never_answers_initialize_times_out() {
     tokio::spawn(async move { axum::serve(listener, router).await.unwrap() });
 
     let record = McpServerRecord {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.com")
             .unwrap()
             .into_owned(),
         url: format!("http://127.0.0.1:{port}/mcp"),

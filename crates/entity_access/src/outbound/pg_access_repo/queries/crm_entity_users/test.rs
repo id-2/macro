@@ -52,9 +52,9 @@ async fn visible_records_reach_the_whole_team(pool: PgPool) -> anyhow::Result<()
     let company = insert_company(&pool, false).await?;
     let contact = insert_contact(&pool, company, false).await?;
     let team = vec![
-        "macro|admin@team.com".to_owned(),
-        "macro|member@team.com".to_owned(),
-        "macro|owner@team.com".to_owned(),
+        "rox|admin@team.com".to_owned(),
+        "rox|member@team.com".to_owned(),
+        "rox|owner@team.com".to_owned(),
     ];
     assert_eq!(users(&pool, company, EntityType::CrmCompany).await, team);
     assert_eq!(users(&pool, contact, EntityType::CrmContact).await, team);
@@ -71,8 +71,8 @@ async fn hidden_records_exclude_plain_members(pool: PgPool) -> anyhow::Result<()
     let visible_company = insert_company(&pool, false).await?;
     let hidden_contact = insert_contact(&pool, visible_company, true).await?;
     let admins = vec![
-        "macro|admin@team.com".to_owned(),
-        "macro|owner@team.com".to_owned(),
+        "rox|admin@team.com".to_owned(),
+        "rox|owner@team.com".to_owned(),
     ];
     assert_eq!(
         users(&pool, hidden_company, EntityType::CrmCompany).await,

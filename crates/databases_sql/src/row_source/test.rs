@@ -96,7 +96,7 @@ fn soup_row(row: &Row) -> SoupItem<SoupPropertiesField> {
             .map(ToString::to_string)
             .unwrap_or_default(),
         owner_id: model_owner::Owner::User(
-            RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|owner@rox.one").unwrap(),
         ),
         created_by: None,
         created_at: Utc::now(),
@@ -352,7 +352,7 @@ impl OpsSink for ReplaySink {
 async fn replay(name: &str) -> Vec<EntityFilterAst> {
     let transcript = transcript(name);
     let soup = ReplaySoup::new(&transcript);
-    let viewer = RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
+    let viewer = RoxUserIdStr::parse_from_str("rox|owner@rox.one").unwrap();
     let source = SoupRowSource {
         soup: &soup,
         contacts: &NoContacts,

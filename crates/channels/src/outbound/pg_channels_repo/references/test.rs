@@ -51,7 +51,7 @@ async fn resolves_live_documents_and_messages_once(pool: Pool<Postgres>) {
     sqlx::query!(
         r#"INSERT INTO comms_messages
             (id, parent_entity_type, parent_entity_id, sender_id, content)
-           VALUES ($1, 'document', 'doc-with-discussion', 'macro|user-a@test.com', 'discussion')"#,
+           VALUES ($1, 'document', 'doc-with-discussion', 'rox|user-a@test.com', 'discussion')"#,
         DISCUSSION_MSG,
     )
     .execute(&pool)

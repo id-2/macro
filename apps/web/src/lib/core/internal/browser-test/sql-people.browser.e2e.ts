@@ -31,7 +31,7 @@ test('executes people SQL in real local Turso, including a fresh query offline',
   const reads = await page.getByTestId('sql-native-reads').textContent();
   await page
     .getByRole('textbox', { name: 'SQL', exact: true })
-    .fill("DELETE FROM rox.people WHERE id = 'macro|late@example.com'");
+    .fill("DELETE FROM rox.people WHERE id = 'rox|late@example.com'");
   await expect(page.getByRole('alert')).not.toBeEmpty();
   await expect(page.getByTestId('sql-native-reads')).toHaveText(reads ?? '');
   expect(forbidden).toEqual([]);

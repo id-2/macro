@@ -60,7 +60,7 @@ impl ActivityAudienceExpander for FailingAudience {
 }
 
 fn user(local: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
+    RoxUserIdStr::try_from(format!("rox|{local}@example.com")).expect("valid user id")
 }
 
 #[tokio::test]

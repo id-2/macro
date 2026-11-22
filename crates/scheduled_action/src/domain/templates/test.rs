@@ -75,7 +75,7 @@ fn owner_receipt(user: RoxUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt<O
 }
 
 fn other_user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|activator@rox.one".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|activator@rox.one".to_owned()).unwrap()
 }
 
 async fn create_routine(actions: &TestService) -> Uuid {

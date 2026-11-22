@@ -4249,7 +4249,7 @@
           },
           "actor_id": {
             "type": "string",
-            "description": "Who mechanically acted, as a principal string (`macro|…` / `bot|…`)."
+            "description": "Who mechanically acted, as a principal string (`rox|…` / `bot|…`)."
           },
           "agent_correlation_id": {
             "type": ["string", "null"],
@@ -6726,7 +6726,7 @@
       },
       "EntityType": {
         "type": "string",
-        "description": "The type of an entity in Macro",
+        "description": "The type of an entity in Rox",
         "enum": [
           "user",
           "chat",

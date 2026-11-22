@@ -37,7 +37,7 @@ async fn fresh_permission_reads_distinguish_team_share_levels(
             assert_eq!(permission.team_share_access_level, level);
             assert_eq!(permission.link_share, Some(LinkShare::Public));
             assert_eq!(permission.link_share_access_level, Some(AccessLevel::Edit));
-            assert_eq!(permission.owner, "macro|user@user.com");
+            assert_eq!(permission.owner, "rox|user@user.com");
             assert_eq!(permission.channel_share_permissions.unwrap().len(), 2);
         }
     }
@@ -55,7 +55,7 @@ async fn get_document_share_permission_reads_link_fields(
         public_permission.link_share_access_level,
         Some(AccessLevel::Edit)
     );
-    assert_eq!(public_permission.owner, "macro|user@user.com");
+    assert_eq!(public_permission.owner, "rox|user@user.com");
     assert_eq!(
         public_permission.channel_share_permissions,
         Some(vec![
@@ -74,7 +74,7 @@ async fn get_document_share_permission_reads_link_fields(
     assert_eq!(disabled_permission.id, "sp-d2");
     assert_eq!(disabled_permission.link_share, None);
     assert_eq!(disabled_permission.link_share_access_level, None);
-    assert_eq!(disabled_permission.owner, "macro|user2@user.com");
+    assert_eq!(disabled_permission.owner, "rox|user2@user.com");
     assert_eq!(disabled_permission.channel_share_permissions, None);
 
     sqlx::query!(
@@ -121,7 +121,7 @@ async fn get_chat_share_permission_reads_link_fields(pool: Pool<Postgres>) -> an
         public_permission.link_share_access_level,
         Some(AccessLevel::Edit)
     );
-    assert_eq!(public_permission.owner, "macro|user@user.com");
+    assert_eq!(public_permission.owner, "rox|user@user.com");
     assert_eq!(
         public_permission.channel_share_permissions,
         Some(vec![
@@ -140,7 +140,7 @@ async fn get_chat_share_permission_reads_link_fields(pool: Pool<Postgres>) -> an
     assert_eq!(disabled_permission.id, "sp-c2");
     assert_eq!(disabled_permission.link_share, None);
     assert_eq!(disabled_permission.link_share_access_level, None);
-    assert_eq!(disabled_permission.owner, "macro|user2@user.com");
+    assert_eq!(disabled_permission.owner, "rox|user2@user.com");
     assert_eq!(disabled_permission.channel_share_permissions, None);
 
     Ok(())

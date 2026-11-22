@@ -36,7 +36,7 @@ function message(id: string, content: string): MessageData {
   return {
     id,
     content,
-    sender_id: 'macro|sender@example.com',
+    sender_id: 'rox|sender@example.com',
     created_at: '2026-11-13T12:00:00Z',
     updated_at: '2026-11-13T12:00:00Z',
     attachments: [],

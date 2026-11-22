@@ -51,7 +51,7 @@ async fn word_router(
     *documents.file_type.lock().unwrap() = Some(file_type);
     // Someone else's document, so the caller's access is checked.
     *documents.document_owner.lock().unwrap() =
-        Some(Owner::from_principal_str("macro|file-owner@example.com").unwrap());
+        Some(Owner::from_principal_str("rox|file-owner@example.com").unwrap());
     state.word_documents = Arc::new(WordDocumentService::new(
         documents,
         Arc::new(ReqwestEditingWorkerClient::from_url(url.clone())),

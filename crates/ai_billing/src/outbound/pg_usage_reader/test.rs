@@ -59,10 +59,10 @@ fn free_completions(user: RoxUserIdStr<'static>) -> [CompletionUsage; 4] {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn aggregates_only_persisted_counted_rows_for_requested_seats(pool: PgPool) {
-    let first = RoxUserIdStr::try_from("macro|first@example.com".to_string()).unwrap();
-    let second = RoxUserIdStr::try_from("macro|second@example.com".to_string()).unwrap();
-    let outside = RoxUserIdStr::try_from("macro|outside@example.com".to_string()).unwrap();
-    let empty = RoxUserIdStr::try_from("macro|empty@example.com".to_string()).unwrap();
+    let first = RoxUserIdStr::try_from("rox|first@example.com".to_string()).unwrap();
+    let second = RoxUserIdStr::try_from("rox|second@example.com".to_string()).unwrap();
+    let outside = RoxUserIdStr::try_from("rox|outside@example.com".to_string()).unwrap();
+    let empty = RoxUserIdStr::try_from("rox|empty@example.com".to_string()).unwrap();
     let repo = PgUsageRepo::new(pool.clone());
     for (user, total, counted) in [
         (&first, 1.0, true),
@@ -146,7 +146,7 @@ async fn aggregates_only_persisted_counted_rows_for_requested_seats(pool: PgPool
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn billing_period_includes_start_and_excludes_end(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|boundary@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|boundary@example.com".to_string()).unwrap();
     let start = chrono::DateTime::from_timestamp(1_800_000_000, 0).unwrap();
     let end = start + Duration::days(30);
     for (created_at, count_usage) in [
@@ -194,7 +194,7 @@ fn current_period() -> BillingPeriod {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_features_are_recorded_but_only_chat_and_editing_are_metered(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for (usage, count_usage) in free_completions(user.clone())
         .into_iter()
@@ -250,7 +250,7 @@ async fn free_features_are_recorded_but_only_chat_and_editing_are_metered(pool: 
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_features_alone_do_not_produce_billable_usage(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for usage in free_completions(user.clone()) {
         usage_repo.insert_usage(&usage, false).await.unwrap();
@@ -265,7 +265,7 @@ async fn free_features_alone_do_not_produce_billable_usage(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unpriced_free_features_are_excluded_from_fallback_billing(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for (mut usage, count_usage) in free_completions(user.clone())
         .into_iter()
@@ -298,7 +298,7 @@ async fn unpriced_free_features_are_excluded_from_fallback_billing(pool: PgPool)
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn priced_cache_tokens_count_through_the_stored_total(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|cache-priced@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|cache-priced@example.com".to_string()).unwrap();
     let amount = UsageAmount::Tokens {
         input: 1_000_000,
         output: 0,
@@ -351,7 +351,7 @@ async fn priced_cache_tokens_count_through_the_stored_total(pool: PgPool) {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unpriced_cache_tokens_fall_back_to_the_opus_5_cache_rates(pool: PgPool) {
-    let user = RoxUserIdStr::try_from("macro|cache-unpriced@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|cache-unpriced@example.com".to_string()).unwrap();
     PgUsageRepo::new(pool.clone())
         .insert_usage(
             &CompletionUsage {
@@ -397,8 +397,8 @@ async fn unpriced_cache_tokens_fall_back_to_the_opus_5_cache_rates(pool: PgPool)
 async fn upgrade_resets_only_the_seat_and_replays_preserve_new_usage(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let first = RoxUserIdStr::try_from("macro|upgraded@example.com").unwrap();
-    let second = RoxUserIdStr::try_from("macro|teammate@example.com").unwrap();
+    let first = RoxUserIdStr::try_from("rox|upgraded@example.com").unwrap();
+    let second = RoxUserIdStr::try_from("rox|teammate@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     for user in [&first, &second] {
@@ -509,7 +509,7 @@ async fn upgrade_resets_only_the_seat_and_replays_preserve_new_usage(pool: PgPoo
 async fn reset_preserves_prior_overage_without_reusing_spent_credits(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let user = RoxUserIdStr::try_from("macro|overage@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|overage@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 22.0);
@@ -548,7 +548,7 @@ async fn reset_preserves_prior_overage_without_reusing_spent_credits(pool: PgPoo
 async fn free_upgrade_discards_usage_without_creating_billable_overage(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let user = RoxUserIdStr::try_from("macro|free-upgrade@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|free-upgrade@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 22.0);
@@ -587,7 +587,7 @@ async fn free_upgrade_discards_usage_without_creating_billable_overage(pool: PgP
 async fn sequential_free_pro_max_upgrades_do_not_double_bill_public_funded_usage(pool: PgPool) {
     use crate::domain::{AiPricing, PlanTier};
     use crate::outbound::PgBillingRepo;
-    let user = RoxUserIdStr::try_from("macro|sequential-upgrade@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|sequential-upgrade@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let billing = PgBillingRepo::new(pool.clone(), AiPricing::testing());
@@ -640,10 +640,10 @@ async fn batched_usage_preserves_each_change_at_a_shared_boundary(pool: PgPool) 
     use crate::domain::{AiPricing, BillingRepo, PlanTier};
     use crate::outbound::PgBillingRepo;
 
-    let upgraded = RoxUserIdStr::try_from("macro|batched-upgrade@example.com").unwrap();
-    let unchanged = RoxUserIdStr::try_from("macro|batched-unchanged@example.com").unwrap();
-    let empty = RoxUserIdStr::try_from("macro|batched-empty@example.com").unwrap();
-    let outside = RoxUserIdStr::try_from("macro|batched-outside@example.com").unwrap();
+    let upgraded = RoxUserIdStr::try_from("rox|batched-upgrade@example.com").unwrap();
+    let unchanged = RoxUserIdStr::try_from("rox|batched-unchanged@example.com").unwrap();
+    let empty = RoxUserIdStr::try_from("rox|batched-empty@example.com").unwrap();
+    let outside = RoxUserIdStr::try_from("rox|batched-outside@example.com").unwrap();
     let period = current_period();
     let at = period.start + Duration::seconds(10);
     let billing = PgBillingRepo::new(pool.clone(), AiPricing::testing());
@@ -766,7 +766,7 @@ impl UpgradeFixture for crate::outbound::PgBillingRepo {
 async fn delayed_plan_cycle_retains_max_consumption_without_creating_downgrade_debt(pool: PgPool) {
     use crate::domain::plan_change::{PlanChange, RecordedPlanChange};
     use crate::domain::{AiPricing, BillingRepo, PlanTier};
-    let user = RoxUserIdStr::try_from("macro|cycle@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("rox|cycle@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 80.0);

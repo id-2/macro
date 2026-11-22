@@ -2,7 +2,7 @@
 //! evaluation suite.
 //!
 //! This is read-only against the source database. It selects tasks created by
-//! Rox employees (owner `macro|…@rox.one`) — internal dogfooding data,
+//! Rox employees (owner `rox|…@rox.one`) — internal dogfooding data,
 //! deliberately excluding customer tasks — and emits **two** corpora:
 //!
 //! - a *title-only* set (tasks whose lexical body is empty), and
@@ -17,7 +17,7 @@
 //!    info). Flagged tasks — and any the model fails to judge — are dropped.
 //! 2. **Email anonymization.** Every real `…@rox.one` email in the owner,
 //!    title, body, and property values is replaced with a fictitious
-//!    `macro|<name>@rox.one` drawn from a fixed set of 20 names, mapped
+//!    `rox|<name>@rox.one` drawn from a fixed set of 20 names, mapped
 //!    deterministically so the same person maps to the same fake email.
 //!
 //! Neither the sensitivity model call nor anything else writes back to the
@@ -53,7 +53,7 @@ use sqlx::PgPool;
 use task_dedup::eval::{CorpusTask, EvalCorpus, TaskSource};
 
 /// Fictitious names used to anonymize employee emails. Real owner/assignee
-/// emails are mapped deterministically onto `macro|<name>@rox.one`.
+/// emails are mapped deterministically onto `rox|<name>@rox.one`.
 const FAKE_NAMES: [&str; 20] = [
     "alex.rivera",
     "sam.chen",
@@ -167,10 +167,10 @@ fn fnv1a(text: &str) -> u64 {
 }
 
 /// Maps one real `…@rox.one` token to a fictitious one, preserving a leading
-/// `macro|` prefix when present. The mapping is stable per local part.
+/// `rox|` prefix when present. The mapping is stable per local part.
 fn fake_for(token: &str) -> String {
-    let (prefix, rest) = match token.strip_prefix("macro|") {
-        Some(rest) => ("macro|", rest),
+    let (prefix, rest) = match token.strip_prefix("rox|") {
+        Some(rest) => ("rox|", rest),
         None => ("", token),
     };
     let local = rest.split('@').next().unwrap_or(rest);
@@ -179,7 +179,7 @@ fn fake_for(token: &str) -> String {
 }
 
 /// Collects every `…@rox.one` email token in `text`, including a leading
-/// `macro|` prefix when present, longest first so replacements don't clobber
+/// `rox|` prefix when present, longest first so replacements don't clobber
 /// each other (the prefixed form is replaced before its bare substring).
 fn collect_rox_emails(text: &str) -> Vec<String> {
     const DOMAIN: &str = "@rox.one";
@@ -199,9 +199,9 @@ fn collect_rox_emails(text: &str) -> Vec<String> {
             start -= prev.len_utf8();
         }
         if start < at {
-            // Include a `macro|` prefix if it immediately precedes the local part.
-            let token_start = if text[..start].ends_with("macro|") {
-                start - "macro|".len()
+            // Include a `rox|` prefix if it immediately precedes the local part.
+            let token_start = if text[..start].ends_with("rox|") {
+                start - "rox|".len()
             } else {
                 start
             };
@@ -553,7 +553,7 @@ async fn fetch_candidates(
         JOIN "Document" d ON d.id = dst.document_id
         WHERE dst.sub_type = 'task'
           AND d."deletedAt" IS NULL
-          AND d.owner LIKE 'macro|%@rox.one'
+          AND d.owner LIKE 'rox|%@rox.one'
           AND length(btrim(d.name)) >= $1
         ORDER BY d."createdAt" DESC
         LIMIT $2

@@ -161,7 +161,7 @@ export const unsubscribeItemsBody = zod.object({
           'form',
           'external_chat',
         ])
-        .describe('The type of an entity in Macro'),
+        .describe('The type of an entity in Rox'),
     })
   ),
   snoozed_until: zod.iso
@@ -211,7 +211,7 @@ export const removeUnsubscribeItemsBody = zod.object({
           'form',
           'external_chat',
         ])
-        .describe('The type of an entity in Macro'),
+        .describe('The type of an entity in Rox'),
     })
   ),
 });
@@ -325,10 +325,10 @@ export const listTypedNotificationsResponse = zod
                 'form',
                 'external_chat',
               ])
-              .describe('The type of an entity in Macro'),
+              .describe('The type of an entity in Rox'),
           })
           .describe(
-            'The Entity describes the minimum amount of information required to describe a unique thing in Macro\nThis contains the type of the entity [EntityType] and the string id of that entity'
+            'The Entity describes the minimum amount of information required to describe a unique thing in Rox\nThis contains the type of the entity [EntityType] and the string id of that entity'
           )
           .and(
             zod.object({
@@ -2611,10 +2611,10 @@ export const bulkGetTypedNotificationsByEventItemIdsResponse = zod
                 'form',
                 'external_chat',
               ])
-              .describe('The type of an entity in Macro'),
+              .describe('The type of an entity in Rox'),
           })
           .describe(
-            'The Entity describes the minimum amount of information required to describe a unique thing in Macro\nThis contains the type of the entity [EntityType] and the string id of that entity'
+            'The Entity describes the minimum amount of information required to describe a unique thing in Rox\nThis contains the type of the entity [EntityType] and the string id of that entity'
           )
           .and(
             zod.object({
@@ -4847,10 +4847,10 @@ export const getTypedNotificationsByEventItemIdResponse = zod
                 'form',
                 'external_chat',
               ])
-              .describe('The type of an entity in Macro'),
+              .describe('The type of an entity in Rox'),
           })
           .describe(
-            'The Entity describes the minimum amount of information required to describe a unique thing in Macro\nThis contains the type of the entity [EntityType] and the string id of that entity'
+            'The Entity describes the minimum amount of information required to describe a unique thing in Rox\nThis contains the type of the entity [EntityType] and the string id of that entity'
           )
           .and(
             zod.object({
@@ -7088,10 +7088,10 @@ export const getTypedNotificationByIdResponse = zod
         'form',
         'external_chat',
       ])
-      .describe('The type of an entity in Macro'),
+      .describe('The type of an entity in Rox'),
   })
   .describe(
-    'The Entity describes the minimum amount of information required to describe a unique thing in Macro\nThis contains the type of the entity [EntityType] and the string id of that entity'
+    'The Entity describes the minimum amount of information required to describe a unique thing in Rox\nThis contains the type of the entity [EntityType] and the string id of that entity'
   )
   .and(
     zod.object({

@@ -50,7 +50,7 @@ impl CheckoutGateway for FakeGateway {
 
 fn request(trial: bool) -> CheckoutRequest<'static> {
     CheckoutRequest {
-        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap(),
         plan: SeatPlan::Premium,
         onboarding_trial: trial,
         success_url: "https://rox.one/app/onboarding?subscriptionSuccess=true".into(),

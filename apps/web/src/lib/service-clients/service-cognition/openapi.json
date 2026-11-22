@@ -2215,7 +2215,7 @@
           {
             "name": "user",
             "in": "query",
-            "description": "A `macro|` user id; omit for the caller.",
+            "description": "A `rox|` user id; omit for the caller.",
             "required": false,
             "schema": {
               "type": "string"
@@ -4726,7 +4726,7 @@
       },
       "Entity": {
         "type": "object",
-        "description": "The Entity describes the minimum amount of information required to describe a unique thing in Macro\nThis contains the type of the entity [EntityType] and the string id of that entity",
+        "description": "The Entity describes the minimum amount of information required to describe a unique thing in Rox\nThis contains the type of the entity [EntityType] and the string id of that entity",
         "required": ["entity_type", "entity_id"],
         "properties": {
           "entity_id": {
@@ -4741,7 +4741,7 @@
       },
       "EntityType": {
         "type": "string",
-        "description": "The type of an entity in Macro",
+        "description": "The type of an entity in Rox",
         "enum": [
           "user",
           "chat",
@@ -5328,7 +5328,7 @@
             }
           }
         ],
-        "description": "A reference image already stored in Macro."
+        "description": "A reference image already stored in Rox."
       },
       "GenerateImageRequest": {
         "type": "object",

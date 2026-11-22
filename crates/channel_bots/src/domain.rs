@@ -14,7 +14,7 @@ pub(crate) fn sender_label(sender_id: &str) -> String {
             "Bot".to_string()
         };
     }
-    // User ids look like `macro|<email>`; show the email's local part.
+    // User ids look like `rox|<email>`; show the email's local part.
     sender_id
         .rsplit('|')
         .next()

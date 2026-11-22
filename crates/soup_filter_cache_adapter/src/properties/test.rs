@@ -11,7 +11,7 @@ use uuid::Uuid;
 const QUERY: &str = include_str!("test/project.graphql");
 const SET: &str = include_str!("test/set.graphql");
 const FAVORITE: &str = include_str!("test/favorite.graphql");
-const VIEWER: &str = "macro|properties@example.com";
+const VIEWER: &str = "rox|properties@example.com";
 fn id(n: u128) -> String {
     Uuid::from_u128(n).to_string()
 }
@@ -304,7 +304,7 @@ fn identity_changes_never_borrow_older_property_snapshots() {
         let mut engine = Engine::new(InMemoryStorage::new());
         write(&mut engine, QUERY, &Map::new(), &data(), VIEWER).await;
         let mut payload = data();
-        payload["user"]["id"] = json!("macro|other@example.com");
+        payload["user"]["id"] = json!("rox|other@example.com");
         payload["user"]["soup"]["items"][0]
             .as_object_mut()
             .unwrap()
@@ -314,7 +314,7 @@ fn identity_changes_never_borrow_older_property_snapshots() {
             QUERY,
             &Map::new(),
             &payload,
-            "macro|other@example.com",
+            "rox|other@example.com",
         )
         .await;
         assert!(!matches(&mut engine, literal(1, 11)).await);

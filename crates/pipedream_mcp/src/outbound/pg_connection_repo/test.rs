@@ -1,7 +1,7 @@
 use super::*;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-const USER: &str = "macro|owner@example.com";
+const USER: &str = "rox|owner@example.com";
 
 fn connection(app_slug: &str) -> PipedreamConnection {
     PipedreamConnection {
@@ -106,7 +106,7 @@ async fn connections_are_deleted_with_their_user(pool: PgPool) {
 async fn connections_follow_a_renamed_user(pool: PgPool) {
     let repo = PgConnectionRepo::new(pool.clone());
     repo.save(&connection("granola")).await.unwrap();
-    let renamed = "macro|renamed@example.com";
+    let renamed = "rox|renamed@example.com";
     sqlx::query!(r#"UPDATE "User" SET id = $1 WHERE id = $2"#, renamed, USER)
         .execute(&pool)
         .await

@@ -13,7 +13,7 @@ use crate::outbound::pg_github_repo::PgGithubRepo;
 async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|user@user.com")
         .unwrap()
         .into_owned();
     let link = repo
@@ -22,7 +22,7 @@ async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
         .unwrap()
         .expect("fixture user has a github link");
 
-    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "rox|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
     assert_eq!(
@@ -38,7 +38,7 @@ async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
 async fn test_get_github_link_by_user_id_not_found(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|nonexistent@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("rox|nonexistent@user.com")
         .unwrap()
         .into_owned();
     let result = repo.get_github_link_by_user_id(&user_id.0).await;
@@ -59,7 +59,7 @@ async fn test_get_github_link_by_github_user_id(pool: Pool<Postgres>) {
         .unwrap()
         .expect("fixture github account is linked");
 
-    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "rox|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
@@ -86,7 +86,7 @@ async fn test_get_github_link_by_id(pool: Pool<Postgres>) {
     let id = uuid::Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap();
     let link = repo.get_github_link_by_id(&id).await.unwrap();
 
-    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "rox|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
@@ -114,7 +114,7 @@ async fn test_insert_github_link(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let link = GithubLink {
         id: uuid::Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap(),
-        rox_id: RoxUserIdStr::parse_from_str("macro|new@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("rox|new@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::parse_str("ffffffff-ffff-ffff-ffff-ffffffffffff").unwrap(),
@@ -128,7 +128,7 @@ async fn test_insert_github_link(pool: Pool<Postgres>) {
 
     // Verify it was inserted by reading it back
     let fetched = repo.get_github_link_by_id(&link.id).await.unwrap();
-    assert_eq!(fetched.rox_id.as_ref(), "macro|new@user.com");
+    assert_eq!(fetched.rox_id.as_ref(), "rox|new@user.com");
     assert_eq!(fetched.github_username, "newuser");
     assert_eq!(fetched.github_user_id, "67890");
 }
@@ -145,7 +145,7 @@ async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postg
     let link = GithubLink {
         id,
         // Different macro user than the fixture owner of github_user_id 12345.
-        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("rox|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -162,7 +162,7 @@ async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postg
 
     // Confirm the row was actually persisted.
     let fetched = repo.get_github_link_by_id(&id).await.unwrap();
-    assert_eq!(fetched.rox_id.as_ref(), "macro|sharer@user.com");
+    assert_eq!(fetched.rox_id.as_ref(), "rox|sharer@user.com");
     assert_eq!(fetched.github_user_id, "12345");
 }
 
@@ -177,7 +177,7 @@ async fn test_insert_github_link_duplicate_rox_and_github_user_id_fails(pool: Po
     let link = GithubLink {
         id: uuid::Uuid::new_v4(),
         // Existing fixture user who already owns github_user_id 12345.
-        rox_id: RoxUserIdStr::parse_from_str("macro|user@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("rox|user@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -206,7 +206,7 @@ async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgre
     let later = chrono::Utc::now() + chrono::Duration::days(1);
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("rox|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -224,7 +224,7 @@ async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgre
         .unwrap()
         .expect("fixture github account is linked");
 
-    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "rox|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
@@ -247,7 +247,7 @@ async fn test_count_github_links_by_github_user_id(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("rox|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -337,7 +337,7 @@ async fn reassign_grant_moves_all_sharers_without_overwriting_other_accounts_or_
     let new_owner = uuid::Uuid::from_u128(42);
     let mut sharer = original.clone();
     sharer.id = uuid::Uuid::from_u128(43);
-    sharer.rox_id = RoxUserIdStr::parse_from_str("macro|sharer@user.com")
+    sharer.rox_id = RoxUserIdStr::parse_from_str("rox|sharer@user.com")
         .unwrap()
         .into_owned();
     repo.insert_github_link(&sharer).await.unwrap();
@@ -382,11 +382,11 @@ async fn link_guard_holds_user_and_shared_account_locks_until_operation_finishes
     pool: Pool<Postgres>,
 ) {
     let repo = PgGithubRepo::new(pool.clone());
-    let mut guard = repo.lock_user_link("macro|user@example.com").await.unwrap();
+    let mut guard = repo.lock_user_link("rox|user@example.com").await.unwrap();
     repo.lock_github_account(&mut guard, "1").await.unwrap();
     let mut other = pool.begin().await.unwrap();
     for key in [
-        "github-link-user:macro|user@example.com",
+        "github-link-user:rox|user@example.com",
         "github-link-account:1",
     ] {
         let locked = sqlx::query_scalar!(
@@ -400,7 +400,7 @@ async fn link_guard_holds_user_and_shared_account_locks_until_operation_finishes
     }
     guard.rollback().await.unwrap();
     for key in [
-        "github-link-user:macro|user@example.com",
+        "github-link-user:rox|user@example.com",
         "github-link-account:1",
     ] {
         let locked = sqlx::query_scalar!(
@@ -418,14 +418,14 @@ async fn link_guard_holds_user_and_shared_account_locks_until_operation_finishes
 async fn contended_link_locks_time_out_and_release_the_waiters_user_lock(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
     let mut owner = repo
-        .lock_user_link("macro|owner@example.com")
+        .lock_user_link("rox|owner@example.com")
         .await
         .unwrap();
     repo.lock_github_account(&mut owner, "1").await.unwrap();
 
     let user_error = tokio::time::timeout(
         std::time::Duration::from_secs(15),
-        repo.lock_user_link("macro|owner@example.com"),
+        repo.lock_user_link("rox|owner@example.com"),
     )
     .await
     .expect("user lock wait must be bounded")
@@ -436,7 +436,7 @@ async fn contended_link_locks_time_out_and_release_the_waiters_user_lock(pool: P
     );
 
     let mut waiter = repo
-        .lock_user_link("macro|waiter@example.com")
+        .lock_user_link("rox|waiter@example.com")
         .await
         .unwrap();
     let account_error = tokio::time::timeout(
@@ -453,7 +453,7 @@ async fn contended_link_locks_time_out_and_release_the_waiters_user_lock(pool: P
     drop(waiter);
     // The failed transaction must not leave the waiter's user lock behind.
     let recovered = repo
-        .lock_user_link("macro|waiter@example.com")
+        .lock_user_link("rox|waiter@example.com")
         .await
         .unwrap();
     recovered.rollback().await.unwrap();

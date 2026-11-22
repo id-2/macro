@@ -192,7 +192,7 @@ fn pending_surface(id: Uuid) -> CollabSurface {
 
 fn channel_receipt() -> EntityAccessReceipt<AnyEntityPermission> {
     receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
@@ -205,7 +205,7 @@ fn initiative_parent(id: Uuid) -> Entity<'static> {
 
 fn initiative_receipt(id: Uuid) -> EntityAccessReceipt<AnyEntityPermission> {
     receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Initiative,
         &id.to_string(),
         edit_permission(),
@@ -230,7 +230,7 @@ fn form_parent(id: Uuid) -> Entity<'static> {
 
 fn form_receipt(id: Uuid, access_level: AccessLevel) -> EntityAccessReceipt<AnyEntityPermission> {
     receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Form,
         &id.to_string(),
         EntityPermission::AccessLevel { access_level },

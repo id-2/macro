@@ -21,14 +21,14 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|owner@example.com', 'owner@example.com', $1)"#,
         rox_user_id,
     )
     .execute(&pool)
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Computers', 'macro|owner@example.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Computers', 'rox|owner@example.com')",
         TEAM,
     )
     .execute(&pool)
@@ -49,7 +49,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
             r#"
             INSERT INTO hosted_runtime
                 (id, team_id, name, size, vcpus, memory_gib, disk_gib, catalog_entry, state, created_by, price_id, purchase_key, host_id)
-            VALUES ($1, $2, 'Build box', 'standard', 4, 8, 100, 'standard@2026-11', '{}', 'macro|owner@example.com', 'price_standard', $1::uuid::text, $3)
+            VALUES ($1, $2, 'Build box', 'standard', 4, 8, 100, 'standard@2026-11', '{}', 'rox|owner@example.com', 'price_standard', $1::uuid::text, $3)
             "#,
             computer.as_uuid(),
             TEAM,
@@ -64,7 +64,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, name, owner_user_id, created_by, computer_id)
-        VALUES ($1, 'Build box', 'macro|owner@example.com', 'macro|owner@example.com', $2)
+        VALUES ($1, 'Build box', 'rox|owner@example.com', 'rox|owner@example.com', $2)
         "#,
         harness_id.as_uuid(),
         signed_in.as_uuid(),
@@ -83,7 +83,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
         )
         INSERT INTO harness_account_logins
             (id, harness_id, provider_account_id, provider, signed_in_by, signed_in_at, expires_at)
-        SELECT $1, $2, account.id, 'claude', 'macro|owner@example.com',
+        SELECT $1, $2, account.id, 'claude', 'rox|owner@example.com',
                '2026-11-01T12:00:00Z', '2026-11-20T12:00:00Z'
         FROM account
         "#,
@@ -97,7 +97,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, name, owner_user_id, created_by, computer_id)
-        VALUES ($1, 'Spare box', 'macro|owner@example.com', 'macro|owner@example.com', $2)
+        VALUES ($1, 'Spare box', 'rox|owner@example.com', 'rox|owner@example.com', $2)
         "#,
         Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0c0d),
         on_credits.as_uuid(),
@@ -113,7 +113,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
         harness_id,
         team_id: TEAM,
         computer_name: "Build box".to_owned(),
-        signed_in_by: Some(RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
+        signed_in_by: Some(RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap()),
         signed_in_at: at(1, 12),
         expires_at: Some(at(20, 12)),
         last_notice: None,

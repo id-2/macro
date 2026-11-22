@@ -32,7 +32,7 @@ fn snapshot(notifications: Vec<Value>) -> Value {
         vec![],
     ))
     .unwrap();
-    json!({"user":{"id":"macro|viewer@example.com", "soup":{"items":[{"__typename":"GraphqlSoupDocument", "id":D, "cacheProjection":capsule, "ownerId":"macro|viewer@example.com", "projectId":null, "fileType":"md", "subType":null, "createdAt":"2025-01-01T00:00:00Z", "updatedAt":"2025-01-02T00:00:00Z", "notifications":notifications}]}}})
+    json!({"user":{"id":"rox|viewer@example.com", "soup":{"items":[{"__typename":"GraphqlSoupDocument", "id":D, "cacheProjection":capsule, "ownerId":"rox|viewer@example.com", "projectId":null, "fileType":"md", "subType":null, "createdAt":"2025-01-01T00:00:00Z", "updatedAt":"2025-01-02T00:00:00Z", "notifications":notifications}]}}})
 }
 fn variables() -> serde_json::Map<String, Value> {
     json!({"input":{"notificationIds":[A], "operation":"MARK_DONE"}})

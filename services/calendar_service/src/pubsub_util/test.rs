@@ -7,35 +7,35 @@ fn found(users: &[&str]) -> Vec<Option<String>> {
 #[test]
 fn an_inbox_refresh_leaves_its_viewers_to_their_own_refresh() {
     let shared_by = [
-        "macro|owner@example.com".to_string(),
-        "macro|delegate@example.com".to_string(),
+        "rox|owner@example.com".to_string(),
+        "rox|delegate@example.com".to_string(),
     ];
 
     let recipients = team_refresh_recipients(
         found(&[
-            "macro|owner@example.com",
-            "macro|delegate@example.com",
-            "macro|teammate@example.com",
+            "rox|owner@example.com",
+            "rox|delegate@example.com",
+            "rox|teammate@example.com",
         ]),
         &shared_by,
         false,
     );
 
-    assert_eq!(recipients, ["macro|teammate@example.com"]);
+    assert_eq!(recipients, ["rox|teammate@example.com"]);
 }
 
 #[test]
 fn a_sharing_change_also_refreshes_the_sharer() {
-    let shared_by = ["macro|owner@example.com".to_string()];
+    let shared_by = ["rox|owner@example.com".to_string()];
 
     let recipients = team_refresh_recipients(
-        found(&["macro|owner@example.com", "macro|teammate@example.com"]),
+        found(&["rox|owner@example.com", "rox|teammate@example.com"]),
         &shared_by,
         true,
     );
 
     assert_eq!(
         recipients,
-        ["macro|owner@example.com", "macro|teammate@example.com"]
+        ["rox|owner@example.com", "rox|teammate@example.com"]
     );
 }

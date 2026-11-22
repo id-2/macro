@@ -9,7 +9,7 @@ const MESSAGE = {
   id: 'comment',
   parent: { type: 'document', id: 'doc' },
   thread_id: null,
-  sender_id: 'macro|commenter@example.com',
+  sender_id: 'rox|commenter@example.com',
   mentions: [],
   content: 'Is this date still right?',
   created_at: '2026-11-05T09:00:00Z',

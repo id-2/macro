@@ -41,7 +41,7 @@ fn created_event_has_exact_sanitized_wire_shape() {
             webhook_id: WEBHOOK_ID.to_string(),
             workspace_id: WORKSPACE_ID.to_string(),
             namespace: "document-updates".to_string(),
-            created_by_user_id: user_id("macro|creator@example.com"),
+            created_by_user_id: user_id("rox|creator@example.com"),
             name: "Document updates".to_string(),
             endpoint_url: "https://example.com/hooks/macro".to_string(),
             status: WebhookStatus::Active,
@@ -62,7 +62,7 @@ fn created_event_has_exact_sanitized_wire_shape() {
                 "webhook_id": WEBHOOK_ID,
                 "workspace_id": WORKSPACE_ID,
                 "namespace": "document-updates",
-                "created_by_user_id": "macro|creator@example.com",
+                "created_by_user_id": "rox|creator@example.com",
                 "name": "Document updates",
                 "endpoint_url": "https://example.com/hooks/macro",
                 "status": "active",
@@ -90,7 +90,7 @@ fn updated_event_has_exact_sanitized_wire_shape() {
         WebhookTopicEvent::Updated(WebhookUpdatedMetadata {
             webhook_id: WEBHOOK_ID.to_string(),
             workspace_id: WORKSPACE_ID.to_string(),
-            actor_user_id: user_id("macro|editor@example.com"),
+            actor_user_id: user_id("rox|editor@example.com"),
             name: None,
             endpoint_url: Some("https://example.com/hooks/updated".to_string()),
             filters: Some(filters()),
@@ -111,7 +111,7 @@ fn updated_event_has_exact_sanitized_wire_shape() {
             "metadata": {
                 "webhook_id": WEBHOOK_ID,
                 "workspace_id": WORKSPACE_ID,
-                "actor_user_id": "macro|editor@example.com",
+                "actor_user_id": "rox|editor@example.com",
                 "name": null,
                 "endpoint_url": "https://example.com/hooks/updated",
                 "filters": [
@@ -140,7 +140,7 @@ fn deleted_event_has_exact_wire_shape() {
         WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
             webhook_id: WEBHOOK_ID.to_string(),
             workspace_id: WORKSPACE_ID.to_string(),
-            actor_user_id: user_id("macro|deleter@example.com"),
+            actor_user_id: user_id("rox|deleter@example.com"),
         }),
     );
 
@@ -153,7 +153,7 @@ fn deleted_event_has_exact_wire_shape() {
             "metadata": {
                 "webhook_id": WEBHOOK_ID,
                 "workspace_id": WORKSPACE_ID,
-                "actor_user_id": "macro|deleter@example.com",
+                "actor_user_id": "rox|deleter@example.com",
             },
         })
     );
@@ -166,7 +166,7 @@ fn validated_event_has_exact_sanitized_wire_shape() {
         WebhookTopicEvent::Validated(WebhookValidatedMetadata {
             webhook_id: WEBHOOK_ID.to_string(),
             workspace_id: WORKSPACE_ID.to_string(),
-            actor_user_id: user_id("macro|validator@example.com"),
+            actor_user_id: user_id("rox|validator@example.com"),
             is_valid: false,
             response_status: Some(401),
             message: Some("endpoint rejected validation request".to_string()),
@@ -182,7 +182,7 @@ fn validated_event_has_exact_sanitized_wire_shape() {
             "metadata": {
                 "webhook_id": WEBHOOK_ID,
                 "workspace_id": WORKSPACE_ID,
-                "actor_user_id": "macro|validator@example.com",
+                "actor_user_id": "rox|validator@example.com",
                 "is_valid": false,
                 "response_status": 401,
                 "message": "endpoint rejected validation request",
@@ -200,7 +200,7 @@ fn decodes_v1_created_payload_persisted_before_namespaces_existed() {
         "metadata": {
             "webhook_id": WEBHOOK_ID,
             "workspace_id": WORKSPACE_ID,
-            "created_by_user_id": "macro|creator@example.com",
+            "created_by_user_id": "rox|creator@example.com",
             "name": "Document updates",
             "endpoint_url": "https://example.com/hooks/macro",
             "status": "active",
@@ -229,7 +229,7 @@ fn constructors_key_events_by_subject_webhook_id() {
                 webhook_id: WEBHOOK_ID.to_string(),
                 workspace_id: WORKSPACE_ID.to_string(),
                 namespace: "lifecycle-events".to_string(),
-                created_by_user_id: user_id("macro|creator@example.com"),
+                created_by_user_id: user_id("rox|creator@example.com"),
                 name: "Lifecycle events".to_string(),
                 endpoint_url: "https://example.com/hooks/macro".to_string(),
                 status: WebhookStatus::Active,
@@ -244,7 +244,7 @@ fn constructors_key_events_by_subject_webhook_id() {
             WebhookUpdatedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
                 workspace_id: WORKSPACE_ID.to_string(),
-                actor_user_id: user_id("macro|editor@example.com"),
+                actor_user_id: user_id("rox|editor@example.com"),
                 name: None,
                 endpoint_url: None,
                 filters: None,
@@ -260,7 +260,7 @@ fn constructors_key_events_by_subject_webhook_id() {
             WebhookDeletedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
                 workspace_id: WORKSPACE_ID.to_string(),
-                actor_user_id: user_id("macro|deleter@example.com"),
+                actor_user_id: user_id("rox|deleter@example.com"),
             },
         ),
         WebhookMacroEvent::validated(
@@ -268,7 +268,7 @@ fn constructors_key_events_by_subject_webhook_id() {
             WebhookValidatedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
                 workspace_id: WORKSPACE_ID.to_string(),
-                actor_user_id: user_id("macro|validator@example.com"),
+                actor_user_id: user_id("rox|validator@example.com"),
                 is_valid: true,
                 response_status: Some(204),
                 message: None,
@@ -302,7 +302,7 @@ fn rox_event_round_trips_without_exposing_secrets_or_header_values() {
             webhook_id: WEBHOOK_ID.to_string(),
             workspace_id: WORKSPACE_ID.to_string(),
             namespace: "lifecycle-events".to_string(),
-            created_by_user_id: user_id("macro|creator@example.com"),
+            created_by_user_id: user_id("rox|creator@example.com"),
             name: "Lifecycle events".to_string(),
             endpoint_url: "https://example.com/hooks/macro".to_string(),
             status: WebhookStatus::Active,

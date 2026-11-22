@@ -67,7 +67,7 @@ fn registry_rows_of_teams_and_bots_become_purgeable_and_a_users_row_is_refused()
             owner: TeamDeletionOwner::Team(team),
         }
     );
-    let user = RoxUserIdStr::parse_from_str("macro|member@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|member@example.com").unwrap();
     assert!(owned_entity_ref(record(Owner::User(user))).is_err());
 }
 

@@ -17,7 +17,7 @@ fn users(emails: &[&str]) -> Vec<RoxUserIdStr<'static>> {
 fn team1_claims(emails: &[&str]) -> Vec<(String, String)> {
     emails
         .iter()
-        .map(|email| (format!("macro|{email}"), "team1".to_owned()))
+        .map(|email| (format!("rox|{email}"), "team1".to_owned()))
         .collect()
 }
 
@@ -196,7 +196,7 @@ async fn people_already_on_rox_are_not_claimed(pool: PgPool) {
     .unwrap();
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
-        "macro|Existing@user.com",
+        "rox|Existing@user.com",
         "Existing@user.com",
         rox_user_id,
     )

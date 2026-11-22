@@ -19,7 +19,7 @@ async fn render_mints_view_access_and_does_not_admit_or_meter_a_model() {
         assert!(matches!(request, CanvasRequest::Render { .. }));
         let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["access_level"], "view");
-        assert_eq!(claims["actor"], "macro|ai@rox.one");
+        assert_eq!(claims["actor"], "rox|ai@rox.one");
         assert_eq!(serde_json::to_value(request).unwrap(), serde_json::json!({"action":"render"}));
         Box::pin(async { Ok(CanvasResult { failure: None, usage: vec![], response: CanvasResponse {
             render: Some(serde_json::from_value(serde_json::json!({"revision":"snapshot-1","clock":{},"crop":{"x":0,"y":0,"width":100,"height":80},"width":200,"height":160,"objects":[],"unavailable":[],"modelMedia":[{"type":"image","mediaType":"image/png","data":"iVBORw0KGgo="}]})).unwrap()),
@@ -38,7 +38,7 @@ async fn render_mints_view_access_and_does_not_admit_or_meter_a_model() {
         .render(
             receipt(AccessLevel::View),
             &user(),
-            Some("macro|ai@rox.one"),
+            Some("rox|ai@rox.one"),
             None,
             None,
         )
@@ -62,7 +62,7 @@ async fn invalid_render_crop_never_starts_storage_or_worker_access() {
             .render(
                 receipt(AccessLevel::View),
                 &user(),
-                Some("macro|ai@rox.one"),
+                Some("rox|ai@rox.one"),
                 None,
                 Some(CanvasBounds {
                     x: 0.0,
@@ -76,7 +76,7 @@ async fn invalid_render_crop_never_starts_storage_or_worker_access() {
     );
 }
 fn user() -> RoxUserIdStr<'static> {
-    "macro|canvas@example.com".to_owned().try_into().unwrap()
+    "rox|canvas@example.com".to_owned().try_into().unwrap()
 }
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
@@ -137,8 +137,8 @@ async fn read_mints_only_view_access_and_preserves_actor_without_admission_or_us
                 rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["document_id"], DOCUMENT);
             assert_eq!(claims["access_level"], "view");
-            assert_eq!(claims["actor"], "macro|ai@rox.one");
-            assert_eq!(claims["user_id"], "macro|canvas@example.com");
+            assert_eq!(claims["actor"], "rox|ai@rox.one");
+            assert_eq!(claims["user_id"], "rox|canvas@example.com");
             Box::pin(async {
                 Ok(CanvasResult {
                     failure: None,
@@ -166,7 +166,7 @@ async fn read_mints_only_view_access_and_preserves_actor_without_admission_or_us
             .read(
                 receipt(AccessLevel::View),
                 &user(),
-                Some("macro|ai@rox.one"),
+                Some("rox|ai@rox.one"),
                 None,
                 None
             )
@@ -201,7 +201,7 @@ async fn invalid_file_type_and_denied_admission_never_start_worker() {
             .edit(
                 receipt(AccessLevel::Edit),
                 &user(),
-                Some("macro|ai@rox.one"),
+                Some("rox|ai@rox.one"),
                 "Make a flowchart".into(),
                 None,
             )
@@ -223,7 +223,7 @@ async fn admitted_edit_mints_edit_access_and_records_actual_worker_usage() {
         assert!(matches!(request,CanvasRequest::Edit {instructions, ..} if instructions=="Make a flowchart"));
         let claims: serde_json::Value=rox_sync_service_jwt::decode(token.as_str(),SECRET).unwrap();
         assert_eq!(claims["access_level"],"edit");
-        assert_eq!(claims["actor"],"macro|ai@rox.one");
+        assert_eq!(claims["actor"],"rox|ai@rox.one");
         Box::pin(async {Ok(CanvasResult { failure: None,response:CanvasResponse { render: None,canvas:None,operations_applied:3,summary:"Applied".into(),clarification:None},usage:vec![EditUsage {model:"test-model".into(),input_tokens:100,output_tokens:20}]})})
     });
     let recorder = Arc::new(Recorder::default());
@@ -239,7 +239,7 @@ async fn admitted_edit_mints_edit_access_and_records_actual_worker_usage() {
             .edit(
                 receipt(AccessLevel::Edit),
                 &user(),
-                Some("macro|ai@rox.one"),
+                Some("rox|ai@rox.one"),
                 "Make a flowchart".into(),
                 None
             )
@@ -315,7 +315,7 @@ async fn failed_later_step_still_records_completed_provider_usage() {
         .edit(
             receipt(AccessLevel::Edit),
             &user(),
-            Some("macro|ai@rox.one"),
+            Some("rox|ai@rox.one"),
             "Make a flowchart".into(),
             None,
         )
@@ -341,7 +341,7 @@ async fn direct_batch_has_edit_capability_without_a_second_model_or_admission() 
     worker.expect_canvas().times(1).returning(|_, token, request, _| {
         let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["access_level"], "edit");
-        assert_eq!(claims["actor"], "macro|ai@rox.one");
+        assert_eq!(claims["actor"], "rox|ai@rox.one");
         assert!(matches!(request, CanvasRequest::Apply { code, .. } if code == "editor.move(['a'],0,20)"));
         Box::pin(async { Ok(CanvasResult { failure: None, usage: vec![], response: CanvasResponse {
             render: None, canvas: Some("verified scene".into()), operations_applied: 1, summary: "Applied".into(), clarification: None,
@@ -359,7 +359,7 @@ async fn direct_batch_has_edit_capability_without_a_second_model_or_admission() 
         .apply(
             receipt(AccessLevel::Edit),
             &user(),
-            Some("macro|ai@rox.one"),
+            Some("rox|ai@rox.one"),
             CanvasRequest::Apply {
                 expected_revision: "a".repeat(64),
                 code: "editor.move(['a'],0,20)".into(),
@@ -386,7 +386,7 @@ async fn invalid_direct_revision_never_reads_storage_or_calls_worker() {
         .apply(
             receipt(AccessLevel::Edit),
             &user(),
-            Some("macro|ai@rox.one"),
+            Some("rox|ai@rox.one"),
             CanvasRequest::Apply {
                 expected_revision: "stale".into(),
                 code: "editor.move(['a'],0,20)".into(),
@@ -437,7 +437,7 @@ async fn the_artifacts_rollout_reaches_the_worker_only_when_set() {
             .read(
                 receipt(AccessLevel::View),
                 &user(),
-                Some("macro|ai@rox.one"),
+                Some("rox|ai@rox.one"),
                 None,
                 None,
             )
@@ -452,7 +452,7 @@ async fn a_user_without_a_bot_mints_a_token_with_no_actor() {
     worker.expect_canvas().times(1).returning(|_, token, _, _| {
         let claims: serde_json::Value =
             rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
-        assert_eq!(claims["user_id"], "macro|canvas@example.com");
+        assert_eq!(claims["user_id"], "rox|canvas@example.com");
         assert!(claims.get("actor").is_none_or(serde_json::Value::is_null));
         Box::pin(async {
             Ok(CanvasResult {
@@ -590,7 +590,7 @@ async fn a_stored_render_keeps_the_png_as_the_callers_file_and_drops_inline_medi
     assert_eq!(stored.render.objects[0].id, "box");
     let saved = images.0.lock().unwrap();
     assert_eq!(saved.len(), 1);
-    assert_eq!(saved[0].0, "macro|canvas@example.com");
+    assert_eq!(saved[0].0, "rox|canvas@example.com");
     assert_eq!(saved[0].1, format!("canvas-{DOCUMENT}.png"));
     assert_eq!(saved[0].2, b"\x89PNG\r\n\x1a\n");
 }

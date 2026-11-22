@@ -42,7 +42,7 @@ fn mutation_target(is_read_only: bool) -> CalendarEventMutationTarget {
         is_read_only,
         provider_event_id: "instance-id".to_string(),
         provider_recurring_event_id: Some("master-id".to_string()),
-        owner_id: "macro|self@example.com".to_string(),
+        owner_id: "rox|self@example.com".to_string(),
         email_link_id: SELF_LINK,
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),
@@ -71,7 +71,7 @@ fn echo_attendee(email: &str, is_self: bool) -> CalendarAttendee {
 fn creation_target(is_read_only: bool) -> CalendarCreationTarget {
     CalendarCreationTarget {
         observed_access_role: Some(if is_read_only { "reader" } else { "owner" }.to_owned()),
-        owner_id: "macro|self@example.com".to_string(),
+        owner_id: "rox|self@example.com".to_string(),
         email_link_id: SELF_LINK,
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),
@@ -1147,7 +1147,7 @@ async fn create_requires_a_writable_calendar() {
     );
     assert!(matches!(
         missing
-            .create_event("macro|user", None, None, draft())
+            .create_event("rox|user", None, None, draft())
             .await,
         Err(CalendarMutationError::NoWritableCalendar)
     ));
@@ -1162,7 +1162,7 @@ async fn create_requires_a_writable_calendar() {
     );
     assert!(matches!(
         read_only
-            .create_event("macro|user", None, None, draft())
+            .create_event("rox|user", None, None, draft())
             .await,
         Err(CalendarMutationError::ReadOnly)
     ));
@@ -1182,7 +1182,7 @@ async fn create_persists_the_provider_echo_and_returns_the_applied_id() {
         FakeProvider::new(FakeProviderBehavior::Echo),
         FakeTokens::ok(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1202,7 +1202,7 @@ async fn create_does_not_write_when_inbox_lookup_fails() {
     let upserts = repo.upserts.clone();
 
     let error = service(repo, provider, FakeTokens::ok())
-        .create_event("macro|user", None, None, draft())
+        .create_event("rox|user", None, None, draft())
         .await
         .unwrap_err();
 
@@ -1229,7 +1229,7 @@ async fn create_returned_echo_marks_the_copys_inbox_as_self() {
         provider,
         FakeTokens::ok(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1253,7 +1253,7 @@ async fn create_publishes_created_when_the_row_was_inserted() {
         FakeTokens::ok(),
         broker.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1269,7 +1269,7 @@ async fn create_publishes_created_when_the_row_was_inserted() {
     assert_eq!(metadata["event_id"], serde_json::json!(applied_id));
     assert_eq!(
         metadata["owner_id"],
-        serde_json::json!("macro|self@example.com")
+        serde_json::json!("rox|self@example.com")
     );
     assert_eq!(event.payload["schema_version"], serde_json::json!(1));
 }
@@ -1292,7 +1292,7 @@ async fn an_idempotent_create_that_hits_the_conflict_path_publishes_updated() {
         FakeTokens::ok(),
         broker.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1322,7 +1322,7 @@ async fn a_write_that_changed_nothing_publishes_nothing() {
         FakeTokens::ok(),
         broker.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1346,13 +1346,13 @@ async fn a_persisted_mutation_nudges_the_links_calendar_viewers() {
         FakeTokens::ok(),
         refresh.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
     let notified = refresh.notified.lock().expect("notifier lock").clone();
     assert_eq!(notified.len(), 1);
-    assert_eq!(notified[0].0, "macro|self@example.com");
+    assert_eq!(notified[0].0, "rox|self@example.com");
     assert!(
         !notified[0].2,
         "ordinary event edits preserve cached OOO rows"
@@ -1367,7 +1367,7 @@ async fn a_policy_reaching_guest_copies_nudges_their_viewers() {
         write_change: CalendarEventChange::Updated,
         aligned_copies: vec![crate::domain::models::AlignedGuestCopy {
             event_id: Uuid::now_v7(),
-            owner_id: "macro|guest@example.com".into(),
+            owner_id: "rox|guest@example.com".into(),
             email_link_id: guest_link,
         }],
         ..FakeRepo::default()
@@ -1379,13 +1379,13 @@ async fn a_policy_reaching_guest_copies_nudges_their_viewers() {
         FakeTokens::ok(),
         refresh.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
     let notified = refresh.notified.lock().expect("notifier lock").clone();
     assert!(
-        notified.contains(&("macro|guest@example.com".to_string(), guest_link, false)),
+        notified.contains(&("rox|guest@example.com".to_string(), guest_link, false)),
         "{notified:?}"
     );
 }
@@ -1404,7 +1404,7 @@ async fn a_write_that_changed_nothing_sends_no_refresh_nudge() {
         FakeTokens::ok(),
         refresh.clone(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1419,7 +1419,7 @@ async fn deleting_clears_team_ooo_rows_only_for_an_out_of_office_event() {
             mutation_target: Some(mutation_target(false)),
             retired_events: vec![RetiredCalendarEvent {
                 event_id,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: true,
                 team_ooo_changed: out_of_office,
             }],
@@ -1432,7 +1432,7 @@ async fn deleting_clears_team_ooo_rows_only_for_an_out_of_office_event() {
             FakeTokens::ok(),
             refresh.clone(),
         )
-        .delete_event("macro|user", event_id, None, CalendarDeletionScope::All)
+        .delete_event("rox|user", event_id, None, CalendarDeletionScope::All)
         .await
         .unwrap();
 
@@ -1455,20 +1455,20 @@ async fn deleting_a_series_publishes_deleted_per_removed_event() {
         retired_events: vec![
             RetiredCalendarEvent {
                 event_id: master,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: true,
                 team_ooo_changed: false,
             },
             RetiredCalendarEvent {
                 event_id: instance,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: true,
                 team_ooo_changed: false,
             },
             // Still backed by another source, so the row was rewritten.
             RetiredCalendarEvent {
                 event_id: survivor,
-                owner_id: "macro|owner".to_string(),
+                owner_id: "rox|owner".to_string(),
                 deleted: false,
                 team_ooo_changed: false,
             },
@@ -1482,7 +1482,7 @@ async fn deleting_a_series_publishes_deleted_per_removed_event() {
         FakeTokens::ok(),
         broker.clone(),
     )
-    .delete_event("macro|user", master, None, CalendarDeletionScope::All)
+    .delete_event("rox|user", master, None, CalendarDeletionScope::All)
     .await
     .unwrap();
 
@@ -1529,7 +1529,7 @@ async fn a_failed_publish_does_not_fail_the_mutation() {
         FakeTokens::ok(),
         RecordingEventBroker::failing(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .expect("a publish failure must not fail the mutation");
 
@@ -1546,7 +1546,7 @@ async fn a_rejected_mutation_publishes_nothing() {
         broker.clone(),
     );
     assert!(
-        svc.create_event("macro|user", None, None, draft())
+        svc.create_event("rox|user", None, None, draft())
             .await
             .is_err()
     );
@@ -1569,7 +1569,7 @@ async fn create_includes_the_calendar_inbox_as_an_accepted_guest() {
         provider,
         FakeTokens::ok(),
     )
-    .create_event("macro|user", None, None, draft())
+    .create_event("rox|user", None, None, draft())
     .await
     .unwrap();
 
@@ -1613,7 +1613,7 @@ async fn create_does_not_duplicate_an_organizer_already_on_the_guest_list() {
         provider,
         FakeTokens::ok(),
     )
-    .create_event("macro|user", None, None, already_listed)
+    .create_event("rox|user", None, None, already_listed)
     .await
     .unwrap();
 
@@ -1654,7 +1654,7 @@ async fn create_collapses_duplicate_organizer_rows() {
         provider,
         FakeTokens::ok(),
     )
-    .create_event("macro|user", None, None, listed)
+    .create_event("rox|user", None, None, listed)
     .await
     .unwrap();
 
@@ -1698,7 +1698,7 @@ async fn create_rejects_invalid_input_before_reaching_the_provider() {
         time_zone: None,
     };
     assert!(matches!(
-        svc.create_event("macro|user", None, None, inverted).await,
+        svc.create_event("rox|user", None, None, inverted).await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
 
@@ -1710,13 +1710,13 @@ async fn create_rejects_invalid_input_before_reaching_the_provider() {
     let mut point_draft = draft();
     point_draft.time = point.clone();
     assert!(matches!(
-        svc.create_event("macro|user", None, None, point_draft)
+        svc.create_event("rox|user", None, None, point_draft)
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
     assert!(matches!(
         svc.update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -1732,7 +1732,7 @@ async fn create_rejects_invalid_input_before_reaching_the_provider() {
     let mut bad_email = draft();
     bad_email.attendees[0].email = "not-an-email".to_string();
     assert!(matches!(
-        svc.create_event("macro|user", None, None, bad_email).await,
+        svc.create_event("rox|user", None, None, bad_email).await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
     assert!(calls.lock().unwrap().is_empty());
@@ -1759,7 +1759,7 @@ async fn create_out_of_office_forwards_the_type_and_adds_no_organizer_guest() {
     };
 
     service(repo, provider, FakeTokens::ok())
-        .create_event("macro|user", None, None, out_of_office_draft())
+        .create_event("rox|user", None, None, out_of_office_draft())
         .await
         .unwrap();
 
@@ -1788,7 +1788,7 @@ async fn create_out_of_office_rejects_a_non_primary_calendar_before_the_provider
     );
 
     assert!(matches!(
-        svc.create_event("macro|user", None, None, out_of_office_draft())
+        svc.create_event("rox|user", None, None, out_of_office_draft())
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
@@ -1812,7 +1812,7 @@ async fn create_out_of_office_rejects_all_day_spans_and_attendees() {
     };
     assert!(matches!(
         all_day
-            .create_event("macro|user", None, None, all_day_draft)
+            .create_event("rox|user", None, None, all_day_draft)
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
@@ -1833,7 +1833,7 @@ async fn create_out_of_office_rejects_all_day_spans_and_attendees() {
     }];
     assert!(matches!(
         with_guest
-            .create_event("macro|user", None, None, guest_draft)
+            .create_event("rox|user", None, None, guest_draft)
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
@@ -1850,7 +1850,7 @@ async fn create_out_of_office_rejects_all_day_spans_and_attendees() {
     conference_draft.conference = Some(ConferenceChange::GoogleMeet);
     assert!(matches!(
         with_conference
-            .create_event("macro|user", None, None, conference_draft)
+            .create_event("rox|user", None, None, conference_draft)
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
@@ -1867,7 +1867,7 @@ async fn create_out_of_office_rejects_all_day_spans_and_attendees() {
     description_draft.description = Some("Back Monday".to_string());
     assert!(matches!(
         with_description
-            .create_event("macro|user", None, None, description_draft)
+            .create_event("rox|user", None, None, description_draft)
             .await,
         Err(CalendarMutationError::InvalidInput(_))
     ));
@@ -1891,7 +1891,7 @@ async fn imported_point_accepts_metadata_and_rsvp_provider_echoes() {
     let service = service(repo, provider, FakeTokens::ok());
     service
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -1904,7 +1904,7 @@ async fn imported_point_accepts_metadata_and_rsvp_provider_echoes() {
         .unwrap();
     service
         .respond_to_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             AttendeeResponseStatus::Accepted,
@@ -1928,7 +1928,7 @@ async fn update_validates_lookup_policy_and_addresses_the_series_master() {
     assert!(matches!(
         empty_patch
             .update_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 CalendarEventPatch::default(),
@@ -1951,7 +1951,7 @@ async fn update_validates_lookup_policy_and_addresses_the_series_master() {
     assert!(matches!(
         not_found
             .update_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 patch.clone(),
@@ -1972,7 +1972,7 @@ async fn update_validates_lookup_policy_and_addresses_the_series_master() {
     assert!(matches!(
         read_only
             .update_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 patch.clone(),
@@ -1993,7 +1993,7 @@ async fn update_validates_lookup_policy_and_addresses_the_series_master() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         patch,
@@ -2076,7 +2076,7 @@ async fn updating_attendees_carries_retained_guests_rsvp_through_to_the_provider
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2135,7 +2135,7 @@ async fn occurrence_scoped_attendee_update_prefers_the_occurrence_rsvp_over_the_
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2191,7 +2191,7 @@ fn echo_override(
 
 #[test]
 fn occurrence_override_preserves_reminders_and_privacy_together() {
-    let mut event = echo_upsert("macro|user").event;
+    let mut event = echo_upsert("rox|user").event;
     let mut occurrence = echo_override("2026-08-18T20:00:00+00:00", None);
     let reminders = EventReminders {
         use_default: false,
@@ -2228,7 +2228,7 @@ async fn occurrence_scoped_update_answers_with_the_occurrence_not_the_series() {
 
     let event = service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -2280,7 +2280,7 @@ async fn occurrence_scoped_rsvp_answers_with_the_occurrence_attendees() {
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Declined,
@@ -2313,7 +2313,7 @@ async fn update_on_a_provider_deleted_event_retires_the_stale_source() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2342,7 +2342,7 @@ async fn occurrence_scoped_update_patches_the_instance_not_the_master() {
 
     service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarEventPatch {
@@ -2377,7 +2377,7 @@ async fn occurrence_scoped_update_rejects_recurrence_changes() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2414,7 +2414,7 @@ async fn occurrence_scoped_update_on_a_vanished_occurrence_persists_the_refresh_
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2453,7 +2453,7 @@ async fn occurrence_scoped_update_on_a_vanished_series_retires_the_source() {
         FakeTokens::ok(),
     )
     .update_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarEventPatch {
@@ -2483,7 +2483,7 @@ async fn delete_pushes_to_the_provider_then_retires_the_local_source() {
 
     service(repo, provider, FakeTokens::ok())
         .delete_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarDeletionScope::All,
@@ -2508,7 +2508,7 @@ async fn rsvp_surfaces_attendance_and_persists_the_echo() {
     assert!(matches!(
         not_attendee
             .respond_to_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 AttendeeResponseStatus::Accepted,
@@ -2528,7 +2528,7 @@ async fn rsvp_surfaces_attendance_and_persists_the_echo() {
     let calls = provider.calls.clone();
     service(repo, provider, FakeTokens::ok())
         .respond_to_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             AttendeeResponseStatus::Declined,
@@ -2563,7 +2563,7 @@ async fn rsvp_addresses_the_requester_inbox_not_the_source_calendar() {
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -2598,7 +2598,7 @@ async fn rsvp_without_an_address_answers_as_the_copys_inbox() {
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -2635,7 +2635,7 @@ async fn rsvp_through_a_delegated_inbox_never_hands_the_subject_email_to_the_pro
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -2671,7 +2671,7 @@ async fn rsvp_through_a_delegated_inbox_without_an_own_inbox_is_not_attendee_bef
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -2701,7 +2701,7 @@ async fn rsvp_echo_marks_actor_inboxes_as_self() {
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -2728,7 +2728,7 @@ async fn token_and_provider_failures_map_to_typed_errors() {
     assert!(matches!(
         reauth
             .delete_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 CalendarDeletionScope::All
@@ -2750,7 +2750,7 @@ async fn token_and_provider_failures_map_to_typed_errors() {
     assert!(matches!(
         transient
             .delete_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 CalendarDeletionScope::All
@@ -2772,7 +2772,7 @@ async fn token_and_provider_failures_map_to_typed_errors() {
     assert!(matches!(
         permanent
             .delete_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 CalendarDeletionScope::All
@@ -2822,7 +2822,7 @@ async fn scoped_deletions_reshape_or_retire_the_series() {
     let svc = service(repo, provider, FakeTokens::ok());
 
     svc.delete_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarDeletionScope::ThisEvent {
@@ -2844,7 +2844,7 @@ async fn scoped_deletions_reshape_or_retire_the_series() {
     assert!(removed.lock().unwrap().is_empty());
 
     svc.delete_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarDeletionScope::ThisAndFollowing {
@@ -2873,7 +2873,7 @@ async fn truncation_google_answers_with_a_new_series_retires_the_old_source() {
         mutation_target: Some(target),
         retired_events: vec![RetiredCalendarEvent {
             event_id,
-            owner_id: "macro|self@example.com".to_string(),
+            owner_id: "rox|self@example.com".to_string(),
             deleted: true,
             team_ooo_changed: false,
         }],
@@ -2887,7 +2887,7 @@ async fn truncation_google_answers_with_a_new_series_retires_the_old_source() {
     let svc = service_with_broker(repo, provider, FakeTokens::ok(), broker.clone());
 
     svc.delete_event(
-        "macro|user",
+        "rox|user",
         event_id,
         None,
         CalendarDeletionScope::ThisAndFollowing {
@@ -2935,7 +2935,7 @@ async fn a_replaced_series_whose_old_source_stays_reports_the_failure() {
 
     let result = service(repo, provider, FakeTokens::ok())
         .delete_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             CalendarDeletionScope::ThisAndFollowing {
@@ -2970,7 +2970,7 @@ async fn truncation_that_empties_the_series_retires_the_local_source() {
     );
 
     svc.delete_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         CalendarDeletionScope::ThisAndFollowing {
@@ -2999,7 +2999,7 @@ async fn conference_changes_reach_the_provider_for_any_conference() {
         let calls = provider.calls.clone();
         let result = service(repo, provider, FakeTokens::ok())
             .update_event(
-                "macro|user",
+                "rox|user",
                 Uuid::now_v7(),
                 None,
                 CalendarEventPatch {
@@ -3043,13 +3043,13 @@ async fn disconnecting_calendar_closes_every_open_watch_channel() {
     let calls = provider.calls.clone();
 
     service(repo, provider, FakeTokens::ok())
-        .disconnect_calendar("macro|user", link_id)
+        .disconnect_calendar("rox|user", link_id)
         .await
         .unwrap();
 
     assert_eq!(
         requests.lock().unwrap().as_slice(),
-        [("macro|user".to_string(), link_id)]
+        [("rox|user".to_string(), link_id)]
     );
     assert_eq!(
         calls.lock().unwrap().as_slice(),
@@ -3074,13 +3074,13 @@ async fn disconnecting_calendar_nudges_the_links_calendar_viewers() {
         FakeTokens::ok(),
         refresh.clone(),
     )
-    .disconnect_calendar("macro|user", link_id)
+    .disconnect_calendar("rox|user", link_id)
     .await
     .unwrap();
 
     assert_eq!(
         refresh.notified.lock().expect("notifier lock").as_slice(),
-        [("macro|user".to_string(), link_id, true)]
+        [("rox|user".to_string(), link_id, true)]
     );
 }
 
@@ -3098,7 +3098,7 @@ async fn disconnecting_calendar_survives_a_provider_that_cannot_close_channels()
     ));
     assert!(
         service(repo.clone(), provider, FakeTokens::ok())
-            .disconnect_calendar("macro|user", Uuid::now_v7())
+            .disconnect_calendar("rox|user", Uuid::now_v7())
             .await
             .is_ok()
     );
@@ -3107,7 +3107,7 @@ async fn disconnecting_calendar_survives_a_provider_that_cannot_close_channels()
     let calls = unreachable_token.calls.clone();
     assert!(
         service(repo, unreachable_token, FakeTokens::reauth())
-            .disconnect_calendar("macro|user", Uuid::now_v7())
+            .disconnect_calendar("rox|user", Uuid::now_v7())
             .await
             .is_ok()
     );
@@ -3120,7 +3120,7 @@ async fn disconnecting_an_inbox_the_requester_does_not_own_is_not_found() {
     let calls = provider.calls.clone();
     assert!(matches!(
         service(FakeRepo::default(), provider, FakeTokens::ok())
-            .disconnect_calendar("macro|other", Uuid::now_v7())
+            .disconnect_calendar("rox|other", Uuid::now_v7())
             .await,
         Err(CalendarMutationError::NotFound)
     ));
@@ -3143,10 +3143,10 @@ async fn keyed_deletion_replays_after_the_canonical_event_has_disappeared() {
     let provider = FakeProvider::new(FakeProviderBehavior::Echo);
     let calls = provider.calls.clone();
     let svc = service(repo, provider, FakeTokens::ok());
-    svc.delete_created_event("macro|user", calendar_id, key)
+    svc.delete_created_event("rox|user", calendar_id, key)
         .await
         .unwrap();
-    svc.delete_created_event("macro|user", calendar_id, key)
+    svc.delete_created_event("rox|user", calendar_id, key)
         .await
         .unwrap();
     assert_eq!(
@@ -3168,7 +3168,7 @@ async fn keyed_deletion_requires_current_writable_calendar_access() {
         let calls = provider.calls.clone();
         assert!(
             service(repo, provider, FakeTokens::ok())
-                .delete_created_event("macro|user", Uuid::now_v7(), Uuid::now_v7())
+                .delete_created_event("rox|user", Uuid::now_v7(), Uuid::now_v7())
                 .await
                 .is_err()
         );
@@ -3200,7 +3200,7 @@ async fn rsvp_uses_only_the_selected_owned_address_for_both_scopes() {
             FakeTokens::ok(),
         )
         .respond_to_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             None,
             AttendeeResponseStatus::Accepted,
@@ -3229,7 +3229,7 @@ async fn rsvp_rejects_a_selected_address_the_requester_does_not_own() {
         FakeTokens::ok(),
     )
     .respond_to_event(
-        "macro|user",
+        "rox|user",
         Uuid::now_v7(),
         None,
         AttendeeResponseStatus::Accepted,
@@ -3262,13 +3262,13 @@ async fn outlook_write_pause_rejects_provider_operations_before_fetching_tokens(
     )
     .with_outlook_writes_enabled(false);
     assert!(matches!(
-        svc.create_event("macro|self@example.com", None, None, draft())
+        svc.create_event("rox|self@example.com", None, None, draft())
             .await,
         Err(CalendarMutationError::Retryable(_))
     ));
     assert!(matches!(
         svc.delete_event(
-            "macro|self@example.com",
+            "rox|self@example.com",
             event_id,
             None,
             CalendarDeletionScope::All
@@ -3278,7 +3278,7 @@ async fn outlook_write_pause_rejects_provider_operations_before_fetching_tokens(
     ));
     assert!(matches!(
         svc.respond_to_event(
-            "macro|self@example.com",
+            "rox|self@example.com",
             event_id,
             None,
             AttendeeResponseStatus::Accepted,
@@ -3299,7 +3299,7 @@ async fn outlook_write_pause_rejects_provider_operations_before_fetching_tokens(
     )
     .with_outlook_writes_enabled(false);
     google
-        .create_event("macro|self@example.com", None, None, draft())
+        .create_event("rox|self@example.com", None, None, draft())
         .await
         .unwrap();
 }

@@ -20,11 +20,11 @@ const PROJECT_ID: &str = "00000000-0000-0000-0000-000000000456";
 const TEAM_ID: Uuid = Uuid::from_u128(7);
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap()
 }
 
 fn other_user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|other@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|other@example.com".to_string()).unwrap()
 }
 
 fn principal() -> CreationPrincipal {

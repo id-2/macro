@@ -97,7 +97,7 @@ fn setup() -> (SfsPhotoUploadService<Fake, Fake, Fake, Fake>, Fake) {
         uploaded: Some((UPLOADED_SOURCE.into(), DESTINATION.into())),
         link: Some(Link {
             id: LINK,
-            rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,
@@ -234,7 +234,7 @@ async fn cached_destinations_including_empty_are_used_without_upload() {
                 Call::Find(SOURCE.into()),
                 Call::Upsert,
                 Call::Link(LINK),
-                Call::Notify("macro|owner@example.com".into(), LINK)
+                Call::Notify("rox|owner@example.com".into(), LINK)
             ]
         );
         let saved = &state.contacts[0];
@@ -270,7 +270,7 @@ async fn fresh_upload_and_failed_mapping_read_preserve_order_and_all_debug_field
                 Call::Insert(UPLOADED_SOURCE.into(), DESTINATION.into()),
                 Call::Upsert,
                 Call::Link(LINK),
-                Call::Notify("macro|owner@example.com".into(), LINK)
+                Call::Notify("rox|owner@example.com".into(), LINK)
             ]
         );
         assert_eq!(
@@ -353,7 +353,7 @@ async fn failed_mapping_insert_still_upserts_refreshes_and_deletes() {
             Call::Insert(UPLOADED_SOURCE.into(), DESTINATION.into()),
             Call::Upsert,
             Call::Link(LINK),
-            Call::Notify("macro|owner@example.com".into(), LINK)
+            Call::Notify("rox|owner@example.com".into(), LINK)
         ]
     );
     assert_eq!(
@@ -427,7 +427,7 @@ async fn self_contact_matches_ascii_case_without_trimming() {
                 Call::Find(SOURCE.into()),
                 Call::Upsert,
                 Call::Link(LINK),
-                Call::Notify("macro|owner@example.com".into(), LINK)
+                Call::Notify("rox|owner@example.com".into(), LINK)
             ]
         );
     }

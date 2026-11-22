@@ -34,9 +34,9 @@ import {
   worlds,
 } from '../watch.ts';
 
-const assistant = 'macro|agent@example.com';
-const owner = 'macro|owner@example.com';
-const cy = 'macro|cy@example.com';
+const assistant = 'rox|agent@example.com';
+const owner = 'rox|owner@example.com';
+const cy = 'rox|cy@example.com';
 const start = Temporal.Instant.from('2026-11-09T15:00:00Z');
 const at = (ms: number) => after(start, ms);
 
@@ -358,7 +358,7 @@ test('a join this watcher started counts as the agent being in the call before i
 
 test("busy: the other caller is told once, in their channel, and a restart doesn't tell them again", async () => {
   const inA: InCall = { pid: 7, callId: 'a', args: ['channel', 'ch-a'] };
-  const w = base({ calls: [dm('a', cy), dm('b', 'macro|ann@example.com')] });
+  const w = base({ calls: [dm('a', cy), dm('b', 'rox|ann@example.com')] });
   const first = fakes({ joins: [inA] });
   await tick(w, watchState(), first.ports);
   expect(first.posts).toHaveLength(1);
@@ -441,7 +441,7 @@ test('a placed call that went stale is closed in the ledger and its asker told b
   const placed: Placed = {
     id: 'p1',
     channelId: 'ch-p',
-    target: 'macro|ann@example.com',
+    target: 'rox|ann@example.com',
     asker: cy,
     reason: 'The build is back.',
     rule: 'owner-order',

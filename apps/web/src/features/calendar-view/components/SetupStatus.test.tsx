@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ startAddInbox: vi.fn() }));
 
-const [userId, setUserId] = createSignal<string | undefined>('macro|self');
+const [userId, setUserId] = createSignal<string | undefined>('rox|self');
 const [links, setLinks] = createSignal<EmailLink[]>([]);
 
 vi.mock('@app/features/calendar/components/CalendarPagerContext', () => ({
@@ -54,7 +54,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    rox_id: 'macro|self',
+    rox_id: 'rox|self',
     email_address: `${id}@example.com`,
     is_sync_active: true,
     needs_calendar_permission: false,
@@ -64,11 +64,11 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   }) as unknown as EmailLink;
 
 const delegated = (id: string, overrides: Partial<EmailLink> = {}) =>
-  link(id, { rox_id: 'macro|someone-else', ...overrides });
+  link(id, { rox_id: 'rox|someone-else', ...overrides });
 
 beforeEach(() => {
   mocks.startAddInbox.mockResolvedValue(undefined);
-  setUserId('macro|self');
+  setUserId('rox|self');
   setLinks([]);
 });
 
@@ -179,7 +179,7 @@ describe('SetupStatus', () => {
     render(() => <SetupStatus />);
     expect(screen.queryByRole('button')).toBeNull();
 
-    setUserId('macro|self');
+    setUserId('rox|self');
     expect(screen.getByRole('button', { name: 'Grant access' })).toBeTruthy();
   });
 });

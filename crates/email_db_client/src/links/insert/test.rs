@@ -13,7 +13,7 @@ use sqlx::{Pool, Postgres};
 async fn upsert_link_in_transaction_persists_divergent_ids(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let child_rox_id = "macro|child@personal.test";
+    let child_rox_id = "rox|child@personal.test";
     let primary_fusion_id = "11111111-1111-1111-1111-111111111111";
     let child_email = "child@personal.test";
 

@@ -6,7 +6,7 @@ use uuid::Uuid;
 async fn legacy_enable_and_disable_abort_before_purge_with_or_without_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let user = "macro|rollout@example.com";
+    let user = "rox|rollout@example.com";
     let rox_user = Uuid::now_v7();
     let team = Uuid::now_v7();
     let company = Uuid::now_v7();

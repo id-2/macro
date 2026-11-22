@@ -5,7 +5,7 @@ import { chatMessageData } from './message-data';
 const message: ChatMessage = {
   id: 'message-1',
   kind: 'message',
-  sender: { name: 'WhatsApp participant', userId: 'macro|owner@example.test' },
+  sender: { name: 'WhatsApp participant', userId: 'rox|owner@example.test' },
   mentions: [],
   forwarded: false,
   body: 'Sent from my phone',
@@ -20,7 +20,7 @@ describe('chat message senders', () => {
   it('shows a Rox user as themselves, whatever WhatsApp called them', () => {
     const row = chatMessageData(message, (body) => body);
 
-    expect(row.sender_id).toBe('macro|owner@example.test');
+    expect(row.sender_id).toBe('rox|owner@example.test');
     expect(row.imported_author).toBeNull();
   });
 
@@ -59,7 +59,7 @@ describe('chat message reactions', () => {
           {
             emoji: '👍',
             reactors: [
-              { name: 'Owner', userId: 'macro|owner@example.test' },
+              { name: 'Owner', userId: 'rox|owner@example.test' },
               { name: 'Ana Ruiz' },
               { name: '+5550002' },
             ],
@@ -74,7 +74,7 @@ describe('chat message reactions', () => {
       {
         emoji: '👍',
         users: [
-          'macro|owner@example.test',
+          'rox|owner@example.test',
           'external-reactor:1',
           'external-reactor:2',
         ],

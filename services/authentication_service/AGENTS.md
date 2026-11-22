@@ -212,7 +212,7 @@ inputs cannot select an agent, and ordinary user credentials remain unattributed
 
 ## Gotchas
 
-- New passwordless accounts require a valid unique mailbox handle before FusionAuth user creation. Existing users keep their username until `PUT /user/handle` claims it; never allocate a suffix for a taken handle or change `macro|{email}` user ids.
+- New passwordless accounts require a valid unique mailbox handle before FusionAuth user creation. Existing users keep their username until `PUT /user/handle` claims it; never allocate a suffix for a taken handle or change `rox|{email}` user ids.
 - Match Google link email display names without ASCII case sensitivity: FusionAuth preserves Google's capitalization, while Rox normalizes email addresses. Keep refresh, token lookup, removal, and grant relocation consistent.
 - `/mobile-welcome-email` copies allowlisted ad parameters from the capture
   request onto the desktop signup link and always sets

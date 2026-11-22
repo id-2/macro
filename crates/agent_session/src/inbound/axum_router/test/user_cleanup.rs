@@ -95,7 +95,7 @@ async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority
     ] {
         let mut request = Request::builder()
             .method("DELETE")
-            .uri("/user/macro%7Cowner%40example.com");
+            .uri("/user/rox%7Cowner%40example.com");
         for (key, value) in headers {
             request = request.header(key, value);
         }
@@ -111,7 +111,7 @@ async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority
         .oneshot(
             Request::builder()
                 .method("DELETE")
-                .uri("/user/macro%7Cowner%40example.com")
+                .uri("/user/rox%7Cowner%40example.com")
                 .header(
                     rox_authorization::INTERNAL_API_KEY_HEADER,
                     "test-internal-key",

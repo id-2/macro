@@ -2,7 +2,7 @@ use super::*;
 use model_entity::EntityType;
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap()
 }
 
 fn facts() -> TeamShareFacts {
@@ -60,7 +60,7 @@ fn every_supplied_operation_requires_the_actual_owner() {
         team_id: facts.owner_team_id.unwrap(),
         level: TeamShareLevel::View,
     });
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     for request in [
         request(Some(AccessLevel::View)),
         request(Some(AccessLevel::Edit)),
@@ -118,7 +118,7 @@ fn resolving_a_bot_or_team_audience_does_not_authorize_a_user_to_edit_sharing() 
 fn repeated_clear_without_a_team_still_requires_the_owner() {
     let mut facts = facts();
     facts.owner_team_id = None;
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     for request in [
         request(None),
         TeamShareRequest {

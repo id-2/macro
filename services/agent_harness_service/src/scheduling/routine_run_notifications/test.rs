@@ -11,7 +11,7 @@ use serde_json::json;
 
 use super::*;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 #[derive(Default)]
 struct CapturingIngress(Mutex<Vec<serde_json::Value>>);

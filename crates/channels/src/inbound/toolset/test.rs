@@ -43,7 +43,7 @@ use std::{
 };
 use uuid::Uuid;
 
-const TEST_USER_ID: &str = "macro|channel-owner@example.com";
+const TEST_USER_ID: &str = "rox|channel-owner@example.com";
 
 type PostedSharedMessage = (
     EntityAccessReceipt<messages::domain::service::MessageWrite>,
@@ -895,9 +895,9 @@ fn channel_name_trims_and_rejects_empty() {
 #[test]
 fn parse_participants_accepts_ids_and_emails_and_dedupes() {
     let parsed = parse_participants(&[
-        "macro|ana@acme.com".to_string(),
+        "rox|ana@acme.com".to_string(),
         "bo@acme.com".to_string(),
-        "  macro|ana@acme.com  ".to_string(),
+        "  rox|ana@acme.com  ".to_string(),
     ])
     .expect("valid participants");
     assert_eq!(
@@ -905,7 +905,7 @@ fn parse_participants_accepts_ids_and_emails_and_dedupes() {
             .iter()
             .map(|id| id.as_ref().to_string())
             .collect::<Vec<_>>(),
-        vec!["macro|ana@acme.com", "macro|bo@acme.com"]
+        vec!["rox|ana@acme.com", "rox|bo@acme.com"]
     );
 }
 
@@ -958,7 +958,7 @@ async fn create_private_channel_does_not_resolve_a_team() {
     assert_eq!(response.channel_id, channel_id);
     assert_eq!(response.name, "Planning");
     assert_eq!(response.channel_type, NewChannelType::Private);
-    assert_eq!(response.participants, vec!["macro|bo@acme.com"]);
+    assert_eq!(response.participants, vec!["rox|bo@acme.com"]);
     let (actor, on_behalf_of, req) = created
         .lock()
         .expect("create lock")
@@ -1124,7 +1124,7 @@ async fn create_channel_surfaces_domain_errors() {
     let context = ChannelToolContext::new(
         Arc::new(RecordingMessages::default()),
         ToolTestChannelService {
-            create_error: Some("participants must be a non-empty list of 'macro|<email>'".into()),
+            create_error: Some("participants must be a non-empty list of 'rox|<email>'".into()),
             ..ToolTestChannelService::default()
         },
         NoOpEntityAccessService,
@@ -1379,7 +1379,7 @@ async fn manage_participants_adds_canonical_ids() {
     .expect("member can add");
 
     assert_eq!(response.action, ParticipantAction::Add);
-    assert_eq!(response.participants, vec!["macro|bo@acme.com"]);
+    assert_eq!(response.participants, vec!["rox|bo@acme.com"]);
     let (actor, added_id, req) = adds.lock().expect("add lock").pop().expect("added");
     assert_eq!(actor.as_user(), Some(&user_id()));
     assert_eq!(added_id, channel_id);
@@ -1410,7 +1410,7 @@ async fn manage_participants_canonicalizes_remove_ids() {
     .expect("member can remove");
 
     let (_, _, req) = removes.lock().expect("remove lock").pop().expect("removed");
-    assert_eq!(req.participants, vec!["macro|bo@acme.com"]);
+    assert_eq!(req.participants, vec!["rox|bo@acme.com"]);
 }
 
 #[tokio::test]
@@ -1593,7 +1593,7 @@ async fn edit_channel_message_rejects_empty_content_before_any_access_check() {
 async fn edit_channel_message_explains_a_forbidden_edit() {
     let messages = RecordingMessages {
         stored_sender: Some(Sender::new_from_user(
-            RoxUserIdStr::try_from("macro|someone-else@example.com".to_string()).unwrap(),
+            RoxUserIdStr::try_from("rox|someone-else@example.com".to_string()).unwrap(),
         )),
         mutation_error: Some(|| messages::domain::ports::MessageError::Forbidden),
         ..RecordingMessages::default()
@@ -1778,7 +1778,7 @@ async fn open_direct_message_opens_a_one_to_one_dm_as_the_user() {
 
     assert_eq!(response.channel_id, channel_id);
     assert!(!response.created);
-    assert_eq!(response.participants, vec!["macro|teammate@example.com"]);
+    assert_eq!(response.participants, vec!["rox|teammate@example.com"]);
     let dms = dms.lock().unwrap();
     let [(actor, request)] = dms.as_slice() else {
         panic!("expected one dm, got {}", dms.len());
@@ -1786,7 +1786,7 @@ async fn open_direct_message_opens_a_one_to_one_dm_as_the_user() {
     assert_eq!(actor.as_user(), Some(&user_id()));
     assert_eq!(
         request.recipient_id.as_user().map(|id| id.as_ref()),
-        Some("macro|teammate@example.com"),
+        Some("rox|teammate@example.com"),
     );
 }
 
@@ -1863,7 +1863,7 @@ fn channel_message(
 }
 
 fn person(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).expect("valid macro user id")
+    RoxUserIdStr::try_from(format!("rox|{email}")).expect("valid macro user id")
 }
 
 fn read_latest(channel_id: Uuid) -> ReadChannelMessages {
@@ -1926,14 +1926,14 @@ async fn read_channel_messages_names_each_sender_as_the_app_does() {
 
     let json = serde_json::to_value(&response).expect("serializable");
     let named = &json["messages"][0];
-    assert_eq!(named["senderId"], "macro|gab@rox.one");
+    assert_eq!(named["senderId"], "rox|gab@rox.one");
     assert_eq!(named["senderName"], "Pine Martin");
     assert_eq!(
         named["thread"]["preview"][0]["senderName"], "Pine Martin",
         "a preview reply names its sender too"
     );
     let unnamed = &json["messages"][1];
-    assert_eq!(unnamed["senderId"], "macro|no-name@rox.one");
+    assert_eq!(unnamed["senderId"], "rox|no-name@rox.one");
     assert!(
         unnamed.get("senderName").is_none(),
         "a person without a profile name is known by the id alone"

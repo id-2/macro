@@ -10,7 +10,7 @@ use crate::domain::models::{ImportKind, ImportSource, ImportStatus};
 use crate::domain::ports::{ImportRepo, NotionPlanRepo, PlanRow};
 
 fn user(label: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
+    RoxUserIdStr::parse_from_str(&format!("rox|{label}@example.com"))
         .unwrap()
         .into_owned()
 }

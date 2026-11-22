@@ -78,7 +78,7 @@ async fn a_title_change_goes_through_the_organizer_copy_and_reads_the_invitation
 
     service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             CalendarEventPatch {
@@ -113,7 +113,7 @@ async fn a_title_change_shows_before_google_carries_it_to_the_invitation() {
 
     let event = service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             CalendarEventPatch {
@@ -150,7 +150,7 @@ async fn reminders_saved_with_a_title_stay_on_the_invitation() {
 
     service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             CalendarEventPatch {
@@ -197,7 +197,7 @@ async fn reminders_alone_stay_on_the_invitation() {
 
     service(repo, provider, FakeTokens::ok())
         .update_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             CalendarEventPatch {
@@ -222,7 +222,7 @@ async fn guests_are_added_through_the_organizer_copy() {
 
     service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             vec![CalendarAttendeeInput {
@@ -257,7 +257,7 @@ async fn added_guests_show_before_google_carries_them_to_the_invitation() {
 
     let event = service(repo, provider, FakeTokens::ok())
         .invite_guests(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             vec![CalendarAttendeeInput {
@@ -290,7 +290,7 @@ async fn deleting_cancels_through_the_organizer_copy_and_retires_the_invitation(
 
     service(repo, provider, FakeTokens::ok())
         .delete_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             CalendarDeletionScope::All,
@@ -320,7 +320,7 @@ async fn an_answer_stays_on_the_invitation() {
 
     service(repo, provider, FakeTokens::ok())
         .respond_to_event(
-            "macro|user",
+            "rox|user",
             Uuid::now_v7(),
             Some(INVITATION_CALENDAR),
             AttendeeResponseStatus::Accepted,
@@ -362,7 +362,7 @@ async fn created_attendees(
         FakeTokens::ok(),
     )
     .create_event(
-        "macro|user",
+        "rox|user",
         None,
         None,
         CalendarEventDraft {

@@ -5,7 +5,7 @@ use super::date_ranges::{GraphqlDateBucketRange, GraphqlPropertyBucketingType};
 use super::*;
 
 fn test_rox_user_id() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user@example.com")
+    RoxUserIdStr::parse_from_str("rox|user@example.com")
         .unwrap()
         .into_owned()
 }

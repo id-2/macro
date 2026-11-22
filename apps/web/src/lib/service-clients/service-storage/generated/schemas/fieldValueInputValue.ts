@@ -6,7 +6,7 @@
  */
 
 /**
- * One value: an option label, a person as "me", an email or a macro|
+ * One value: an option label, a person as "me", an email or a rox|
 user id, a number, true/false, or a date.
  */
 export type FieldValueInputValue = string | null;

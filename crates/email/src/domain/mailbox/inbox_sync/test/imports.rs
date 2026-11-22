@@ -253,8 +253,8 @@ async fn notifications_select_signal_partitions_and_filter_sent_or_missing_messa
         s.message = None;
         s.import.previews.push_back(true);
         s.import.primaries = vec![
-            "macro|staff@rox.one".into(),
-            "macro|delegate@example.com".into(),
+            "rox|staff@rox.one".into(),
+            "rox|delegate@example.com".into(),
             "invalid".into(),
         ];
     }
@@ -647,10 +647,10 @@ async fn staff_inbox_notifications_keep_both_partitions_without_realtime_or_apns
     {
         let mut s = fake.0.lock().unwrap();
         s.link.as_mut().unwrap().rox_id =
-            RoxUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap();
+            RoxUserIdStr::try_from("rox|staff@rox.one".to_owned()).unwrap();
         s.message = None;
         s.import.previews.extend([false, true]);
-        s.import.primaries = vec!["macro|delegate@example.com".into()];
+        s.import.primaries = vec!["rox|delegate@example.com".into()];
     }
     assert!(matches!(
         svc.process(Ok(input(operation()))).await,

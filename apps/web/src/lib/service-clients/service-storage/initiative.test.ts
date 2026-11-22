@@ -25,7 +25,7 @@ const project = {
   id: 'project-1',
   displayName: 'Launch',
   metadata: {
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     updatedAt: '2026-09-22T12:00:00Z',
     createdAt: '2026-09-20T12:00:00Z',
   },
@@ -41,7 +41,7 @@ const project = {
   sharePermission: {
     __typename: 'InitiativeSharePermission',
     id: 'share-1',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
     linkShare: 'TEAM',
     linkShareAccessLevel: 'VIEW',
     teamShareAccessLevel: 'COMMENT',
@@ -136,7 +136,7 @@ describe('initiative GraphQL transport', () => {
     expect(result.isOk() && result.value).toMatchObject({
       id: 'project-1',
       name: 'Launch',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       updatedAt: '2026-09-22T12:00:00Z',
       createdAt: '2026-09-20T12:00:00Z',
       userAccessLevel: 'comment',

@@ -12,7 +12,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 /// A consumer provider, so email sync would admit it if it weren't
 /// blocked. No reserved example domain is one.
@@ -102,8 +102,8 @@ async fn blocking_preserves_records_and_stops_consented_sync(pool: PgPool) -> an
 async fn blocklists_are_per_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@example.com").await?;
-    seed_team(&pool, team_b, "macro|b@example.com").await?;
+    seed_team(&pool, team_a, "rox|a@example.com").await?;
+    seed_team(&pool, team_b, "rox|b@example.com").await?;
     let acme_b = insert_company(&pool, team_b, true, &["example.com"]).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
 

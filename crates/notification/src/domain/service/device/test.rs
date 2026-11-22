@@ -443,7 +443,7 @@ async fn register_existing_token_valid_endpoint() {
 
     service
         .register_device(
-            RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap(),
             "device-token",
             &DeviceType::Ios,
             false,

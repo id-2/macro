@@ -2215,7 +2215,7 @@
           {
             "name": "user",
             "in": "query",
-            "description": "A `macro|` user id; omit for the caller.",
+            "description": "A `rox|` user id; omit for the caller.",
             "required": false,
             "schema": {
               "type": "string"

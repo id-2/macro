@@ -10,8 +10,8 @@ use crate::domain::{
 };
 
 const TEAM_ID: Uuid = Uuid::from_u128(0x1_1000);
-const CALLER: &str = "macro|caller@example.com";
-const JOINER: &str = "macro|joiner@example.com";
+const CALLER: &str = "rox|caller@example.com";
+const JOINER: &str = "rox|joiner@example.com";
 
 fn caller() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(CALLER).unwrap()

@@ -31,7 +31,7 @@ impl StaticMediaStore for FakeStore {
 }
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap()
 }
 
 fn upload(file_name: &str, content_type: Option<&str>) -> NewChannelMediaUpload {
@@ -57,7 +57,7 @@ async fn infers_video_from_extension() {
     assert_eq!(
         *uploads.store.reserved.lock().unwrap(),
         vec![(
-            "macro|user@example.com".to_string(),
+            "rox|user@example.com".to_string(),
             "Demo.MP4".to_string(),
             "video/mp4".to_string()
         )]

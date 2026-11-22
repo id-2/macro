@@ -33,7 +33,7 @@ use crate::domain::session::MAX_CLEANUP_ATTEMPTS;
 const PEOPLE: usize = 32;
 
 fn person(n: usize) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|generation-{n}@rox.one")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|generation-{n}@rox.one")).unwrap()
 }
 
 fn user() -> RoxUserIdStr<'static> {

@@ -61,7 +61,7 @@ pub async fn create_user(
     .await?;
 
     // Create user profile
-    let id = format!("macro|{}", email);
+    let id = format!("rox|{}", email);
 
     let user_id = sqlx::query!(
         r#"
@@ -221,7 +221,7 @@ pub async fn create_user_profile(
     roles: HashSet<String>,
 ) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::string_to_uuid(id)?;
-    let user_profile_id = format!("macro|{}", email);
+    let user_profile_id = format!("rox|{}", email);
 
     let mut transaction = db.begin().await?;
 

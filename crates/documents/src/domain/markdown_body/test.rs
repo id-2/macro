@@ -12,7 +12,7 @@ fn document(file_type: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: DOCUMENT.into(),
         document_name: "Notes".into(),
-        owner: Owner::from_principal_str("macro|editor@example.com").unwrap(),
+        owner: Owner::from_principal_str("rox|editor@example.com").unwrap(),
         file_type: Some(file_type.into()),
         sub_type: None,
         branched_from_id: None,
@@ -24,7 +24,7 @@ fn document(file_type: &str) -> DocumentBasic {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    "macro|editor@example.com".to_owned().try_into().unwrap()
+    "rox|editor@example.com".to_owned().try_into().unwrap()
 }
 
 fn entity() -> Entity {
@@ -67,7 +67,7 @@ async fn read_returns_the_body_with_a_view_token_for_the_caller() {
             let claims = decode_permission_token(token, SECRET).unwrap();
             assert_eq!(
                 claims.user_id.map(|user| user.as_ref().to_string()),
-                Some("macro|editor@example.com".to_string())
+                Some("rox|editor@example.com".to_string())
             );
             assert_eq!(claims.access_level, AccessLevel::View);
             Box::pin(async {

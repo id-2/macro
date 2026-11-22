@@ -133,11 +133,11 @@ fn assert_unauthorized((status, body): (StatusCode, Value)) {
 #[tokio::test]
 async fn internal_routes_reject_missing_and_incorrect_keys_before_other_extraction() {
     let endpoints = [
-        (Method::POST, "/message/send/user/macro%7Ctest@example.com"),
+        (Method::POST, "/message/send/user/rox%7Ctest@example.com"),
         (Method::POST, "/message/batch_send"),
         (Method::POST, "/message/batch_send_unique"),
         (Method::POST, "/message/broadcast"),
-        (Method::GET, "/track/user/macro%7Ctest@example.com"),
+        (Method::GET, "/track/user/rox%7Ctest@example.com"),
     ];
 
     for (method, uri) in endpoints {

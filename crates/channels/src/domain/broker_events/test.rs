@@ -19,13 +19,13 @@ fn created_event_wire_shape() {
         event_id,
         ChannelTopicEvent::Created(ChannelCreatedMetadata {
             channel_id,
-            actor: user("macro|owner@example.com"),
+            actor: user("rox|owner@example.com"),
             on_behalf_of: None,
             channel_type: ChannelType::Private,
             channel_name: Some("general".to_string()),
             participant_user_ids: vec![
-                user_id("macro|owner@example.com"),
-                user_id("macro|member@example.com"),
+                user_id("rox|owner@example.com"),
+                user_id("rox|member@example.com"),
             ],
         }),
     );
@@ -39,12 +39,12 @@ fn created_event_wire_shape() {
             "event_type": "channel.created",
             "metadata": {
                 "channel_id": "00000000-0000-0000-0000-000000000000",
-                "actor": "macro|owner@example.com",
+                "actor": "rox|owner@example.com",
                 "channel_type": "private",
                 "channel_name": "general",
                 "participant_user_ids": [
-                    "macro|owner@example.com",
-                    "macro|member@example.com",
+                    "rox|owner@example.com",
+                    "rox|member@example.com",
                 ],
             },
         })
@@ -60,10 +60,10 @@ fn created_event_wire_shape_includes_on_behalf_of() {
         ChannelTopicEvent::Created(ChannelCreatedMetadata {
             channel_id,
             actor: actor.clone(),
-            on_behalf_of: Some(user_id("macro|owner@example.com")),
+            on_behalf_of: Some(user_id("rox|owner@example.com")),
             channel_type: ChannelType::Private,
             channel_name: Some("Rox Support x owner".to_string()),
-            participant_user_ids: vec![user_id("macro|owner@example.com")],
+            participant_user_ids: vec![user_id("rox|owner@example.com")],
         }),
     );
 
@@ -77,11 +77,11 @@ fn created_event_wire_shape_includes_on_behalf_of() {
             "metadata": {
                 "channel_id": "00000000-0000-0000-0000-000000000000",
                 "actor": actor.as_ref(),
-                "on_behalf_of": "macro|owner@example.com",
+                "on_behalf_of": "rox|owner@example.com",
                 "channel_type": "private",
                 "channel_name": "Rox Support x owner",
                 "participant_user_ids": [
-                    "macro|owner@example.com",
+                    "rox|owner@example.com",
                 ],
             },
         })
@@ -94,8 +94,8 @@ fn decode_round_trips() {
     let original = ChannelMacroEvent::participant_removed(ChannelParticipantRemovedMetadata {
         channel_id,
         channel_type: ChannelType::Private,
-        removed_by: user_id("macro|admin@example.com"),
-        removed_user_ids: vec![user_id("macro|member@example.com")],
+        removed_by: user_id("rox|admin@example.com"),
+        removed_user_ids: vec![user_id("rox|member@example.com")],
     });
 
     let payload = serde_json::to_vec(original.event()).expect("serializable");
@@ -110,7 +110,7 @@ fn events_are_keyed_by_channel_id() {
     let channel_id = Uuid::new_v4();
     let event = ChannelMacroEvent::deleted(ChannelDeletedMetadata {
         channel_id,
-        actor: user("macro|owner@example.com"),
+        actor: user("rox|owner@example.com"),
     });
     assert_eq!(event.key(), channel_id.to_string());
 }
@@ -123,14 +123,14 @@ fn event_type_strings_follow_dot_convention() {
         (
             ChannelMacroEvent::picture_changed(ChannelPictureChangedMetadata {
                 channel_id,
-                actor: user_id("macro|owner@example.com"),
+                actor: user_id("rox|owner@example.com"),
             }),
             "channel.picture_changed",
         ),
         (
             ChannelMacroEvent::updated(ChannelUpdatedMetadata {
                 channel_id,
-                actor: user_id("macro|owner@example.com"),
+                actor: user_id("rox|owner@example.com"),
                 previous_name: None,
                 channel_name: Some("renamed".to_string()),
             }),
@@ -140,8 +140,8 @@ fn event_type_strings_follow_dot_convention() {
             ChannelMacroEvent::participant_added(ChannelParticipantAddedMetadata {
                 channel_id,
                 channel_type: ChannelType::Team,
-                added_by: user("macro|owner@example.com"),
-                added_user_ids: vec![user_id("macro|member@example.com")],
+                added_by: user("rox|owner@example.com"),
+                added_user_ids: vec![user_id("rox|member@example.com")],
             }),
             "channel.participant_added",
         ),

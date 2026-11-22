@@ -12,14 +12,14 @@ async fn ensure_creates_initializes_then_marks_ready() {
 
     let svc = service_with(repo.clone(), init);
     let receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
     );
     let id = surface_id();
     let surface = svc
-        .ensure_surface(&user("macro|a@b.c"), receipt, id, "# hi".to_string())
+        .ensure_surface(&user("rox|a@b.c"), receipt, id, "# hi".to_string())
         .await
         .unwrap();
 
@@ -45,7 +45,7 @@ async fn ensure_is_idempotent_for_a_ready_surface() {
     let id = surface_id();
     let make_receipt = || {
         receipt_for(
-            "macro|a@b.c",
+            "rox|a@b.c",
             EntityType::Channel,
             "chan-1",
             edit_permission(),
@@ -53,12 +53,12 @@ async fn ensure_is_idempotent_for_a_ready_surface() {
     };
 
     let first = svc
-        .ensure_surface(&user("macro|a@b.c"), make_receipt(), id, "# hi".to_string())
+        .ensure_surface(&user("rox|a@b.c"), make_receipt(), id, "# hi".to_string())
         .await
         .unwrap();
     let second = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             make_receipt(),
             id,
             "# different seed, ignored".to_string(),
@@ -95,7 +95,7 @@ async fn ensure_retries_init_for_a_pending_surface() {
     let id = surface_id();
     let make_receipt = || {
         receipt_for(
-            "macro|a@b.c",
+            "rox|a@b.c",
             EntityType::Channel,
             "chan-1",
             edit_permission(),
@@ -103,7 +103,7 @@ async fn ensure_retries_init_for_a_pending_surface() {
     };
 
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), make_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), make_receipt(), id, String::new())
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::Internal(_)));
@@ -114,7 +114,7 @@ async fn ensure_retries_init_for_a_pending_surface() {
     );
 
     let surface = svc
-        .ensure_surface(&user("macro|a@b.c"), make_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), make_receipt(), id, String::new())
         .await
         .unwrap();
     assert_eq!(surface.state, SurfaceState::Ready);
@@ -131,22 +131,22 @@ async fn ensure_maps_insert_conflict_on_deleted_id_to_gone() {
     let id = surface_id();
     let make_receipt = || {
         receipt_for(
-            "macro|a@b.c",
+            "rox|a@b.c",
             EntityType::Channel,
             "chan-1",
             edit_permission(),
         )
     };
 
-    svc.ensure_surface(&user("macro|a@b.c"), make_receipt(), id, String::new())
+    svc.ensure_surface(&user("rox|a@b.c"), make_receipt(), id, String::new())
         .await
         .unwrap();
-    svc.delete_surface(&user("macro|a@b.c"), make_receipt(), id)
+    svc.delete_surface(&user("rox|a@b.c"), make_receipt(), id)
         .await
         .unwrap();
 
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), make_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), make_receipt(), id, String::new())
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::Gone));
@@ -162,25 +162,25 @@ async fn ensure_rejects_mismatched_parent() {
     let id = surface_id();
 
     let chan1_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
     );
-    svc.ensure_surface(&user("macro|a@b.c"), chan1_receipt, id, String::new())
+    svc.ensure_surface(&user("rox|a@b.c"), chan1_receipt, id, String::new())
         .await
         .unwrap();
 
     // Ensuring the same id against a different parent must fail: the id is
     // bound to chan-1, and a receipt for chan-2 proves nothing about it.
     let chan2_receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Channel,
         "chan-2",
         edit_permission(),
     );
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), chan2_receipt, id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), chan2_receipt, id, String::new())
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::AccessDenied));
@@ -191,13 +191,13 @@ async fn ensure_rejects_receipt_for_other_user() {
     let repo = Arc::new(MemRepo::default());
     let svc = service_with(repo, MockSurfaceInitializer::new());
     let receipt = receipt_for(
-        "macro|other@b.c",
+        "rox|other@b.c",
         EntityType::Channel,
         "chan-1",
         edit_permission(),
     );
     let err = svc
-        .ensure_surface(&user("macro|a@b.c"), receipt, surface_id(), String::new())
+        .ensure_surface(&user("rox|a@b.c"), receipt, surface_id(), String::new())
         .await
         .unwrap_err();
     assert!(matches!(err, CollabSurfaceError::AccessDenied));
@@ -221,13 +221,13 @@ async fn a_pending_surface_whose_session_exists_heals_on_retry() {
     let svc = service_with(repo.clone(), init);
     let id = surface_id();
 
-    svc.ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+    svc.ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
         .await
         .unwrap_err();
     assert_eq!(repo.stored().unwrap().state, SurfaceState::Pending);
 
     let surface = svc
-        .ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+        .ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
         .await
         .unwrap();
     assert_eq!(surface.state, SurfaceState::Ready);
@@ -255,7 +255,7 @@ async fn concurrent_ensures_of_a_new_id_both_end_ready() {
     let svc = service_with(repo.clone(), init);
     let id = surface_id();
 
-    let caller = user("macro|a@b.c");
+    let caller = user("rox|a@b.c");
     let (first, second) = tokio::join!(
         svc.ensure_surface(&caller, channel_receipt(), id, String::new()),
         svc.ensure_surface(&caller, channel_receipt(), id, String::new()),
@@ -279,7 +279,7 @@ async fn ensure_accepts_random_ids() {
     // v4, as a browser's crypto.randomUUID() makes, and v7.
     for id in [uuid::Uuid::new_v4(), surface_id()] {
         let surface = svc
-            .ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+            .ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
             .await
             .unwrap();
         assert_eq!(surface.state, SurfaceState::Ready);
@@ -297,7 +297,7 @@ async fn ensure_refuses_ids_that_are_not_random() {
         uuid::Uuid::nil(),
     ] {
         let err = svc
-            .ensure_surface(&user("macro|a@b.c"), channel_receipt(), id, String::new())
+            .ensure_surface(&user("rox|a@b.c"), channel_receipt(), id, String::new())
             .await
             .unwrap_err();
         assert!(matches!(err, CollabSurfaceError::BadRequest(_)));

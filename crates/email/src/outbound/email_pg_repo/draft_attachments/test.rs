@@ -3,7 +3,7 @@ use crate::domain::models::AttachmentDraft;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
-const ACTOR: &str = "macro|attachment-owner@example.com";
+const ACTOR: &str = "rox|attachment-owner@example.com";
 async fn fixture(db: &PgPool) -> (EmailPgRepo, Uuid, Uuid) {
     let link = Uuid::now_v7();
     let thread = Uuid::now_v7();
@@ -84,7 +84,7 @@ async fn upload_reservations_are_idempotent_and_never_send_unverified_bytes(db: 
     );
     assert!(matches!(
         repo.commit_attachment_change(
-            "macro|other@example.com",
+            "rox|other@example.com",
             link,
             draft,
             AttachmentChange::CompleteUpload(file.clone()),
@@ -303,7 +303,7 @@ async fn send_and_attachment_edits_share_the_same_transaction_boundary(db: PgPoo
     );
     assert!(matches!(
         repo.commit_attachment_change(
-            "macro|intruder@example.com",
+            "rox|intruder@example.com",
             link,
             draft,
             AttachmentChange::Upload(upload(draft, 123)),

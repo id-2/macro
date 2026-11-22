@@ -92,7 +92,7 @@ pub struct ListCompanies {
 
     /// Filter to companies owned by this Rox user id.
     #[schemars(
-        description = "Filter to companies whose Owner property is this Rox user id (e.g. \"macro|user@example.com\"). Use ListTeamMembers to find user ids."
+        description = "Filter to companies whose Owner property is this Rox user id (e.g. \"rox|user@example.com\"). Use ListTeamMembers to find user ids."
     )]
     #[serde(default)]
     pub owner_user_id: Option<String>,

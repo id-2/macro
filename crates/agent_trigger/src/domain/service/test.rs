@@ -20,7 +20,7 @@ use messages::domain::models::SimpleMention;
 use crate::domain::broker_events::TriggerDecision;
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|trigger-service-test@rox.one")
+    RoxUserIdStr::parse_from_str("rox|trigger-service-test@rox.one")
         .expect("valid user id")
         .into_owned()
 }
@@ -393,7 +393,7 @@ async fn a_selected_agent_requires_active_channel_membership() {
             Ok(Some(agent_with(
                 bot_id,
                 BotOwner::User {
-                    user_id: "macro|some-owner@example.com".to_owned(),
+                    user_id: "rox|some-owner@example.com".to_owned(),
                 },
                 AgentChannelScope::Selected,
             )))
@@ -422,7 +422,7 @@ async fn an_active_selected_agent_is_available_to_channel_members() {
             Ok(Some(agent_with(
                 bot_id,
                 BotOwner::User {
-                    user_id: "macro|some-owner@example.com".to_owned(),
+                    user_id: "rox|some-owner@example.com".to_owned(),
                 },
                 AgentChannelScope::Selected,
             )))
@@ -909,7 +909,7 @@ async fn the_judge_reads_every_live_agent_numbered_in_the_thread() {
                 transcript,
                 "[agent 1] on it\n\
                  [agent 2] me too\n\
-                 [user macro|trigger-service-test@rox.one] hello\n"
+                 [user rox|trigger-service-test@rox.one] hello\n"
             );
             Box::pin(async { Ok(vec![0.9, 0.1]) })
         });
@@ -986,9 +986,9 @@ async fn the_judge_reads_the_thread_around_the_agent() {
         agent_bots(),
         extractor(Ok(None)),
         judge_expecting(
-            "[user macro|trigger-service-test@rox.one] unrelated chatter\n\
+            "[user rox|trigger-service-test@rox.one] unrelated chatter\n\
              [agent 1] on it\n\
-             [user macro|trigger-service-test@rox.one] hello\n",
+             [user rox|trigger-service-test@rox.one] hello\n",
         ),
         history,
     );
@@ -1485,7 +1485,7 @@ async fn attributed_bots_cannot_bypass_access_or_trigger_themselves() {
 
     for (source, actor) in [
         (BotId::TEST_A, user().to_string()),
-        (BotId::TEST_B, "macro|outsider@example.com".into()),
+        (BotId::TEST_B, "rox|outsider@example.com".into()),
     ] {
         posted.sender = ChannelSender::new_from_bot(source);
         posted.triggered_by = Some(actor);

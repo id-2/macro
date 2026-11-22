@@ -98,7 +98,7 @@ impl ActivityMetadataResolver for RecordingMetadata {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|user@example.com".to_string()).unwrap()
 }
 
 fn time(value: &str) -> DateTime<Utc> {

@@ -4,7 +4,7 @@ use serde_json::json;
 #[test]
 fn source_requires_a_supported_provider() {
     let mut source = json!({
-        "userId": "macro|call-model@test.com",
+        "userId": "rox|call-model@test.com",
         "namespace": "account-1",
         "provider": "granola",
         "objectType": "note",

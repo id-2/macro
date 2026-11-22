@@ -115,7 +115,7 @@ pub async fn get_user_names_with_email(
             FROM email_links li
             JOIN email_contacts ec
                 ON ec.link_id = li.id
-                AND ec.email_address = REPLACE(req.id, 'macro|', '')
+                AND ec.email_address = REPLACE(req.id, 'rox|', '')
                 AND ec.name IS NOT NULL
             WHERE li.rox_id = $1
               AND NULLIF(mui.first_name, 'N/A') IS NULL

@@ -23,7 +23,7 @@ fn make_test_metadata() -> DocumentMetadata {
         appearance: None,
         document_id: "doc-1".to_string(),
         document_version_id: 1,
-        owner: Owner::from_principal_str("macro|user@user.com").unwrap(),
+        owner: Owner::from_principal_str("rox|user@user.com").unwrap(),
         document_name: "test_doc".to_string(),
         file_type: Some("txt".to_string()),
         sha: Some("sha-1".to_string()),
@@ -59,7 +59,7 @@ fn task_document_context(document_id: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: document_id.to_string(),
         document_name: "Test task".to_string(),
-        owner: Owner::from_principal_str("macro|owner@user.com").unwrap(),
+        owner: Owner::from_principal_str("rox|owner@user.com").unwrap(),
         file_type: Some("md".to_string()),
         sub_type: Some(DocumentSubType::Task),
         branched_from_id: None,
@@ -71,7 +71,7 @@ fn task_document_context(document_id: &str) -> DocumentBasic {
 }
 
 fn authenticated_receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
-    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -529,7 +529,7 @@ fn make_foreign_entity_with_metadata(
 
 fn expect_authenticated_team_lookup(repo: &mut MockDocumentRepo, team_ids: Vec<uuid::Uuid>) {
     repo.expect_get_team_ids_for_user()
-        .withf(|user_id| user_id == "macro|user@user.com")
+        .withf(|user_id| user_id == "rox|user@user.com")
         .return_once(move |_| Box::pin(std::future::ready(Ok(team_ids))));
 }
 
@@ -620,7 +620,7 @@ async fn get_document_by_team_slug_resolves_valid_slug() {
 
     let document_id = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|user@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|user@user.com"),
             "engineering-platform-42",
         )
         .await
@@ -649,7 +649,7 @@ async fn get_document_by_team_slug_rejects_malformed_slugs() {
             .get_document_by_team_slug(
                 member_team_receipt(
                     "00000000-0000-0000-0000-000000000701",
-                    "macro|user@user.com",
+                    "rox|user@user.com",
                 ),
                 slug,
             )
@@ -673,7 +673,7 @@ async fn get_document_by_team_slug_rejects_non_positive_and_overflowing_numbers(
             .get_document_by_team_slug(
                 member_team_receipt(
                     "00000000-0000-0000-0000-000000000701",
-                    "macro|user@user.com",
+                    "rox|user@user.com",
                 ),
                 slug,
             )
@@ -692,7 +692,7 @@ async fn get_document_by_team_slug_rejects_wrong_receipt_entity_type() {
     repo.expect_get_document_id_by_team_task_number().times(0);
     repo.expect_get_basic_document().times(0);
     let receipt = EntityAccessReceipt::<MemberTeamRole>::dangerously_assert_authenticated_user(
-        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
             .unwrap()
             .into_owned(),
         "00000000-0000-0000-0000-000000000701",
@@ -714,7 +714,7 @@ async fn get_document_by_team_slug_rejects_malformed_team_uuid() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt("not-a-team-uuid", "macro|user@user.com"),
+            member_team_receipt("not-a-team-uuid", "rox|user@user.com"),
             "engineering-1",
         )
         .await;
@@ -733,7 +733,7 @@ async fn get_document_by_team_slug_maps_missing_lookup_to_not_found() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|user@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|user@user.com"),
             "engineering-404",
         )
         .await;
@@ -754,7 +754,7 @@ async fn get_document_by_team_slug_maps_lookup_error_to_internal() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|user@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|user@user.com"),
             "engineering-1",
         )
         .await;
@@ -773,7 +773,7 @@ async fn get_document_by_team_slug_maps_document_load_error_to_internal() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|user@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|user@user.com"),
             "engineering-1",
         )
         .await;
@@ -794,7 +794,7 @@ async fn get_document_by_team_slug_allows_owner_of_deleted_document() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|owner@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|owner@user.com"),
             "engineering-1",
         )
         .await;
@@ -815,7 +815,7 @@ async fn get_document_by_team_slug_rejects_non_owner_of_deleted_document() {
 
     let result = make_test_service(repo)
         .get_document_by_team_slug(
-            member_team_receipt(&team_id.to_string(), "macro|user@user.com"),
+            member_team_receipt(&team_id.to_string(), "rox|user@user.com"),
             "engineering-1",
         )
         .await;
@@ -1055,7 +1055,7 @@ async fn test_get_task_github_pull_requests_adds_user_foreign_entity_id() {
             foreign_entity_id,
             "macro/repo/pull/8",
             GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-            "macro|user@user.com",
+            "rox|user@user.com",
             "user",
         )],
     );
@@ -1140,7 +1140,7 @@ async fn test_get_task_github_pull_requests_hydrates_visible_foreign_entity_meta
             foreign_entity_id,
             "macro/repo/pull/14",
             GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-            "macro|user@user.com",
+            "rox|user@user.com",
             "user",
             metadata.clone(),
         )],
@@ -1191,7 +1191,7 @@ async fn test_get_task_github_pull_requests_falls_back_when_foreign_entity_metad
                 malformed_foreign_entity_id,
                 "macro/repo/pull/15",
                 GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-                "macro|user@user.com",
+                "rox|user@user.com",
                 "user",
                 serde_json::json!({
                     "githubKey": "macro/repo/pull/15",
@@ -1202,7 +1202,7 @@ async fn test_get_task_github_pull_requests_falls_back_when_foreign_entity_metad
                 mismatched_foreign_entity_id,
                 "macro/repo/pull/16",
                 GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-                "macro|user@user.com",
+                "rox|user@user.com",
                 "user",
                 serde_json::json!({
                     "githubKey": "macro/repo/pull/999",
@@ -1319,7 +1319,7 @@ async fn test_get_task_github_pull_requests_ignores_unrelated_foreign_entity_sou
         unrelated_foreign_entity_id,
         "macro/repo/pull/10",
         "linear_issue",
-        "macro|user@user.com",
+        "rox|user@user.com",
         "user",
     )]);
     let lookup_requests = foreign_entity_service.lookup_requests();
@@ -1372,7 +1372,7 @@ async fn test_get_task_github_pull_requests_ignores_unrelated_stored_source() {
             unrelated_foreign_entity_id,
             "macro/repo/pull/11",
             GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-            "macro|other@user.com",
+            "rox|other@user.com",
             "user",
             serde_json::json!({
                 "githubKey": "macro/repo/pull/11",
@@ -1509,7 +1509,7 @@ async fn test_get_task_github_pull_requests_skips_malformed_keys_before_lookup()
 }
 
 fn owner_receipt(document_id: &str) -> EntityAccessReceipt<OwnerAccessLevel> {
-    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -1782,7 +1782,7 @@ async fn team_edit_rejects_owner_level_and_enable_without_team_before_writes() {
 }
 
 fn edit_receipt(document_id: &str) -> EntityAccessReceipt<EditAccessLevel> {
-    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -1815,7 +1815,7 @@ async fn content_uploaded_publishes_document_event_with_owner_and_version() {
     assert_eq!(event.key, "doc-1");
     assert_eq!(event.payload["event_type"], "document.content_uploaded");
     assert_eq!(event.payload["metadata"]["document_id"], "doc-1");
-    assert_eq!(event.payload["metadata"]["owner"], "macro|owner@user.com");
+    assert_eq!(event.payload["metadata"]["owner"], "rox|owner@user.com");
     assert_eq!(event.payload["metadata"]["file_type"], "pdf");
     assert_eq!(event.payload["metadata"]["document_version_id"], "convert");
 }
@@ -1913,7 +1913,7 @@ async fn test_delete_document_publishes_document_deleted_event() {
     assert_eq!(event.payload["metadata"]["sub_type"], "task");
     assert_eq!(
         event.payload["metadata"]["actor_user_id"],
-        "macro|user@user.com"
+        "rox|user@user.com"
     );
     assert_eq!(event.payload["metadata"]["project_id"], "project-1");
     assert!(
@@ -2027,10 +2027,10 @@ async fn test_edit_document_publishes_document_updated_event() {
     assert_eq!(event.key, "doc-1");
     assert_eq!(event.payload["event_type"], "document.updated");
     assert_eq!(event.payload["metadata"]["document_name"], "New name");
-    assert_eq!(event.payload["metadata"]["owner"], "macro|owner@user.com");
+    assert_eq!(event.payload["metadata"]["owner"], "rox|owner@user.com");
     assert_eq!(
         event.payload["metadata"]["actor_user_id"],
-        "macro|user@user.com"
+        "rox|user@user.com"
     );
     assert_eq!(event.payload["metadata"]["share_permission_updated"], false);
     assert_eq!(
@@ -2135,7 +2135,7 @@ async fn copy_document_best_effort_bumps_inherited_project_and_publishes_event()
         .withf(|id| id == "project-1")
         .returning(|_| {
             Box::pin(std::future::ready(Ok(
-                rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
+                rox_user_id::user_id::RoxUserIdStr::parse_from_str("rox|user@user.com")
                     .unwrap()
                     .into_owned(),
             )))
@@ -2188,7 +2188,7 @@ async fn copy_document_best_effort_bumps_inherited_project_and_publishes_event()
     assert_eq!(event.payload["metadata"]["document_id"], "doc-2");
     assert_eq!(event.payload["metadata"]["source_document_id"], "doc-1");
     assert_eq!(event.payload["metadata"]["document_name"], "copied doc");
-    assert_eq!(event.payload["metadata"]["owner"], "macro|user@user.com");
+    assert_eq!(event.payload["metadata"]["owner"], "rox|user@user.com");
 }
 
 #[derive(Clone, Default)]
@@ -2256,12 +2256,12 @@ async fn bot_owned_copy_reads_the_source_owner_key_and_writes_the_bot_key() {
     for (file_type, source_key, destination_key) in [
         (
             "txt",
-            "macro|user@user.com/doc-1/1",
+            "rox|user@user.com/doc-1/1",
             "bot|00000000-0000-0000-0000-000000000123/doc-2/3",
         ),
         (
             "docx",
-            "macro|user@user.com/doc-1/converted.pdf",
+            "rox|user@user.com/doc-1/converted.pdf",
             "bot|00000000-0000-0000-0000-000000000123/doc-2/converted.pdf",
         ),
     ] {
@@ -2428,7 +2428,7 @@ async fn creator_forwards_explicit_consent_and_stops_after_repository_failure() 
 }
 
 fn test_user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user@user.com")
+    RoxUserIdStr::parse_from_str("rox|user@user.com")
         .unwrap()
         .into_owned()
 }
@@ -2676,8 +2676,8 @@ async fn create_document_publishes_the_principal_as_owner_and_actor() {
     for (principal, owner, actor, on_behalf_of) in [
         (
             CreationPrincipal::User(test_user()),
-            "macro|user@user.com",
-            "macro|user@user.com",
+            "rox|user@user.com",
+            "rox|user@user.com",
             None,
         ),
         (
@@ -2685,9 +2685,9 @@ async fn create_document_publishes_the_principal_as_owner_and_actor() {
                 bot: bot_id::ROX_AI_BOT_ID,
                 user: test_user(),
             },
-            "macro|user@user.com",
+            "rox|user@user.com",
             "bot|00000000-0000-0000-0000-00000000a1a1",
-            Some("macro|user@user.com"),
+            Some("rox|user@user.com"),
         ),
         (
             team_bot,
@@ -2764,7 +2764,7 @@ async fn email_import_is_attributed_to_the_system_bot() {
     assert_eq!(published[0].payload["event_type"], "document.created");
     assert_eq!(
         published[0].payload["metadata"]["owner"],
-        "macro|user@user.com"
+        "rox|user@user.com"
     );
     assert_eq!(
         published[0].payload["metadata"]["actor"],
@@ -2831,7 +2831,7 @@ async fn default_task_properties_assign_the_acting_user_and_never_a_team_bot() {
     };
     let assigned_to_user = SetPropertyValue::MultiEntityReference {
         references: vec![EntityReference {
-            entity_id: "macro|user@user.com".to_string(),
+            entity_id: "rox|user@user.com".to_string(),
             entity_type: models_properties::EntityType::User,
             specific_message_id: None,
         }],
@@ -3308,7 +3308,7 @@ async fn canvas_copy_failure_compensates_only_its_destinations_and_still_removes
         );
         assert_eq!(
             *deleted.lock().unwrap(),
-            vec!["macro|user@user.com/doc-2/1"]
+            vec!["rox|user@user.com/doc-2/1"]
         );
     }
 }
@@ -3446,26 +3446,26 @@ fn spreadsheet_uploads_are_rejected_instead_of_discarding_their_bytes() {
 #[test]
 fn presigned_url_path_percent_encodes_the_owner_segment_of_the_object_key() {
     let service = make_test_service(make_mock_repo());
-    let owner = Owner::from_principal_str("macro|owner@user.com").unwrap();
+    let owner = Owner::from_principal_str("rox|owner@user.com").unwrap();
     let key = build_cloud_storage_bucket_document_key(&owner, "doc-1", 7);
 
     // The object key stays the raw principal; only the URL path is encoded.
-    assert_eq!(key, "macro|owner@user.com/doc-1/7");
+    assert_eq!(key, "rox|owner@user.com/doc-1/7");
     assert_eq!(
         service.cloudfront_url_for_key(&key),
-        "https://cdn.example.test/macro%7Cowner%40user.com/doc-1/7"
+        "https://cdn.example.test/rox%7Cowner%40user.com/doc-1/7"
     );
 }
 
 #[test]
 fn presigned_url_path_for_a_converted_docx_matches_the_legacy_encoding() {
     let service = make_test_service(make_mock_repo());
-    let owner = Owner::from_principal_str("macro|owner@user.com").unwrap();
+    let owner = Owner::from_principal_str("rox|owner@user.com").unwrap();
     let key = build_docx_to_pdf_converted_document_key(&owner, "doc-1");
 
     assert_eq!(
         service.cloudfront_url_for_key(&key),
-        "https://cdn.example.test/macro%7Cowner%40user.com/doc-1/converted.pdf"
+        "https://cdn.example.test/rox%7Cowner%40user.com/doc-1/converted.pdf"
     );
 }
 
@@ -3634,7 +3634,7 @@ async fn user_display_names_join_the_parts_a_user_set() {
     ] {
         let mut repo = make_mock_repo();
         repo.expect_get_user_name()
-            .withf(|user_id| user_id == "macro|user@user.com")
+            .withf(|user_id| user_id == "rox|user@user.com")
             .return_once(move |_| {
                 Box::pin(std::future::ready(Ok((
                     first.map(str::to_owned),
@@ -3642,7 +3642,7 @@ async fn user_display_names_join_the_parts_a_user_set() {
                 ))))
             });
         let name = make_test_service(repo)
-            .internal_get_user_display_name("macro|user@user.com")
+            .internal_get_user_display_name("rox|user@user.com")
             .await
             .unwrap();
         assert_eq!(name.as_deref(), expected);
@@ -3683,14 +3683,14 @@ async fn github_pull_request_tasks_are_returned_only_for_visible_pull_requests()
                 uuid::uuid!("00000000-0000-0000-0000-000000000211"),
                 "macro/repo/pull/1",
                 GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-                "macro|user@user.com",
+                "rox|user@user.com",
                 "user",
             ),
             make_foreign_entity(
                 uuid::uuid!("00000000-0000-0000-0000-000000000212"),
                 "macro/repo/pull/2",
                 GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE,
-                "macro|someone-else@user.com",
+                "rox|someone-else@user.com",
                 "user",
             ),
         ],
@@ -3698,7 +3698,7 @@ async fn github_pull_request_tasks_are_returned_only_for_visible_pull_requests()
 
     let response = service
         .get_github_pull_request_tasks(
-            "macro|user@user.com",
+            "rox|user@user.com",
             vec![
                 "macro/repo/pull/3".to_string(),
                 "macro/repo/pull/1".to_string(),
@@ -3736,7 +3736,7 @@ async fn github_pull_request_tasks_reject_oversized_lookups() {
         .collect();
 
     let result = service
-        .get_github_pull_request_tasks("macro|user@user.com", keys)
+        .get_github_pull_request_tasks("rox|user@user.com", keys)
         .await;
 
     assert!(matches!(result, Err(DocumentError::BadRequest(_))));

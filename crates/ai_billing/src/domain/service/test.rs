@@ -17,7 +17,7 @@ use std::sync::{Arc, Mutex};
 use teams::domain::open_seat_release::OpenSeatRelease;
 
 fn user(email: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{email}")).unwrap()
 }
 
 #[derive(Clone, Default)]
@@ -3041,12 +3041,12 @@ async fn overlapping_subscription_window_starts_at_the_stored_end() {
         repo.period_writes(),
         vec![
             (
-                "macro|payer@x.com".to_string(),
+                "rox|payer@x.com".to_string(),
                 d(2026, 1, 15),
                 d(2026, 2, 15)
             ),
             (
-                "macro|payer@x.com".to_string(),
+                "rox|payer@x.com".to_string(),
                 d(2026, 2, 15),
                 d(2026, 3, 3)
             ),
@@ -3092,7 +3092,7 @@ async fn unrolled_subscription_window_rolls_the_anchor_and_stores_nothing() {
     assert_eq!(
         repo.period_writes(),
         vec![(
-            "macro|payer@x.com".to_string(),
+            "rox|payer@x.com".to_string(),
             d(2026, 3, 18),
             d(2026, 4, 18)
         )],
@@ -3379,7 +3379,7 @@ async fn team_member_reads_the_owner_subscription_in_team_scope() {
     assert_eq!(
         repo.period_writes(),
         vec![(
-            "macro|owner@x.com".to_string(),
+            "rox|owner@x.com".to_string(),
             d(2026, 4, 10),
             d(2026, 5, 10)
         )]
@@ -3416,9 +3416,9 @@ async fn release_uses_the_subscription_period() {
     assert_eq!(
         repo.releases(),
         vec![(
-            "macro|owner@x.com".to_string(),
+            "rox|owner@x.com".to_string(),
             d(2026, 3, 20),
-            "macro|member@x.com".to_string()
+            "rox|member@x.com".to_string()
         )]
     );
 }
@@ -3454,9 +3454,9 @@ async fn release_with_a_covering_anchor_never_reads_the_entitlement() {
     assert_eq!(
         repo.releases(),
         vec![(
-            "macro|owner@x.com".to_string(),
+            "rox|owner@x.com".to_string(),
             d(2026, 4, 10),
-            "macro|member@x.com".to_string()
+            "rox|member@x.com".to_string()
         )]
     );
     assert!(payments.period_requests().is_empty());
@@ -3492,9 +3492,9 @@ async fn release_rolls_an_ended_anchor_when_the_entitlement_read_fails() {
     assert_eq!(
         repo.releases(),
         vec![(
-            "macro|owner@x.com".to_string(),
+            "rox|owner@x.com".to_string(),
             d(2026, 4, 15),
-            "macro|member@x.com".to_string()
+            "rox|member@x.com".to_string()
         )]
     );
 }

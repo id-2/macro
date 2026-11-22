@@ -27,7 +27,7 @@ impl ActivityTopicEventConsumer for FakeConsumer {
 }
 
 fn user(local: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user ID")
+    RoxUserIdStr::try_from(format!("rox|{local}@example.com")).expect("valid user ID")
 }
 
 fn wire_row(subject: &RoxUserIdStr<'static>, entity_id: &str) -> ActivityWireRow {

@@ -16,7 +16,7 @@ afterEach(cleanup);
 it('inserts a native mention inside mixed text and publishes the document encoding intact', async () => {
   const token = encodeCellMention({
     type: 'user',
-    userId: 'macro|maya@example.com',
+    userId: 'rox|maya@example.com',
     email: 'maya@example.com',
     displayName: 'Maya',
   });

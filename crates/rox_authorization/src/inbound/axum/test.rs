@@ -25,20 +25,20 @@ use crate::{
     RoxAuthorizationService, RoxUserAuthentication,
 };
 
-const VALID_USER_ID: &str = "macro|valid@example.com";
-const COOKIE_USER_ID: &str = "macro|cookie@example.com";
-const QUERY_USER_ID: &str = "macro|query@example.com";
-const BEARER_USER_ID: &str = "macro|bearer@example.com";
-const OPTIONAL_USER_ID: &str = "macro|optional@example.com";
-const STANDARD_INTERNAL_USER_ID: &str = "macro|standard-internal@example.com";
-const LEGACY_INTERNAL_USER_ID: &str = "macro|legacy-internal@example.com";
-const BOT_ACTING_USER_ID: &str = "macro|bot-acting@example.com";
+const VALID_USER_ID: &str = "rox|valid@example.com";
+const COOKIE_USER_ID: &str = "rox|cookie@example.com";
+const QUERY_USER_ID: &str = "rox|query@example.com";
+const BEARER_USER_ID: &str = "rox|bearer@example.com";
+const OPTIONAL_USER_ID: &str = "rox|optional@example.com";
+const STANDARD_INTERNAL_USER_ID: &str = "rox|standard-internal@example.com";
+const LEGACY_INTERNAL_USER_ID: &str = "rox|legacy-internal@example.com";
+const BOT_ACTING_USER_ID: &str = "rox|bot-acting@example.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 const BOT_ID: BotId = BotId::new_from_uuid(Uuid::from_u128(1));
 const BOT_TOKEN_ID: Uuid = Uuid::from_u128(2);
 const BOT_TEAM_ID: Uuid = Uuid::from_u128(3);
 const ACCESS_TOKEN_COOKIE: &str = "macro-access-token";
-const API_KEY_USER_ID: &str = "macro|api-key@example.com";
+const API_KEY_USER_ID: &str = "rox|api-key@example.com";
 const VALID_USER_API_KEY: &str = "mak_valid";
 const MANAGER_API_KEY: &str = "mak_manager";
 /// A Rox API token that signs an agent session's scope.
@@ -124,7 +124,7 @@ impl RoxAuthorizationService for FakeAuthorizationService {
                 user_context: user_context(API_KEY_USER_ID, Some(42)),
                 account_manager: Some(AccountManagerCredential {
                     grant_id: Uuid::nil(),
-                    manager_user_id: RoxUserIdStr::parse_from_str("macro|agent@example.com")
+                    manager_user_id: RoxUserIdStr::parse_from_str("rox|agent@example.com")
                         .expect("valid Rox user id")
                         .into_owned(),
                 }),

@@ -11,8 +11,8 @@ import { type Accessor, createSignal } from 'solid-js';
 
 export { useContactFilterLabels } from '../../user/use-contact-filter-options';
 
-export const VIEWER = 'macro|viewer@example.com';
-export const SELECTED = 'macro|selected@example.com';
+export const VIEWER = 'rox|viewer@example.com';
+export const SELECTED = 'rox|selected@example.com';
 export const [driveValue, setDriveValue] = createSignal<DriveState>({
   location: { kind: 'tab', tab: 'shared' },
   scope: 'default',
@@ -79,13 +79,13 @@ export const useContactFilterOptions: SearchableOptionSourceFactory = (
         const users = request.query
           ? [
               {
-                id: 'macro|match@example.com',
+                id: 'rox|match@example.com',
                 email: 'match@example.com',
                 name: 'Broader match',
               },
             ]
           : Array.from({ length: 50 }, (_, index) => ({
-              id: `macro|person${index + (second ? 50 : 0)}@example.com`,
+              id: `rox|person${index + (second ? 50 : 0)}@example.com`,
               email: `person${index + (second ? 50 : 0)}@example.com`,
               name: `Person ${index + (second ? 50 : 0)}`,
             }));
@@ -112,11 +112,11 @@ export const useContactFilterOptions: SearchableOptionSourceFactory = (
         signal.throwIfAborted();
         return {
           users: lookup.values.map((id) => {
-            let name = id.slice(6);
+            let name = id.slice(4);
             if (id === VIEWER) name = 'Viewer';
             if (id === SELECTED) name = 'Selected Person';
-            if (id === 'macro|match@example.com') name = 'Broader match';
-            return { id: id.toLowerCase(), email: id.slice(6), name };
+            if (id === 'rox|match@example.com') name = 'Broader match';
+            return { id: id.toLowerCase(), email: id.slice(4), name };
           }),
           unresolved: [],
           source: 'server',

@@ -600,9 +600,9 @@ async fn contacts_skip_malformed_addresses_and_keep_valid_order_and_duplicates()
             .map(|u| u.as_ref())
             .collect::<Vec<_>>(),
         [
-            "macro|alice@example.com",
-            "macro|bob@example.com",
-            "macro|alice@example.com"
+            "rox|alice@example.com",
+            "rox|bob@example.com",
+            "rox|alice@example.com"
         ]
     );
 }

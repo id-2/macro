@@ -61,7 +61,7 @@ impl LastOnlineRepo for MockRepo {
 }
 
 fn test_user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap()
 }
 
 #[tokio::test]
@@ -96,7 +96,7 @@ async fn get_last_online_returns_stored_time() {
     let now = Utc.with_ymd_and_hms(2024, 1, 15, 12, 0, 0).unwrap();
 
     let mut data = HashMap::new();
-    data.insert("macro|test@example.com".to_string(), stored_time);
+    data.insert("rox|test@example.com".to_string(), stored_time);
 
     let time = MockTime::new(now);
     let repo = MockRepo::with_data(data);
@@ -125,7 +125,7 @@ async fn time_since_last_online_returns_duration() {
     let now = Utc.with_ymd_and_hms(2024, 1, 15, 12, 0, 0).unwrap();
 
     let mut data = HashMap::new();
-    data.insert("macro|test@example.com".to_string(), stored_time);
+    data.insert("rox|test@example.com".to_string(), stored_time);
 
     let time = MockTime::new(now);
     let repo = MockRepo::with_data(data);
@@ -141,7 +141,7 @@ async fn time_since_last_online_handles_just_now() {
     let now = Utc.with_ymd_and_hms(2024, 1, 15, 12, 0, 0).unwrap();
 
     let mut data = HashMap::new();
-    data.insert("macro|test@example.com".to_string(), now);
+    data.insert("rox|test@example.com".to_string(), now);
 
     let time = MockTime::new(now);
     let repo = MockRepo::with_data(data);
@@ -158,7 +158,7 @@ async fn record_updates_existing_last_online() {
     let second_time = Utc.with_ymd_and_hms(2024, 1, 15, 12, 0, 0).unwrap();
 
     let mut data = HashMap::new();
-    data.insert("macro|test@example.com".to_string(), first_time);
+    data.insert("rox|test@example.com".to_string(), first_time);
 
     let time = MockTime::new(second_time);
     let repo = MockRepo::with_data(data);
@@ -185,8 +185,8 @@ async fn multiple_users_tracked_independently() {
 
     let service = LastOnlineService::new(time, repo);
 
-    let user1 = RoxUserIdStr::parse_from_str("macro|user1@example.com").unwrap();
-    let user2 = RoxUserIdStr::parse_from_str("macro|user2@example.com").unwrap();
+    let user1 = RoxUserIdStr::parse_from_str("rox|user1@example.com").unwrap();
+    let user2 = RoxUserIdStr::parse_from_str("rox|user2@example.com").unwrap();
 
     service.record_last_online(user1.copied()).await.unwrap();
 

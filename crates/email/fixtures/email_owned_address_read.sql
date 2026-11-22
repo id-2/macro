@@ -27,12 +27,12 @@ SELECT md5('owned-user' || i)::uuid, 'u' || i || '@owned.test', 'u' || i || '@ow
 FROM generate_series(0, 1) i;
 
 INSERT INTO "User" (id, email, name, rox_user_id)
-SELECT 'macro|u' || i || '@owned.test', 'u' || i || '@owned.test', 'U' || i, md5('owned-user' || i)::uuid
+SELECT 'rox|u' || i || '@owned.test', 'u' || i || '@owned.test', 'U' || i, md5('owned-user' || i)::uuid
 FROM generate_series(0, 1) i;
 
 CREATE TEMP TABLE owned_link AS
 SELECT i, ('f1000000-0000-0000-0000-' || lpad(to_hex(i), 12, '0'))::uuid AS id,
-       'macro|u' || u || '@owned.test' AS rox_id, email
+       'rox|u' || u || '@owned.test' AS rox_id, email
 FROM (VALUES (0, 0, 'u0@owned.test'), (1, 0, 'u0.second@else.test'),
              (2, 1, 'u1@owned.test')) AS link(i, u, email);
 
@@ -86,10 +86,10 @@ JOIN owned_draw d
 
 -- u1's project, shared with u0, holding threads of links 0 and 2.
 INSERT INTO "Project" (id, name, "userId")
-VALUES (md5('owned-project')::uuid::text, 'Shared', 'macro|u1@owned.test');
+VALUES (md5('owned-project')::uuid::text, 'Shared', 'rox|u1@owned.test');
 
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
-VALUES (md5('owned-project')::uuid, 'project', 'macro|u0@owned.test', 'user', 'view');
+VALUES (md5('owned-project')::uuid, 'project', 'rox|u0@owned.test', 'user', 'view');
 
 INSERT INTO email_threads (id, provider_id, link_id, inbox_visible, is_read, latest_inbound_message_ts,
   latest_non_spam_message_ts, created_at, updated_at, is_signal, has_pdf_attachment,
@@ -113,7 +113,7 @@ FROM owned_thread
 WHERE i = 0 AND k % 4 = 2;
 
 INSERT INTO user_notification (user_id, notification_id, state, deleted_at)
-SELECT 'macro|u0@owned.test', md5('owned-notification' || k)::uuid,
+SELECT 'rox|u0@owned.test', md5('owned-notification' || k)::uuid,
        (ARRAY['unseen', 'seen', 'done'])[1 + k % 3]::notification_state,
        CASE WHEN k % 20 = 10 THEN NOW() END
 FROM owned_thread
@@ -121,7 +121,7 @@ WHERE i = 0 AND k % 4 = 2;
 
 -- A select property on some threads of both inboxes.
 INSERT INTO property_definitions (id, user_id, display_name, data_type, is_multi_select, specific_entity_type)
-VALUES (md5('owned-property')::uuid, 'macro|u0@owned.test', 'Deal phase', 'SELECT_STRING', false, 'THREAD');
+VALUES (md5('owned-property')::uuid, 'rox|u0@owned.test', 'Deal phase', 'SELECT_STRING', false, 'THREAD');
 
 INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values)
 SELECT md5('owned-property' || id::text)::uuid, id::text, 'THREAD', md5('owned-property')::uuid,

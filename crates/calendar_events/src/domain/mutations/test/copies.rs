@@ -38,7 +38,7 @@ async fn confirming_a_copy_checks_the_requesters_copies_of_the_meeting() {
 
     let refusal = service
         .confirm_copy(
-            "macro|self@example.com",
+            "rox|self@example.com",
             ORGANIZED,
             None,
             CopyChange::Delete,
@@ -54,7 +54,7 @@ async fn confirming_a_copy_checks_the_requesters_copies_of_the_meeting() {
     assert_eq!(
         service
             .confirm_copy(
-                "macro|self@example.com",
+                "rox|self@example.com",
                 ORGANIZED,
                 Some("owner@example.com"),
                 CopyChange::Delete,

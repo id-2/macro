@@ -12,7 +12,7 @@ use sqlx::PgPool;
 use std::{collections::BTreeMap, time::Duration};
 
 const WEBHOOK_ID: &str = "wh_delivery_test";
-const USER_ID: &str = "macro|webhook-delivery@example.com";
+const USER_ID: &str = "rox|webhook-delivery@example.com";
 const ENDPOINT_URL: &str = "https://example.com/webhooks/original";
 const SIGNING_SECRET: &str = "secret-never-snapshotted";
 

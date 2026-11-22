@@ -75,9 +75,9 @@ async fn spawn_gateway(
 async fn user_id_reaches_the_gateway_as_one_path_segment() {
     let (notifier, received) = spawn_gateway(StatusCode::OK).await;
     let user_ids = [
-        "macro|accounts/payables@example.com",
-        "macro|//alias@example.com",
-        "macro|a#b?c%d@example.com",
+        "rox|accounts/payables@example.com",
+        "rox|//alias@example.com",
+        "rox|a#b?c%d@example.com",
     ];
 
     for user_id in user_ids {
@@ -98,7 +98,7 @@ async fn sequential_invalidations_reuse_one_connection() {
         let (notifier, received) = spawn_gateway(status).await;
 
         for _ in 0..20 {
-            let result = notifier.invalidate_contacts("macro|user@example.com").await;
+            let result = notifier.invalidate_contacts("rox|user@example.com").await;
             assert_eq!(result.is_ok(), status.is_success(), "{status}");
         }
 

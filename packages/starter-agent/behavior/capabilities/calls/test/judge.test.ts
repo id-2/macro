@@ -31,9 +31,9 @@ import {
 } from '../judge.ts';
 import type { ActiveMeeting, ChannelMessage } from '../types.ts';
 
-const assistant = 'macro|agent@example.com';
-const owner = 'macro|owner@example.com';
-const cy = 'macro|cy@example.com';
+const assistant = 'rox|agent@example.com';
+const owner = 'rox|owner@example.com';
+const cy = 'rox|cy@example.com';
 const start = Temporal.Instant.from('2026-11-05T14:00:00Z');
 const at = (ms: number) => after(start, ms);
 const world = (over: Partial<World> = {}): World => ({

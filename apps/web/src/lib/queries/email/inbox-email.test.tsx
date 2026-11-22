@@ -10,7 +10,7 @@ import { useInboxEmail } from './inbox-email';
 import { emailKeys } from './keys';
 
 const getLinksMock = vi.hoisted(() => vi.fn());
-const VIEWER = 'macro|viewer@example.com';
+const VIEWER = 'rox|viewer@example.com';
 
 vi.mock('@service-email/client', () => ({
   emailClient: { getLinks: getLinksMock },

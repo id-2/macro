@@ -13,7 +13,7 @@ use crate::domain::models::{ImportEntity, ImportStatus, Initiator};
 use crate::domain::ports::Result;
 use crate::domain::service::{DiscardOutcome, ImportNotionPageOutcome, StageOutcome};
 
-const TEST_USER: &str = "macro|test@example.com";
+const TEST_USER: &str = "rox|test@example.com";
 
 #[derive(Clone)]
 struct FakeAuthorization;
@@ -427,7 +427,7 @@ impl ImportStager for FakeImportService {
         self.calls.lock().unwrap().push((user.clone(), source));
         if foreign_id == "ENG-1" {
             let mut row = ledger_row(source, foreign_id, ImportStatus::Imported);
-            row.user_id = "macro|teammate@example.com".to_string();
+            row.user_id = "rox|teammate@example.com".to_string();
             return Ok(StageOutcome::AlreadyImported {
                 entity: row,
                 by_teammate: true,
@@ -568,7 +568,7 @@ async fn ledger_tracking_reports_a_teammates_import() {
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body["outcome"], "already_imported_by_teammate");
-    assert_eq!(body["entity"]["user_id"], "macro|teammate@example.com");
+    assert_eq!(body["entity"]["user_id"], "rox|teammate@example.com");
 }
 
 #[tokio::test]

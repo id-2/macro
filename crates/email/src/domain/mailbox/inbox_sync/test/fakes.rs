@@ -135,7 +135,7 @@ pub(super) fn input(operation: InboxSyncOperation) -> InboxSyncPubsubMessage {
 pub(super) fn link() -> Link {
     Link {
         id: LINK,
-        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fixture-owner".into(),
         email_address: EmailStr::try_from("Owner@example.com".to_string()).unwrap(),
         provider: service::link::UserProvider::Gmail,

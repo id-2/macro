@@ -46,7 +46,7 @@ impl RoxAuthorizationService for Identity {
 
 #[tokio::test]
 async fn client_and_router_preserve_authority_and_all_management_workflows() {
-    let user = "macro|host@example.com";
+    let user = "rox|host@example.com";
     let service = Arc::new(TestService::new(
         Arc::new(Memory::default()),
         Arc::new(Calendar::default()),
@@ -105,7 +105,7 @@ async fn client_and_router_preserve_authority_and_all_management_workflows() {
     let id = record.booking.id;
     assert!(matches!(
         client
-            .change_booking("macro|outsider@example.com", id, BookingChange::Cancel)
+            .change_booking("rox|outsider@example.com", id, BookingChange::Cancel)
             .await,
         Err(Error::Forbidden)
     ));

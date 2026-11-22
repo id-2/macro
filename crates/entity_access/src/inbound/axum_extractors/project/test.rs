@@ -33,10 +33,10 @@ use crate::{
 };
 
 const PROJECT_ID: &str = "project-1";
-const OWNER_ID: &str = "macro|owner@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
 const VALID_INTERNAL_KEY: &str = "valid-internal-key";
-const USER_ID: &str = "macro|user@example.com";
-const INTERNAL_USER_ID: &str = "macro|internal-user@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const INTERNAL_USER_ID: &str = "rox|internal-user@example.com";
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

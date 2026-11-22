@@ -11,8 +11,8 @@ async fn here_includes_active_humans_and_excludes_departed_users_and_bots() {
         .returning(|channel_id| {
             Box::pin(async move {
                 Ok([
-                    ("macro|active@example.com".to_string(), false),
-                    ("macro|left@example.com".to_string(), true),
+                    ("rox|active@example.com".to_string(), false),
+                    ("rox|left@example.com".to_string(), true),
                     (bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(), false),
                 ]
                 .into_iter()
@@ -32,6 +32,6 @@ async fn here_includes_active_humans_and_excludes_departed_users_and_bots() {
         .unwrap();
     assert_eq!(
         members.iter().map(|u| u.as_ref()).collect::<Vec<_>>(),
-        ["macro|active@example.com"]
+        ["rox|active@example.com"]
     );
 }

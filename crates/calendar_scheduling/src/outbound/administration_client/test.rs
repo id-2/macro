@@ -11,7 +11,7 @@ fn requests_preserve_authenticated_actor_scope_and_wire_shape() {
         .request(
             Method::GET,
             "/settings",
-            "macro|host@example.com",
+            "rox|host@example.com",
             Some(team),
         )
         .build()
@@ -23,7 +23,7 @@ fn requests_preserve_authenticated_actor_scope_and_wire_shape() {
     );
     assert_eq!(
         request.headers()["x-internal-macro-user-id"],
-        "macro|host@example.com"
+        "rox|host@example.com"
     );
     assert_eq!(request.headers()["x-internal-auth-key"], "test-key");
     let change = BookingChange::Attendance {
@@ -54,7 +54,7 @@ async fn stale_revision_response_remains_a_conflict() {
         "test-key".into(),
     );
     assert!(matches!(
-        client.settings("macro|host@example.com", None).await,
+        client.settings("rox|host@example.com", None).await,
         Err(Error::Conflict)
     ));
     server.await.unwrap();

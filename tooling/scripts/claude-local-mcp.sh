@@ -46,7 +46,7 @@ if [[ -z "$fusion_user_id" ]]; then
 fi
 
 token=$(cd "$root" && cargo run --quiet -p local_e2e_test_support --bin generate_local_e2e_token -- \
-  --email "$email" --macro-user-id "macro|$email" --fusion-user-id "$fusion_user_id" \
+  --email "$email" --macro-user-id "rox|$email" --fusion-user-id "$fusion_user_id" \
   --expiry-seconds 28800)
 
 config=$(mktemp --suffix=.json)

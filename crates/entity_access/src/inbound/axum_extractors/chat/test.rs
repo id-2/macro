@@ -27,10 +27,10 @@ use crate::{
 };
 
 const CHAT_ID: &str = "chat-1";
-const OWNER_ID: &str = "macro|owner@example.com";
-const USER_ID: &str = "macro|user@example.com";
-const ACT_AS_ID: &str = "macro|internal@example.com";
-const DEFAULT_INTERNAL_ID: &str = "macro|default-internal@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const ACT_AS_ID: &str = "rox|internal@example.com";
+const DEFAULT_INTERNAL_ID: &str = "rox|default-internal@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 
 #[derive(Clone, Debug, Default)]

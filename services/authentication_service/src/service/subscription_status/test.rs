@@ -61,7 +61,7 @@ impl SubscriptionStatusGateway for Gateway {
     }
 }
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|member@example.com")
+    RoxUserIdStr::try_from("rox|member@example.com")
         .unwrap()
         .into_owned()
 }
@@ -137,7 +137,7 @@ async fn returns_pending_downgrade_from_the_authenticated_personal_scope() {
 
 #[tokio::test]
 async fn team_member_reads_the_owners_customer_but_only_their_own_seat() {
-    let owner = RoxUserIdStr::try_from("macro|owner@example.com")
+    let owner = RoxUserIdStr::try_from("rox|owner@example.com")
         .unwrap()
         .into_owned();
     let team_id = rox_uuid::generate_uuid_v7();

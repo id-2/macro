@@ -23,7 +23,7 @@ function copy(
 ): CalendarEventRecord {
   return {
     id,
-    ownerId: 'macro|user@example.com',
+    ownerId: 'rox|user@example.com',
     calendarId,
     icalUid: 'meeting@google.com',
     title: 'Planning',
@@ -436,7 +436,7 @@ describe('team availability', () => {
               end: '2026-10-07T17:00:00Z',
               members: [
                 {
-                  userId: 'macro|user@example.com',
+                  userId: 'rox|user@example.com',
                   busy: [
                     {
                       start: '2026-10-07T10:00:00Z',
@@ -447,7 +447,7 @@ describe('team availability', () => {
                   unknownReasons: [],
                 },
               ],
-              unknownUserIds: ['macro|former@example.com'],
+              unknownUserIds: ['rox|former@example.com'],
               complete: false,
               summary: 'Coverage is incomplete',
             },
@@ -459,24 +459,24 @@ describe('team availability', () => {
     const availability = await new CalendarNamespace(client).teamAvailability({
       start: '2026-10-07T09:00:00Z',
       end: '2026-10-07T17:00:00Z',
-      members: [User.byId(client, 'macro|former@example.com')],
+      members: [User.byId(client, 'rox|former@example.com')],
     });
 
     expect(bodies).toEqual([
       {
         start: '2026-10-07T09:00:00Z',
         end: '2026-10-07T17:00:00Z',
-        userIds: ['macro|former@example.com'],
+        userIds: ['rox|former@example.com'],
       },
     ]);
     expect(availability.members.map((member) => member.user.id)).toEqual([
-      'macro|user@example.com',
+      'rox|user@example.com',
     ]);
     expect(availability.members[0]?.busy).toEqual([
       { start: '2026-10-07T10:00:00Z', end: '2026-10-07T11:00:00Z' },
     ]);
     expect(availability.unknownUsers.map((user) => user.id)).toEqual([
-      'macro|former@example.com',
+      'rox|former@example.com',
     ]);
     expect(availability.freeWindows).toBeUndefined();
     expect(availability.complete).toBe(false);

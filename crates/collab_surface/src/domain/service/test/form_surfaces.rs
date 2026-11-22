@@ -267,7 +267,7 @@ async fn the_public_api_never_ensures_or_deletes_a_form_surface() {
     let svc = service_with(empty.clone(), MockSurfaceInitializer::new());
     let err = svc
         .ensure_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             form_receipt(id, AccessLevel::Owner),
             id,
             String::new(),
@@ -281,7 +281,7 @@ async fn the_public_api_never_ensures_or_deletes_a_form_surface() {
     let svc = service_with(repo.clone(), MockSurfaceInitializer::new());
     let err = svc
         .delete_surface(
-            &user("macro|a@b.c"),
+            &user("rox|a@b.c"),
             form_receipt(id, AccessLevel::Owner),
             id,
         )
@@ -300,7 +300,7 @@ async fn a_form_surface_token_requires_edit_on_the_form() {
     // Respondents hold View; the draft is not theirs to read.
     for denied in [AccessLevel::View, AccessLevel::Comment] {
         let err = svc
-            .mint_token(&user("macro|a@b.c"), form_receipt(id, denied), id)
+            .mint_token(&user("rox|a@b.c"), form_receipt(id, denied), id)
             .await
             .unwrap_err();
         assert!(
@@ -311,7 +311,7 @@ async fn a_form_surface_token_requires_edit_on_the_form() {
 
     for allowed in [AccessLevel::Edit, AccessLevel::Owner] {
         let token = svc
-            .mint_token(&user("macro|a@b.c"), form_receipt(id, allowed), id)
+            .mint_token(&user("rox|a@b.c"), form_receipt(id, allowed), id)
             .await
             .unwrap();
         let claims: model::document::DocumentPermissionsToken =
@@ -340,7 +340,7 @@ async fn an_anonymous_visitor_never_gets_a_form_surface_token() {
     .unwrap();
 
     let err = svc
-        .mint_token(&user("macro|a@b.c"), anonymous, id)
+        .mint_token(&user("rox|a@b.c"), anonymous, id)
         .await
         .unwrap_err();
 
@@ -353,7 +353,7 @@ async fn other_parents_keep_view_tokens() {
     let repo = MemRepo::holding(ready_initiative_surface(id));
     let svc = service_with(repo, MockSurfaceInitializer::new());
     let receipt = receipt_for(
-        "macro|a@b.c",
+        "rox|a@b.c",
         EntityType::Initiative,
         &id.to_string(),
         EntityPermission::AccessLevel {
@@ -362,7 +362,7 @@ async fn other_parents_keep_view_tokens() {
     );
 
     let token = svc
-        .mint_token(&user("macro|a@b.c"), receipt, id)
+        .mint_token(&user("rox|a@b.c"), receipt, id)
         .await
         .unwrap();
     let claims: model::document::DocumentPermissionsToken =

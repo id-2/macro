@@ -25,7 +25,7 @@ import {
   type FakeCollaboration,
 } from './fake-collaboration';
 
-export const MOCK_VIEWER_ID = 'macro|respondent@example.com';
+export const MOCK_VIEWER_ID = 'rox|respondent@example.com';
 
 /** What a mocked context was asked to do, in order. */
 export type MockFormCalls = {

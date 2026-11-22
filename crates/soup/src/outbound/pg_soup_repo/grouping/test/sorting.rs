@@ -22,7 +22,7 @@ async fn fetch(
     Ok(expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com")?,
             limit,
             cursor: DynamicSort::from_timestamp_query(cursor),
             exclude_frecency: false,

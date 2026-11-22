@@ -4,14 +4,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PushMessageTest {
-    private val recipient = "macro|alice@example.com"
+    private val recipient = "rox|alice@example.com"
     private val alert = mapOf("type" to "notification", "recipientId" to recipient,
         "identifier" to "channel-id", "title" to "Alice", "body" to "Hello", "payload" to "{}")
 
     @Test fun acceptsAlertsOnlyForTheActiveAccount() {
         assertEquals("Hello", PushMessage.parse(alert, recipient)?.body)
         assertNull(PushMessage.parse(alert, null))
-        assertNull(PushMessage.parse(alert, "macro|bob@example.com"))
+        assertNull(PushMessage.parse(alert, "rox|bob@example.com"))
         assertNull(PushMessage.parse(alert - "recipientId", recipient))
     }
 

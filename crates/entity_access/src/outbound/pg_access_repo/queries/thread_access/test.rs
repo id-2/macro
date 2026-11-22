@@ -6,9 +6,9 @@ use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@corp.test";
-const REQUESTER: &str = "macro|requester@corp.test";
-const OTHER: &str = "macro|other@corp.test";
+const OWNER: &str = "rox|owner@corp.test";
+const REQUESTER: &str = "rox|requester@corp.test";
+const OTHER: &str = "rox|other@corp.test";
 
 fn user(s: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(s.to_string()).unwrap()
@@ -190,7 +190,7 @@ async fn create_primary_link(pool: &PgPool, owner_rox_id: &str) -> Uuid {
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
             link_id,
             owner_rox_id,
-            owner_rox_id.strip_prefix("macro|").unwrap(),
+            owner_rox_id.strip_prefix("rox|").unwrap(),
         )
         .execute(pool)
         .await

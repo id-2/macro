@@ -15,7 +15,7 @@ fn timestamp() -> DateTime<Utc> {
 }
 
 fn new_contract_events(link_id: Uuid) -> Vec<EmailMacroEvent> {
-    let owner = user_id("macro|owner@example.com");
+    let owner = user_id("rox|owner@example.com");
 
     vec![
         EmailMacroEvent::message_draft_synced(MessageDraftSyncedMetadata {
@@ -55,7 +55,7 @@ fn message_received_wire_shape() {
         Uuid::nil(),
         EmailTopicEvent::MessageReceived(MessageReceivedMetadata {
             link_id: Uuid::nil(),
-            owner: user_id("macro|owner@example.com"),
+            owner: user_id("rox|owner@example.com"),
             message_id: Uuid::nil(),
             provider_message_id: "gmail-msg-1".to_string(),
             thread_id: Uuid::nil(),
@@ -80,7 +80,7 @@ fn message_received_wire_shape() {
             "event_type": "email.message_received",
             "metadata": {
                 "link_id": "00000000-0000-0000-0000-000000000000",
-                "owner": "macro|owner@example.com",
+                "owner": "rox|owner@example.com",
                 "message_id": "00000000-0000-0000-0000-000000000000",
                 "provider_message_id": "gmail-msg-1",
                 "thread_id": "00000000-0000-0000-0000-000000000000",
@@ -105,7 +105,7 @@ fn message_draft_synced_wire_shape_preserves_spam_or_trash_state() {
             Uuid::nil(),
             EmailTopicEvent::MessageDraftSynced(MessageDraftSyncedMetadata {
                 link_id: Uuid::nil(),
-                owner: user_id("macro|owner@example.com"),
+                owner: user_id("rox|owner@example.com"),
                 message_id: Uuid::nil(),
                 provider_message_id: "gmail-draft-1".to_string(),
                 thread_id: Uuid::nil(),
@@ -123,7 +123,7 @@ fn message_draft_synced_wire_shape_preserves_spam_or_trash_state() {
                 "event_type": "email.message_draft_synced",
                 "metadata": {
                     "link_id": "00000000-0000-0000-0000-000000000000",
-                    "owner": "macro|owner@example.com",
+                    "owner": "rox|owner@example.com",
                     "message_id": "00000000-0000-0000-0000-000000000000",
                     "provider_message_id": "gmail-draft-1",
                     "thread_id": "00000000-0000-0000-0000-000000000000",
@@ -141,7 +141,7 @@ fn thread_archived_wire_shape_with_origin() {
         Uuid::nil(),
         EmailTopicEvent::ThreadArchived(ThreadArchivedMetadata {
             link_id: Uuid::nil(),
-            owner: user_id("macro|owner@example.com"),
+            owner: user_id("rox|owner@example.com"),
             actor: None,
             thread_id: Uuid::nil(),
             archived: true,
@@ -158,7 +158,7 @@ fn thread_archived_wire_shape_with_origin() {
             "event_type": "email.thread_archived",
             "metadata": {
                 "link_id": "00000000-0000-0000-0000-000000000000",
-                "owner": "macro|owner@example.com",
+                "owner": "rox|owner@example.com",
                 "actor": null,
                 "thread_id": "00000000-0000-0000-0000-000000000000",
                 "archived": true,
@@ -173,7 +173,7 @@ fn decode_round_trips() {
     let link_id = Uuid::new_v4();
     let original = EmailMacroEvent::message_deleted(MessageDeletedMetadata {
         link_id,
-        owner: user_id("macro|owner@example.com"),
+        owner: user_id("rox|owner@example.com"),
         message_id: Uuid::new_v4(),
         provider_message_id: "gmail-msg-1".to_string(),
         thread_id: Uuid::new_v4(),
@@ -204,7 +204,7 @@ fn events_are_keyed_by_link_id() {
     let link_id = Uuid::new_v4();
     let event = EmailMacroEvent::link_disconnected(LinkDisconnectedMetadata {
         link_id,
-        owner: user_id("macro|owner@example.com"),
+        owner: user_id("rox|owner@example.com"),
         email_address: "owner@example.com".to_string(),
         reason: LinkDisconnectReason::ManuallyDisabled,
     });
@@ -231,8 +231,8 @@ fn threads_reindex_reason_uses_snake_case() {
 #[test]
 fn event_type_strings_follow_dot_convention() {
     let link_id = Uuid::nil();
-    let owner = user_id("macro|owner@example.com");
-    let actor = Some(user_id("macro|actor@example.com"));
+    let owner = user_id("rox|owner@example.com");
+    let actor = Some(user_id("rox|actor@example.com"));
 
     let cases = vec![
         (
@@ -404,7 +404,7 @@ fn event_type_strings_follow_dot_convention() {
             EmailMacroEvent::thread_project_changed(ThreadProjectChangedMetadata {
                 link_id,
                 owner: owner.clone(),
-                actor: user_id("macro|actor@example.com"),
+                actor: user_id("rox|actor@example.com"),
                 thread_id: Uuid::nil(),
                 previous_project_id: None,
                 project_id: Some("project-1".to_string()),
@@ -471,7 +471,7 @@ fn system_label(provider_label_id: &str) -> LabelRef {
 fn label_change(label: LabelRef, added: bool) -> Option<EmailMacroEvent> {
     EmailMacroEvent::thread_label_change(
         Uuid::nil(),
-        user_id("macro|owner@example.com"),
+        user_id("rox|owner@example.com"),
         None,
         Uuid::nil(),
         label,

@@ -24,7 +24,7 @@ impl FrecencyQueryService for PanicFrecencyService {
 
 #[tokio::test]
 async fn skips_frecency_lookup_when_not_requested() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let ids = [EntityType::EmailThread.with_entity_string("thread-id".to_owned())];
     let scores = get_frecency_scores(&PanicFrecencyService, false, user_id, &ids)
         .await
@@ -43,7 +43,7 @@ fn a_request_without_a_limit_gets_the_documented_page_of_twenty() {
 
 #[test]
 fn authorized_threads_render_in_their_owning_inboxes_with_an_exact_id_filter() {
-    let viewer = RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap();
     let first = Uuid::from_u128(1);
     let second = Uuid::from_u128(2);
     let own_link = Uuid::from_u128(10);

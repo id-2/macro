@@ -20,7 +20,7 @@ use item_filters::ast::properties::{PropertiesLiteral, PropertyMatchValue};
 use rox_user_id::cowlike::CowLike;
 use std::collections::HashMap;
 
-const CALLER: &str = "macro|u0@owned.test";
+const CALLER: &str = "rox|u0@owned.test";
 
 fn link(i: u8) -> Uuid {
     Uuid::from_u128(0xf100_0000_0000_0000_0000_0000_0000_0000 | u128::from(i))

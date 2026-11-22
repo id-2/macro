@@ -7,7 +7,7 @@ use crate::domain::ports::UserApiKeyAuthorizationRepo as _;
 
 const API_KEY: &str = "mak_authorization_test_secret";
 const USER_EMAIL: &str = "user-api-key-authorization@example.com";
-const USER_ID: &str = "macro|user-api-key-authorization@example.com";
+const USER_ID: &str = "rox|user-api-key-authorization@example.com";
 
 async fn insert_user_and_key(pool: &PgPool, user_id: &str, email: &str, key: &str) -> Uuid {
     let rox_user_id = Uuid::new_v4();
@@ -78,7 +78,7 @@ async fn unknown_key_returns_none(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_manager_credential_resolves_to_the_managed_account_until_revoked(pool: PgPool) {
     const MANAGER_KEY: &str = "mak_manager_secret";
-    const MANAGER_ID: &str = "macro|manager-credential@example.com";
+    const MANAGER_ID: &str = "rox|manager-credential@example.com";
 
     insert_user_and_key(&pool, USER_ID, USER_EMAIL, API_KEY).await;
     insert_user_and_key(

@@ -7,11 +7,11 @@ import { PropertyRootContext } from '../core/context';
 import type { EntityProperty } from '../types';
 import { EntityPropertyEditor } from './entity-property-editor';
 
-const outsiderId = 'macro|former@example.com';
+const outsiderId = 'rox|former@example.com';
 
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'viewer@example.com',
-  useUserId: () => () => 'macro|viewer@example.com',
+  useUserId: () => () => 'rox|viewer@example.com',
 }));
 vi.mock('@core/context/quickAccess', () => ({
   useQuickAccess: () => ({
@@ -29,7 +29,7 @@ vi.mock('@core/user', () => ({
   useAugmentUserWithDmActivity: () => (user: unknown) => user,
 }));
 vi.mock('@core/user/util', () => ({
-  idToEmail: (id: string) => id.replace('macro|', ''),
+  idToEmail: (id: string) => id.replace('rox|', ''),
   idToDisplayName: () => 'former',
 }));
 vi.mock('@queries/team/members', () => ({

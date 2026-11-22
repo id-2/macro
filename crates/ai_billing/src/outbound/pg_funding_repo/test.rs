@@ -381,7 +381,7 @@ async fn delayed_renewal_does_not_convert_a_legacy_period_already_in_use(pool: P
 }
 
 fn user(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{name}@example.com")).unwrap()
 }
 
 fn period() -> FundingPeriod {

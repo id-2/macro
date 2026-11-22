@@ -5,8 +5,8 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use super::*;
 use crate::outbound::pg_suggestion_repo::test::insert_user;
 
-const OWNER: &str = "macro|waits-owner@example.com";
-const SENDER: &str = "macro|waits-sender@example.com";
+const OWNER: &str = "rox|waits-owner@example.com";
+const SENDER: &str = "rox|waits-sender@example.com";
 
 fn owner() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(OWNER).unwrap()

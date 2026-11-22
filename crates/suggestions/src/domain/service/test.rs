@@ -17,8 +17,8 @@ use crate::outbound::pg_suggestion_repo::PgSuggestionRepo;
 
 pub(crate) mod runs;
 
-pub(crate) const OWNER: &str = "macro|suggestions-owner@rox.one";
-const OTHER: &str = "macro|suggestions-other@rox.one";
+pub(crate) const OWNER: &str = "rox|suggestions-owner@rox.one";
+const OTHER: &str = "rox|suggestions-other@rox.one";
 
 pub(crate) fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).unwrap()

@@ -8,8 +8,8 @@ use super::*;
 use crate::domain::ports::HarnessAuthorizationRepo;
 
 const RAW_TOKEN: &str = "mhns_test_secret";
-const OWNER_ID: &str = "macro|owner@example.com";
-const MEMBER_ID: &str = "macro|member@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
+const MEMBER_ID: &str = "rox|member@example.com";
 const FUSION_USER_ID: &str = "fusion-owner";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -207,7 +207,7 @@ async fn rejects_claims_for_unknown_users() {
     let repo = FakeRepo::owned_by_user();
 
     let result = HarnessAuthorizerService::new(repo)
-        .authorize_harness(RAW_TOKEN, Some("macro|nobody@example.com".to_string()))
+        .authorize_harness(RAW_TOKEN, Some("rox|nobody@example.com".to_string()))
         .await;
 
     assert_error(result, RoxAuthorizationError::ActingUserNotAuthorized);

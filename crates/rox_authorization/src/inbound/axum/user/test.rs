@@ -28,7 +28,7 @@ impl JwtValidator for Validator {
             "execution" | "api" | "user" => Ok(ValidatedIdentity {
                 agent_id: (jwt == "execution").then_some(bot_id::ROX_NEW_BOT_ID),
                 agent_via: None,
-                user_id: "macro|owner@example.com".into(),
+                user_id: "rox|owner@example.com".into(),
                 fusion_user_id: "fusion-owner".into(),
                 organization_id: Some(42),
                 permissions: None,
@@ -78,7 +78,7 @@ async fn bearer_agent_attribution_survives_user_policy_without_becoming_bot_auth
         );
         assert_eq!(
             caller.authorization.rox_user_id.as_ref(),
-            "macro|owner@example.com"
+            "rox|owner@example.com"
         );
         assert_eq!(caller.authorization.user_context.organization_id, Some(42));
         assert!(

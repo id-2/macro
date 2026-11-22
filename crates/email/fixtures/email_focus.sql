@@ -11,9 +11,9 @@
 -- Thread f207: signal, in inbox, on the other link.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000f01', 'macro|owner@acme.example', '00000000-0000-0000-0000-000000000f01',
+VALUES ('00000000-0000-0000-0000-000000000f01', 'rox|owner@acme.example', '00000000-0000-0000-0000-000000000f01',
         'Owner@Acme.example', 'GMAIL', true, NOW(), NOW()),
-       ('00000000-0000-0000-0000-000000000f02', 'macro|other@elsewhere.example', '00000000-0000-0000-0000-000000000f02',
+       ('00000000-0000-0000-0000-000000000f02', 'rox|other@elsewhere.example', '00000000-0000-0000-0000-000000000f02',
         'other@elsewhere.example', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)

@@ -5,8 +5,8 @@ use super::*;
 #[tokio::test]
 async fn add_team_agent_on_a_paying_team_grants_premium_roles_without_billing() {
     let team_id = uuid::Uuid::from_u128(0x7a_0001);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -43,7 +43,7 @@ async fn add_team_agent_on_a_paying_team_grants_premium_roles_without_billing() 
         .unwrap();
 
     assert_eq!(member.team_id, team_id);
-    assert_eq!(member.user_id.as_ref(), "macro|agent@example.com");
+    assert_eq!(member.user_id.as_ref(), "rox|agent@example.com");
     assert_eq!(member.role, TeamRole::Member);
     assert_eq!(
         *team_repository.added_seat_included.lock().unwrap(),
@@ -88,13 +88,13 @@ async fn add_team_agent_on_a_paying_team_grants_premium_roles_without_billing() 
     assert_eq!(
         *roles_service.upsert_calls.lock().unwrap(),
         vec![(
-            "macro|agent@example.com".to_string(),
+            "rox|agent@example.com".to_string(),
             vec![RoleId::TeamSubscriber, RoleId::SubOpus]
         )]
     );
     assert_eq!(
         *channel_service.auto_join_calls.lock().unwrap(),
-        vec![(team_id, "macro|agent@example.com".to_string())]
+        vec![(team_id, "rox|agent@example.com".to_string())]
     );
     assert_eq!(*team_repository.remove_user_calls.lock().unwrap(), 0);
 
@@ -103,13 +103,13 @@ async fn add_team_agent_on_a_paying_team_grants_premium_roles_without_billing() 
     assert_eq!(events[0].envelope["event_type"], "team.member_joined");
     assert_eq!(
         events[0].envelope["metadata"]["member_id"],
-        "macro|agent@example.com"
+        "rox|agent@example.com"
     );
     assert_eq!(
         events[0].envelope["metadata"]["join_method"],
         serde_json::json!({
             "type": "team_agent",
-            "added_by": "macro|admin@example.com"
+            "added_by": "rox|admin@example.com"
         })
     );
 }
@@ -117,8 +117,8 @@ async fn add_team_agent_on_a_paying_team_grants_premium_roles_without_billing() 
 #[tokio::test]
 async fn add_team_agent_on_a_free_team_joins_without_premium_roles() {
     let team_id = uuid::Uuid::from_u128(0x7a_0002);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -176,15 +176,15 @@ async fn add_team_agent_on_a_free_team_joins_without_premium_roles() {
     assert!(roles_service.upsert_calls.lock().unwrap().is_empty());
     assert_eq!(
         *channel_service.auto_join_calls.lock().unwrap(),
-        vec![(team_id, "macro|agent@example.com".to_string())]
+        vec![(team_id, "rox|agent@example.com".to_string())]
     );
 }
 
 #[tokio::test]
 async fn add_team_agent_already_on_the_team_is_a_typed_error() {
     let team_id = uuid::Uuid::from_u128(0x7a_0003);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -230,8 +230,8 @@ async fn add_team_agent_already_on_the_team_is_a_typed_error() {
 #[tokio::test]
 async fn undo_team_agent_join_removes_only_the_included_membership() {
     let team_id = uuid::Uuid::from_u128(0x7a_0004);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -290,8 +290,8 @@ async fn undo_team_agent_join_removes_only_the_included_membership() {
 #[tokio::test]
 async fn undo_team_agent_join_refuses_a_billed_membership() {
     let team_id = uuid::Uuid::from_u128(0x7a_0005);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let member_id = RoxUserIdStr::parse_from_str("macro|member@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let member_id = RoxUserIdStr::parse_from_str("rox|member@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())))
@@ -328,8 +328,8 @@ async fn undo_team_agent_join_refuses_a_billed_membership() {
 #[tokio::test]
 async fn undo_team_agent_join_of_a_missing_membership_is_user_not_in_team() {
     let team_id = uuid::Uuid::from_u128(0x7a_0006);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -360,8 +360,8 @@ async fn undo_team_agent_join_of_a_missing_membership_is_user_not_in_team() {
 #[tokio::test]
 async fn removing_a_team_agent_leaves_the_subscription_alone() {
     let team_id = uuid::Uuid::from_u128(0x7a_0007);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -427,7 +427,7 @@ async fn removing_a_team_agent_leaves_the_subscription_alone() {
     assert_eq!(customer_repository.renewal_reads.load(Ordering::SeqCst), 0);
     assert_eq!(
         *channel_service.leave_calls.lock().unwrap(),
-        vec![(team_id, "macro|agent@example.com".to_string())]
+        vec![(team_id, "rox|agent@example.com".to_string())]
     );
     assert_eq!(roles_service.remove_calls.lock().unwrap().len(), 1);
     assert_eq!(*team_repository.rollback_remove_calls.lock().unwrap(), 0);
@@ -436,8 +436,8 @@ async fn removing_a_team_agent_leaves_the_subscription_alone() {
 #[tokio::test]
 async fn removing_a_team_agent_rolls_back_keeping_the_seat_included() {
     let team_id = uuid::Uuid::from_u128(0x7a_0008);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));
@@ -496,8 +496,8 @@ async fn removing_a_team_agent_rolls_back_keeping_the_seat_included() {
 #[tokio::test]
 async fn set_team_member_plan_rejects_an_included_seat() {
     let team_id = uuid::Uuid::from_u128(0x7a_0009);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())))
@@ -559,8 +559,8 @@ async fn set_team_member_plan_rejects_an_included_seat() {
 #[tokio::test]
 async fn the_members_api_refuses_an_agent_and_team_agents_removes_it() {
     let team_id = uuid::Uuid::from_u128(0x7a_0007);
-    let admin_id = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
-    let agent_id = RoxUserIdStr::parse_from_str("macro|agent@example.com").unwrap();
+    let admin_id = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
+    let agent_id = RoxUserIdStr::parse_from_str("rox|agent@example.com").unwrap();
 
     let mut team_repository =
         MockTeamRepository::new(Vec::new(), "Acme", Arc::new(Mutex::new(Vec::new())));

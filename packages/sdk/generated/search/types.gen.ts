@@ -24,7 +24,7 @@ export type AgentSessionFilters = {
      */
     include?: boolean;
     /**
-     * Filter by session owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by session owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every
      * owner.
      */
@@ -684,9 +684,9 @@ export type ChatFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by chat owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by chat owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;
@@ -931,9 +931,9 @@ export type DocumentFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by document owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by document owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;
@@ -1522,7 +1522,7 @@ export type InitiativeFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by initiative owner principal — a user ('macro|user@example.com'), a
+     * Filter by initiative owner principal — a user ('rox|user@example.com'), a
      * bot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include
      * every owner.
      */
@@ -1564,9 +1564,9 @@ export type ProjectFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by project owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by project owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;

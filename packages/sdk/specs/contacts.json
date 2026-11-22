@@ -231,7 +231,7 @@
           },
           "userId": {
             "type": "string",
-            "description": "The person's user ID (`macro|<email>`)."
+            "description": "The person's user ID (`rox|<email>`)."
           }
         }
       }

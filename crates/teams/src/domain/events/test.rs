@@ -35,7 +35,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 team_id: team_id(),
                 name: "Acme".to_string(),
                 slug: "acme".to_string(),
-                owner: user_id("macro|owner@acme.com"),
+                owner: user_id("rox|owner@acme.com"),
                 enterprise: true,
                 paid: true,
                 auto_join_domain: Some("acme.com".to_string()),
@@ -46,7 +46,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                     "team_id": TEAM_ID,
                     "name": "Acme",
                     "slug": "acme",
-                    "owner": "macro|owner@acme.com",
+                    "owner": "rox|owner@acme.com",
                     "enterprise": true,
                     "paid": true,
                     "auto_join_domain": "acme.com"
@@ -56,7 +56,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
         (
             TeamTopicEvent::Updated(TeamUpdatedMetadata {
                 team_id: team_id(),
-                actor_user_id: user_id("macro|admin@acme.com"),
+                actor_user_id: user_id("rox|admin@acme.com"),
                 name: Some("Acme Inc".to_string()),
                 slug: None,
             }),
@@ -64,7 +64,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 "event_type": "team.updated",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "actor_user_id": "macro|admin@acme.com",
+                    "actor_user_id": "rox|admin@acme.com",
                     "name": "Acme Inc",
                     "slug": null
                 }
@@ -73,10 +73,10 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
         (
             TeamTopicEvent::Deleted(TeamDeletedMetadata {
                 team_id: team_id(),
-                actor_user_id: user_id("macro|owner@acme.com"),
+                actor_user_id: user_id("rox|owner@acme.com"),
                 member_user_ids: vec![
-                    user_id("macro|owner@acme.com"),
-                    user_id("macro|member@acme.com"),
+                    user_id("rox|owner@acme.com"),
+                    user_id("rox|member@acme.com"),
                 ],
                 bot_ids: vec![bot_id()],
                 owned_entities: vec![
@@ -96,8 +96,8 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 "event_type": "team.deleted",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "actor_user_id": "macro|owner@acme.com",
-                    "member_user_ids": ["macro|owner@acme.com", "macro|member@acme.com"],
+                    "actor_user_id": "rox|owner@acme.com",
+                    "member_user_ids": ["rox|owner@acme.com", "rox|member@acme.com"],
                     "bot_ids": [BOT_ID],
                     "owned_entities": [
                         {
@@ -119,7 +119,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 team_id: team_id(),
                 invite_id: invite_id(),
                 email: "invitee@acme.com".to_string(),
-                invited_by: user_id("macro|admin@acme.com"),
+                invited_by: user_id("rox|admin@acme.com"),
                 team_name: Some("Acme".to_string()),
             }),
             json!({
@@ -128,7 +128,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                     "team_id": TEAM_ID,
                     "invite_id": INVITE_ID,
                     "email": "invitee@acme.com",
-                    "invited_by": "macro|admin@acme.com",
+                    "invited_by": "rox|admin@acme.com",
                     "team_name": "Acme"
                 }
             }),
@@ -138,7 +138,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 team_id: team_id(),
                 invite_id: invite_id(),
                 email: "invitee@acme.com".to_string(),
-                actor_user_id: user_id("macro|invitee@acme.com"),
+                actor_user_id: user_id("rox|invitee@acme.com"),
             }),
             json!({
                 "event_type": "team.invite_rejected",
@@ -146,7 +146,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                     "team_id": TEAM_ID,
                     "invite_id": INVITE_ID,
                     "email": "invitee@acme.com",
-                    "actor_user_id": "macro|invitee@acme.com"
+                    "actor_user_id": "rox|invitee@acme.com"
                 }
             }),
         ),
@@ -155,7 +155,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 team_id: team_id(),
                 invite_id: invite_id(),
                 email: "invitee@acme.com".to_string(),
-                actor_user_id: user_id("macro|admin@acme.com"),
+                actor_user_id: user_id("rox|admin@acme.com"),
             }),
             json!({
                 "event_type": "team.invite_revoked",
@@ -163,38 +163,38 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                     "team_id": TEAM_ID,
                     "invite_id": INVITE_ID,
                     "email": "invitee@acme.com",
-                    "actor_user_id": "macro|admin@acme.com"
+                    "actor_user_id": "rox|admin@acme.com"
                 }
             }),
         ),
         (
             TeamTopicEvent::MemberJoined(TeamMemberJoinedMetadata {
                 team_id: team_id(),
-                member_id: user_id("macro|member@acme.com"),
+                member_id: user_id("rox|member@acme.com"),
                 teammate_ids: vec![
-                    user_id("macro|admin@acme.com"),
-                    user_id("macro|owner@acme.com"),
+                    user_id("rox|admin@acme.com"),
+                    user_id("rox|owner@acme.com"),
                 ],
                 role: TeamRole::Member,
                 join_method: TeamJoinMethod::InviteAccepted {
                     invite_id: invite_id(),
-                    invited_by: user_id("macro|admin@acme.com"),
+                    invited_by: user_id("rox|admin@acme.com"),
                 },
             }),
             json!({
                 "event_type": "team.member_joined",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "member_id": "macro|member@acme.com",
+                    "member_id": "rox|member@acme.com",
                     "teammate_ids": [
-                        "macro|admin@acme.com",
-                        "macro|owner@acme.com"
+                        "rox|admin@acme.com",
+                        "rox|owner@acme.com"
                     ],
                     "role": "member",
                     "join_method": {
                         "type": "invite_accepted",
                         "invite_id": INVITE_ID,
-                        "invited_by": "macro|admin@acme.com"
+                        "invited_by": "rox|admin@acme.com"
                     }
                 }
             }),
@@ -202,16 +202,16 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
         (
             TeamTopicEvent::MemberRemoved(TeamMemberRemovedMetadata {
                 team_id: team_id(),
-                member_id: user_id("macro|member@acme.com"),
-                removed_by: user_id("macro|admin@acme.com"),
+                member_id: user_id("rox|member@acme.com"),
+                removed_by: user_id("rox|admin@acme.com"),
                 role: TeamRole::Admin,
             }),
             json!({
                 "event_type": "team.member_removed",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "member_id": "macro|member@acme.com",
-                    "removed_by": "macro|admin@acme.com",
+                    "member_id": "rox|member@acme.com",
+                    "removed_by": "rox|admin@acme.com",
                     "role": "admin"
                 }
             }),
@@ -219,8 +219,8 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
         (
             TeamTopicEvent::MemberRoleChanged(TeamMemberRoleChangedMetadata {
                 team_id: team_id(),
-                actor_user_id: user_id("macro|owner@acme.com"),
-                member_id: user_id("macro|member@acme.com"),
+                actor_user_id: user_id("rox|owner@acme.com"),
+                member_id: user_id("rox|member@acme.com"),
                 role: TeamRole::Admin,
                 previous_role: Some(TeamRole::Member),
             }),
@@ -228,8 +228,8 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
                 "event_type": "team.member_role_changed",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "actor_user_id": "macro|owner@acme.com",
-                    "member_id": "macro|member@acme.com",
+                    "actor_user_id": "rox|owner@acme.com",
+                    "member_id": "rox|member@acme.com",
                     "role": "admin",
                     "previous_role": "member"
                 }
@@ -238,14 +238,14 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
         (
             TeamTopicEvent::AutoJoinDomainToggled(TeamAutoJoinDomainToggledMetadata {
                 team_id: team_id(),
-                actor_user_id: user_id("macro|admin@acme.com"),
+                actor_user_id: user_id("rox|admin@acme.com"),
                 auto_join_domain: None,
             }),
             json!({
                 "event_type": "team.auto_join_domain_toggled",
                 "metadata": {
                     "team_id": TEAM_ID,
-                    "actor_user_id": "macro|admin@acme.com",
+                    "actor_user_id": "rox|admin@acme.com",
                     "auto_join_domain": null
                 }
             }),
@@ -323,7 +323,7 @@ fn member_joined_defaults_missing_teammate_ids() {
         "event_type": "team.member_joined",
         "metadata": {
             "team_id": TEAM_ID,
-            "member_id": "macro|member@acme.com",
+            "member_id": "rox|member@acme.com",
             "role": "member",
             "join_method": { "type": "domain_auto_join" }
         }
@@ -347,8 +347,8 @@ fn deleted_defaults_missing_bots_and_owned_entities() {
         "event_type": "team.deleted",
         "metadata": {
             "team_id": TEAM_ID,
-            "actor_user_id": "macro|owner@acme.com",
-            "member_user_ids": ["macro|owner@acme.com"]
+            "actor_user_id": "rox|owner@acme.com",
+            "member_user_ids": ["rox|owner@acme.com"]
         }
     });
 
@@ -358,8 +358,8 @@ fn deleted_defaults_missing_bots_and_owned_entities() {
         event.event,
         TeamTopicEvent::Deleted(TeamDeletedMetadata {
             team_id: team_id(),
-            actor_user_id: user_id("macro|owner@acme.com"),
-            member_user_ids: vec![user_id("macro|owner@acme.com")],
+            actor_user_id: user_id("rox|owner@acme.com"),
+            member_user_ids: vec![user_id("rox|owner@acme.com")],
             bot_ids: Vec::new(),
             owned_entities: Vec::new(),
         })
@@ -370,7 +370,7 @@ fn deleted_defaults_missing_bots_and_owned_entities() {
 fn roles_and_join_methods_serialize_lowercase() {
     let invite_join = serde_json::to_value(TeamJoinMethod::InviteAccepted {
         invite_id: invite_id(),
-        invited_by: user_id("macro|admin@acme.com"),
+        invited_by: user_id("rox|admin@acme.com"),
     })
     .expect("serializable join method");
     let domain_join =

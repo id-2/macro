@@ -2,8 +2,8 @@ use feature_flags::{FlagSnapshot, outbound::fake::FakeFeatureFlags};
 
 use super::*;
 
-const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
-const PERSON: &str = "macro|person@example.com";
+const AGENT: &str = "rox|sam-rivera-abc123@agents.macro.invalid";
+const PERSON: &str = "rox|person@example.com";
 
 fn user(id: &str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::try_from(id.to_owned()).unwrap()

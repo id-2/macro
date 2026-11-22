@@ -6,7 +6,7 @@ fn document(file_type: &str) -> DocumentBasic {
     DocumentBasic {
         document_id: "native-document".into(),
         document_name: "Notes".into(),
-        owner: Owner::from_principal_str("macro|reader@macro.local").unwrap(),
+        owner: Owner::from_principal_str("rox|reader@macro.local").unwrap(),
         file_type: Some(file_type.into()),
         sub_type: None,
         branched_from_id: None,
@@ -18,7 +18,7 @@ fn document(file_type: &str) -> DocumentBasic {
 }
 fn access(id: &str, kind: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        RoxUserIdStr::parse_from_str("macro|reader@macro.local").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|reader@macro.local").unwrap(),
         id,
         kind,
     )

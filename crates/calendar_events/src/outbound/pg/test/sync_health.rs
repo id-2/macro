@@ -37,7 +37,7 @@ async fn synced_at(pool: &PgPool, calendar_id: Uuid) -> DateTime<Utc> {
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_health_reads_each_calendar_and_account_state(pool: PgPool) {
-    let owner_id = "macro|calendar-sync-health@example.com";
+    let owner_id = "rox|calendar-sync-health@example.com";
     let link_id = insert_link(&pool, owner_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let enabled = repo
@@ -226,7 +226,7 @@ async fn sync_health_reads_each_calendar_and_account_state(pool: PgPool) {
         None
     );
     assert!(
-        repo.calendar_sync_health("macro|calendar-sync-health-stranger@example.com")
+        repo.calendar_sync_health("rox|calendar-sync-health-stranger@example.com")
             .await
             .unwrap()
             .calendars

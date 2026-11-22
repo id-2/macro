@@ -43,7 +43,7 @@ it('decodes durable DTOs, reconciles overlap, and folds a batch like a stream', 
     ...chunk('same'),
     id: '00000000-0000-0000-0000-000000000002',
     createdAt: '2026-08-13T00:00:00.000002Z',
-    userId: 'macro|reader@example.com',
+    userId: 'rox|reader@example.com',
   };
   const confirmed = (row: typeof boundary) => ({ kind: 'confirmed' as const, row });
   const stream = new Stream(session);

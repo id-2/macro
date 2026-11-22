@@ -13,7 +13,7 @@ use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
 pub fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|routine-owner@rox.one").unwrap()
+    RoxUserIdStr::parse_from_str("rox|routine-owner@rox.one").unwrap()
 }
 
 pub fn incoming() -> IncomingEvent {
@@ -24,8 +24,8 @@ pub fn incoming() -> IncomingEvent {
         payload: EventPayload::Document(
             serde_json::from_value(json!({
                 "event_type":"document.updated", "metadata": {
-                    "document_id": generate_uuid_v7(), "owner":"macro|event-actor@rox.one",
-                    "actor_user_id":"macro|event-actor@rox.one", "share_permission_updated":false
+                    "document_id": generate_uuid_v7(), "owner":"rox|event-actor@rox.one",
+                    "actor_user_id":"rox|event-actor@rox.one", "share_permission_updated":false
                 }
             }))
             .unwrap(),

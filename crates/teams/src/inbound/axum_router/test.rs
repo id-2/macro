@@ -259,8 +259,8 @@ async fn toggle_auto_join_domain_missing_team_response_is_not_found() {
     assert_eq!(body_text, r#"{"message":"team does not exist"}"#);
 }
 
-const USER_ID: &str = "macro|user@example.com";
-const ACTING_USER_ID: &str = "macro|acting@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const ACTING_USER_ID: &str = "rox|acting@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const TEAM_ID: uuid::Uuid = uuid::Uuid::from_u128(42);
 

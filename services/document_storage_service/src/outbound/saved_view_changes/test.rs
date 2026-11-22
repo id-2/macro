@@ -8,8 +8,8 @@ use wiremock::{
 
 use super::*;
 
-const OWNER: &str = "macro|views-owner@example.com";
-const MEMBER: &str = "macro|views-member@example.com";
+const OWNER: &str = "rox|views-owner@example.com";
+const MEMBER: &str = "rox|views-member@example.com";
 const TEAM: Uuid = uuid!("11111111-1111-7111-8111-111111111111");
 const MISSING_TEAM: Uuid = uuid!("22222222-2222-7222-8222-222222222222");
 

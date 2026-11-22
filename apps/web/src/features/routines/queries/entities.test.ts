@@ -17,7 +17,7 @@ vi.mock('./schedules', () => ({ useSchedulesQuery: () => query }));
 
 const cron: ScheduledAction = {
   id: 'cron-id',
-  owner: 'macro|owner@example.com',
+  owner: 'rox|owner@example.com',
   name: 'Summary',
   kind: 'Agent',
   trigger: { type: 'cron', schedule: '0 0 9 * * 2', timezone: 'UTC' },
@@ -86,7 +86,7 @@ describe('routine entities', () => {
       id: 'cron-id',
       type: 'routine',
       name: 'Summary',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       createdAt: '2026-09-22T12:00:00Z',
       updatedAt: '2026-09-22T12:00:00Z',
       appearance: null,

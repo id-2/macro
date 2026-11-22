@@ -587,7 +587,7 @@ fn channel_name_cursor_round_trips_through_the_unified_cursor() {
 }
 
 fn caller(origin: rox_authorization::CredentialOrigin) -> RoxUserAuthentication {
-    let user_id = "macro|user@example.com";
+    let user_id = "rox|user@example.com";
     RoxUserAuthentication {
         origin,
         agent_id: None,

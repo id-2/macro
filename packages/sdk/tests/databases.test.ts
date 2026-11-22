@@ -435,7 +435,7 @@ describe('Database', () => {
       id: webhookId,
       databaseId,
       tableId,
-      createdBy: 'macro|ada@example.test',
+      createdBy: 'rox|ada@example.test',
       tokenPrefix: 'mdbw_0123456789ab',
       createdAt: '2026-10-09T12:00:00Z',
     };
@@ -474,7 +474,7 @@ describe('Database', () => {
       tableId,
       tokenPrefix: 'mdbw_0123456789ab',
     });
-    expect(listed.createdBy.id).toBe('macro|ada@example.test');
+    expect(listed.createdBy.id).toBe('rox|ada@example.test');
     expect(listed.createdAt).toBe('2026-10-09T12:00:00Z');
     expect(writes).toEqual([
       {

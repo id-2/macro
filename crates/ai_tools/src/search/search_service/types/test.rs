@@ -54,7 +54,7 @@ fn calendar_hit(
         extra: CalendarEventSearchResponseItem {
             id: uuid::Uuid::nil(),
             name: "Dentist".to_string(),
-            owner_id: "macro|owner@example.com".to_string(),
+            owner_id: "rox|owner@example.com".to_string(),
             updated_at: at,
             created_at: at,
             calendar_event_search_results: Vec::new(),

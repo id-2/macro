@@ -106,7 +106,7 @@ test('an email link opens the dropped step and a new session keeps later progres
       {
         address: 'ada@acme.com',
         isPrimary: true,
-        ownerId: 'macro|ada@acme.com',
+        ownerId: 'rox|ada@acme.com',
       },
     ],
   });
@@ -134,7 +134,7 @@ test('a work-email link shows the inbox that is already connected', async ({
       {
         address: 'ada@acme.com',
         isPrimary: true,
-        ownerId: 'macro|ada@acme.com',
+        ownerId: 'rox|ada@acme.com',
       },
     ],
   });
@@ -155,7 +155,7 @@ test('Free, Pro, and Max appear below the unchanged trial offer', async ({
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
     );
   });
   await page.reload();
@@ -204,7 +204,7 @@ test('Max checkout returns with a licensed account and no trial', async ({
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
     );
   });
   await page.reload();
@@ -227,7 +227,7 @@ test('cancelling checkout returns to a retryable trial offer', async ({
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
     );
   });
   await page.reload();
@@ -249,7 +249,7 @@ test('an ineligible trial explains itself instead of charging', async ({
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
     );
   });
   await page.reload();
@@ -279,7 +279,7 @@ test('an invite’s free months replace the trial and keep its promotion', async
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
     );
   });
   await page.reload();
@@ -296,7 +296,7 @@ test('an existing team member just confirms and moves on', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'team' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'team' })
     );
   });
   await page.reload();
@@ -314,7 +314,7 @@ test('a personal address refers friends instead of creating a team', async ({
   await page.evaluate(() => {
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'team' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'team' })
     );
   });
   await page.reload();
@@ -337,7 +337,7 @@ test('a personal address refers friends instead of creating a team', async ({
 test('staff can bypass onboarding from any step', async ({ page }) => {
   await openFixture(page, '/?view=flow', {
     viewer: {
-      id: 'macro|wolf@rox.one',
+      id: 'rox|wolf@rox.one',
       email: 'wolf@rox.one',
       tutorialComplete: false,
       licensed: false,
@@ -352,7 +352,7 @@ test('staff can bypass onboarding from any step', async ({ page }) => {
 test('a finished user is sent straight into the app', async ({ page }) => {
   await openFixture(page, '/?view=flow&next=/md/doc', {
     viewer: {
-      id: 'macro|ada@acme.com',
+      id: 'rox|ada@acme.com',
       email: 'ada@acme.com',
       tutorialComplete: true,
       licensed: false,
@@ -446,7 +446,7 @@ for (const width of [1440, 390]) {
         await page.evaluate((step) => {
           localStorage.setItem(
             'onboarding-flow-step',
-            JSON.stringify({ user: 'macro|ada@acme.com', step })
+            JSON.stringify({ user: 'rox|ada@acme.com', step })
           );
         }, step);
         await page.reload();
@@ -469,7 +469,7 @@ for (const width of [1440, 390]) {
       await page.evaluate(() =>
         localStorage.setItem(
           'onboarding-flow-step',
-          JSON.stringify({ user: 'macro|ada@acme.com', step: 'work' })
+          JSON.stringify({ user: 'rox|ada@acme.com', step: 'work' })
         )
       );
       await page.reload();
@@ -557,7 +557,7 @@ test('tools keep Drive and Sheets, hide excluded Google apps and preserve native
   await page.evaluate(() =>
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'tools' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'tools' })
     )
   );
   await page.reload();
@@ -691,7 +691,7 @@ for (const githubLinkStatus of [
     await page.evaluate(() =>
       localStorage.setItem(
         'onboarding-flow-step',
-        JSON.stringify({ user: 'macro|ada@acme.com', step: 'tools' })
+        JSON.stringify({ user: 'rox|ada@acme.com', step: 'tools' })
       )
     );
     await page.reload();
@@ -724,7 +724,7 @@ test('connection status failure leaves native GitHub available', async ({
   await page.evaluate(() =>
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'tools' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'tools' })
     )
   );
   await page.reload();
@@ -755,7 +755,7 @@ test('enables an existing native tool without reconnecting', async ({
   await page.evaluate(() =>
     localStorage.setItem(
       'onboarding-flow-step',
-      JSON.stringify({ user: 'macro|ada@acme.com', step: 'tools' })
+      JSON.stringify({ user: 'rox|ada@acme.com', step: 'tools' })
     )
   );
   await page.reload();
@@ -778,7 +778,7 @@ for (const width of [1280, 390]) {
     await page.evaluate(() => {
       localStorage.setItem(
         'onboarding-flow-step',
-        JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+        JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
       );
     });
     await page.reload();
@@ -812,7 +812,7 @@ test.describe('subscription recovery', () => {
       await page.evaluate(() =>
         localStorage.setItem(
           'onboarding-flow-step',
-          JSON.stringify({ user: 'macro|ada@acme.com', step: 'plan' })
+          JSON.stringify({ user: 'rox|ada@acme.com', step: 'plan' })
         )
       );
       await page.reload();

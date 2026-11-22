@@ -42,8 +42,8 @@ async fn search_matches_names_and_resumes_using_original_storage_positions() {
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(
         Arc::new(ScanPages(vec![
-            ContactIdEntry::parse("macro|KNOWN@example.com".into()).unwrap(),
-            ContactIdEntry::parse("macro|LATER@example.com".into()).unwrap(),
+            ContactIdEntry::parse("rox|KNOWN@example.com".into()).unwrap(),
+            ContactIdEntry::parse("rox|LATER@example.com".into()).unwrap(),
         ])),
         names,
     );
@@ -72,7 +72,7 @@ async fn search_matches_names_and_resumes_using_original_storage_positions() {
     assert_eq!(first.contacts[0].user_id.email_str(), "known@example.com");
     assert_eq!(
         first.next_cursor.as_ref().unwrap().position(),
-        "macro|KNOWN@example.com"
+        "rox|KNOWN@example.com"
     );
     let next = service
         .search_contacts(
@@ -90,9 +90,9 @@ async fn search_matches_names_and_resumes_using_original_storage_positions() {
 #[tokio::test]
 async fn scan_budget_returns_progress_instead_of_false_exhaustion() {
     let mut rows: Vec<_> = (0..CONTACT_SEARCH_SCAN_BUDGET)
-        .map(|i| ContactIdEntry::parse(format!("macro|a{i:04}@example.com")).unwrap())
+        .map(|i| ContactIdEntry::parse(format!("rox|a{i:04}@example.com")).unwrap())
         .collect();
-    rows.push(ContactIdEntry::parse("macro|winner@example.com".into()).unwrap());
+    rows.push(ContactIdEntry::parse("rox|winner@example.com".into()).unwrap());
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(Arc::new(ScanPages(rows)), names.clone());
     let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
@@ -124,9 +124,9 @@ async fn scan_budget_returns_progress_instead_of_false_exhaustion() {
 #[tokio::test]
 async fn exact_reference_matching_keeps_the_scan_budget_and_filters_before_limit() {
     let mut rows: Vec<_> = (0..CONTACT_SEARCH_SCAN_BUDGET)
-        .map(|i| ContactIdEntry::parse(format!("macro|a{i:04}@example.com")).unwrap())
+        .map(|i| ContactIdEntry::parse(format!("rox|a{i:04}@example.com")).unwrap())
         .collect();
-    rows.push(ContactIdEntry::parse("macro|known@example.com".into()).unwrap());
+    rows.push(ContactIdEntry::parse("rox|known@example.com".into()).unwrap());
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(Arc::new(ScanPages(rows)), names.clone());
     let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
@@ -183,7 +183,7 @@ async fn lookup_never_enriches_unknown_members_and_keeps_requested_order() {
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(
         Arc::new(ScanPages(
-            ["macro|known@example.com", "macro|unknown@example.com"]
+            ["rox|known@example.com", "rox|unknown@example.com"]
                 .map(|id| ContactIdEntry::parse(id.into()).unwrap())
                 .to_vec(),
         )),
@@ -214,7 +214,7 @@ async fn lookup_never_enriches_unknown_members_and_keeps_requested_order() {
     );
     assert_eq!(
         names.requests.lock().unwrap()[0].1,
-        ["macro|unknown@example.com", "macro|known@example.com"]
+        ["rox|unknown@example.com", "rox|known@example.com"]
     );
     let missing = ContactLookup::new(vec![
         RoxUserIdStr::try_from_email("outside@example.com").unwrap(),

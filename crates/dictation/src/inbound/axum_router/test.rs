@@ -15,8 +15,8 @@ use std::sync::{
 };
 use tower::ServiceExt;
 
-const USER_ID: &str = "macro|dictation-test@example.com";
-const OTHER_USER_ID: &str = "macro|other-dictation-test@example.com";
+const USER_ID: &str = "rox|dictation-test@example.com";
+const OTHER_USER_ID: &str = "rox|other-dictation-test@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 
 /// `(user id, audio bytes, language hint)` as seen by the service.

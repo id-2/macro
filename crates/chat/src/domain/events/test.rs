@@ -19,7 +19,7 @@ fn user_id(value: &str) -> RoxUserIdStr<'static> {
 #[test]
 fn created_round_trips_all_owner_kinds_with_the_v1_string_wire_format() {
     for principal in [
-        "macro|owner@acme.com",
+        "rox|owner@acme.com",
         "bot|00000000-0000-0000-0000-000000000001",
         "01998a30-1a2b-7c3d-9e4f-5a6b7c8d9e0f",
     ] {
@@ -54,7 +54,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
         (
             ChatTopicEvent::Created(ChatCreatedMetadata {
                 chat_id: CHAT_ID.to_string(),
-                owner: Owner::User(user_id("macro|owner@acme.com")),
+                owner: Owner::User(user_id("rox|owner@acme.com")),
                 name: "New Chat".to_string(),
                 project_id: Some(PROJECT_ID.to_string()),
             }),
@@ -62,7 +62,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
                 "event_type": "chat.created",
                 "metadata": {
                     "chat_id": CHAT_ID,
-                    "owner": "macro|owner@acme.com",
+                    "owner": "rox|owner@acme.com",
                     "name": "New Chat",
                     "project_id": PROJECT_ID
                 }
@@ -71,7 +71,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
         (
             ChatTopicEvent::Updated(ChatUpdatedMetadata {
                 chat_id: CHAT_ID.to_string(),
-                actor_user_id: user_id("macro|editor@acme.com"),
+                actor_user_id: user_id("rox|editor@acme.com"),
                 name: Some("Renamed Chat".to_string()),
                 previous_project_id: Some(PROJECT_ID.to_string()),
                 project_id: Some(String::new()),
@@ -81,7 +81,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
                 "event_type": "chat.updated",
                 "metadata": {
                     "chat_id": CHAT_ID,
-                    "actor_user_id": "macro|editor@acme.com",
+                    "actor_user_id": "rox|editor@acme.com",
                     "name": "Renamed Chat",
                     "previous_project_id": PROJECT_ID,
                     "project_id": "",
@@ -92,14 +92,14 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
         (
             ChatTopicEvent::Deleted(ChatDeletedMetadata {
                 chat_id: CHAT_ID.to_string(),
-                actor_user_id: Some(user_id("macro|owner@acme.com")),
+                actor_user_id: Some(user_id("rox|owner@acme.com")),
                 project_id: Some(PROJECT_ID.to_string()),
             }),
             json!({
                 "event_type": "chat.deleted",
                 "metadata": {
                     "chat_id": CHAT_ID,
-                    "actor_user_id": "macro|owner@acme.com",
+                    "actor_user_id": "rox|owner@acme.com",
                     "project_id": PROJECT_ID
                 }
             }),
@@ -122,14 +122,14 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
         (
             ChatTopicEvent::Restored(ChatRestoredMetadata {
                 chat_id: CHAT_ID.to_string(),
-                actor_user_id: Some(user_id("macro|owner@acme.com")),
+                actor_user_id: Some(user_id("rox|owner@acme.com")),
                 project_id: None,
             }),
             json!({
                 "event_type": "chat.restored",
                 "metadata": {
                     "chat_id": CHAT_ID,
-                    "actor_user_id": "macro|owner@acme.com",
+                    "actor_user_id": "rox|owner@acme.com",
                     "project_id": null
                 }
             }),
@@ -138,7 +138,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
             ChatTopicEvent::Copied(ChatCopiedMetadata {
                 chat_id: CHAT_ID.to_string(),
                 source_chat_id: SOURCE_CHAT_ID.to_string(),
-                owner: user_id("macro|copier@acme.com"),
+                owner: user_id("rox|copier@acme.com"),
                 name: "New Chat Copy".to_string(),
             }),
             json!({
@@ -146,7 +146,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
                 "metadata": {
                     "chat_id": CHAT_ID,
                     "source_chat_id": SOURCE_CHAT_ID,
-                    "owner": "macro|copier@acme.com",
+                    "owner": "rox|copier@acme.com",
                     "name": "New Chat Copy"
                 }
             }),
@@ -157,7 +157,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
                 message_id: MESSAGE_ID.to_string(),
                 role: ChatMessageRole::User,
                 model: "gpt-test".to_string(),
-                actor_user_id: Some(user_id("macro|sender@acme.com")),
+                actor_user_id: Some(user_id("rox|sender@acme.com")),
                 attachment_count: 2,
             }),
             json!({
@@ -167,7 +167,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
                     "message_id": MESSAGE_ID,
                     "role": "user",
                     "model": "gpt-test",
-                    "actor_user_id": "macro|sender@acme.com",
+                    "actor_user_id": "rox|sender@acme.com",
                     "attachment_count": 2
                 }
             }),

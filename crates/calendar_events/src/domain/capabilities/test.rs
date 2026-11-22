@@ -34,7 +34,7 @@ fn attendee(email: &str, is_organizer: bool) -> CalendarAttendee {
 fn event(attendees: Vec<CalendarAttendee>, guest_policy: GuestPolicy) -> CalendarEvent {
     CalendarEvent {
         id: Uuid::from_u128(7),
-        owner_id: "macro|jacob@example.com".to_string(),
+        owner_id: "rox|jacob@example.com".to_string(),
         ical_uid: "uid-1".to_string(),
         calendar_id: Some(Uuid::from_u128(9)),
         sources: Vec::new(),

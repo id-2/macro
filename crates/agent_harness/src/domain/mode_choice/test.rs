@@ -7,7 +7,7 @@ use serde_json::Value;
 use std::sync::Mutex;
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|person@example.com".to_owned()).unwrap()
 }
 
 struct Admission(Result<(), AiAdmissionError>);

@@ -65,7 +65,7 @@ async fn the_proxy_addresses_the_upstream_url_for_the_connected_account() {
         .and(path(
             "/v1/connect/proj_fixture/proxy/aHR0cHM6Ly9hcGkubm90aW9uLmNvbS92MS9zZWFyY2g",
         ))
-        .and(query_param("external_user_id", "macro|caller@example.com"))
+        .and(query_param("external_user_id", "rox|caller@example.com"))
         .and(query_param("account_id", "apn_notion"))
         .and(header("authorization", "Bearer project-token"))
         .and(header("x-pd-environment", "development"))
@@ -129,14 +129,14 @@ async fn listing_accounts_filters_by_user_and_app_and_keeps_creation_times() {
         .await;
     Mock::given(method("GET"))
         .and(path("/v1/connect/proj_fixture/accounts"))
-        .and(query_param("external_user_id", "macro|caller@example.com"))
+        .and(query_param("external_user_id", "rox|caller@example.com"))
         .and(query_param("app", "linear"))
         .and(header("authorization", "Bearer project-token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
             "page_info": {"total_count": 1},
             "data": [{
                 "id": "apn_1",
-                "external_id": "macro|caller@example.com",
+                "external_id": "rox|caller@example.com",
                 "healthy": true,
                 "created_at": "2026-10-27T18:54:23.000Z",
                 "app": {"name_slug": "linear", "name": "Linear"}
@@ -157,7 +157,7 @@ async fn listing_accounts_filters_by_user_and_app_and_keeps_creation_times() {
     .unwrap();
 
     let accounts = client
-        .list_accounts("macro|caller@example.com", "linear")
+        .list_accounts("rox|caller@example.com", "linear")
         .await
         .unwrap();
 

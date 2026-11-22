@@ -25,7 +25,7 @@ async fn agents_do_not_require_human_permission_or_notification_services() {
         .handle_task_assignees_property(
             &Uuid::from_u128(1).to_string(),
             assignment(vec![agent_reference()]),
-            Some(&RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap()),
+            Some(&RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap()),
         )
         .await
         .unwrap();
@@ -39,7 +39,7 @@ async fn project_agents_do_not_require_human_collaborator_grants() {
         None::<MockNotificationService>,
     );
     let access = EditReceipt::dangerously_assert_authenticated_user(
-        RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap(),
         &Uuid::from_u128(1).to_string(),
         entity_access::domain::models::EntityType::Initiative,
     );
@@ -55,8 +55,8 @@ async fn project_agents_do_not_require_human_collaborator_grants() {
 #[tokio::test]
 async fn mixed_assignments_grant_access_and_notify_only_humans() {
     let task_id = Uuid::from_u128(1);
-    let assignee = RoxUserIdStr::parse_from_str("macro|assignee@example.com").unwrap();
-    let assigner = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let assignee = RoxUserIdStr::parse_from_str("rox|assignee@example.com").unwrap();
+    let assigner = RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap();
     let mut repo = MockPropertiesRepo::new();
     repo.expect_get_entity_property_value()
         .times(1)
@@ -105,7 +105,7 @@ async fn malformed_agent_and_non_user_references_are_rejected_before_side_effect
             bot_id::CODEX_BOT_ID.into_storage_id().as_ref(),
             EntityType::Document,
         ),
-        EntityReference::new("macro|assignee@example.com", EntityType::Document),
+        EntityReference::new("rox|assignee@example.com", EntityType::Document),
     ] {
         let service = PropertiesServiceImpl::new(
             MockPropertiesRepo::new(),
@@ -116,7 +116,7 @@ async fn malformed_agent_and_non_user_references_are_rejected_before_side_effect
             .handle_task_assignees_property(
                 &Uuid::from_u128(1).to_string(),
                 assignment(vec![reference]),
-                Some(&RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap()),
+                Some(&RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap()),
             )
             .await;
 
@@ -141,7 +141,7 @@ fn project_reference(entity_id: &str, entity_type: EntityType) -> Option<Propert
 
 #[tokio::test]
 async fn joining_a_project_requires_project_edit_access_and_stores_the_canonical_id() {
-    let user = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap();
     let project = Uuid::from_u128(0xABCDEF);
     let mut permissions = MockPermissionService::new();
     let expected_user = user.clone();
@@ -182,7 +182,7 @@ async fn joining_a_project_requires_project_edit_access_and_stores_the_canonical
 
 #[tokio::test]
 async fn joining_a_project_without_project_edit_access_is_denied() {
-    let user = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap();
     let mut permissions = MockPermissionService::new();
     permissions
         .expect_mint_edit_receipt()
@@ -205,7 +205,7 @@ async fn joining_a_project_without_project_edit_access_is_denied() {
 
 #[tokio::test]
 async fn leaving_a_project_needs_only_task_edit_access() {
-    let user = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap();
     // No permission service: clearing must not check the project.
     let service = PropertiesServiceImpl::new(
         MockPropertiesRepo::new(),
@@ -225,7 +225,7 @@ async fn leaving_a_project_needs_only_task_edit_access() {
 
 #[tokio::test]
 async fn project_values_must_name_one_project() {
-    let user = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|assigner@example.com").unwrap();
     let service = PropertiesServiceImpl::new(
         MockPropertiesRepo::new(),
         None::<MockPermissionService>,

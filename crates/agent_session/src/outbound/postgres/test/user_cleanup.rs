@@ -10,7 +10,7 @@ use std::sync::Arc;
 /// Harness tests separately prove every selected row goes through teardown first.
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cleanup_batches_remove_all_session_rows_without_a_user_cascade(pool: PgPool) {
-    const OTHER: &str = "macro|cleanup-other@example.com";
+    const OTHER: &str = "rox|cleanup-other@example.com";
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
     insert_user(&pool, OTHER).await;

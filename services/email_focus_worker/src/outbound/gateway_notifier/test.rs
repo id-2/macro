@@ -140,7 +140,7 @@ async fn a_push_reaches_the_owner_and_delegates_as_one_refresh_email(pool: Pool<
         .and(matchers::path("/message/batch_send"))
         .and(matchers::header("x-internal-auth-key", "test-key"))
         .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
-            "receipts": [{"user_id": "macro|other@elsewhere.example", "delivery_count": 2, "active": true}],
+            "receipts": [{"user_id": "rox|other@elsewhere.example", "delivery_count": 2, "active": true}],
         })))
         .expect(1)
         .mount(&gateway)
@@ -166,6 +166,6 @@ async fn a_push_reaches_the_owner_and_delegates_as_one_refresh_email(pool: Pool<
         .collect::<Vec<_>>();
     assert_eq!(
         readers,
-        ["macro|other@elsewhere.example", "macro|owner@acme.example"]
+        ["rox|other@elsewhere.example", "rox|owner@acme.example"]
     );
 }

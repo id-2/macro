@@ -98,7 +98,7 @@ notification) at
 | ---------------- | -------- | ------- | --------------------------------------------------------- |
 | `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-rox-bot-token`)      |
 | `CHANNEL_ID`     | yes      |         | Channel UUID to post to (Rox Alerts)                    |
-| `ACTING_USER_ID` | yes      |         | Secret: the bot owner's user id (`macro\|<email>`)         |
+| `ACTING_USER_ID` | yes      |         | Secret: the bot owner's user id (`rox\|<email>`)         |
 | `WEBHOOK_SECRET` | yes      |         | Secret path segment for the webhook URL                   |
 | `ALERT_MESSAGES` | worker   |         | KV namespace binding: `alert:<AlertID>` → posted message  |
 | `ENVIRONMENT`    | no       | `local` | `deployment.environment` on exported spans                |

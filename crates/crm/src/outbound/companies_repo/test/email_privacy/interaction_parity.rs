@@ -157,7 +157,7 @@ async fn set_based_scan_applies_every_privacy_rule_like_thread_allowed(
     }
     let quiet = insert_company(&pool, team, false, &["Quiet.Example"]).await?;
     // Another member's personal blocklist never applies to this mailbox.
-    let colleague = "macro|colleague@example.com";
+    let colleague = "rox|colleague@example.com";
     insert_member(&pool, team, colleague).await?;
     sqlx::query!(
         "INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain) VALUES ($1, $2, 'acme.example.com')",
@@ -203,7 +203,7 @@ async fn set_based_scan_applies_every_privacy_rule_like_thread_allowed(
     );
 
     let other_team = Uuid::now_v7();
-    seed_team(&pool, other_team, "macro|other-owner@example.com").await?;
+    seed_team(&pool, other_team, "rox|other-owner@example.com").await?;
     assert_eq!(
         scan(&pool, other_team, link, "kept@acme.example.com").await?,
         (None, None, None),

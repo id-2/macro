@@ -306,7 +306,7 @@ describe('links in a channel message', () => {
 
   it("opens a Rox link from a person's message in a browser tab", () => {
     const { view, contents } = renderSplits(() =>
-      channelMessage('macro|person@example.com', NOTES)
+      channelMessage('rox|person@example.com', NOTES)
     );
 
     fireEvent.click(view.getByText('the notes'));

@@ -88,7 +88,7 @@ fn page(rows: usize) -> Json {
                 "id": format!("doc-{i}"),
                 "frecencyScore": 0.5,
                 "documentName": format!("Document {i}"),
-                "ownerId": "macro|owner@example.com",
+                "ownerId": "rox|owner@example.com",
                 "fileType": "md",
                 "projectId": if i % 3 == 0 { Json::Null } else { json!("project-1") },
                 "createdAt": "2026-10-01T00:00:00Z",

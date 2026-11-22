@@ -1,4 +1,4 @@
-/// User IDs are expected to be in the format "macro|email@example.com"
+/// User IDs are expected to be in the format "rox|email@example.com"
 /// Returns the email or an error if the email is invalid
 #[tracing::instrument(level = "debug")]
 pub fn email_from_user_id(user_id: &str) -> anyhow::Result<String> {

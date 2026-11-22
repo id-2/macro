@@ -11,18 +11,18 @@
 
 -- == Team: user1 is a member, project dddd0000 is granted to the team ==
 INSERT INTO team (id, name, owner_id)
-VALUES ('77770000-0000-0000-0000-000000007777', 'Scope Team', 'macro|user2@test.com');
+VALUES ('77770000-0000-0000-0000-000000007777', 'Scope Team', 'rox|user2@test.com');
 
 INSERT INTO team_user (user_id, team_id, team_role)
 VALUES
-    ('macro|user2@test.com', '77770000-0000-0000-0000-000000007777', 'owner'),
-    ('macro|user1@test.com', '77770000-0000-0000-0000-000000007777', 'member');
+    ('rox|user2@test.com', '77770000-0000-0000-0000-000000007777', 'owner'),
+    ('rox|user1@test.com', '77770000-0000-0000-0000-000000007777', 'member');
 
 -- == Projects owned by user2 ==
 INSERT INTO "Project" (id, name, "userId", "createdAt", "updatedAt")
 VALUES
-    ('dddd0000-0000-0000-0000-00000000dddd', 'Team Project', 'macro|user2@test.com', NOW(), NOW()),
-    ('eeee0000-0000-0000-0000-00000000eeee', 'Private Project', 'macro|user2@test.com', NOW(), NOW());
+    ('dddd0000-0000-0000-0000-00000000dddd', 'Team Project', 'rox|user2@test.com', NOW(), NOW()),
+    ('eeee0000-0000-0000-0000-00000000eeee', 'Private Project', 'rox|user2@test.com', NOW(), NOW());
 
 -- Team grant on the team project. No grants at all on the private project.
 INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)

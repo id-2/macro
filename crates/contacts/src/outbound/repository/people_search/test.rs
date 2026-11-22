@@ -48,24 +48,24 @@ async fn teammates_rank_first_then_prefix_then_substring_matches(pool: PgPool) {
         vec![
             // Equal prefix match to "Sam Rivera", but on the viewer's team.
             (
-                "macro|teammate@example.com".to_string(),
+                "rox|teammate@example.com".to_string(),
                 Some("Sam Rivers".to_string()),
                 true
             ),
             (
-                "macro|contact@example.com".to_string(),
+                "rox|contact@example.com".to_string(),
                 Some("Sam Rivera".to_string()),
                 false
             ),
             // Not a Rox user: matched by email, named by the viewer's own address book.
             (
-                "macro|samantha.book@example.org".to_string(),
+                "rox|samantha.book@example.org".to_string(),
                 Some("Book Sam".to_string()),
                 false
             ),
             // Substring of the email only, so after every prefix match; N/A is not a name.
             (
-                "macro|ossam@example.com".to_string(),
+                "rox|ossam@example.com".to_string(),
                 Some("Zed".to_string()),
                 false
             ),
@@ -92,10 +92,10 @@ async fn results_flag_agents_and_treat_non_rox_contacts_as_people(pool: PgPool) 
     assert_eq!(
         flags,
         vec![
-            ("macro|teammate@example.com".to_string(), false),
-            ("macro|contact@example.com".to_string(), false),
-            ("macro|samantha.book@example.org".to_string(), false),
-            ("macro|ossam@example.com".to_string(), true),
+            ("rox|teammate@example.com".to_string(), false),
+            ("rox|contact@example.com".to_string(), false),
+            ("rox|samantha.book@example.org".to_string(), false),
+            ("rox|ossam@example.com".to_string(), true),
         ]
     );
 }
@@ -109,9 +109,9 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
     // name ("Sam Other", "Sam Stranger") or by email ("samuel.private").
     let people = search(&pool, "sam", 50).await;
     for absent in [
-        "macro|other@example.com",
-        "macro|stranger@example.com",
-        "macro|samuel.private@example.org",
+        "rox|other@example.com",
+        "rox|stranger@example.com",
+        "rox|samuel.private@example.org",
     ] {
         assert!(
             people.iter().all(|(id, _, _)| id != absent),
@@ -125,7 +125,7 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
     assert_eq!(
         search(&pool, "viewer per", 50).await,
         vec![(
-            "macro|viewer@example.com".to_string(),
+            "rox|viewer@example.com".to_string(),
             Some("Viewer Person".to_string()),
             true
         )]
@@ -144,7 +144,7 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
             .into_iter()
             .map(|person| (person.contact.user_id.to_string(), person.is_teammate))
             .collect::<Vec<_>>(),
-        vec![("macro|nobody@example.com".to_string(), false)]
+        vec![("rox|nobody@example.com".to_string(), false)]
     );
 }
 
@@ -152,7 +152,7 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
 async fn limit_is_honoured_and_capped_at_fifty(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections (user1, user2)
-         SELECT 'macro|bulk' || lpad(g::text, 3, '0') || '@example.com', 'macro|viewer@example.com'
+         SELECT 'rox|bulk' || lpad(g::text, 3, '0') || '@example.com', 'rox|viewer@example.com'
          FROM generate_series(1, 60) AS g"
     )
     .execute(&pool)
@@ -165,9 +165,9 @@ async fn limit_is_honoured_and_capped_at_fifty(pool: PgPool) {
             .map(|(id, _, _)| id.as_str())
             .collect::<Vec<_>>(),
         vec![
-            "macro|bulk001@example.com",
-            "macro|bulk002@example.com",
-            "macro|bulk003@example.com"
+            "rox|bulk001@example.com",
+            "rox|bulk002@example.com",
+            "rox|bulk003@example.com"
         ]
     );
     assert_eq!(search(&pool, "bulk", 50).await.len(), 50);

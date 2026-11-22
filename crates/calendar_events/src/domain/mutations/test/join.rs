@@ -13,8 +13,8 @@ use crate::domain::ports::{
     CalendarJoinRequestError, CalendarJoinRequestNotifier, CalendarJoinRequestService,
 };
 
-const SHARER: &str = "macro|self@example.com";
-const MEMBER: &str = "macro|member@example.com";
+const SHARER: &str = "rox|self@example.com";
+const MEMBER: &str = "rox|member@example.com";
 const ORGANIZER: &str = "olivia@example.com";
 
 #[derive(Clone, Default)]

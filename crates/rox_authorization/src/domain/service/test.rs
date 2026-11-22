@@ -182,10 +182,10 @@ fn bot_authentication() -> BotAuthentication {
             origin: crate::CredentialOrigin::Bot,
             agent_id: None,
             agent_via: None,
-            rox_user_id: RoxUserIdStr::try_from("macro|acting@example.com".to_string())
+            rox_user_id: RoxUserIdStr::try_from("rox|acting@example.com".to_string())
                 .expect("valid Rox user id"),
             user_context: UserContext {
-                user_id: "macro|acting@example.com".to_string(),
+                user_id: "rox|acting@example.com".to_string(),
                 fusion_user_id: "fusion-acting-user".to_string(),
                 permissions: None,
                 organization_id: Some(42),
@@ -206,9 +206,9 @@ fn assert_bot_authentication(bot: &BotAuthentication) {
         .expect("expected a verified acting user");
     assert_eq!(
         acting_user.rox_user_id.as_ref(),
-        "macro|acting@example.com"
+        "rox|acting@example.com"
     );
-    assert_eq!(acting_user.user_context.user_id, "macro|acting@example.com");
+    assert_eq!(acting_user.user_context.user_id, "rox|acting@example.com");
     assert_eq!(
         acting_user.user_context.fusion_user_id,
         "fusion-acting-user"
@@ -224,7 +224,7 @@ async fn no_bot_authorizer_rejects_bot_credentials() {
             "bot-token",
             BotScope::User,
             Some(BotActingUserClaims {
-                user_id: Some("macro|acting@example.com".to_string()),
+                user_id: Some("rox|acting@example.com".to_string()),
                 fusion_user_id: None,
                 organization_id: None,
             }),
@@ -267,7 +267,7 @@ async fn authorization_service_impl_rejects_bots_with_explicit_no_bot_authorizer
 #[tokio::test]
 async fn authorize_bot_delegates_token_and_exact_acting_user_claims() {
     let claims = BotActingUserClaims {
-        user_id: Some("macro|acting@example.com".to_string()),
+        user_id: Some("rox|acting@example.com".to_string()),
         fusion_user_id: Some("fusion-acting-user".to_string()),
         organization_id: Some(42),
     };
@@ -333,7 +333,7 @@ async fn authorize_constructs_user_context_from_validated_identity() {
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
-                    user_id: "macro|user@example.com".to_string(),
+                    user_id: "rox|user@example.com".to_string(),
                     fusion_user_id: "fusion-user-id".to_string(),
                     organization_id: Some(42),
                     permissions: Some(permissions.clone()),
@@ -347,7 +347,7 @@ async fn authorize_constructs_user_context_from_validated_identity() {
 
     let context = service.authorize("valid-jwt").await.unwrap();
 
-    assert_eq!(context.user_id, "macro|user@example.com");
+    assert_eq!(context.user_id, "rox|user@example.com");
     assert_eq!(context.fusion_user_id, "fusion-user-id");
     assert_eq!(context.organization_id, Some(42));
     assert_eq!(context.permissions, Some(permissions));
@@ -370,13 +370,13 @@ async fn authorize_internal_rejects_an_incorrect_key() {
 
 #[tokio::test]
 async fn authorize_internal_maps_explicit_identity_claims() {
-    let service = service_with_internal_auth(Some("macro|default@example.com"));
+    let service = service_with_internal_auth(Some("rox|default@example.com"));
 
     let context = service
         .authorize_internal(
             INTERNAL_API_KEY,
             InternalIdentityClaims {
-                user_id: Some("macro|acting@example.com".to_string()),
+                user_id: Some("rox|acting@example.com".to_string()),
                 fusion_user_id: Some("fusion-user-id".to_string()),
                 organization_id: Some(42),
             },
@@ -385,7 +385,7 @@ async fn authorize_internal_maps_explicit_identity_claims() {
         .unwrap()
         .expect("explicit user claim should establish an identity");
 
-    assert_eq!(context.user_id, "macro|acting@example.com");
+    assert_eq!(context.user_id, "rox|acting@example.com");
     assert_eq!(context.fusion_user_id, "fusion-user-id");
     assert_eq!(context.organization_id, Some(42));
     assert_eq!(context.permissions, None);
@@ -393,7 +393,7 @@ async fn authorize_internal_maps_explicit_identity_claims() {
 
 #[tokio::test]
 async fn authorize_internal_uses_the_configured_default_user() {
-    let service = service_with_internal_auth(Some("macro|default@example.com"));
+    let service = service_with_internal_auth(Some("rox|default@example.com"));
 
     let context = service
         .authorize_internal(INTERNAL_API_KEY, InternalIdentityClaims::default())
@@ -401,7 +401,7 @@ async fn authorize_internal_uses_the_configured_default_user() {
         .unwrap()
         .expect("configured default user should establish an identity");
 
-    assert_eq!(context.user_id, "macro|default@example.com");
+    assert_eq!(context.user_id, "rox|default@example.com");
     assert_eq!(context.fusion_user_id, "");
     assert_eq!(context.organization_id, None);
     assert_eq!(context.permissions, None);
@@ -498,7 +498,7 @@ async fn authorization_service_impl_rejects_user_api_keys_with_explicit_no_autho
 
 fn api_key_user_context() -> UserContext {
     UserContext {
-        user_id: "macro|api-key@example.com".to_string(),
+        user_id: "rox|api-key@example.com".to_string(),
         fusion_user_id: "fusion-api-key-user".to_string(),
         permissions: None,
         organization_id: Some(42),
@@ -520,7 +520,7 @@ async fn authorize_user_api_key_delegates_the_exact_key() {
     let authorized = service.authorize_user_api_key("mak_secret").await.unwrap();
     let context = authorized.user_context;
 
-    assert_eq!(context.user_id, "macro|api-key@example.com");
+    assert_eq!(context.user_id, "rox|api-key@example.com");
     assert_eq!(context.fusion_user_id, "fusion-api-key-user");
     assert_eq!(context.organization_id, Some(42));
     assert_eq!(context.permissions, None);
@@ -560,7 +560,7 @@ async fn authorize_identity_keeps_verified_agent_and_owner() {
                 identity: ValidatedIdentity {
                     agent_id: Some(bot_id::ROX_NEW_BOT_ID),
                     agent_via: None,
-                    user_id: "macro|owner@example.com".into(),
+                    user_id: "rox|owner@example.com".into(),
                     fusion_user_id: "fusion-owner".into(),
                     organization_id: Some(42),
                     permissions: None,
@@ -575,7 +575,7 @@ async fn authorize_identity_keeps_verified_agent_and_owner() {
     assert_eq!(credential.origin, CredentialOrigin::RoxApiJwt);
     let identity = credential.identity;
     assert_eq!(identity.agent_id, Some(bot_id::ROX_NEW_BOT_ID));
-    assert_eq!(identity.user_id, "macro|owner@example.com");
+    assert_eq!(identity.user_id, "rox|owner@example.com");
     assert_eq!(
         service.authorize("signed-token").await.unwrap().user_id,
         identity.user_id

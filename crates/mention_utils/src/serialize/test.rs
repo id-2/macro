@@ -109,7 +109,7 @@ fn serializes_user_mention() {
 
     assert_eq!(
         user_mention(&user_id).unwrap(),
-        "<m-user-mention>{\"userId\":\"macro|new.user@example.com\",\"email\":\"new.user@example.com\"}</m-user-mention>"
+        "<m-user-mention>{\"userId\":\"rox|new.user@example.com\",\"email\":\"new.user@example.com\"}</m-user-mention>"
     );
 }
 

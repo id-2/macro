@@ -54,7 +54,7 @@ fn claims_with_rox_claims(issued_at: u64) -> serde_json::Value {
     let mut claims = claims_without_rox_claims(issued_at);
     claims["email"] = "user@example.com".into();
     claims["fusion_user_id"] = "fusion-user".into();
-    claims["rox_user_id"] = "macro|user@example.com".into();
+    claims["rox_user_id"] = "rox|user@example.com".into();
     claims
 }
 

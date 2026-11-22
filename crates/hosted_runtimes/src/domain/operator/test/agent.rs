@@ -7,7 +7,7 @@ use crate::domain::agent::{
 };
 
 fn ada() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|ada-1@agents.macro.invalid".to_owned()).unwrap()
 }
 
 fn ada_enrollment() -> AgentEnrollment {

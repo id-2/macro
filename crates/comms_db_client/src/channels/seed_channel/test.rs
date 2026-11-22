@@ -13,10 +13,10 @@ async fn seeds_channel_without_team(pool: Pool<Postgres>) -> anyhow::Result<()> 
         SeedChannelOptions {
             channel_id,
             name: Some("general".to_string()),
-            owner_id: "macro|owner@example.com".to_string(),
+            owner_id: "rox|owner@example.com".to_string(),
             org_id: None,
             channel_type: ChannelType::Public,
-            participants: vec!["macro|member@example.com".to_string()],
+            participants: vec!["rox|member@example.com".to_string()],
             team_id: None,
         },
     )
@@ -54,12 +54,12 @@ async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result
     .await?;
     sqlx::query(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-           VALUES ('macro|owner@example.com', 'owner@example.com', '55555555-5555-5555-5555-555555555555')"#,
+           VALUES ('rox|owner@example.com', 'owner@example.com', '55555555-5555-5555-5555-555555555555')"#,
     )
     .execute(&pool)
     .await?;
     sqlx::query(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'acme', 'macro|owner@example.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'acme', 'rox|owner@example.com')",
     )
     .bind(team_id)
     .execute(&pool)
@@ -70,7 +70,7 @@ async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result
         SeedChannelOptions {
             channel_id,
             name: Some("acme-hq".to_string()),
-            owner_id: "macro|owner@example.com".to_string(),
+            owner_id: "rox|owner@example.com".to_string(),
             org_id: None,
             channel_type: ChannelType::Team,
             participants: vec![],
@@ -98,7 +98,7 @@ async fn rejects_team_channel_without_team_id(pool: Pool<Postgres>) -> anyhow::R
         SeedChannelOptions {
             channel_id,
             name: Some("orphan".to_string()),
-            owner_id: "macro|owner@example.com".to_string(),
+            owner_id: "rox|owner@example.com".to_string(),
             org_id: None,
             channel_type: ChannelType::Team,
             participants: vec![],

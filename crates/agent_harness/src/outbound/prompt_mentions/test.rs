@@ -98,7 +98,7 @@ async fn an_editor_shares_the_session_with_everyone_they_mention() {
         .share_with_mentioned(
             AgentSessionId::TEST_A,
             Some(&user("a@rox.one")),
-            "<m-user-mention>{\"userId\":\"macro|b@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|c@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|a@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|b@rox.one\"}</m-user-mention>",
+            "<m-user-mention>{\"userId\":\"rox|b@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|c@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|a@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|b@rox.one\"}</m-user-mention>",
         )
         .await
         .expect("mentions resolve");
@@ -127,7 +127,7 @@ async fn a_viewer_amplifies_nobody_and_only_existing_viewers_are_named() {
     );
 
     let users = mentions
-        .share_with_mentioned(AgentSessionId::TEST_A, Some(&user("a@rox.one")), "<m-user-mention>{\"userId\":\"macro|b@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|c@rox.one\"}</m-user-mention>")
+        .share_with_mentioned(AgentSessionId::TEST_A, Some(&user("a@rox.one")), "<m-user-mention>{\"userId\":\"rox|b@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|c@rox.one\"}</m-user-mention>")
         .await
         .expect("mentions resolve");
 
@@ -147,7 +147,7 @@ async fn a_prompt_with_no_user_behind_it_shares_nothing() {
     );
 
     let users = mentions
-        .share_with_mentioned(AgentSessionId::TEST_A, None, "<m-user-mention>{\"userId\":\"macro|owner@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|c@rox.one\"}</m-user-mention>")
+        .share_with_mentioned(AgentSessionId::TEST_A, None, "<m-user-mention>{\"userId\":\"rox|owner@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|c@rox.one\"}</m-user-mention>")
         .await
         .expect("mentions resolve");
 
@@ -225,7 +225,7 @@ async fn ids_that_are_not_rox_users_are_skipped() {
     );
 
     let users = mentions
-        .share_with_mentioned(AgentSessionId::TEST_A, Some(&owner()), "<m-user-mention>{\"userId\":\"macro|junk@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"macro|a@rox.one\"}</m-user-mention>")
+        .share_with_mentioned(AgentSessionId::TEST_A, Some(&owner()), "<m-user-mention>{\"userId\":\"rox|junk@rox.one\"}</m-user-mention> <m-user-mention>{\"userId\":\"rox|a@rox.one\"}</m-user-mention>")
         .await
         .expect("mentions resolve");
 
@@ -243,7 +243,7 @@ async fn a_lexical_failure_is_an_error_not_an_empty_answer() {
         .share_with_mentioned(
             AgentSessionId::TEST_A,
             Some(&owner()),
-            "<m-user-mention>{\"userId\":\"macro|a@rox.one\"}</m-user-mention>",
+            "<m-user-mention>{\"userId\":\"rox|a@rox.one\"}</m-user-mention>",
         )
         .await
         .expect_err("the failure surfaces");

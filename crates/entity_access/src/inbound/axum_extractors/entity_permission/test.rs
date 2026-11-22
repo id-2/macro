@@ -40,8 +40,8 @@ use crate::{
     },
 };
 
-const USER_ID: &str = "macro|user@example.com";
-const INTERNAL_USER_ID: &str = "macro|internal@example.com";
+const USER_ID: &str = "rox|user@example.com";
+const INTERNAL_USER_ID: &str = "rox|internal@example.com";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const ENTITY_ID: &str = "entity-id";
 

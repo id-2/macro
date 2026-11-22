@@ -13,8 +13,8 @@ async fn channel_call_chat_uses_current_channel_grants_without_direct_participan
     let repo = PgAccessRepository::new(pool.clone());
     let service = EntityAccessServiceImpl::new(repo);
     let channel_id = uuid::uuid!("00000000-0000-0000-0000-000000000c01");
-    let member = user_id("macro|user-b@test.com");
-    let viewer = user_id("macro|user-d@test.com");
+    let member = user_id("rox|user-b@test.com");
+    let viewer = user_id("rox|user-d@test.com");
 
     for call_id in [
         "00000000-0000-0000-0000-0000000ca110",

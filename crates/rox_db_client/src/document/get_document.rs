@@ -643,7 +643,7 @@ mod tests {
                 .await
                 .unwrap()
                 .owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
     }
 
@@ -668,7 +668,7 @@ mod tests {
         );
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
     }
 
@@ -686,7 +686,7 @@ mod tests {
         );
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
     }
 
@@ -706,7 +706,7 @@ mod tests {
         );
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
     }
 

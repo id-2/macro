@@ -26,7 +26,7 @@ pub(crate) fn series_event() -> CalendarEvent {
     let starts_at = Utc.with_ymd_and_hms(2026, 10, 6, 15, 0, 0).unwrap();
     CalendarEvent {
         id: EVENT_ID,
-        owner_id: "macro|owner@example.com".to_owned(),
+        owner_id: "rox|owner@example.com".to_owned(),
         ical_uid: "uid@example.com".to_owned(),
         calendar_id: Some(CALENDAR_ID),
         sources: Vec::new(),

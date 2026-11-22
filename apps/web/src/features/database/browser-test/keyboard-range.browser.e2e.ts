@@ -106,7 +106,7 @@ test('a collaborator’s range is drawn with the presence ring', async ({
       'setRemoteUsers'
     )([
       {
-        userId: 'macro|alex@example.com',
+        userId: 'rox|alex@example.com',
         rowId: 'row-1',
         columnId: 'title',
         endRowId: 'row-3',

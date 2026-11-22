@@ -96,7 +96,7 @@ export const attachmentsOf = (
 
 /** A name for someone with no display name: the front of their id's email. */
 export const nameFromId = (id: string): string =>
-  id.replace(/^macro\|/, '').replace(/@.*/, '');
+  id.replace(/^rox\|/, '').replace(/@.*/, '');
 
 export const sdkChat = ({
   macro: connect,

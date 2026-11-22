@@ -67,7 +67,7 @@ const sdk = (n: (typeof names)[number]) =>
   new Rox({ env: 'local', auth: { type: 'user', token: tokens[n] } });
 
 const alice = sdk('alice');
-const aliceId = `macro|${emailOf('alice')}`;
+const aliceId = `rox|${emailOf('alice')}`;
 
 // Live listeners: SDK SSE stream and raw connection-gateway socket.
 type Name = (typeof names)[number];

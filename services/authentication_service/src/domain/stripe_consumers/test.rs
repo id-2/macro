@@ -405,7 +405,7 @@ fn a_paid_renewal_restores_access_with_renewal_evidence() {
 #[test]
 fn a_new_team_trial_starts_seats_and_pays() {
     let mut object = subscription("sub_Team", "trialing", 1_800_000_000, "price_premium");
-    object["metadata"] = json!({"team_id": TEAM, "owner_id": "macro|owner@example.com"});
+    object["metadata"] = json!({"team_id": TEAM, "owner_id": "rox|owner@example.com"});
     let created = change(EventType::CustomerSubscriptionCreated, object, Value::Null);
 
     let update = decide_team_subscription(&event_id(), event_at(), &created).unwrap();
@@ -415,7 +415,7 @@ fn a_new_team_trial_starts_seats_and_pays() {
     assert!(update.started_trial);
     assert_eq!(
         update.owner.map(|owner| owner.as_ref().to_owned()),
-        Some("macro|owner@example.com".to_owned())
+        Some("rox|owner@example.com".to_owned())
     );
     let start = update.start.unwrap();
     assert_eq!(start.at, event_at());

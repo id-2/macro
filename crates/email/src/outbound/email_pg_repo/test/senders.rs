@@ -27,7 +27,7 @@ fn inbox_id() -> Uuid {
     Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap()
 }
 fn actor() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap()
 }
 
 fn draft() -> CreateDraftInput {

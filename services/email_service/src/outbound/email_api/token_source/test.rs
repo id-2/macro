@@ -20,7 +20,7 @@ async fn insert_link_needing_reauth(pool: &PgPool) -> Uuid {
         VALUES ($1, $2, $2, $3, 'GMAIL', true)
         "#,
         link_id,
-        "macro|token-health@example.com",
+        "rox|token-health@example.com",
         format!("token-health-{link_id}@example.com"),
     )
     .execute(pool)

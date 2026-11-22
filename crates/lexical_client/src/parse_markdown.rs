@@ -877,7 +877,7 @@ mod tests {
                 "targetMessageId": "message-1",
                 "targetThreadId": "thread-1",
                 "displayText": "please fix this",
-                "senderId": "macro|user@example.com"
+                "senderId": "rox|user@example.com"
             }
         }"#;
 
@@ -898,7 +898,7 @@ mod tests {
             target_message_id: "message-1".to_owned(),
             target_thread_id: "thread-1".to_owned(),
             display_text: "please fix this".to_owned(),
-            sender_id: "macro|user@example.com".to_owned(),
+            sender_id: "rox|user@example.com".to_owned(),
         };
         let value = serde_json::to_value(&target).unwrap();
         assert_eq!(value["parent"]["type"], "channel");

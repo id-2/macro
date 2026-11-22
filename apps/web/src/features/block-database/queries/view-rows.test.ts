@@ -56,7 +56,7 @@ function page(
       id,
       tableId: 'table',
       position: id,
-      ownerId: 'macro|viewer@example.com',
+      ownerId: 'rox|viewer@example.com',
       createdAt: view.createdAt,
       updatedAt: view.updatedAt,
       cacheProjection: null,

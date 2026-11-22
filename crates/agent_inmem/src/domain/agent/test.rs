@@ -361,7 +361,7 @@ async fn direct_acp_denials_preserve_history_and_allow_retry() {
                 .lock()
                 .unwrap()
                 .iter()
-                .all(|(user, feature)| user == "macro|owner@rox.one"
+                .all(|(user, feature)| user == "rox|owner@rox.one"
                     && *feature == ai_usage::AiFeature::AgentSession)
         );
     }

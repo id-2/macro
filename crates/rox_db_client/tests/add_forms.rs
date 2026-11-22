@@ -4,8 +4,8 @@
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@forms.test";
-const RESPONDENT: &str = "macro|respondent@forms.test";
+const OWNER: &str = "rox|owner@forms.test";
+const RESPONDENT: &str = "rox|respondent@forms.test";
 
 /// The ids of one database, its table, a question column, a managed
 /// column, a form over the table, and its one section and question.
@@ -19,7 +19,7 @@ struct FormFixture {
 }
 
 async fn insert_user(pool: &Pool<Postgres>, user_id: &str) {
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,

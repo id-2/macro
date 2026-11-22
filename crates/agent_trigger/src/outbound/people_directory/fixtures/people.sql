@@ -4,9 +4,9 @@ INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('00000000-0000-7000-8000-000000000003', 'nameless@example.com', 'nameless@example.com', 'stripe_nameless');
 
 INSERT INTO "User" (id, email, rox_user_id) VALUES
-    ('macro|julia@example.com', 'julia@example.com', '00000000-0000-7000-8000-000000000001'),
-    ('macro|teo@example.com', 'teo@example.com', '00000000-0000-7000-8000-000000000002'),
-    ('macro|nameless@example.com', 'nameless@example.com', '00000000-0000-7000-8000-000000000003');
+    ('rox|julia@example.com', 'julia@example.com', '00000000-0000-7000-8000-000000000001'),
+    ('rox|teo@example.com', 'teo@example.com', '00000000-0000-7000-8000-000000000002'),
+    ('rox|nameless@example.com', 'nameless@example.com', '00000000-0000-7000-8000-000000000003');
 
 -- Teo never set a last name; the nameless user never set either.
 INSERT INTO rox_user_info (rox_user_id, first_name, last_name) VALUES

@@ -29,7 +29,7 @@ use crate::{
     test_fixtures::{EVENT_ID, LINK_ID, series_event, timed_listing},
 };
 
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 
 #[derive(Debug, PartialEq)]
 enum Call {

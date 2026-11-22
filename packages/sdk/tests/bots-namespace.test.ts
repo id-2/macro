@@ -18,7 +18,7 @@ describe('BotsNamespace', () => {
       handle: 'mention-bot',
       description: null,
       avatar_url: null,
-      created_by: 'macro|owner@example.com',
+      created_by: 'rox|owner@example.com',
       created_at: '2026-07-31T12:00:00Z',
       updated_at: '2026-07-31T12:00:00Z',
       deleted_at: null,

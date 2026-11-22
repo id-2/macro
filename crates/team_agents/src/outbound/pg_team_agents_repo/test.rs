@@ -17,14 +17,14 @@ async fn insert_team(pool: &PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|admin@example.com', 'admin@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|admin@example.com', 'admin@example.com', $1)"#,
         rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Agents', 'macro|admin@example.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Agents', 'rox|admin@example.com')",
         TEAM,
     )
     .execute(pool)
@@ -34,19 +34,19 @@ async fn insert_team(pool: &PgPool) {
 
 fn sam() -> NewAgentAccount {
     NewAgentAccount {
-        user_id: RoxUserIdStr::parse_from_str("macro|sam-rivera-abc123@agents.macro.invalid")
+        user_id: RoxUserIdStr::parse_from_str("rox|sam-rivera-abc123@agents.macro.invalid")
             .unwrap()
             .into_owned(),
         email: "sam-rivera-abc123@agents.macro.invalid".to_owned(),
         team_id: TEAM,
-        created_by: RoxUserIdStr::parse_from_str("macro|admin@example.com")
+        created_by: RoxUserIdStr::parse_from_str("rox|admin@example.com")
             .unwrap()
             .into_owned(),
         name: "Sam Rivera".to_owned(),
         avatar_url: None,
         persona_seed: PersonaSeed {
             creator_id: Some(
-                RoxUserIdStr::parse_from_str("macro|admin@example.com")
+                RoxUserIdStr::parse_from_str("rox|admin@example.com")
                     .unwrap()
                     .into_owned(),
             ),
@@ -134,7 +134,7 @@ async fn admission_facts_read_the_row_the_agent_flag_membership_and_creator(pool
     );
 
     // The creator marked as an agent is no responsible human.
-    sqlx::query!(r#"UPDATE "User" SET "isAgent" = TRUE WHERE id = 'macro|admin@example.com'"#)
+    sqlx::query!(r#"UPDATE "User" SET "isAgent" = TRUE WHERE id = 'rox|admin@example.com'"#)
         .execute(&pool)
         .await
         .unwrap();
@@ -146,7 +146,7 @@ async fn admission_facts_read_the_row_the_agent_flag_membership_and_creator(pool
             .created_by_is_agent
     );
 
-    let human = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let human = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
     assert_eq!(repo.account_facts(&human).await.unwrap(), None);
 }
 

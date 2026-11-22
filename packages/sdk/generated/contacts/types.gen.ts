@@ -51,7 +51,7 @@ export type SearchedPerson = {
      */
     name?: string | null;
     /**
-     * The person's user ID (`macro|<email>`).
+     * The person's user ID (`rox|<email>`).
      */
     userId: string;
 };

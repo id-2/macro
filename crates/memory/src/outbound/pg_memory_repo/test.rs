@@ -7,7 +7,7 @@ use sqlx::{Pool, Postgres};
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn save_and_get_by_id(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let memory_text = "User is a senior engineer working on cloud infra".to_string();
 
     let id = repo.save_memory(&memory_text, user.clone()).await.unwrap();
@@ -19,7 +19,7 @@ async fn save_and_get_by_id(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_latest_returns_most_recent(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
 
     repo.save_memory(&"first memory".to_string(), user.clone())
         .await
@@ -35,7 +35,7 @@ async fn get_latest_returns_most_recent(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_latest_no_memories_returns_none(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
 
     let result = repo.get_latest_memory(user).await.unwrap();
     assert!(result.is_none());
@@ -44,8 +44,8 @@ async fn get_latest_no_memories_returns_none(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_by_id_wrong_user_returns_error(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user_a = RoxUserIdStr::parse_from_str("macro|user-a@example.com").unwrap();
-    let user_b = RoxUserIdStr::parse_from_str("macro|user-b@example.com").unwrap();
+    let user_a = RoxUserIdStr::parse_from_str("rox|user-a@example.com").unwrap();
+    let user_b = RoxUserIdStr::parse_from_str("rox|user-b@example.com").unwrap();
 
     let id = repo
         .save_memory(&"private memory".to_string(), user_a)
@@ -59,7 +59,7 @@ async fn get_by_id_wrong_user_returns_error(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_by_id_nonexistent_returns_error(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
     let fake_id = rox_uuid::generate_uuid_v7();
 
     let result = repo.get_memory_by_id(user, fake_id).await;
@@ -69,8 +69,8 @@ async fn get_by_id_nonexistent_returns_error(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn memories_are_scoped_to_user(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user_a = RoxUserIdStr::parse_from_str("macro|user-a@example.com").unwrap();
-    let user_b = RoxUserIdStr::parse_from_str("macro|user-b@example.com").unwrap();
+    let user_a = RoxUserIdStr::parse_from_str("rox|user-a@example.com").unwrap();
+    let user_b = RoxUserIdStr::parse_from_str("rox|user-b@example.com").unwrap();
 
     repo.save_memory(&"user a memory".to_string(), user_a.clone())
         .await
@@ -89,7 +89,7 @@ async fn memories_are_scoped_to_user(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_latest_includes_updated_at(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
 
     repo.save_memory(&"a memory".to_string(), user.clone())
         .await
@@ -102,7 +102,7 @@ async fn get_latest_includes_updated_at(pool: Pool<Postgres>) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_latest_uses_refresh_time_for_staleness(pool: Pool<Postgres>) {
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|test@example.com").unwrap();
 
     repo.save_memory(&"first memory".to_string(), user.clone())
         .await

@@ -21,7 +21,7 @@ async fn initiative_initialization_preserves_values_and_folder_namespace(
         EntityType::Project,
         SystemPropertyKey::ASSIGNEES_UUID,
         EntityType::User,
-        vec!["macro|folder@test.com".into()],
+        vec!["rox|folder@test.com".into()],
         None,
     )])
     .await?;
@@ -33,7 +33,7 @@ async fn initiative_initialization_preserves_values_and_folder_namespace(
         EntityType::Initiative,
         SystemPropertyKey::ASSIGNEES_UUID,
         EntityType::User,
-        vec!["macro|owner@test.com".into()],
+        vec!["rox|owner@test.com".into()],
         None,
     )])
     .await?;
@@ -61,7 +61,7 @@ async fn initiative_initialization_preserves_values_and_folder_namespace(
         if row.property_definition_id == SystemPropertyKey::ASSIGNEES_UUID {
             assert_eq!(
                 row.values.as_ref().unwrap()["value"][0]["entity_id"],
-                "macro|owner@test.com"
+                "rox|owner@test.com"
             );
         } else {
             assert!(row.values.as_ref().unwrap().is_null());
@@ -73,7 +73,7 @@ async fn initiative_initialization_preserves_values_and_folder_namespace(
         .unwrap();
     assert_eq!(
         folder.values.as_ref().unwrap()["value"][0]["entity_id"],
-        "macro|folder@test.com"
+        "rox|folder@test.com"
     );
     Ok(())
 }

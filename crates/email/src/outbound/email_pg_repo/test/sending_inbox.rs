@@ -47,7 +47,7 @@ fn service(
 }
 
 fn caller() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user1@test.com").unwrap()
 }
 
 fn reply_to(replying_to_id: Uuid) -> SendingInboxRequest<'static> {

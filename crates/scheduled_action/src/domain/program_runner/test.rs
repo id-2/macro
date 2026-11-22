@@ -16,7 +16,7 @@ use crate::domain::{
     models::{ActionKind, ExecutionResource, ExecutionResourceType, RunVisibility},
 };
 
-pub(crate) const OWNER: &str = "macro|routine@rox.one";
+pub(crate) const OWNER: &str = "rox|routine@rox.one";
 
 /// Records agent steps; prepares like the real runner, without a session.
 #[derive(Default)]
@@ -287,12 +287,12 @@ async fn an_unreadable_trigger_fails_before_any_step() {
 }
 
 fn dana() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|dana@example.com").unwrap()
 }
 
 fn dana_in_context() -> ContextPerson {
     ContextPerson {
-        id: "macro|dana@example.com".into(),
+        id: "rox|dana@example.com".into(),
         name: "dana@example.com".into(),
         email: Some("dana@example.com".into()),
     }
@@ -379,7 +379,7 @@ async fn a_task_status_change_hands_the_agent_the_task_instead_of_its_ids() {
             priority: Some("High".into()),
             due: Some(Utc.with_ymd_and_hms(2026, 10, 9, 0, 0, 0).unwrap()),
             assignees: vec![ContextPerson {
-                id: "macro|sam@example.com".into(),
+                id: "rox|sam@example.com".into(),
                 name: "sam@example.com".into(),
                 email: Some("sam@example.com".into()),
             }],

@@ -14,7 +14,7 @@ use super::{
 const DOCUMENT_ID: &str = "11111111-1111-1111-1111-111111111111";
 
 fn owner() -> Owner {
-    Owner::from_principal_str("macro|owner@example.com").expect("valid owner")
+    Owner::from_principal_str("rox|owner@example.com").expect("valid owner")
 }
 
 fn assert_wire_round_trip(event: Event<DocumentTopicEvent>, expected: Value) {
@@ -31,7 +31,7 @@ fn assert_wire_round_trip(event: Event<DocumentTopicEvent>, expected: Value) {
 #[test]
 fn owner_bearing_events_round_trip_all_owner_kinds_as_strings() {
     for principal in [
-        "macro|owner@example.com",
+        "rox|owner@example.com",
         "bot|00000000-0000-0000-0000-000000000001",
         "01998a30-1a2b-7c3d-9e4f-5a6b7c8d9e0f",
     ] {
@@ -113,7 +113,7 @@ fn content_uploaded_serializes_to_the_exact_envelope() {
             "event_type": "document.content_uploaded",
             "metadata": {
                 "document_id": DOCUMENT_ID,
-                "owner": "macro|owner@example.com",
+                "owner": "rox|owner@example.com",
                 "file_type": "pdf",
                 "document_version_id": "convert",
             },
@@ -273,7 +273,7 @@ fn created_events_without_attribution_still_decode() {
         DocumentTopicEvent::Created(metadata) => {
             assert_eq!(
                 metadata.owner,
-                Owner::from_principal_str("macro|owner@example.com").unwrap()
+                Owner::from_principal_str("rox|owner@example.com").unwrap()
             );
             assert_eq!(metadata.actor, None);
             assert_eq!(metadata.on_behalf_of, None);

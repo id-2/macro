@@ -42,7 +42,7 @@ describe('agent context', () => {
           channel_type: 'direct_message',
         },
         prompt_message_id: 'm-1',
-        sender: { id: 'macro|ada@example.com', name: 'Ada' },
+        sender: { id: 'rox|ada@example.com', name: 'Ada' },
         reply_target: { kind: 'none' },
       },
     });
@@ -59,7 +59,7 @@ describe('agent context', () => {
         kind: 'routine',
         routine_id: 'r-1',
         name: 'Check back on the deploy',
-        owner: { id: 'macro|ada@example.com', name: 'Ada' },
+        owner: { id: 'rox|ada@example.com', name: 'Ada' },
         instructions: 'Report the deploy status in the thread.',
         triggers: [{ type: 'once', at: '2026-10-08T09:00:02Z' }],
         firing: {

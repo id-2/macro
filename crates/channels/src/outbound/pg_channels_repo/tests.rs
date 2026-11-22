@@ -30,7 +30,7 @@ const TEAM_A_AUTO_ACTIVE: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_00000
 const TEAM_A_AUTO_LEFT: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000c12);
 const TEAM_A_MANUAL: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000c13);
 const TEAM_B_AUTO: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000c21);
-const TEAM_OWNER_A: &str = "macro|team-owner-a@test.com";
+const TEAM_OWNER_A: &str = "rox|team-owner-a@test.com";
 const MSG1: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000001);
 const MSG2: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000002);
 const MSG3: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000003);
@@ -42,12 +42,12 @@ const DELETED_MSG_ATTACHMENT: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_0
 const INITIATIVE_A: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_0000000000a1);
 const COMMENT_ON_INITIATIVE: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_00000000c0a1);
 const COMMENT_ON_DOCUMENT: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_00000000c0a2);
-const USER_A: &str = "macro|user-a@test.com";
-const USER_B: &str = "macro|user-b@test.com";
-const USER_C: &str = "macro|user-c@test.com";
-const NON_MEMBER: &str = "macro|user-d@test.com";
-const USER_E: &str = "macro|user-e@test.com";
-const LEFT_USER: &str = "macro|left-user@test.com";
+const USER_A: &str = "rox|user-a@test.com";
+const USER_B: &str = "rox|user-b@test.com";
+const USER_C: &str = "rox|user-c@test.com";
+const NON_MEMBER: &str = "rox|user-d@test.com";
+const USER_E: &str = "rox|user-e@test.com";
+const LEFT_USER: &str = "rox|left-user@test.com";
 // Participant-filter fixture threads in ch4 (see channels_repo.sql).
 const T41: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000041);
 const T42: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000042);
@@ -2217,7 +2217,7 @@ async fn participants_excludes_left_users(pool: Pool<Postgres>) -> anyhow::Resul
 
     let user_ids: Vec<&str> = participants.iter().map(|p| p.user_id.as_str()).collect();
     assert_eq!(participants.len(), 3);
-    assert!(!user_ids.contains(&"macro|left-user@test.com"));
+    assert!(!user_ids.contains(&"rox|left-user@test.com"));
     Ok(())
 }
 
@@ -2231,19 +2231,19 @@ async fn participants_roles_parsed_correctly(pool: Pool<Postgres>) -> anyhow::Re
 
     let owner = participants
         .iter()
-        .find(|p| p.user_id == "macro|user-a@test.com")
+        .find(|p| p.user_id == "rox|user-a@test.com")
         .unwrap();
     assert_eq!(owner.role, ParticipantRole::Owner);
 
     let admin = participants
         .iter()
-        .find(|p| p.user_id == "macro|user-b@test.com")
+        .find(|p| p.user_id == "rox|user-b@test.com")
         .unwrap();
     assert_eq!(admin.role, ParticipantRole::Admin);
 
     let member = participants
         .iter()
-        .find(|p| p.user_id == "macro|user-c@test.com")
+        .find(|p| p.user_id == "rox|user-c@test.com")
         .unwrap();
     assert_eq!(member.role, ParticipantRole::Member);
     Ok(())
@@ -2647,7 +2647,7 @@ async fn attachment_references_collapse_repeat_mentions_from_one_source(
             (id, source_entity_type, source_entity_id, entity_type, entity_id, user_id, created_at)
         VALUES
             ('00000000-0000-0000-0000-00000000e0a1'::uuid, 'doc', 'src-doc',
-             'document', 'doc-generic', 'macro|user-a@test.com', '2024-01-05 00:00:00+00')
+             'document', 'doc-generic', 'rox|user-a@test.com', '2024-01-05 00:00:00+00')
         "#,
     )
     .execute(&pool)
@@ -2681,9 +2681,9 @@ async fn attachment_references_collapse_alias_typed_mentions_from_one_source(
             (id, source_entity_type, source_entity_id, entity_type, entity_id, user_id, created_at)
         VALUES
             ('00000000-0000-0000-0000-00000000e0b1'::uuid, 'document', 'task-1',
-             'thread', 'thread-9', 'macro|user-a@test.com', '2024-01-05 00:00:00+00'),
+             'thread', 'thread-9', 'rox|user-a@test.com', '2024-01-05 00:00:00+00'),
             ('00000000-0000-0000-0000-00000000e0b2'::uuid, 'document', 'task-1',
-             'email', 'thread-9', 'macro|user-a@test.com', '2024-01-06 00:00:00+00')
+             'email', 'thread-9', 'rox|user-a@test.com', '2024-01-06 00:00:00+00')
         "#,
     )
     .execute(&pool)
@@ -2873,7 +2873,7 @@ async fn delete_channel_cascades_contacts_backfill_outbox_rows(pool: Pool<Postgr
 
     sqlx::query!(
         "INSERT INTO contacts_backfill_outbox (comms_channel_id, user_ids) \
-         VALUES ($1, '[\"macro|user-a@test.com\"]'::jsonb)",
+         VALUES ($1, '[\"rox|user-a@test.com\"]'::jsonb)",
         created.id,
     )
     .execute(&pool)

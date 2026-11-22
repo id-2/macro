@@ -49,7 +49,7 @@ impl Cognition for FakeCognition {
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(RoxUserIdStr::try_from("macro|requester@macro.local".to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from("rox|requester@macro.local".to_owned()).unwrap())
 }
 
 fn context(service: Arc<FakeCognition>) -> ServiceContext<CognitionToolContext> {
@@ -121,7 +121,7 @@ async fn both_tools_forward_authenticated_owner_and_preserve_results() {
     assert!(
         requests
             .iter()
-            .all(|(owner, _)| owner == "macro|requester@macro.local")
+            .all(|(owner, _)| owner == "rox|requester@macro.local")
     );
     assert_eq!(requests[0].1["prompt"], "Extract the total: USD 42.");
     assert_eq!(

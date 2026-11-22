@@ -20,7 +20,7 @@ impl MessageEventPublisher for Target {
 fn event(change: MessageChange) -> MessageEvent {
     MessageEvent {
         parent: MessageParent::parse("document", "doc").unwrap(),
-        actor: "macro|author@example.com".into(),
+        actor: "rox|author@example.com".into(),
         nonce: None,
         change,
     }
@@ -39,7 +39,7 @@ async fn every_committed_target_is_attempted_even_if_any_or_all_fail() {
             .publish(event(MessageChange::ThreadUpdated {
                 state: crate::domain::models::ThreadState {
                     root_id: uuid::Uuid::from_u128(1),
-                    user_id: "macro|author@example.com".into(),
+                    user_id: "rox|author@example.com".into(),
                     resolved: true,
                     anchor: None,
                     created_at: chrono::Utc::now(),
@@ -82,7 +82,7 @@ async fn call_chat_reaches_both_agent_targets_and_the_parent_transport() {
     let mut event = event(MessageChange::ThreadUpdated {
         state: crate::domain::models::ThreadState {
             root_id: uuid::Uuid::from_u128(1),
-            user_id: "macro|author@example.com".into(),
+            user_id: "rox|author@example.com".into(),
             resolved: false,
             anchor: None,
             created_at: chrono::Utc::now(),

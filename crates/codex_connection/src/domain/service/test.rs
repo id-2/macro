@@ -7,8 +7,8 @@ use std::{
     },
 };
 
-const OWNER: &str = "macro|owner@example.com";
-const OTHER: &str = "macro|other@example.com";
+const OWNER: &str = "rox|owner@example.com";
+const OTHER: &str = "rox|other@example.com";
 #[derive(Default)]
 struct Repo(Mutex<HashMap<String, Arc<tokio::sync::Mutex<ConnectionState>>>>);
 impl Repo {

@@ -211,16 +211,16 @@ async fn resources(endpoint: &str) -> Resources {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|t17@example.com").unwrap()
 }
 
 async fn team(pool: &PgPool) -> TeamId {
     let account = Uuid::now_v7();
     let team = Uuid::now_v7();
     sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 't17', 't17@example.com', 't17-customer')", account).execute(pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|t17@example.com', 't17@example.com', $1)"#, account).execute(pool).await.unwrap();
-    sqlx::query!("INSERT INTO team (id, name, owner_id, auto_join_domain) VALUES ($1, 'Atomic history', 'macro|t17@example.com', 'example.com')", team).execute(pool).await.unwrap();
-    sqlx::query!("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1, 'macro|t17@example.com', 'owner')", team).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('rox|t17@example.com', 't17@example.com', $1)"#, account).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO team (id, name, owner_id, auto_join_domain) VALUES ($1, 'Atomic history', 'rox|t17@example.com', 'example.com')", team).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1, 'rox|t17@example.com', 'owner')", team).execute(pool).await.unwrap();
     team.try_into().unwrap()
 }
 

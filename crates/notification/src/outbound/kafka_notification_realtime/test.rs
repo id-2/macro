@@ -108,8 +108,8 @@ fn assert_envelope(record: &PublishedRecord, event_type: &str) -> serde_json::Va
 async fn publishes_one_notification_for_many_users_event() {
     let records = Arc::new(Mutex::new(Vec::new()));
     let publisher = publisher(Arc::clone(&records), false);
-    let first_user = user("macro|first@example.com");
-    let second_user = user("macro|second@example.com");
+    let first_user = user("rox|first@example.com");
+    let second_user = user("rox|second@example.com");
     let notification_id = uuid::Uuid::parse_str("0193b1ea-c742-7589-893b-2b4a509c1e77")
         .expect("valid notification ID");
     let payload = NotificationStatusPayload::NotificationForUsers {
@@ -154,7 +154,7 @@ async fn publishes_one_notification_for_many_users_event() {
 async fn publishes_many_notifications_for_one_user_event() {
     let records = Arc::new(Mutex::new(Vec::new()));
     let publisher = publisher(Arc::clone(&records), false);
-    let recipient = user("macro|recipient@example.com");
+    let recipient = user("rox|recipient@example.com");
     let first_id = uuid::Uuid::parse_str("0193b1ea-c742-7589-893b-2b4a509c1e77")
         .expect("valid notification ID");
     let second_id = uuid::Uuid::parse_str("0193b1ea-c742-7589-893b-2b4a509c1e78")
@@ -206,7 +206,7 @@ async fn publishes_many_notifications_for_one_user_event() {
 async fn propagates_publish_failures() {
     let publisher = publisher(Arc::new(Mutex::new(Vec::new())), true);
     let payload = NotificationStatusPayload::UserNotifications {
-        user: user("macro|recipient@example.com"),
+        user: user("rox|recipient@example.com"),
         updates: vec![PatchDelete::Delete {
             id: uuid::Uuid::nil(),
         }],

@@ -3,8 +3,8 @@ use crate::outbound::pg_access_repo::queries::get_user_source_ids;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 use rox_user_id::user_id::RoxUserIdStr;
 
-const OWNER: &str = "macro|owner@team.com";
-const MEMBER: &str = "macro|member@team.com";
+const OWNER: &str = "rox|owner@team.com";
+const MEMBER: &str = "rox|member@team.com";
 const MEMBER_TEAM: &str = "00000000-0000-0000-0000-0000000ea001";
 
 #[sqlx::test(
@@ -216,7 +216,7 @@ async fn a_channel_grant_reaches_its_active_participants(pool: PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO comms_channel_participants (channel_id, user_id, role) VALUES ($1, 'macro|noteam@team.com', 'member')"#,
+        r#"INSERT INTO comms_channel_participants (channel_id, user_id, role) VALUES ($1, 'rox|noteam@team.com', 'member')"#,
         channel_id,
     )
     .execute(&pool)

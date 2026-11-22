@@ -44,7 +44,7 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
     ids.sort();
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner, "createdAt", "updatedAt")
-        SELECT id, 'pagination task', 'macro|user-1@test.com', '2026-01-01', '2026-01-02'
+        SELECT id, 'pagination task', 'rox|user-1@test.com', '2026-01-01', '2026-01-02'
         FROM unnest($1::text[]) id ON CONFLICT DO NOTHING"#,
         &ids,
     )
@@ -62,7 +62,7 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
     ).execute(&pool).await?;
     // Test-local denormalized permissions, not production grant orchestration.
     sqlx::query!(
-        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) SELECT id::uuid, 'document', 'macro|user-1@test.com', 'user', 'view' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
+        "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) SELECT id::uuid, 'document', 'rox|user-1@test.com', 'user', 'view' FROM unnest($1::text[]) id ON CONFLICT DO NOTHING",
         &ids,
     ).execute(&pool).await?;
     for (index, id) in ids.iter().enumerate() {
@@ -95,7 +95,7 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
             expanded_dynamic_cursor_soup_grouped(
                 &pool,
                 GroupedDynamicCursorArgs {
-                    user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
+                    user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap(),
                     limit: 2,
                     cursor,
                     exclude_frecency: false,
@@ -159,13 +159,13 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
         }
     }
     sqlx::query!(
-        "INSERT INTO frecency_aggregates (entity_id, entity_type, user_id, first_event) VALUES ($1, 'document', 'macro|user-1@test.com', now()) ON CONFLICT DO NOTHING",
+        "INSERT INTO frecency_aggregates (entity_id, entity_type, user_id, first_event) VALUES ($1, 'document', 'rox|user-1@test.com', now()) ON CONFLICT DO NOTHING",
         &ids[0],
     ).execute(&pool).await?;
     let excluded = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
-            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("rox|user-1@test.com")?,
             limit: 50,
             cursor: Query::Sort(SimpleSortMethod::UpdatedAt.into(), task_filter()),
             exclude_frecency: true,

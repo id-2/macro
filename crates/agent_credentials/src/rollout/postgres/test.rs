@@ -13,16 +13,16 @@ async fn insert_fixtures(pool: &PgPool) {
             ('01900000-0000-7000-8000-00000000000c', 'sam', 'sam@agents.macro.invalid', 'cus_c'),
             ('01900000-0000-7000-8000-00000000000d', 'kim', 'kim@agents.macro.invalid', 'cus_d');
         INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES
-            ('macro|admin@rox.one', 'admin@rox.one', '01900000-0000-7000-8000-00000000000a', FALSE),
-            ('macro|gone@rox.one', 'gone@rox.one', '01900000-0000-7000-8000-00000000000b', FALSE),
-            ('macro|sam@agents.macro.invalid', 'sam@agents.macro.invalid', '01900000-0000-7000-8000-00000000000c', TRUE),
-            ('macro|kim@agents.macro.invalid', 'kim@agents.macro.invalid', '01900000-0000-7000-8000-00000000000d', TRUE);
+            ('rox|admin@rox.one', 'admin@rox.one', '01900000-0000-7000-8000-00000000000a', FALSE),
+            ('rox|gone@rox.one', 'gone@rox.one', '01900000-0000-7000-8000-00000000000b', FALSE),
+            ('rox|sam@agents.macro.invalid', 'sam@agents.macro.invalid', '01900000-0000-7000-8000-00000000000c', TRUE),
+            ('rox|kim@agents.macro.invalid', 'kim@agents.macro.invalid', '01900000-0000-7000-8000-00000000000d', TRUE);
         INSERT INTO team (id, name, owner_id) VALUES
-            ('01900000-0000-7000-8000-000000000001', 'Agents', 'macro|admin@rox.one');
+            ('01900000-0000-7000-8000-000000000001', 'Agents', 'rox|admin@rox.one');
         INSERT INTO team_agents (user_id, team_id, created_by, persona_seed) VALUES
-            ('macro|sam@agents.macro.invalid', '01900000-0000-7000-8000-000000000001', 'macro|admin@rox.one', '{}'),
-            ('macro|kim@agents.macro.invalid', '01900000-0000-7000-8000-000000000001', 'macro|gone@rox.one', '{}');
-        DELETE FROM "User" WHERE id = 'macro|gone@rox.one';
+            ('rox|sam@agents.macro.invalid', '01900000-0000-7000-8000-000000000001', 'rox|admin@rox.one', '{}'),
+            ('rox|kim@agents.macro.invalid', '01900000-0000-7000-8000-000000000001', 'rox|gone@rox.one', '{}');
+        DELETE FROM "User" WHERE id = 'rox|gone@rox.one';
         "#,
     )
     .execute(pool)
@@ -35,9 +35,9 @@ async fn an_agent_follows_its_creator_then_its_team_owner(pool: PgPool) {
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
 
-    let sam = RoxUserIdStr::parse_from_str("macro|sam@agents.macro.invalid").unwrap();
-    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one").unwrap();
+    let sam = RoxUserIdStr::parse_from_str("rox|sam@agents.macro.invalid").unwrap();
+    let kim = RoxUserIdStr::parse_from_str("rox|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("rox|admin@rox.one").unwrap();
 
     assert_eq!(
         creators.creator_of(&sam).await.unwrap(),
@@ -60,8 +60,8 @@ async fn with_its_creator_gone_the_team_owners_rollout_decides(pool: PgPool) {
 
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
-    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one")
+    let kim = RoxUserIdStr::parse_from_str("rox|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("rox|admin@rox.one")
         .unwrap()
         .into_owned();
 

@@ -429,7 +429,7 @@ async fn direct_and_participant_grants_are_refused(pool: PgPool) -> anyhow::Resu
     )
     .execute(&pool)
     .await?;
-    sqlx::query!("INSERT INTO calls (id, room_name, created_by, share_permission_id) VALUES ($1, 'test-room', 'macro|owner@example.com', $2)", call, call.to_string()).execute(&pool).await?;
+    sqlx::query!("INSERT INTO calls (id, room_name, created_by, share_permission_id) VALUES ($1, 'test-room', 'rox|owner@example.com', $2)", call, call.to_string()).execute(&pool).await?;
     sqlx::query!(
         "INSERT INTO call_participants (call_id, user_id) VALUES ($1, $2)",
         call,

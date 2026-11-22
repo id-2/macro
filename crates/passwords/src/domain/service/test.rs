@@ -2,11 +2,11 @@ use super::*;
 #[test]
 fn owner_and_grants_are_scoped_to_the_team_and_permission() {
     use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
-    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.test")
+    let owner = RoxUserIdStr::parse_from_str("rox|owner@example.test")
         .expect("valid fixture")
         .into_owned();
     let viewer = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|viewer@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
@@ -72,12 +72,12 @@ async fn metadata_never_decrypts_and_disclosure_checks_membership_and_grants() {
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
     let stranger = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|stranger@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|stranger@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
@@ -266,7 +266,7 @@ async fn accepted_provider_write_recovers_metadata_and_deletion_remains_resumabl
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
@@ -347,12 +347,12 @@ async fn cancelling_a_create_with_accepted_provider_values_erases_values_and_pre
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
     let stranger = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|stranger@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|stranger@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
@@ -417,12 +417,12 @@ async fn delayed_write_recovery_preserves_later_grant_revocation_and_metadata_ed
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|viewer@example.test")
             .expect("valid fixture")
             .into_owned(),
     };
@@ -546,7 +546,7 @@ async fn unique_totp_generations_isolate_late_writes_and_durable_cleanup_preserv
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("rox|owner@example.test")
             .expect("valid fixture")
             .into_owned(),
     };

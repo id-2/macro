@@ -90,13 +90,13 @@ const ROX_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1)
 const ROX_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
 const ROX_USER_C: Uuid = Uuid::from_u128(0xcccccccc_cccc_cccc_cccc_ccccccccccc3);
 pub(super) static USER_A: LazyLock<RoxUserIdStr<'static>> =
-    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-a@test.com").unwrap());
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("rox|user-a@test.com").unwrap());
 pub(super) static USER_B: LazyLock<RoxUserIdStr<'static>> =
-    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-b@test.com").unwrap());
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("rox|user-b@test.com").unwrap());
 static USER_C: LazyLock<RoxUserIdStr<'static>> =
-    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-c@test.com").unwrap());
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("rox|user-c@test.com").unwrap());
 static USER_D: LazyLock<RoxUserIdStr<'static>> =
-    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-d@test.com").unwrap());
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("rox|user-d@test.com").unwrap());
 
 pub(super) fn repo(pool: Pool<Postgres>) -> PgCallRepo {
     PgCallRepo::new(pool)
@@ -1414,7 +1414,7 @@ async fn get_stable_speaker_voices_for_call_record_returns_all_voices_for_consis
         // Unknown speaker ids are ignored even if their diarized speaker id is stable.
         (
             "unknown-speaker",
-            "macro|unknown-speaker@test.com",
+            "rox|unknown-speaker@test.com",
             Some("spk-unknown"),
             Some(voice_a),
         ),
@@ -1594,12 +1594,12 @@ async fn get_call_record_overrides_speaker_id_with_custom_speaker(
 
     // Row without an override returns the derived speaker_id.
     assert_eq!(record.transcript[0].content, "archived hello");
-    assert_eq!(record.transcript[0].speaker_id, "macro|user-a@test.com");
+    assert_eq!(record.transcript[0].speaker_id, "rox|user-a@test.com");
 
     // Row with `custom_speaker` set returns the override, not the derived
-    // speaker_id (which is `macro|user-a@test.com` in the fixture).
+    // speaker_id (which is `rox|user-a@test.com` in the fixture).
     assert_eq!(record.transcript[2].content, "archived overridden");
-    assert_eq!(record.transcript[2].speaker_id, "macro|user-b@test.com");
+    assert_eq!(record.transcript[2].speaker_id, "rox|user-b@test.com");
     assert_eq!(
         record.transcript[2].diarized_speaker_id.as_deref(),
         Some("spk-arch-b0")
@@ -3060,9 +3060,9 @@ async fn get_call_participants_with_team_members_returns_distinct_users(
     assert_eq!(
         user_ids,
         vec![
-            "macro|user-a@test.com".to_string(),
-            "macro|user-b@test.com".to_string(),
-            "macro|user-c@test.com".to_string(),
+            "rox|user-a@test.com".to_string(),
+            "rox|user-b@test.com".to_string(),
+            "rox|user-c@test.com".to_string(),
         ]
     );
     Ok(())
@@ -3132,7 +3132,7 @@ async fn get_call_record_people_returns_participants_only_without_a_meeting(
     user_ids.sort();
     assert_eq!(
         user_ids,
-        vec!["macro|user-a@test.com", "macro|user-b@test.com"]
+        vec!["rox|user-a@test.com", "rox|user-b@test.com"]
     );
     assert!(people.invitee_emails.is_empty());
     Ok(())
@@ -3158,7 +3158,7 @@ async fn get_call_record_people_skips_unparsable_participant_ids(
     user_ids.sort();
     assert_eq!(
         user_ids,
-        vec!["macro|user-a@test.com", "macro|user-b@test.com"]
+        vec!["rox|user-a@test.com", "rox|user-b@test.com"]
     );
     Ok(())
 }
@@ -3281,9 +3281,9 @@ async fn get_call_record_people_includes_meeting_owner_and_calendar_invitees(
     assert_eq!(
         user_ids,
         vec![
-            "macro|user-a@test.com",
-            "macro|user-b@test.com",
-            "macro|user-c@test.com"
+            "rox|user-a@test.com",
+            "rox|user-b@test.com",
+            "rox|user-c@test.com"
         ]
     );
     let mut invitee_emails = people.invitee_emails;
@@ -3318,7 +3318,7 @@ async fn get_enhanced_call_record_transcripts_returns_archived_rows(
     assert_eq!(transcripts.len(), 3);
     assert_eq!(transcripts[0].call_record_id, CALL_ARCHIVED);
     assert_eq!(transcripts[0].segment_id.as_deref(), Some("seg-arch-1"));
-    assert_eq!(transcripts[0].speaker_id, "macro|user-a@test.com");
+    assert_eq!(transcripts[0].speaker_id, "rox|user-a@test.com");
     assert_eq!(
         transcripts[0].diarized_speaker_id.as_deref(),
         Some("spk-arch-a0")
@@ -3460,15 +3460,15 @@ async fn patch_call_transcript_custom_speakers_sets_and_clears(
 
     // seg-arch-1 (diarized spk-arch-a0): override now applied → user-c.
     assert_eq!(record.transcript[0].content, "archived hello");
-    assert_eq!(record.transcript[0].speaker_id, "macro|user-c@test.com");
+    assert_eq!(record.transcript[0].speaker_id, "rox|user-c@test.com");
 
     // seg-arch-2 (diarized NULL): never touched.
     assert_eq!(record.transcript[1].content, "archived reply");
-    assert_eq!(record.transcript[1].speaker_id, "macro|user-b@test.com");
+    assert_eq!(record.transcript[1].speaker_id, "rox|user-b@test.com");
 
     // seg-arch-3 (diarized spk-arch-b0): override cleared → derived speaker_id wins.
     assert_eq!(record.transcript[2].content, "archived overridden");
-    assert_eq!(record.transcript[2].speaker_id, "macro|user-a@test.com");
+    assert_eq!(record.transcript[2].speaker_id, "rox|user-a@test.com");
 
     Ok(())
 }
@@ -3490,7 +3490,7 @@ async fn patch_call_transcript_custom_speakers_empty_is_noop(
         .get_call_record_by_call_id(&CALL_ARCHIVED)
         .await?
         .expect("archived call should exist");
-    assert_eq!(record.transcript[2].speaker_id, "macro|user-b@test.com");
+    assert_eq!(record.transcript[2].speaker_id, "rox|user-b@test.com");
     Ok(())
 }
 
@@ -3518,9 +3518,9 @@ async fn patch_call_transcript_custom_speakers_unknown_diarized_id_is_noop(
         .await?
         .expect("archived call should exist");
     // All rows still reflect their original speaker_id / custom_speaker.
-    assert_eq!(record.transcript[0].speaker_id, "macro|user-a@test.com");
-    assert_eq!(record.transcript[1].speaker_id, "macro|user-b@test.com");
-    assert_eq!(record.transcript[2].speaker_id, "macro|user-b@test.com");
+    assert_eq!(record.transcript[0].speaker_id, "rox|user-a@test.com");
+    assert_eq!(record.transcript[1].speaker_id, "rox|user-b@test.com");
+    assert_eq!(record.transcript[2].speaker_id, "rox|user-b@test.com");
     Ok(())
 }
 

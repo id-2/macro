@@ -17,7 +17,7 @@ impl AuthorizedAttachmentBytes for Reader {
         id: Uuid,
     ) -> BoxFuture<'a, Result<(AttachmentReadRecord, Vec<u8>), MailboxError>> {
         Box::pin(async move {
-            assert_eq!(actor, "macro|gmail-native@example.com");
+            assert_eq!(actor, "rox|gmail-native@example.com");
             self.read.lock().unwrap().push(id);
             let record = email::outbound::EmailPgRepo::new(self.db.clone())
                 .attachment_read_record(id)
@@ -37,7 +37,7 @@ async fn imported_gmail_draft_preserves_native_inline_files_and_honors_removal_a
     let thread = Uuid::now_v7();
     let draft = Uuid::now_v7();
     let upload = Uuid::now_v7();
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,'macro|gmail-native@example.com','gmail-native','gmail-native@example.com','GMAIL')",link).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,'rox|gmail-native@example.com','gmail-native','gmail-native@example.com','GMAIL')",link).execute(&db).await.unwrap();
     sqlx::query!(
         "INSERT INTO email_threads(id,link_id) VALUES($1,$2)",
         thread,
@@ -87,7 +87,7 @@ async fn imported_gmail_draft_preserves_native_inline_files_and_honors_removal_a
     assert_eq!(snapshot.forwarded, vec![inline]);
     let files = prepare_provider_attachments(
         &reader,
-        "macro|gmail-native@example.com",
+        "rox|gmail-native@example.com",
         &snapshot.forwarded,
         message.body_html.as_deref(),
     )
@@ -112,7 +112,7 @@ impl AuthorizedAttachmentBytes for SourceInboxReader {
         id: Uuid,
     ) -> BoxFuture<'a, Result<(AttachmentReadRecord, Vec<u8>), MailboxError>> {
         Box::pin(async move {
-            assert_eq!(actor, "macro|forwarder@example.com");
+            assert_eq!(actor, "rox|forwarder@example.com");
             let record = email::outbound::EmailPgRepo::new(self.db.clone())
                 .attachment_read_record(id)
                 .await
@@ -143,8 +143,8 @@ async fn forwarding_reads_bytes_with_the_source_inbox_identity(db: PgPool) {
     let attachment = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES
-        ($1,'macro|forwarder@example.com','forwarder','sender@example.com','GMAIL'),
-        ($2,'macro|forwarder@example.com','forwarder','source@example.com','OUTLOOK')",
+        ($1,'rox|forwarder@example.com','forwarder','sender@example.com','GMAIL'),
+        ($2,'rox|forwarder@example.com','forwarder','source@example.com','OUTLOOK')",
         sending,
         source
     )
@@ -197,7 +197,7 @@ async fn forwarding_reads_bytes_with_the_source_inbox_identity(db: PgPool) {
     assert_eq!(snapshot.forwarded, vec![attachment]);
     let files = prepare_provider_attachments(
         &reader,
-        "macro|forwarder@example.com",
+        "rox|forwarder@example.com",
         &snapshot.forwarded,
         None,
     )

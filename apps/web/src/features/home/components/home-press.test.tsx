@@ -11,9 +11,9 @@ vi.mock('@app/features/agents-view/views/AgentSessionListItem', () => ({
 vi.mock('@core/context/user', () => ({ useUserId: () => () => 'test-user' }));
 vi.mock('@core/user', () => ({
   getDisplayName: (id: string) =>
-    id === 'macro|teo@rox.one'
+    id === 'rox|teo@rox.one'
       ? 'Teo'
-      : id === 'macro|eric.hayes@rox.one'
+      : id === 'rox|eric.hayes@rox.one'
         ? 'Eric'
         : 'Peter',
   tryRoxId: (id: string) => id,
@@ -60,14 +60,14 @@ describe('Home channel reply row', () => {
         threadId: 'root',
         channelType: 'private',
         senderDisplayName,
-        threadParentSenderId: 'macro|peter@rox.one',
+        threadParentSenderId: 'rox|peter@rox.one',
       },
     },
   });
 
   const renderThread = (
     initial: UnifiedNotification[] = [],
-    senderId = 'macro|peter@rox.one'
+    senderId = 'rox|peter@rox.one'
   ) => {
     const [notifications, setNotifications] = createSignal(initial);
     const entity: WithNotification<ChannelThreadEntity> = {
@@ -96,27 +96,27 @@ describe('Home channel reply row', () => {
 
   it('updates the sender from a human reply to a bot reply', () => {
     const { row, setNotifications } = renderThread([
-      replyNotification('macro|teo@rox.one'),
+      replyNotification('rox|teo@rox.one'),
     ]);
     expect(row.textContent).toContain('Teo in #bug-reports');
 
     setNotifications([
       replyNotification(null, 'Codex'),
-      replyNotification('macro|teo@rox.one'),
+      replyNotification('rox|teo@rox.one'),
     ]);
     expect(row.textContent).toContain('Codex in #bug-reports');
     expect(row.textContent).not.toContain('Peter');
   });
 
   it.each([
-    { senderId: 'macro|teo@rox.one', displayName: null, label: 'Teo' },
+    { senderId: 'rox|teo@rox.one', displayName: null, label: 'Teo' },
     { senderId: null, displayName: 'Codex', label: 'Codex' },
     { senderId: 'test-user', displayName: null, label: 'You' },
     { senderId: null, displayName: null, label: 'Someone' },
   ])(
     'names the mention sender as $label when a mention follows a reply',
     ({ senderId, displayName, label }) => {
-      const previousReply = replyNotification('macro|peter@rox.one');
+      const previousReply = replyNotification('rox|peter@rox.one');
       const { row, setNotifications } = renderThread([previousReply]);
       expect(row.textContent).toContain('Peter in #bug-reports');
 
@@ -151,7 +151,7 @@ describe('Home channel reply row', () => {
   });
 
   it('keeps the reply sender when the same message also mentions a document', () => {
-    const reply = replyNotification('macro|eric.hayes@rox.one');
+    const reply = replyNotification('rox|eric.hayes@rox.one');
     const { row, setNotifications } = renderThread([reply], 'test-user');
     expect(row.textContent).toContain('Eric in #bug-reports');
 
@@ -169,7 +169,7 @@ describe('Home channel reply row', () => {
           threadId: 'root',
           channelType: 'private',
           documentName: 'Owners',
-          owner: 'macro|teo@rox.one',
+          owner: 'rox|teo@rox.one',
           fileType: 'md',
           subType: null,
           senderDisplayName: null,
@@ -249,7 +249,7 @@ describe('Home document comment row', () => {
     id: 'n1',
     entity_id: 'doc-1',
     entity_type: 'document',
-    sender_id: 'macro|peter@rox.one',
+    sender_id: 'rox|peter@rox.one',
     state,
     created_at: '2026-09-23T00:00:00Z',
     notification_metadata: {
@@ -352,7 +352,7 @@ describe('Home calendar join request row', () => {
     id: 'join-request',
     entity_id: 'event-1',
     entity_type: 'calendar_event',
-    sender_id: 'macro|teo@rox.one',
+    sender_id: 'rox|teo@rox.one',
     state: 'unseen',
     created_at: '2026-10-23T17:21:50Z',
     updated_at: '2026-10-23T17:21:50Z',

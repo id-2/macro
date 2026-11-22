@@ -8,7 +8,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const VIEWER: &str = "macro|viewer@test.com";
+const VIEWER: &str = "rox|viewer@test.com";
 fn id(value: u128) -> Uuid {
     Uuid::from_u128(value)
 }
@@ -221,7 +221,7 @@ async fn activity_preserves_duplicates_without_consent_and_excludes_hidden(pool:
     assert_eq!(team.company_ids, vec![id(102)]);
     assert_eq!(team.contact_ids, [1002, 1005].map(id));
     assert!(
-        repo.resolve_activity(CrmContactListScope::Viewer("macro|stranger@test.com"))
+        repo.resolve_activity(CrmContactListScope::Viewer("rox|stranger@test.com"))
             .await
             .unwrap()
             .company_ids

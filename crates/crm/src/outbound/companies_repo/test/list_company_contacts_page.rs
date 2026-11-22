@@ -76,7 +76,7 @@ async fn hide_contact(pool: &PgPool, id: Uuid) -> anyhow::Result<()> {
 /// neither (they sort last), and hidden contacts among them.
 async fn seed_company(pool: &PgPool) -> anyhow::Result<(Uuid, Uuid, Vec<Uuid>)> {
     let team_id = Uuid::now_v7();
-    seed_team(pool, team_id, "macro|owner@owner.test").await?;
+    seed_team(pool, team_id, "rox|owner@owner.test").await?;
     let company_id = insert_company(pool, team_id, true, &["acme.test"]).await?;
     let mut hidden = Vec::new();
     insert_named(pool, company_id, Some("zoe@acme.test"), Some("Zoe Adams")).await?;
@@ -272,7 +272,7 @@ async fn archived_company_lists_every_contact_as_archived(pool: PgPool) -> anyho
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_company_returns_empty_page(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@owner.test").await?;
+    seed_team(&pool, team_id, "rox|owner@owner.test").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.test"]).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
 
@@ -288,7 +288,7 @@ async fn empty_company_returns_empty_page(pool: PgPool) -> anyhow::Result<()> {
 async fn other_team_and_unknown_company_are_not_found(pool: PgPool) -> anyhow::Result<()> {
     let (team_a, company_a, _) = seed_company(&pool).await?;
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_b, "macro|b@owner.test").await?;
+    seed_team(&pool, team_b, "rox|b@owner.test").await?;
     let repo = CompaniesRepositoryImpl::new(pool);
 
     let result = repo
@@ -399,7 +399,7 @@ async fn page_contacts_equal_the_full_read(pool: PgPool) -> anyhow::Result<()> {
     // so only its team keeps it from counting.
     insert_company(&pool, team_id, true, &["other.test"]).await?;
     let other_team = Uuid::now_v7();
-    seed_team(&pool, other_team, "macro|owner@other.test").await?;
+    seed_team(&pool, other_team, "rox|owner@other.test").await?;
     sqlx::query!(
         r#"INSERT INTO crm_domains (company_id, team_id, domain) VALUES ($1, $2, 'foreign.test')"#,
         company_id,

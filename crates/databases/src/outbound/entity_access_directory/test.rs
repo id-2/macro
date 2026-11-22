@@ -21,7 +21,7 @@ use crate::outbound::pg_databases_repo::PgDatabasesRepo;
 /// A user id no other test in this process shares, so the source-id cache
 /// cannot carry one test's answer into another's database.
 fn unique_user() -> RoxUserIdStr<'static> {
-    let id = format!("macro|databases-dir-{}@rox.one", Uuid::new_v4());
+    let id = format!("rox|databases-dir-{}@rox.one", Uuid::new_v4());
     RoxUserIdStr::parse_from_str(&id)
         .expect("valid user id")
         .into_owned()

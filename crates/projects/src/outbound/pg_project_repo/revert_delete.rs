@@ -196,7 +196,7 @@ mod tests {
             "project-team".to_string(),
         ];
         let owner_ids = [
-            "macro|owner@example.com".to_string(),
+            "rox|owner@example.com".to_string(),
             "bot|00000000-0000-0000-0000-00000000a1a1".to_string(),
             "01234567-89ab-cdef-0123-456789abcdef".to_string(),
         ];
@@ -207,7 +207,7 @@ mod tests {
         assert_eq!(history_item_ids, vec!["project-user".to_string()]);
         assert_eq!(
             history_owner_ids,
-            vec!["macro|owner@example.com".to_string()]
+            vec!["rox|owner@example.com".to_string()]
         );
     }
 
@@ -216,7 +216,7 @@ mod tests {
         let item_ids = ["project-one".to_string(), "project-two".to_string()];
         let owner_ids = [
             "not-a-macro-user".to_string(),
-            "macro|owner@example.com".to_string(),
+            "rox|owner@example.com".to_string(),
         ];
 
         let error = user_history_pairs(&item_ids, &owner_ids)

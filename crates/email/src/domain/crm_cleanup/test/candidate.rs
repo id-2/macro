@@ -18,7 +18,7 @@ async fn a_duplicate_claim_still_checks_and_removes_the_stored_links_contributio
         [
             Call::Claim(LINK, EMAIL.into()),
             Call::Link(LINK),
-            Call::Team("macro|owner@example.com".into()),
+            Call::Team("rox|owner@example.com".into()),
             Call::Target(TEAM, EMAIL.into()),
             Call::Messages(stored, EMAIL.into()),
             Call::Depopulate(TEAM, stored, EMAIL.into())
@@ -46,7 +46,7 @@ async fn each_candidate_guard_stops_at_its_own_boundary() {
         let all = [
             Call::Claim(LINK, EMAIL.into()),
             Call::Link(LINK),
-            Call::Team("macro|owner@example.com".into()),
+            Call::Team("rox|owner@example.com".into()),
             Call::Target(TEAM, EMAIL.into()),
             Call::Messages(LINK, EMAIL.into()),
         ];

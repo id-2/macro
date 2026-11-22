@@ -21,7 +21,7 @@ describe('agent session entity mapping', () => {
       data: {
         id: 'session',
         name: 'Fix mentions',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         botId: 'bot',
         harness: 'cursor',
         repoUrl: 'https://github.com/rox/rox',

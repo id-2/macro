@@ -24,7 +24,7 @@ struct State {
 fn harness(stage: Option<DraftStage>) -> Harness {
     let message = Uuid::now_v7();
     let link = Uuid::now_v7();
-    let input:ResolvedDraftInput = serde_json::from_value(serde_json::json!({"db_id":message,"thread_db_id":Uuid::now_v7(),"subject":"Saved locally","to":[],"cc":[],"bcc":[],"actor_id":"macro|owner@example.com"})).unwrap();
+    let input:ResolvedDraftInput = serde_json::from_value(serde_json::json!({"db_id":message,"thread_db_id":Uuid::now_v7(),"subject":"Saved locally","to":[],"cc":[],"bcc":[],"actor_id":"rox|owner@example.com"})).unwrap();
     let prepared = PreparedDraft {
         reply_to: None,
         request: SendRequest {
@@ -54,7 +54,7 @@ fn harness(stage: Option<DraftStage>) -> Harness {
     };
     let checkpoint = stage.map(|stage| DraftCheckpoint {
         revision: 1,
-        actor_id: "macro|owner@example.com".into(),
+        actor_id: "rox|owner@example.com".into(),
         prepared: prepared.clone(),
         stage,
         stage_started_at: Utc::now(),
@@ -74,7 +74,7 @@ fn harness(stage: Option<DraftStage>) -> Harness {
                 grant_generation: 1,
             },
             revision: 1,
-            actor_id: "macro|owner@example.com".into(),
+            actor_id: "rox|owner@example.com".into(),
             input,
             attachments: Default::default(),
             provider_id: stage.map(|_| remote.id.clone()),

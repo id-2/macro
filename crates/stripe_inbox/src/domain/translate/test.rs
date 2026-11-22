@@ -184,7 +184,7 @@ fn a_team_subscription_carries_its_team_owner_and_computers() {
             .owner_id
             .as_ref()
             .map(|owner| owner.as_ref().to_owned()),
-        Some("macro|owner@example.com".to_owned())
+        Some("rox|owner@example.com".to_owned())
     );
     // `has_more` means a snapshot left items out.
     assert!(!subscription.items_complete);
@@ -323,7 +323,7 @@ fn a_checkout_session_translates_its_payment_and_metadata() {
     assert_eq!(checkout.amount_total, Some(2500));
     assert_eq!(
         checkout.metadata.get("rox_user_id").map(String::as_str),
-        Some("macro|buyer@example.com")
+        Some("rox|buyer@example.com")
     );
 }
 

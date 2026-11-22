@@ -44,7 +44,7 @@ it.each(['query', 'policy'] as const)(
         query: request.query,
         users: [
           {
-            id: 'macro|person@example.com',
+            id: 'rox|person@example.com',
             email: 'person@example.com',
             name: request.cursor ? 'page two' : 'page one',
           },
@@ -61,7 +61,7 @@ it.each(['query', 'policy'] as const)(
     );
     function Harness() {
       const directory = createContactDirectoryWindow(
-        () => ({ userId: 'macro|viewer@example.com' }),
+        () => ({ userId: 'rox|viewer@example.com' }),
         reader,
         () => true,
         {
@@ -89,7 +89,7 @@ it.each(['query', 'policy'] as const)(
     expect(window!.data()?.users[0].name).toBe('page two');
     committed = Promise.withResolvers<void>();
     if (change === 'query') setTerm('beta');
-    else setExcluded(['macro|viewer@example.com']);
+    else setExcluded(['rox|viewer@example.com']);
     await vi.advanceTimersByTimeAsync(200);
     await committed.promise;
     expect(window!.data()?.users[0].name).toBe('page one');
@@ -123,7 +123,7 @@ it('recovers an initially unavailable offline picker after context publication',
           people: [
             {
               recordKey: 'GraphqlContact:test',
-              userId: 'macro|person@example.com',
+              userId: 'rox|person@example.com',
               email: 'person@example.com',
               name: 'Person',
               matchRank: 0,
@@ -141,7 +141,7 @@ it('recovers an initially unavailable offline picker after context publication',
       '00000000-0000-4000-8000-000000000001',
     readQuery: async () => ({
       kind: 'hit',
-      data: { user: { id: 'macro|viewer@example.com' } },
+      data: { user: { id: 'rox|viewer@example.com' } },
     }),
     onCacheChanged: (callback) => {
       changed = callback;
@@ -159,7 +159,7 @@ it('recovers an initially unavailable offline picker after context publication',
   let window: ReturnType<typeof createContactDirectoryWindow> | undefined;
   function Harness() {
     window = createContactDirectoryWindow(
-      () => ({ userId: 'macro|viewer@example.com', host }),
+      () => ({ userId: 'rox|viewer@example.com', host }),
       undefined,
       () => true,
       { policy: () => ({ mode: 'command', excluded: [] }) }

@@ -16,10 +16,10 @@ test('real cached command windows apply inbox exclusions and DM dedup before lim
   await expect(page.getByTestId('command-source')).toHaveText('cache');
   await expect(page.getByTestId('command-dm-count')).toHaveText('1');
   await expect(page.getByTestId('command-ids')).not.toContainText(
-    'macro|person3@example.com'
+    'rox|person3@example.com'
   );
   await expect(page.getByTestId('command-ids')).not.toContainText(
-    'macro|not-member@example.com'
+    'rox|not-member@example.com'
   );
   const first = await page.getByTestId('command-ids').textContent();
   await page
@@ -45,7 +45,7 @@ test('real cached recipients preserve custom selections and react to published D
   await expect(page.getByRole('option').first()).toContainText('Person 4');
   await input.press('Enter');
   await expect(page.getByTestId('policy-selections')).toHaveText(
-    '["macro|outside@example.com","macro|person4@example.com"]'
+    '["rox|outside@example.com","rox|person4@example.com"]'
   );
   await page
     .getByRole('button', { name: 'Update recency', exact: true })
@@ -57,6 +57,6 @@ test('real cached recipients preserve custom selections and react to published D
   ).toHaveCount(0);
   await input.press('Enter');
   await expect(page.getByTestId('policy-selections')).toHaveText(
-    '["macro|outside@example.com","macro|person4@example.com","macro|person50@example.com"]'
+    '["rox|outside@example.com","rox|person4@example.com","rox|person50@example.com"]'
   );
 });

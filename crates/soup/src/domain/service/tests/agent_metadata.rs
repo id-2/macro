@@ -24,7 +24,7 @@ fn agent(id: AgentSessionId, pull_request: Option<&str>) -> SoupCandidate {
         name: "Agent".to_owned(),
         archived_by: None,
         archived_at: None,
-        owner_id: Owner::User(RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()),
+        owner_id: Owner::User(RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap()),
         bot_id: Uuid::now_v7(),
         harness: "roxd".to_owned(),
         repo_url: Some("https://github.com/macro/macro".to_owned()),
@@ -60,7 +60,7 @@ fn pull_request(id: &str, user: &str, status: &str) -> ForeignEntity {
 
 #[tokio::test]
 async fn metadata_is_batched_and_only_uses_visible_prs_and_captured_branches() {
-    let user = "macro|owner@example.com";
+    let user = "rox|owner@example.com";
     let first = AgentSessionId::new();
     let second = AgentSessionId::new();
     let third = AgentSessionId::new();
@@ -76,7 +76,7 @@ async fn metadata_is_batched_and_only_uses_visible_prs_and_captured_branches() {
     };
     let foreign = RecordingPullRequestListing::new(vec![
         pull_request("1", user, "merged"),
-        pull_request("2", "macro|someone-else@example.com", "closed"),
+        pull_request("2", "rox|someone-else@example.com", "closed"),
         pull_request("3", user, "unknown"),
     ]);
     let mut items = vec![
@@ -139,8 +139,8 @@ async fn no_pr_links_skip_foreign_entity_lookup() {
     super::super::agent_metadata::enrich(
         &foreign,
         Some(&branches),
-        "macro|owner@example.com".to_owned(),
-        vec![SourceId::user("macro|owner@example.com")],
+        "rox|owner@example.com".to_owned(),
+        vec![SourceId::user("rox|owner@example.com")],
         &mut items,
     )
     .await
@@ -172,8 +172,8 @@ async fn runtime_branch_without_pr_survives_enrichment_and_takes_precedence() {
     super::super::agent_metadata::enrich(
         &foreign,
         Some(&branches),
-        "macro|owner@example.com".to_owned(),
-        vec![SourceId::user("macro|owner@example.com")],
+        "rox|owner@example.com".to_owned(),
+        vec![SourceId::user("rox|owner@example.com")],
         &mut items,
     )
     .await
@@ -211,8 +211,8 @@ async fn changed_or_missing_repository_does_not_restore_an_old_captured_branch()
         super::super::agent_metadata::enrich(
             &foreign,
             Some(&branches),
-            "macro|owner@example.com".to_owned(),
-            vec![SourceId::user("macro|owner@example.com")],
+            "rox|owner@example.com".to_owned(),
+            vec![SourceId::user("rox|owner@example.com")],
             &mut items,
         )
         .await

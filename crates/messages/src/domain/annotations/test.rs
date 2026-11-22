@@ -17,13 +17,13 @@ fn access(user: &str, document: &str, level: AccessLevel) -> EntityAccessReceipt
 
 #[test]
 fn annotation_owner_cannot_delete_someone_elses_discussion() {
-    let user = "macro|author@example.com";
+    let user = "rox|author@example.com";
     let target = AnnotationTarget {
         id: Uuid::from_u128(1),
         document_id: "legacy-document".into(),
         owner: user.into(),
         thread_id: Some(Uuid::from_u128(2)),
-        thread_owner: Some("macro|other@example.com".into()),
+        thread_owner: Some("rox|other@example.com".into()),
     };
     assert!(matches!(
         authorize(

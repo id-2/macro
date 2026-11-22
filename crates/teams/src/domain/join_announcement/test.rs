@@ -208,10 +208,10 @@ async fn a_claimed_colleague_gets_one_email_from_the_joiner() {
         request["req"]["secondary_notification_entity"],
         serde_json::Value::Null
     );
-    assert_eq!(request["req"]["sender_id"], "macro|alice@acme.com");
+    assert_eq!(request["req"]["sender_id"], "rox|alice@acme.com");
     assert_eq!(
         request["req"]["recipient_ids"],
-        json!(["macro|bob@acme.com"])
+        json!(["rox|bob@acme.com"])
     );
     assert_eq!(
         request["req"]["notification"],
@@ -219,7 +219,7 @@ async fn a_claimed_colleague_gets_one_email_from_the_joiner() {
             "tag": "colleague_joined_macro",
             "content": {
                 "team_name": "Acme",
-                "joined_by": "macro|alice@acme.com",
+                "joined_by": "rox|alice@acme.com",
                 "joined_name": "Alice Example",
                 "recipient_email": "bob@acme.com",
             },
@@ -237,7 +237,7 @@ async fn a_claimed_colleague_gets_one_email_from_the_joiner() {
 async fn a_failed_enqueue_releases_only_that_claim() {
     let service = JoinAnnouncementServiceImpl::new(
         FakeRepository::eligible(&["bob@acme.com", "carol@acme.com"]),
-        FakeIngress::failing_for("macro|bob@acme.com"),
+        FakeIngress::failing_for("rox|bob@acme.com"),
     );
 
     let report = service

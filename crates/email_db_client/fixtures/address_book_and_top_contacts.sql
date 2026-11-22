@@ -3,7 +3,7 @@
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('ab000000-0000-0000-0000-000000000001', 'macro|owner@acme.com', 'fa-owner', 'owner@acme.com', 'GMAIL', true, NOW(), NOW());
+    ('ab000000-0000-0000-0000-000000000001', 'rox|owner@acme.com', 'fa-owner', 'owner@acme.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)
 VALUES

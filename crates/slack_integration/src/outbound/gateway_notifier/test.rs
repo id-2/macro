@@ -87,7 +87,7 @@ async fn gateway_uses_requester_entity_and_json_object_for_string_framing() {
         "test".into(),
         endpoint,
     )));
-    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let requester = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
     notifier
         .invalidate(&requester, team(), job(), 9, JobStatus::Processing)
         .await
@@ -100,7 +100,7 @@ async fn gateway_uses_requester_entity_and_json_object_for_string_framing() {
         .unwrap();
     let request = requests.recv_timeout(Duration::from_secs(2)).unwrap();
     let (headers, body) = request.split_once("\r\n\r\n").unwrap();
-    assert!(headers.starts_with("POST /message/send/user/macro|admin@example.com HTTP/1.1"));
+    assert!(headers.starts_with("POST /message/send/user/rox|admin@example.com HTTP/1.1"));
     let body: SendMessageBody = serde_json::from_str(body).unwrap();
     assert_eq!(body.message_type, "slack_import_updated");
     assert_eq!(
@@ -127,7 +127,7 @@ async fn gateway_failure_is_retryable_and_attempts_are_throttled() {
         "test".into(),
         endpoint,
     )));
-    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let requester = RoxUserIdStr::parse_from_str("rox|admin@example.com").unwrap();
     assert_eq!(
         notifier
             .invalidate(&requester, team(), job(), 1, JobStatus::Uploading)

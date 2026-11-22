@@ -42,9 +42,9 @@ fn rox_user_id(value: &str) -> RoxUserIdStr<'static> {
 async fn contacts_ingress_enqueuer_maps_pairs() {
     let ingress = Arc::new(FakeContactsIngress::default());
     let enqueuer = ContactsIngressEnqueuer::new(ingress.clone()).clone();
-    let first = rox_user_id("macro|first@example.com");
-    let second = rox_user_id("macro|second@example.com");
-    let third = rox_user_id("macro|third@example.com");
+    let first = rox_user_id("rox|first@example.com");
+    let second = rox_user_id("rox|second@example.com");
+    let third = rox_user_id("rox|third@example.com");
 
     enqueuer
         .enqueue_contact_connections(vec![

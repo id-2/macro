@@ -4,11 +4,11 @@ use super::*;
 use crate::outbound::pg_access_repo::queries::get_entity_users;
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-const OWNER: &str = "macro|owner@corp.test";
-const TEAM_MEMBER: &str = "macro|member@corp.test";
-const PARTICIPANT: &str = "macro|participant@corp.test";
-const DEPARTED: &str = "macro|departed@corp.test";
-const GUEST: &str = "macro|guest@corp.test";
+const OWNER: &str = "rox|owner@corp.test";
+const TEAM_MEMBER: &str = "rox|member@corp.test";
+const PARTICIPANT: &str = "rox|participant@corp.test";
+const DEPARTED: &str = "rox|departed@corp.test";
+const GUEST: &str = "rox|guest@corp.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let rox_uuid = Uuid::now_v7();
@@ -170,8 +170,8 @@ async fn grouped_audiences_match_each_entitys_own_users(pool: PgPool) {
     );
 }
 
-const FOLDER_GUEST: &str = "macro|folder-guest@corp.test";
-const MAILBOX_OWNER: &str = "macro|mailbox@corp.test";
+const FOLDER_GUEST: &str = "rox|folder-guest@corp.test";
+const MAILBOX_OWNER: &str = "rox|mailbox@corp.test";
 
 /// For every kind the grouped lookup serves, entities that are owner-only,
 /// inherited from a shared folder, team-shared, channel-shared, shared separately

@@ -6,7 +6,7 @@ use models_permissions::share_permission::{
 };
 use std::sync::{Arc, Mutex};
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 type SavedUpdate = (
     UpdateSharePermissionRequestV2,
     Option<AuthorizedTeamShareCommand>,
@@ -199,7 +199,7 @@ async fn team_sharing_requires_actual_owner_and_preserves_omission() {
     assert!(matches!(
         service
             .update_permissions(
-                &owner_access(repo.id, "macro|other@example.com"),
+                &owner_access(repo.id, "rox|other@example.com"),
                 change.clone()
             )
             .await,
@@ -252,7 +252,7 @@ async fn effective_owner_access_does_not_substitute_for_the_session_owner() {
         ..request()
     };
     for access in [
-        owner_access(repo.id, "macro|other@example.com"),
+        owner_access(repo.id, "rox|other@example.com"),
         EntityAccessReceipt::dangerously_assert_internal_user(
             &repo.id.to_string(),
             EntityType::AgentSession,

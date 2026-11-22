@@ -57,7 +57,7 @@ impl BookingLinks for Scheduling {
 }
 fn args() -> Value {
     json!({"teamId": null, "draft": {
-        "event": {"title":"Intro", "slug":"intro", "description":"", "durationMinutes":30, "location":"Office", "googleMeet":false, "enabled":true, "mode":"individual", "hosts":["macro|owner@rox.one"], "beforeMinutes":0, "afterMinutes":0, "noticeMinutes":60, "horizonDays":30, "intervalMinutes":30, "dailyLimit":null, "requiresConfirmation":false, "questions":[]},
+        "event": {"title":"Intro", "slug":"intro", "description":"", "durationMinutes":30, "location":"Office", "googleMeet":false, "enabled":true, "mode":"individual", "hosts":["rox|owner@rox.one"], "beforeMinutes":0, "afterMinutes":0, "noticeMinutes":60, "horizonDays":30, "intervalMinutes":30, "dailyLimit":null, "requiresConfirmation":false, "questions":[]},
         "schedule":{"name":"Working hours", "timeZone":"UTC", "weekly":(0..7).map(|day| json!({"day":day, "windows":[{"start":"09:00", "end":"17:00"}]})).collect::<Vec<_>>(), "overrides":[]}
     }})
 }
@@ -85,7 +85,7 @@ async fn mutations_require_confirmation_and_execute_without_elicitation() {
                 .try_tool_call(
                     context.clone(),
                     RequestContext::new(
-                        serde_json::from_value(json!("macro|owner@rox.one")).unwrap(),
+                        serde_json::from_value(json!("rox|owner@rox.one")).unwrap(),
                     ),
                     tool,
                     &args,
@@ -102,7 +102,7 @@ async fn mutations_require_confirmation_and_execute_without_elicitation() {
             .try_tool_call(
                 context,
                 RequestContext::new(
-                    serde_json::from_value(json!("macro|owner@rox.one")).unwrap(),
+                    serde_json::from_value(json!("rox|owner@rox.one")).unwrap(),
                 ),
                 tool,
                 &args,
@@ -121,7 +121,7 @@ async fn mutations_require_confirmation_and_execute_without_elicitation() {
         );
         let writes = service.writes.lock().unwrap();
         assert_eq!(writes.len(), 1);
-        assert_eq!(writes[0].1, "macro|owner@rox.one");
+        assert_eq!(writes[0].1, "rox|owner@rox.one");
         assert_eq!(writes[0].2, None);
         assert_eq!(serde_json::to_value(&writes[0].3).unwrap(), args["draft"]);
     }

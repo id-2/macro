@@ -101,7 +101,7 @@ async fn cancelled_tool_does_not_start_worker() {
     assert!(worker.edit_calls.lock().unwrap().is_empty());
 }
 
-const TEST_USER_ID: &str = "macro|editor@example.com";
+const TEST_USER_ID: &str = "rox|editor@example.com";
 const TEST_DOCUMENT_ID: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
 
 fn document_with_file_type(file_type: Option<&str>) -> DocumentBasic {

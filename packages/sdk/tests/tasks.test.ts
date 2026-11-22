@@ -164,7 +164,7 @@ describe('Task.create', () => {
       initiative: macro.initiatives.byId(
         '01a1793c-85f8-7961-885a-1718b0f00de5',
       ),
-      assignees: [macro.users.byId('macro|someone@example.test')],
+      assignees: [macro.users.byId('rox|someone@example.test')],
       dueDate: new Date('2026-10-29T04:00:00.000Z'),
     });
 
@@ -190,7 +190,7 @@ describe('Task.create', () => {
           value: {
             type: 'multi_entity_reference',
             references: [
-              { entity_id: 'macro|someone@example.test', entity_type: 'USER' },
+              { entity_id: 'rox|someone@example.test', entity_type: 'USER' },
             ],
           },
         },
@@ -219,7 +219,7 @@ describe('Task.create', () => {
         input instanceof Request ? input : new Request(input, init);
       requests.push(request.clone());
       if (new URL(request.url).pathname === '/user/me') {
-        return Response.json({ user_id: 'macro|creator@example.test' });
+        return Response.json({ user_id: 'rox|creator@example.test' });
       }
       return Response.json({
         documentId: '0198a4cc-e138-7670-a308-a6b766602721',
@@ -257,7 +257,7 @@ describe('Task.create', () => {
         value: {
           type: 'multi_entity_reference',
           references: [
-            { entity_id: 'macro|creator@example.test', entity_type: 'USER' },
+            { entity_id: 'rox|creator@example.test', entity_type: 'USER' },
           ],
         },
       },
@@ -309,7 +309,7 @@ describe('Task.summaries', () => {
             type: 'access',
             document_id: '0198a4cc-e138-7670-a308-a6b766602731',
             document_name: 'Second task',
-            owner: 'macro|owner@example.test',
+            owner: 'rox|owner@example.test',
             updated_at: '2026-10-27T10:00:00Z',
             sub_type: { type: 'task', is_completed: true },
           },
@@ -321,7 +321,7 @@ describe('Task.summaries', () => {
             type: 'access',
             document_id: '0198a4cc-e138-7670-a308-a6b766602730',
             document_name: 'First task',
-            owner: 'macro|owner@example.test',
+            owner: 'rox|owner@example.test',
             updated_at: null,
             sub_type: { type: 'task', is_completed: false },
           },
@@ -351,14 +351,14 @@ describe('Task.summaries', () => {
       {
         id: '0198a4cc-e138-7670-a308-a6b766602730',
         name: 'First task',
-        owner: 'macro|owner@example.test',
+        owner: 'rox|owner@example.test',
         updatedAt: undefined,
         completed: false,
       },
       {
         id: '0198a4cc-e138-7670-a308-a6b766602731',
         name: 'Second task',
-        owner: 'macro|owner@example.test',
+        owner: 'rox|owner@example.test',
         updatedAt: '2026-10-27T10:00:00Z',
         completed: true,
       },

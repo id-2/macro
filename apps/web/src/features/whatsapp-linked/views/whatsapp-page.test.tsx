@@ -110,7 +110,7 @@ const chats = [
     inMacro: {
       kind: 'shared' as const,
       chatId: 'group-family',
-      ownerId: 'macro|ana@example.test',
+      ownerId: 'rox|ana@example.test',
       ownerName: 'Ana Silva',
     },
     canAdd: false,

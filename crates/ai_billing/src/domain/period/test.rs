@@ -49,7 +49,7 @@ impl PeriodRepo for Observations {
 
 #[tokio::test]
 async fn unresolved_bindings_are_quarantined_without_inventing_seats() {
-    let payer = RoxUserIdStr::try_from("macro|payer@example.com".to_owned()).unwrap();
+    let payer = RoxUserIdStr::try_from("rox|payer@example.com".to_owned()).unwrap();
     for bindings in [None, Some(vec![])] {
         let repo = Observations::default();
         let service = PeriodService::new(Bindings(bindings), repo.clone(), rollout()).unwrap();
@@ -59,7 +59,7 @@ async fn unresolved_bindings_are_quarantined_without_inventing_seats() {
         assert!(!observations[0].1);
         assert_eq!(observations[0].0.payer, payer);
     }
-    let seat = RoxUserIdStr::try_from("macro|seat@example.com".to_owned()).unwrap();
+    let seat = RoxUserIdStr::try_from("rox|seat@example.com".to_owned()).unwrap();
     let repo = Observations::default();
     let service =
         PeriodService::new(Bindings(Some(vec![seat.clone()])), repo.clone(), rollout()).unwrap();

@@ -61,8 +61,8 @@ mod tests {
             &pool,
             "0193b1ea-a542-7589-893b-2b4a509c1e76".parse().unwrap(),
             &vec![
-                "macro|user2@user.com".to_string(),
-                "macro|user3@user.com".to_string(),
+                "rox|user2@user.com".to_string(),
+                "rox|user3@user.com".to_string(),
             ],
         )
         .await?;

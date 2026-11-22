@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use uuid::Uuid;
 
-const ACTOR: &str = "macro|owner@example.com";
+const ACTOR: &str = "rox|owner@example.com";
 
 struct Mailboxes(Result<Vec<RecentInboxMailbox>, MailboxError>);
 

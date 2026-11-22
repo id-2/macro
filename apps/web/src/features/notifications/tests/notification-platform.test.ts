@@ -334,7 +334,7 @@ it('uses the project discussion bot display name for platform notifications', as
       tag: 'initiative_discussion',
       content: {
         projectName: 'Launch',
-        owner: 'macro|owner@example.com',
+        owner: 'rox|owner@example.com',
         reason: 'mention',
         messageId: '01992d2f-8444-7000-8000-000000000001',
         threadId: '01992d2f-8444-7000-8000-000000000001',
@@ -360,14 +360,14 @@ describe('platform notification sender and conversation', () => {
   ): UnifiedNotification {
     return baseNotification({
       entity_id: 'channel-1',
-      sender_id: 'macro|ada@example.com',
+      sender_id: 'rox|ada@example.com',
       notification_event_type: 'channel_message_send',
       notification_metadata: {
         tag: 'channel_message_send',
         content: {
           messageId: 'message-1',
           messageContent: 'Ship it',
-          sender: 'macro|ada@example.com',
+          sender: 'rox|ada@example.com',
           channelType,
           senderProfilePictureUrl,
         },
@@ -389,14 +389,14 @@ describe('platform notification sender and conversation', () => {
     expect(result).toMatchObject({
       title: 'Ada <design>',
       sender: {
-        id: 'macro|ada@example.com',
+        id: 'rox|ada@example.com',
         name: 'Ada',
         avatarUrl: 'https://cdn.example.com/ada.png',
       },
       conversation: { id: 'channel-1', name: 'design' },
     });
     expect(resolveUserAvatar).toHaveBeenCalledExactlyOnceWith(
-      'macro|ada@example.com'
+      'rox|ada@example.com'
     );
   });
 

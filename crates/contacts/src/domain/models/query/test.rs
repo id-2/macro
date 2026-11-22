@@ -51,7 +51,7 @@ fn reference_predicates_match_before_limiting_without_inventing_local_part_names
     assert!(!ContactSearch::any_name("Sm").unwrap().matches(&contact));
     assert!(ContactSearch::new("Sm").unwrap().matches(&contact));
     assert!(
-        ContactSearch::exact("macro|person@example.com")
+        ContactSearch::exact("rox|person@example.com")
             .unwrap()
             .matches(&contact)
     );

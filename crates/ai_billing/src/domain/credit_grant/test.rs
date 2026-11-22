@@ -45,8 +45,8 @@ impl CreditGrantRepo for RecordingRepo {
 
 #[tokio::test]
 async fn team_member_grant_lands_on_team_owner_once() {
-    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
-    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("rox|member@example.com".to_string()).unwrap();
     let team_id = Uuid::parse_str("01a15302-4b49-7df3-8b84-40b43624d747").unwrap();
     let service = CreditGrantService::new(
         OneEntitlement(Entitlement {
@@ -80,7 +80,7 @@ async fn team_member_grant_lands_on_team_owner_once() {
     assert_eq!(
         *service.repo.booked.lock().unwrap(),
         vec![(
-            "macro|owner@example.com".to_string(),
+            "rox|owner@example.com".to_string(),
             Uuid::parse_str("019a0f6e-0000-7000-8000-000000000001").unwrap(),
             1500,
         )]
@@ -89,7 +89,7 @@ async fn team_member_grant_lands_on_team_owner_once() {
 
 #[tokio::test]
 async fn free_user_grant_is_refused() {
-    let user = RoxUserIdStr::try_from("macro|free@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("rox|free@example.com".to_string()).unwrap();
     let service = CreditGrantService::new(
         OneEntitlement(Entitlement::personal(user.clone(), PlanTier::Free)),
         RecordingRepo::default(),

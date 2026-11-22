@@ -9,7 +9,7 @@ async fn insert_link(pool: &Pool<Postgres>, link_id: Uuid) {
         r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
-        "macro|conflict@corp.test",
+        "rox|conflict@corp.test",
         "conflict@corp.test",
     )
     .execute(pool)

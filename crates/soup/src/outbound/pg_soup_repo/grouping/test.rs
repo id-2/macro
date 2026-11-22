@@ -108,7 +108,7 @@ async fn property_grouping_uses_canonical_task_entity_type(
     .execute(&pool)
     .await?;
 
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
@@ -148,7 +148,7 @@ async fn property_grouping_uses_canonical_task_entity_type(
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_by_entity_type(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     let grouping = GroupingConfig {
         field: GroupByField::EntityType,
         group_key: None,
@@ -201,7 +201,7 @@ async fn test_grouped_by_entity_type(pool: Pool<Postgres>) -> anyhow::Result<()>
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_by_project(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     let grouping = GroupingConfig {
         field: GroupByField::Project,
         group_key: None,
@@ -244,7 +244,7 @@ async fn test_grouped_by_project(pool: Pool<Postgres>) -> anyhow::Result<()> {
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_single_group_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
 
     // First, get all items grouped by entity type
     let all_items = expanded_dynamic_cursor_soup_grouped(
@@ -315,7 +315,7 @@ async fn test_grouped_single_group_filter(pool: Pool<Postgres>) -> anyhow::Resul
 async fn tagged_calendar_event_participates_in_grouped_property_soup(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const OWNER_ID: &str = "macro|user-1@test.com";
+    const OWNER_ID: &str = "rox|user-1@test.com";
     const EVENT_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000001");
     const LINK_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000002");
     const STATUS_PROPERTY_ID: uuid::Uuid = uuid::uuid!("00000001-0000-0000-0000-000000000002");
@@ -411,7 +411,7 @@ async fn tagged_calendar_event_participates_in_grouped_property_soup(
 async fn grouped_recency_sort_uses_reminder_delivery_time(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const OWNER_ID: &str = "macro|calendar-fired-grouped@example.com";
+    const OWNER_ID: &str = "rox|calendar-fired-grouped@example.com";
     let link_id = uuid::Uuid::now_v7();
     let reminded_id = uuid::Uuid::now_v7();
     let edited_id = uuid::Uuid::now_v7();
@@ -506,7 +506,7 @@ async fn grouped_recency_sort_uses_reminder_delivery_time(
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_chat_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     // Importance(false) never matches a chat, so the chat arm is omitted and
     // Combined unions document ∪ project ∪ calendar_event.
     let filter = EntityFilterAst {
@@ -551,7 +551,7 @@ async fn grouped_soup_runs_when_chat_arm_excluded(pool: Pool<Postgres>) -> anyho
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_document_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     // A nil document id filter is impossible, so the document arm is omitted.
     let filter = EntityFilterAst {
         document_filter: Some(Arc::new(Expr::val(DocumentLiteral::Id(uuid::Uuid::nil())))),
@@ -596,7 +596,7 @@ async fn grouped_soup_runs_when_document_arm_excluded(pool: Pool<Postgres>) -> a
     migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_calendar_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|user-1@test.com").unwrap();
     let filter = EntityFilterAst {
         calendar_event_filter: Some(Arc::new(Expr::val(CalendarEventLiteral::Id(
             uuid::Uuid::nil(),
@@ -644,7 +644,7 @@ async fn grouped_soup_runs_when_calendar_arm_excluded(pool: Pool<Postgres>) -> a
 async fn grouped_soup_renders_bind_bearing_calendar_literals(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const OWNER_ID: &str = "macro|user-1@test.com";
+    const OWNER_ID: &str = "rox|user-1@test.com";
     const LINK_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000030");
     const EVENT_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000031");
 
@@ -745,7 +745,7 @@ async fn grouped_soup_renders_bind_bearing_calendar_literals(
 async fn grouped_soup_filters_calendar_events_by_notification_done(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const OWNER_ID: &str = "macro|user-1@test.com";
+    const OWNER_ID: &str = "rox|user-1@test.com";
     const LINK_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000010");
     const ALERTED_EVENT_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000011");
     const DONE_EVENT_ID: uuid::Uuid = uuid::uuid!("ca1e0000-0000-0000-0000-000000000012");

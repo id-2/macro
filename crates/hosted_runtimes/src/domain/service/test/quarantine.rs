@@ -17,7 +17,7 @@ async fn quarantine_is_visible_only_to_its_team_and_refuses_lifecycle_commands()
             billing: PurchaseBilling::Stripe,
             purchase_key: key("buy-dialog-1"),
             team_id: TEAM,
-            created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
             size: ComputerSize::Standard,
             name: Some("Unavailable computer".to_owned()),
             extra_items: vec![],

@@ -24,7 +24,7 @@ async fn document_sub_types_resolve_mixed_batch(pool: Pool<Postgres>) -> anyhow:
         sqlx::query!(
             r#"
             INSERT INTO "Document" (id, name, owner)
-            VALUES ($1, $2, 'macro|user1@test.com')
+            VALUES ($1, $2, 'rox|user1@test.com')
             "#,
             id.to_string(),
             name,

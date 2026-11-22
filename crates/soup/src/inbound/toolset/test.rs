@@ -72,7 +72,7 @@ fn test_rox_task_completed_assigned_to_me_filter_deserializes() {
                     "l": {
                         "pd": "00000001-0000-0000-0000-000000000001",
                         "et": "TASK",
-                        "v": { "er": "macro|eric@example.com" }
+                        "v": { "er": "rox|eric@example.com" }
                     }
                 }
             ]
@@ -441,7 +441,7 @@ fn test_from_soup_item_resolves_tags_via_caller_map() {
         appearance: None,
         id: Uuid::new_v4(),
         document_version_id: 1,
-        owner_id: Owner::try_from("macro|user1@test.com".to_string()).unwrap(),
+        owner_id: Owner::try_from("rox|user1@test.com".to_string()).unwrap(),
         name: "tagged.md".to_string(),
         file_type: None,
         sha: None,

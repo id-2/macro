@@ -48,7 +48,7 @@ impl NameSearch {
         let input = input.trim();
         if input
             .get(..6)
-            .is_some_and(|prefix| prefix.eq_ignore_ascii_case("macro|"))
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case("rox|"))
         {
             return RoxUserIdStr::parse_from_str(input)
                 .map(|id| Self::Identity(id.into_owned()))

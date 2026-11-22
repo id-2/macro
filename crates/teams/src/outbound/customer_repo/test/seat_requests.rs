@@ -254,7 +254,7 @@ async fn a_seat_change_with_scheduled_downgrades_sends_mains_schedule_update(poo
     let mut sched = schedule();
     let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
-    let members = json!({"macro|one@example.com": "premium"});
+    let members = json!({"rox|one@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
     sched
         .metadata

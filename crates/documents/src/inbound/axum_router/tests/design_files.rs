@@ -41,7 +41,7 @@ fn file_router(file_type: FileType, bytes: &[u8]) -> (Router, FakeEntityAccessSe
     *documents.file_type.lock().unwrap() = Some(file_type);
     // Someone else's document, so the caller's access is checked.
     *documents.document_owner.lock().unwrap() =
-        Some(Owner::from_principal_str("macro|file-owner@example.com").unwrap());
+        Some(Owner::from_principal_str("rox|file-owner@example.com").unwrap());
     let file = Arc::new(StoredFile(bytes.to_vec()));
     state.designs = Arc::new(DesignService::new(file.clone()));
     state.photoshop_documents = Arc::new(PhotoshopService::new(file.clone()));

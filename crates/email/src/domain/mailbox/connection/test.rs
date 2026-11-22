@@ -81,8 +81,8 @@ async fn unowned_incomplete_and_non_gmail_attempts_are_rejected_before_account_l
 #[tokio::test]
 async fn delegation_commits_before_grant_and_never_starts_a_second_backfill() {
     let (service, fake) = service(Data {
-        owner: Some("macro|child@example.com".into()),
-        by_email: Some(link("macro|child@example.com")),
+        owner: Some("rox|child@example.com".into()),
+        by_email: Some(link("rox|child@example.com")),
         ..Data::default()
     });
     assert_eq!(
@@ -117,7 +117,7 @@ async fn child_lookup_failures_preserve_context_and_stop_before_delegation_or_bo
         ),
     ] {
         let (service, fake) = service(Data {
-            owner: Some("macro|child@example.com".into()),
+            owner: Some("rox|child@example.com".into()),
             fail: Some(failure),
             ..Data::default()
         });
@@ -144,7 +144,7 @@ async fn child_lookup_failures_preserve_context_and_stop_before_delegation_or_bo
 #[tokio::test]
 async fn bootstrap_uses_the_child_credential_owner_and_starts_one_backfill() {
     let (service, fake) = service(Data {
-        owner: Some("macro|child@example.com".into()),
+        owner: Some("rox|child@example.com".into()),
         ..Data::default()
     });
     assert_eq!(
@@ -172,14 +172,14 @@ async fn bootstrap_uses_the_child_credential_owner_and_starts_one_backfill() {
         ]
     );
     let watched = data.watched.as_ref().unwrap();
-    assert_eq!(watched.rox_id.as_ref(), "macro|child@example.com");
+    assert_eq!(watched.rox_id.as_ref(), "rox|child@example.com");
     assert_eq!(watched.fusionauth_user_id, Uuid::from_u128(5).to_string());
 }
 
 #[tokio::test]
 async fn disappearing_child_is_not_provisioned_with_the_callers_identity() {
     let (service, fake) = service(Data {
-        owner: Some("macro|child@example.com".into()),
+        owner: Some("rox|child@example.com".into()),
         child_fusion: None,
         ..Data::default()
     });
@@ -204,7 +204,7 @@ async fn disappearing_child_is_not_provisioned_with_the_callers_identity() {
 #[tokio::test]
 async fn shared_conflict_keeps_the_attempt_for_confirmation() {
     let (service, fake) = service(Data {
-        by_email: Some(link("macro|owner@example.com")),
+        by_email: Some(link("rox|owner@example.com")),
         ..Data::default()
     });
     assert!(matches!(
@@ -231,7 +231,7 @@ async fn shared_conflict_keeps_the_attempt_for_confirmation() {
 async fn promotion_is_durable_before_relocation_and_survives_its_failure() {
     for failure in [None, Some("relocate")] {
         let (service, fake) = service(Data {
-            by_email: Some(link("macro|owner@example.com")),
+            by_email: Some(link("rox|owner@example.com")),
             fail: failure,
             ..Data::default()
         });
@@ -266,7 +266,7 @@ async fn promotion_is_durable_before_relocation_and_survives_its_failure() {
 async fn relocation_retries_only_the_owner_write_and_keeps_terminal_failure_best_effort() {
     for failures in [1, 2, 3] {
         let (service, fake) = service(Data {
-            by_email: Some(link("macro|owner@example.com")),
+            by_email: Some(link("rox|owner@example.com")),
             update_failures: failures,
             ..Data::default()
         });
@@ -305,7 +305,7 @@ async fn credential_owner_retry_exhaustion_has_no_sleep_after_the_third_failure(
 
 async fn assert_credential_owner_retry_backoff(failures: usize, terminal_failure: bool) {
     let (service, fake) = service(Data {
-        by_email: Some(link("macro|owner@example.com")),
+        by_email: Some(link("rox|owner@example.com")),
         update_failures: failures,
         ..Data::default()
     });
@@ -386,7 +386,7 @@ async fn assert_credential_owner_retry_backoff(failures: usize, terminal_failure
 #[tokio::test]
 async fn an_existing_grant_applies_permissions_without_registering_a_watch() {
     let mut data = Data {
-        by_grant: Some(link("macro|actor@example.com")),
+        by_grant: Some(link("rox|actor@example.com")),
         ..Data::default()
     };
     data.attempt.requested_scopes = calendar_events::domain::models::GOOGLE_CALENDAR_SCOPES
@@ -446,7 +446,7 @@ async fn an_existing_grant_applies_permissions_without_registering_a_watch() {
 #[tokio::test]
 async fn the_callers_existing_primary_inbox_is_a_noop_without_cleanup() {
     let (service, fake) = service(Data {
-        by_identity: Some(link("macro|actor@example.com")),
+        by_identity: Some(link("rox|actor@example.com")),
         ..Data::default()
     });
     assert!(matches!(
@@ -548,7 +548,7 @@ async fn discovery_preserves_every_outcome_call_order_and_warning() {
         grants::discover(
             &service.grants,
             &service.provider,
-            &link("macro|actor@example.com"),
+            &link("rox|actor@example.com"),
         )
         .with_subscriber(subscriber)
         .await;

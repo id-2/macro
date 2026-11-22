@@ -16,7 +16,7 @@ function channel(id: string, name: string | null): ApiChannelWithLatest {
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
     is_participant: true,
-    owner_id: 'macro|user@example.com',
+    owner_id: 'rox|user@example.com',
     participants: [],
   };
 }

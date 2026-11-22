@@ -11,7 +11,7 @@ export const parseRoxAppLink = () => undefined;
 export const recipientEntityMapper =
   <K extends string>(kind: K) =>
   <T extends { id: string }>(data: T) => ({ kind, data, id: data.id });
-export const idToEmail = (id: string) => id.replace(/^macro\|/, '');
+export const idToEmail = (id: string) => id.replace(/^rox\|/, '');
 
 // Sample services for the event details overlays. The popover, drawer,
 // join-requests section and guest editors render their real UI; the requests
@@ -31,7 +31,7 @@ export type CalendarJoinRequest = {
 const sampleRequest: CalendarJoinRequest = {
   id: 'request-1',
   eventId: 'event-1',
-  requesterId: 'macro|member@example.com',
+  requesterId: 'rox|member@example.com',
   requesterEmail: 'member@example.com',
   status: 'pending',
   createdAt: '2026-10-22T18:00:00Z',
@@ -51,7 +51,7 @@ const sampleContacts = [
   'Jordan Wells',
 ].map((name) => {
   const email = `${name.split(' ')[0]?.toLowerCase()}@example.com`;
-  return { id: `macro|${email}`, email, name };
+  return { id: `rox|${email}`, email, name };
 });
 const [contacts, setContacts] = createSignal(
   params.get('contacts') === 'late' ? [] : sampleContacts
@@ -181,7 +181,7 @@ export const createCalendarRsvpController = () => ({
 });
 
 const names: Record<string, string> = {
-  'macro|member@example.com': 'Morgan Member',
+  'rox|member@example.com': 'Morgan Member',
   'alex@example.com': 'Alex Morgan',
   'sam@example.com': 'Sam Lee',
   'quarterly.planning.review.coordinator.northeast@facilities-and-operations.example.com':

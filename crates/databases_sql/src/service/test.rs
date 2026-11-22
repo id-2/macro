@@ -376,7 +376,7 @@ pub(crate) fn world() -> Shared {
                             specific_message_id: None,
                         }]),
                     ),
-                    (CONTACT, reference("macro|maria@rox.one")),
+                    (CONTACT, reference("rox|maria@rox.one")),
                 ],
             },
             StoredRow {
@@ -407,7 +407,7 @@ pub(crate) fn world() -> Shared {
                 cells: vec![(PLAN_NAME, PropertyValue::Str("Launch".into()))],
             },
         ],
-        contacts: vec!["macro|maria@rox.one", "macro|sam@rox.one"],
+        contacts: vec!["rox|maria@rox.one", "rox|sam@rox.one"],
         ..World::default()
     }))
 }
@@ -664,7 +664,7 @@ async fn a_read_answers_typed_cells_with_what_renders_them() {
             rows: vec![vec![
                 Some(Cell::Text("Maria".into())),
                 Some(Cell::Options(vec![GOING])),
-                Some(Cell::Entities(vec!["macro|maria@rox.one".into()])),
+                Some(Cell::Entities(vec!["rox|maria@rox.one".into()])),
             ]],
             row_ids: vec![MARIA],
         }

@@ -10,8 +10,8 @@ INSERT INTO activity_events (
 )
 SELECT
   ('00000000-0000-0000-0005-' || lpad(n::text, 12, '0'))::uuid,
-  'macro|e2e@macro.local',
-  'macro|e2e@macro.local',
+  'rox|e2e@macro.local',
+  'rox|e2e@macro.local',
   CASE WHEN n = 1 THEN 'created' ELSE 'edited' END,
   NULL,
   CASE WHEN n = 1 THEN 'document' ELSE 'channel' END,

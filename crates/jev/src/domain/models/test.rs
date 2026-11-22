@@ -100,7 +100,7 @@ fn named_decisions_reject_unknown_authority_fields_and_preserve_exact_keys() {
         serde_json::from_value::<DecisionRequest>(serde_json::json!({
             "input": null,
             "questions": {"valid": "Valid?"},
-            "owner": "macro|other@example.com"
+            "owner": "rox|other@example.com"
         }))
         .is_err()
     );

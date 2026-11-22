@@ -72,7 +72,7 @@ impl ChatService for MockService {
         Ok(GetChatResponse {
             chat: ChatResponse {
                 id: chat_id,
-                user_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+                user_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
                 project_id: None,
                 name: "Mock Chat".to_string(),
                 messages: Vec::new(),
@@ -516,7 +516,7 @@ impl RoxAuthorizationService for FakeAuthorizationService {
         }
 
         Ok(UserContext {
-            user_id: "macro|test@example.com".to_string(),
+            user_id: "rox|test@example.com".to_string(),
             fusion_user_id: "1234".to_string(),
             permissions: None,
             organization_id: None,
@@ -655,7 +655,7 @@ fn chat_basic_extension() -> Extension<ChatBasic> {
     Extension(ChatBasic {
         id: "some-chat-id".to_string(),
         name: "Mock Chat".to_string(),
-        user_id: Owner::from_principal_str("macro|test@example.com").unwrap(),
+        user_id: Owner::from_principal_str("rox|test@example.com").unwrap(),
         project_id: None,
         deleted_at: None,
     })

@@ -3,7 +3,7 @@
 -- Owned by the user created in email_dynamic_query.sql.
 INSERT INTO property_definitions (id, team_id, user_id, display_name, data_type, is_multi_select, specific_entity_type)
 VALUES
-    ('bb111111-1111-1111-1111-111111111111', NULL, 'macro|user1@test.com', 'Tags', 'TAG', true, NULL)
+    ('bb111111-1111-1111-1111-111111111111', NULL, 'rox|user1@test.com', 'Tags', 'TAG', true, NULL)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values)

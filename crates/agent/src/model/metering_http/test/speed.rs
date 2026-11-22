@@ -17,7 +17,7 @@ async fn responses_transport_prices_actual_tier_and_rejects_mismatched_request()
         recorder.clone(),
         &UsageContext::new(
             AiFeature::Chat,
-            "macro|speed@example.com".to_owned().try_into().unwrap(),
+            "rox|speed@example.com".to_owned().try_into().unwrap(),
         ),
         "openai/gpt-6.1-sol",
         ModelSpeed::Ultrafast,

@@ -9,7 +9,7 @@ use cache_core::{
 };
 use pollster::block_on;
 use uuid::Uuid;
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 const EPOCH: Uuid = Uuid::from_u128(2);
 fn key(user: &str) -> EntityKey<'static> {
     EntityKey::entity(
@@ -27,7 +27,7 @@ fn record(user: &str, name: &str) -> Record {
             ("userId".into(), CacheValue::String(user.into())),
             (
                 "email".into(),
-                CacheValue::String(user.strip_prefix("macro|").unwrap().into()),
+                CacheValue::String(user.strip_prefix("rox|").unwrap().into()),
             ),
             ("name".into(), CacheValue::String(name.into())),
         ]
@@ -62,7 +62,7 @@ async fn seed(count: usize) -> (Engine<TursoStorage>, HydrationScope) {
             .put_batch(
                 (start..(start + 500).min(count))
                     .map(|i| {
-                        let id = format!("macro|p{i:06}@example.com");
+                        let id = format!("rox|p{i:06}@example.com");
                         (
                             key(&id),
                             record(
@@ -169,7 +169,7 @@ fn indexed_stages_match_complete_scan_across_sparse_prefixes_overflow_and_contin
                 PeopleMode::Property,
             ] {
                 let mut request = request(&scope, query, mode);
-                request.excluded = vec!["macro|p004800@example.com".try_into().unwrap()];
+                request.excluded = vec!["rox|p004800@example.com".try_into().unwrap()];
                 for _ in 0..3 {
                     let result = parity(&mut engine, &request, EPOCH).await;
                     let PeopleSearchResult::Page { next_cursor, .. } = result else {
@@ -191,12 +191,12 @@ fn indexed_stages_match_complete_scan_across_sparse_prefixes_overflow_and_contin
         storage
             .put_batch(vec![
                 (
-                    key("macro|overflow@example.com"),
-                    record("macro|overflow@example.com", &overflow),
+                    key("rox|overflow@example.com"),
+                    record("rox|overflow@example.com", &overflow),
                 ),
                 (
-                    key("macro|nul@example.com"),
-                    record("macro|nul@example.com", "Late\0label"),
+                    key("rox|nul@example.com"),
+                    record("rox|nul@example.com", "Late\0label"),
                 ),
             ])
             .await
@@ -220,7 +220,7 @@ fn current_epoch_overrides_inboxes_and_dm_aliases_do_not_weaken_membership() {
         let mut updates = vec![];
         for i in 0..10 {
             updates.push(PersonFactPatch {
-                user_id: format!("macro|p{i:06}@example.com").try_into().unwrap(),
+                user_id: format!("rox|p{i:06}@example.com").try_into().unwrap(),
                 facts: PersonFacts {
                     last_interaction_ms: Some(100 - i),
                     secondary_inbox: i == 3,
@@ -233,7 +233,7 @@ fn current_epoch_overrides_inboxes_and_dm_aliases_do_not_weaken_membership() {
             });
         }
         updates.push(PersonFactPatch {
-            user_id: "macro|stub@example.com".try_into().unwrap(),
+            user_id: "rox|stub@example.com".try_into().unwrap(),
             facts: PersonFacts {
                 last_interaction_ms: Some(1000),
                 ..Default::default()
@@ -267,7 +267,7 @@ fn current_epoch_overrides_inboxes_and_dm_aliases_do_not_weaken_membership() {
                 assert!(
                     !people
                         .iter()
-                        .any(|p| p.user_id.as_ref() == "macro|stub@example.com")
+                        .any(|p| p.user_id.as_ref() == "rox|stub@example.com")
                 );
                 if next_cursor.is_none() {
                     break;
@@ -308,7 +308,7 @@ fn current_epoch_overrides_inboxes_and_dm_aliases_do_not_weaken_membership() {
         )
         .await;
         let mut foreign = request(&scope, "", PeopleMode::Recipient);
-        foreign.scope.identity = "macro|foreign@example.com".into();
+        foreign.scope.identity = "rox|foreign@example.com".into();
         assert!(engine.search_people(&foreign).await.is_err());
     });
 }

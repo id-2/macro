@@ -954,7 +954,7 @@ async fn subscription_period_prefers_the_billable_subscription_to_an_unpaid_one(
 
 #[test]
 fn credit_reload_metadata_stamps_purpose_reload_and_payer() {
-    let payer = RoxUserIdStr::try_from("macro|payer@example.com".to_string()).expect("payer");
+    let payer = RoxUserIdStr::try_from("rox|payer@example.com".to_string()).expect("payer");
     let metadata = credit_reload_metadata(Uuid::from_u128(13), &payer);
 
     assert_eq!(metadata.len(), 3);
@@ -968,7 +968,7 @@ fn credit_reload_metadata_stamps_purpose_reload_and_payer() {
     );
     assert_eq!(
         metadata.get(PAYER_METADATA_KEY).map(String::as_str),
-        Some("macro|payer@example.com")
+        Some("rox|payer@example.com")
     );
     assert!(!metadata.contains_key(CHARGE_METADATA_KEY));
 }
@@ -1277,7 +1277,7 @@ async fn direct_usage_invoices_are_disabled_without_contacting_stripe() {
 }
 
 fn payer() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+    RoxUserIdStr::try_from("rox|payer@example.com".to_string()).unwrap()
 }
 
 #[tokio::test]

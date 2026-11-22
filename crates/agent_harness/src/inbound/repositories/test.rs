@@ -12,7 +12,7 @@ use super::*;
 use crate::domain::error::HarnessError;
 use crate::domain::ports::RepositoryBranches;
 
-const USER_ID: &str = "macro|repository-lister@example.com";
+const USER_ID: &str = "rox|repository-lister@example.com";
 
 /// Admits the one token `valid`, as the user above.
 #[derive(Clone)]

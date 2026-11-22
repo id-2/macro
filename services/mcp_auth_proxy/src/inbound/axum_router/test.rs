@@ -1641,7 +1641,7 @@ impl rox_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
         }
         Ok(Some(rox_authorization::ResolvedApiKeyUser {
             rox_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
-                "macro|agent@example.com",
+                "rox|agent@example.com",
             )
             .unwrap(),
             fusion_user_id: "agent-fusion".into(),
@@ -1650,7 +1650,7 @@ impl rox_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
                 rox_authorization::AccountManagerCredential {
                     grant_id: uuid::Uuid::nil(),
                     manager_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
-                        "macro|manager@example.com",
+                        "rox|manager@example.com",
                     )
                     .unwrap(),
                 }
@@ -1692,7 +1692,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
             Request::builder()
                 .uri("/mcp/mcp")
                 .header("x-rox-user-api-key", "fixture-user-key")
-                .header("x-rox-user-id", "macro|another@example.com")
+                .header("x-rox-user-id", "rox|another@example.com")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -1703,7 +1703,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
         axum::body::to_bytes(response.into_body(), BODY_LIMIT)
             .await
             .unwrap(),
-        "macro|agent@example.com"
+        "rox|agent@example.com"
     );
     let managed = app
         .clone()
@@ -1741,7 +1741,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
         &serde_json::json!({
             "aud": "", "iss": "", "exp": 4102444800_u64, "tid": "tenant",
             "email": "user@example.com", "fusion_user_id": "fusion-user",
-            "rox_user_id": "macro|user@example.com", "rox_organization_id": null,
+            "rox_user_id": "rox|user@example.com", "rox_organization_id": null,
             "root_rox_id": null,
         }),
         &jsonwebtoken::EncodingKey::from_secret(b""),
@@ -1783,7 +1783,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
             axum::body::to_bytes(response.into_body(), BODY_LIMIT)
                 .await
                 .unwrap(),
-            "macro|user@example.com"
+            "rox|user@example.com"
         );
     }
 }

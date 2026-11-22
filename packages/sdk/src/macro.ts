@@ -327,7 +327,7 @@ export class Rox<T extends RoxOpts = RoxOpts> {
 
   /**
    * The authenticated caller's mentionable principal — `bot|<uuid>` for bot
-   * auth, `macro|<email>` for user auth — fetched once and cached.
+   * auth, `rox|<email>` for user auth — fetched once and cached.
    *
    * @readonly
    */

@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn receipt(key: &model_entity::Entity<'static>) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(
-        RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap(),
         Entity {
             entity_id: key.entity_id.to_string(),
             entity_type: key.entity_type,
@@ -247,7 +247,7 @@ fn mixed_documents() -> Vec<model_entity::Entity<'static>> {
 
 async fn authorized_ids(access: &DocumentAccess) -> Vec<String> {
     let reader = PropertiesEntityPropertyReader::new(Arc::new(()), Arc::new(access.clone()));
-    let user = RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap();
     let mut ids = reader
         .view_receipts(&user, &mixed_documents())
         .await

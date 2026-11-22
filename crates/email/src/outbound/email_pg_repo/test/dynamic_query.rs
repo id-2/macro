@@ -1597,7 +1597,7 @@ async fn test_shared_exclude_returns_only_own_threads(pool: Pool<Postgres>) -> a
         limit,
         &view,
         query,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
         None,
     )
     .await?;
@@ -1650,7 +1650,7 @@ async fn test_shared_only_returns_only_shared_threads(pool: Pool<Postgres>) -> a
         limit,
         &view,
         query,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
         None,
     )
     .await?;
@@ -1715,7 +1715,7 @@ async fn test_shared_include_returns_own_and_shared_threads(
         limit,
         &view,
         query,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
         None,
     )
     .await?;
@@ -1971,7 +1971,7 @@ async fn test_shared_only_returns_correct_owner_id(pool: Pool<Postgres>) -> anyh
         limit,
         &view,
         query,
-        "macro|user1@test.com",
+        "rox|user1@test.com",
         None,
     )
     .await?;
@@ -1980,7 +1980,7 @@ async fn test_shared_only_returns_correct_owner_id(pool: Pool<Postgres>) -> anyh
     for result in &results {
         assert_eq!(
             result.owner_id.as_str(),
-            "macro|user2@test.com",
+            "rox|user2@test.com",
             "Shared threads should have user2 as owner, got {:?} for thread {}",
             result.owner_id,
             result.id

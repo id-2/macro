@@ -11,7 +11,7 @@ use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use wiremock::{Request, Respond, matchers::path_regex};
 
-pub(super) const OWNER: &str = "macro|olivia@example.com";
+pub(super) const OWNER: &str = "rox|olivia@example.com";
 const INBOX: &str = "olivia@example.com";
 pub(super) const TOKEN: &str = "graph-access-token";
 const EVENTS: &str = r"^/v1\.0/me/(calendars/[^/]+/)?events(/|$)";

@@ -24,7 +24,7 @@ vi.mock('@service-auth/client', () => ({
   authServiceClient: { getUserNamesWithEmail: mocks.getUserNamesWithEmail },
 }));
 const unavailable = err([{ code: 'NETWORK_ERROR', message: 'Unavailable' }]);
-const IDENTITY = { id: 'macro|viewer@example.com', authenticated: true };
+const IDENTITY = { id: 'rox|viewer@example.com', authenticated: true };
 const cleanups: (() => void)[] = [];
 function renderLabel(email: string) {
   const id = emailToRoxId(email);
@@ -63,7 +63,7 @@ describe('display name compatibility over the scoped query cache', () => {
     expect(label.labels.at(-1)).toBe('offline@example.com');
   });
   it('retries on a later access after cooldown', async () => {
-    const id = 'macro|person@example.com';
+    const id = 'rox|person@example.com';
     mocks.getUserNamesWithEmail
       .mockResolvedValueOnce(unavailable)
       .mockResolvedValueOnce(
@@ -118,7 +118,7 @@ describe('display name compatibility over the scoped query cache', () => {
   });
   it('wakes mounted labels after an unauthorized auth query is replaced by a confirmed login', async () => {
     mocks.getUserNamesWithEmail.mockResolvedValue(
-      ok({ names: [{ id: 'macro|person@example.com', first_name: 'Private' }] })
+      ok({ names: [{ id: 'rox|person@example.com', first_name: 'Private' }] })
     );
     const label = renderLabel('person@example.com');
     await vi.advanceTimersByTimeAsync(10);

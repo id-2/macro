@@ -47,7 +47,7 @@ mod threads;
 
 // Constants
 // auth based constants
-pub const ROX_INTERNAL_USER_ID: &str = "macro|INTERNAL@rox.one";
+pub const ROX_INTERNAL_USER_ID: &str = "rox|INTERNAL@rox.one";
 
 pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
     let sync_sessions = state.sync_sessions.clone();

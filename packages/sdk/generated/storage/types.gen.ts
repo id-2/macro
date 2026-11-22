@@ -483,7 +483,7 @@ export type AgentSessionFilters = {
      */
     include?: boolean;
     /**
-     * Filter by session owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by session owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every
      * owner.
      */
@@ -4125,9 +4125,9 @@ export type ChatFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by chat owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by chat owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;
@@ -6435,7 +6435,7 @@ export type CropMode = 'fill' | 'fit';
  *
  * `custom_speaker = None` clears any existing override for this
  * `diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is
- * expected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);
+ * expected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);
  * the service layer rejects malformed values with `400 Bad Request`.
  */
 export type CustomSpeakerAssignment = {
@@ -7028,9 +7028,9 @@ export type DocumentFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by document owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by document owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;
@@ -9734,7 +9734,7 @@ export type EntryFieldValue = {
 } | {
     type: 'references';
     /**
-     * Rox ids: people as macro| user ids, records or other items.
+     * Rox ids: people as rox| user ids, records or other items.
      */
     value: Array<string>;
 };
@@ -10843,7 +10843,7 @@ export type FieldValueInput = {
      */
     field: string;
     /**
-     * One value: an option label, a person as "me", an email or a macro|
+     * One value: an option label, a person as "me", an email or a rox|
      * user id, a number, true/false, or a date.
      */
     value?: string | null;
@@ -11995,7 +11995,7 @@ export type GetOrCreateChannelResponse = {
  */
 export type GetOrCreateDmRequest = {
     /**
-     * Recipient user id (`macro|...`) or agent persona id (`bot|...`).
+     * Recipient user id (`rox|...`) or agent persona id (`bot|...`).
      */
     recipient_id: string;
 };
@@ -12627,7 +12627,7 @@ export type GuestChatThread = {
  *
  * The id doubles as the guest's RTC participant identity, so identities are
  * opaque UUIDs and never share a namespace (or a column) with Rox user
- * ids. Only the server mints them; Rox users keep `macro|…` identities,
+ * ids. Only the server mints them; Rox users keep `rox|…` identities,
  * so an RTC identity classifies as exactly one of the two.
  */
 export type GuestId = string;
@@ -13294,7 +13294,7 @@ export type InitiativeFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by initiative owner principal — a user ('macro|user@example.com'), a
+     * Filter by initiative owner principal — a user ('rox|user@example.com'), a
      * bot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include
      * every owner.
      */
@@ -16709,9 +16709,9 @@ export type ProjectFilters = {
      */
     notification_filters?: NotificationFilters;
     /**
-     * Filter by project owner principal — a user ('macro|user@example.com'), a bot
+     * Filter by project owner principal — a user ('rox|user@example.com'), a bot
      * ('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:
-     * ['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to
+     * ['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to
      * search all owners.
      */
     owners?: Array<string>;
@@ -17256,7 +17256,7 @@ export type RequestAccountManagerBody = {
      */
     callerRole: AccountManagerRole;
     /**
-     * The other account (`macro|...`).
+     * The other account (`rox|...`).
      */
     counterpartyId: string;
 };

@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-const VIEWER: &str = "macro|viewer@example.com";
+const VIEWER: &str = "rox|viewer@example.com";
 const CRM_COMPANY: &str = "crm_company";
 const ALL_SORTS: [CrmCompanyListSort; 4] = [
     CrmCompanyListSort::UpdatedAt,
@@ -111,7 +111,7 @@ async fn list_for_soup_includes_companies_without_legacy_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     // Viewing company records does not require email contribution consent.
     insert_company(&pool, team, true, &["acme.com"]).await?;
@@ -120,7 +120,7 @@ async fn list_for_soup_includes_companies_without_legacy_settings(
     let result = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -135,7 +135,7 @@ async fn list_for_soup_includes_companies_without_legacy_settings(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_includes_companies_when_legacy_flag_off(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     sqlx::query(r#"INSERT INTO team_crm_settings (team_id, crm_enabled) VALUES ($1, FALSE)"#)
         .bind(team)
@@ -158,7 +158,7 @@ async fn list_for_soup_includes_companies_when_legacy_flag_off(pool: PgPool) -> 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_excludes_hidden_rows(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     let visible = insert_company(&pool, team, true, &["acme.com"]).await?;
@@ -172,7 +172,7 @@ async fn list_for_soup_excludes_hidden_rows(pool: PgPool) -> anyhow::Result<()> 
     let result = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -194,7 +194,7 @@ async fn list_for_soup_excludes_hidden_rows(pool: PgPool) -> anyhow::Result<()> 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_returns_hidden_when_hidden_true(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     let visible = insert_company(&pool, team, true, &["acme.com"]).await?;
@@ -209,7 +209,7 @@ async fn list_for_soup_returns_hidden_when_hidden_true(pool: PgPool) -> anyhow::
     let hidden_only = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             Some(true),
             CrmCompanyListSort::UpdatedAt,
@@ -227,7 +227,7 @@ async fn list_for_soup_returns_hidden_when_hidden_true(pool: PgPool) -> anyhow::
     let visible_only_explicit = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             Some(false),
             CrmCompanyListSort::UpdatedAt,
@@ -249,7 +249,7 @@ async fn list_for_soup_hydrates_name_and_description_from_directory(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     insert_company(&pool, team, true, &["acme.com", "acmecorp.com"]).await?;
@@ -268,7 +268,7 @@ async fn list_for_soup_hydrates_name_and_description_from_directory(
     let result = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -295,7 +295,7 @@ async fn list_for_soup_returns_none_for_negative_cache_directory_row(
     // Negative-cache directory row (NULL name/description) → soup
     // surfaces as None, not Some("").
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     insert_company(&pool, team, true, &["acme.com"]).await?;
@@ -311,7 +311,7 @@ async fn list_for_soup_returns_none_for_negative_cache_directory_row(
     let result = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -328,7 +328,7 @@ async fn list_for_soup_returns_none_for_negative_cache_directory_row(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_filters_by_company_ids_when_non_empty(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    let owner = "macro|owner@test.com";
+    let owner = "rox|owner@test.com";
     seed_team(&pool, team, owner).await?;
     enable_crm_for_team(&pool, team).await?;
     let wanted = insert_company(&pool, team, true, &["acme.com"]).await?;
@@ -338,7 +338,7 @@ async fn list_for_soup_filters_by_company_ids_when_non_empty(pool: PgPool) -> an
     let result = repo
         .list_companies_for_soup(
             &team,
-            "macro|owner@test.com",
+            "rox|owner@test.com",
             &[wanted],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -355,8 +355,8 @@ async fn list_for_soup_filters_by_company_ids_when_non_empty(pool: PgPool) -> an
 async fn list_for_soup_does_not_leak_other_team_rows(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@test.com").await?;
-    seed_team(&pool, team_b, "macro|b@test.com").await?;
+    seed_team(&pool, team_a, "rox|a@test.com").await?;
+    seed_team(&pool, team_b, "rox|b@test.com").await?;
     enable_crm_for_team(&pool, team_a).await?;
     enable_crm_for_team(&pool, team_b).await?;
     insert_company(&pool, team_a, true, &["acme.com"]).await?;
@@ -366,7 +366,7 @@ async fn list_for_soup_does_not_leak_other_team_rows(pool: PgPool) -> anyhow::Re
     let result = repo
         .list_companies_for_soup(
             &team_b,
-            "macro|b@test.com",
+            "rox|b@test.com",
             &[],
             None,
             CrmCompanyListSort::UpdatedAt,
@@ -382,7 +382,7 @@ async fn list_for_soup_does_not_leak_other_team_rows(pool: PgPool) -> anyhow::Re
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@test.com").await?;
+    seed_team(&pool, team, "rox|owner@test.com").await?;
     enable_crm_for_team(&pool, team).await?;
 
     // Five companies with strictly increasing interaction timestamps.
@@ -418,7 +418,7 @@ async fn list_for_soup_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()>
         let page = repo
             .list_companies_for_soup(
                 &team,
-                "macro|owner@test.com",
+                "rox|owner@test.com",
                 &[],
                 None,
                 CrmCompanyListSort::UpdatedAt,
@@ -462,7 +462,7 @@ async fn list_for_soup_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()>
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@test.com").await?;
+    seed_team(&pool, team, "rox|owner@test.com").await?;
     enable_crm_for_team(&pool, team).await?;
 
     // One newest company, then a tied pair, then two older. At limit=2
@@ -502,7 +502,7 @@ async fn list_for_soup_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Res
         let page = repo
             .list_companies_for_soup(
                 &team,
-                "macro|owner@test.com",
+                "rox|owner@test.com",
                 &[],
                 None,
                 CrmCompanyListSort::UpdatedAt,
@@ -612,7 +612,7 @@ async fn list_for_soup_viewed_sorts_use_only_this_users_company_views(
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let other_team = Uuid::now_v7();
-    let other_user = "macro|other@example.com";
+    let other_user = "rox|other@example.com";
     seed_team(&pool, team, VIEWER).await?;
     seed_team(&pool, other_team, other_user).await?;
     enable_crm_for_team(&pool, team).await?;

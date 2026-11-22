@@ -46,7 +46,7 @@ vi.mock('@app/lib/analytics/posthog', () => ({
   }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|viewer@rox.one',
+  useUserId: () => () => 'rox|viewer@rox.one',
 }));
 vi.mock('@core/context/quickAccess', () => ({
   exclude: () => [],

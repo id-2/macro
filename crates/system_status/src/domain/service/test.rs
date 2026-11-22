@@ -8,7 +8,7 @@ use crate::domain::{
 };
 
 fn staff() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|oncall@rox.one").unwrap()
+    RoxUserIdStr::parse_from_str("rox|oncall@rox.one").unwrap()
 }
 
 fn degraded(message: &str) -> SystemStatus {
@@ -105,7 +105,7 @@ async fn set_status_succeeds_when_the_broadcast_fails() {
 #[tokio::test]
 async fn non_staff_cannot_set_status_or_read_history() {
     let service = SystemStatusServiceImpl::new(FakeRepo::default(), FakeBroadcaster::default());
-    let outsider = RoxUserIdStr::parse_from_str("macro|someone@example.com").unwrap();
+    let outsider = RoxUserIdStr::parse_from_str("rox|someone@example.com").unwrap();
 
     let set = service
         .set_status(&outsider, degraded("Search is slow"))

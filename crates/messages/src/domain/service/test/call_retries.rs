@@ -20,7 +20,7 @@ async fn call_root_retry_returns_the_canonical_message_without_delivery() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             input,
         )
         .await
@@ -41,7 +41,7 @@ async fn call_reply_retry_returns_the_existing_reply_without_delivery() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             input,
         )
         .await
@@ -60,7 +60,7 @@ async fn call_retry_recovers_a_concurrent_commit_without_delivery() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             input,
         )
         .await
@@ -79,7 +79,7 @@ async fn call_retry_does_not_restore_a_deleted_message() {
     let service = MessageService::new(repo.clone(), events.clone());
     let message = service
         .post(
-            call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+            call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
             input,
         )
         .await
@@ -96,8 +96,8 @@ async fn call_retry_cannot_recover_another_actor_or_parents_message() {
     let events = Events::default();
     let service = MessageService::new(repo.clone(), events.clone());
     for (actor, parent) in [
-        ("macro|other@example.com", call_id),
-        ("macro|author@example.com", rox_uuid::generate_uuid_v7()),
+        ("rox|other@example.com", call_id),
+        ("rox|author@example.com", rox_uuid::generate_uuid_v7()),
     ] {
         assert!(matches!(
             service
@@ -126,7 +126,7 @@ async fn call_retry_still_rejects_a_deleted_parent() {
     assert!(matches!(
         service
             .post(
-                call_receipt("macro|author@example.com", call_id, AccessLevel::Comment).unwrap(),
+                call_receipt("rox|author@example.com", call_id, AccessLevel::Comment).unwrap(),
                 input,
             )
             .await,

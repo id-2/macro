@@ -407,7 +407,7 @@ fn parse_participants(entries: &[String]) -> Result<Vec<RoxUserIdStr<'static>>, 
                 }
             }
             Err(()) => invalid.push(format!(
-                "participants[{index}] `{trimmed}` is not a user id (`macro|<email>`) or email"
+                "participants[{index}] `{trimmed}` is not a user id (`rox|<email>`) or email"
             )),
         }
     }

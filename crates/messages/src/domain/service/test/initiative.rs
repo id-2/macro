@@ -31,8 +31,8 @@ async fn initiative_messages_use_parent_capabilities_and_authorship() {
     let id = Uuid::from_u128(901);
     let repo = project_repo(id);
     let service = MessageService::new(repo.clone(), Events::default());
-    let author = "macro|author@example.com";
-    let other = "macro|other@example.com";
+    let author = "rox|author@example.com";
+    let other = "rox|other@example.com";
     let message = service
         .post(
             project_access(author, id, AccessLevel::Comment),
@@ -123,7 +123,7 @@ async fn initiative_discussions_resolve_but_never_accept_document_anchors() {
     let id = Uuid::from_u128(903);
     let repo = project_repo(id);
     let service = MessageService::new(repo.clone(), Events::default());
-    let access = || project_access("macro|author@example.com", id, AccessLevel::Edit);
+    let access = || project_access("rox|author@example.com", id, AccessLevel::Edit);
     for resolved in [true, false] {
         let state = service
             .patch_thread(
@@ -194,7 +194,7 @@ async fn deleted_initiative_threads_reject_replies() {
     assert!(matches!(
         service
             .post(
-                project_access("macro|author@example.com", id, AccessLevel::Comment),
+                project_access("rox|author@example.com", id, AccessLevel::Comment),
                 PostMessage {
                     thread_id: Some(root),
                     ..post_input()

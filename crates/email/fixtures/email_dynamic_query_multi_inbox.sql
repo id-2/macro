@@ -4,7 +4,7 @@
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'macro|user1@test.com', 'user1', 'user1.alt@gmail.com', 'GMAIL', true, NOW(), NOW());
+    ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'rox|user1@test.com', 'user1', 'user1.alt@gmail.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)
 VALUES

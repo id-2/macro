@@ -14,7 +14,7 @@ const requestId = '0198a4cc-e138-7670-a308-a6b766602731';
 function record(status: string, revision: number) {
   return {
     id: requestId,
-    requesterId: 'macro|reader@example.test',
+    requesterId: 'rox|reader@example.test',
     requestedLevel: status === 'pending' ? 'edit' : 'comment',
     status,
     revision,
@@ -28,7 +28,7 @@ function record(status: string, revision: number) {
 
 function state(mine: ReturnType<typeof record> | null) {
   return {
-    owner: 'macro|owner@example.test',
+    owner: 'rox|owner@example.test',
     canReview: false,
     accessLevel: 'comment',
     supportedLevels: ['view', 'comment', 'edit'],

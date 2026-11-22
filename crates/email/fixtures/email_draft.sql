@@ -4,7 +4,7 @@
 -- Insert test link
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user1@test.com', 'fa-user-1', 'user1@test.com', 'GMAIL', true, NOW(), NOW());
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'rox|user1@test.com', 'fa-user-1', 'user1@test.com', 'GMAIL', true, NOW(), NOW());
 
 -- Insert contacts
 INSERT INTO email_contacts (id, link_id, email_address, name, sfs_photo_url, created_at, updated_at)
@@ -76,7 +76,7 @@ VALUES
 -- switching the sender (lives in a different thread) — for cross_inbox_reply_drafts.
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'macro|user1@test.com', 'fa-user-1', 'user1-alt@test.com', 'GMAIL', true, NOW(), NOW());
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'rox|user1@test.com', 'fa-user-1', 'user1-alt@test.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_threads (id, provider_id, link_id, inbox_visible, is_read, created_at, updated_at)
 VALUES

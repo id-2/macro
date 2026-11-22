@@ -55,7 +55,7 @@ fn deleted() -> AgentSessionLifecycleEvent {
             session_name: "Agent Session".to_owned(),
             bot_id: BotId::TEST_A,
             bot_name: "Test Agent".to_owned(),
-            owner_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
+            owner_id: RoxUserIdStr::parse_from_str("rox|owner@example.com")
                 .expect("valid user id")
                 .into_owned(),
             origin: None,

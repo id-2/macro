@@ -13,11 +13,11 @@ use uuid::Uuid;
 
 const TEAM_ALPHA: &str = "00000000-0000-0000-0000-0000000ea001";
 const TEAM_BETA: &str = "00000000-0000-0000-0000-0000000ea002";
-const TEAM_MEMBER: &str = "macro|member@team.com";
-const TEAM_ADMIN: &str = "macro|admin@team.com";
-const TEAM_OWNER: &str = "macro|owner@team.com";
-const USER_WITHOUT_TEAM: &str = "macro|noteam@team.com";
-const TEAM_BETA_OWNER: &str = "macro|multi@team.com";
+const TEAM_MEMBER: &str = "rox|member@team.com";
+const TEAM_ADMIN: &str = "rox|admin@team.com";
+const TEAM_OWNER: &str = "rox|owner@team.com";
+const USER_WITHOUT_TEAM: &str = "rox|noteam@team.com";
+const TEAM_BETA_OWNER: &str = "rox|multi@team.com";
 
 mod agent_session_parent;
 mod channel_call_chat;
@@ -468,8 +468,8 @@ async fn crm_contact_access_rejects_invalid_uuid(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-const PG_BOT_OWNER: &str = "macro|pg-bot-owner@example.com";
-const PG_OTHER_DOCUMENT_OWNER: &str = "macro|other-document-owner@example.com";
+const PG_BOT_OWNER: &str = "rox|pg-bot-owner@example.com";
+const PG_OTHER_DOCUMENT_OWNER: &str = "rox|other-document-owner@example.com";
 
 async fn insert_pg_user(pool: &PgPool, user_id: &str, email: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
@@ -1199,8 +1199,8 @@ async fn team_item_access_rejects_unsupported_entity_type(pool: PgPool) -> anyho
     Ok(())
 }
 
-const REMINDER_OWNER: &str = "macro|reminder-owner@example.com";
-const REMINDER_STRANGER: &str = "macro|reminder-stranger@example.com";
+const REMINDER_OWNER: &str = "rox|reminder-owner@example.com";
+const REMINDER_STRANGER: &str = "rox|reminder-stranger@example.com";
 
 async fn insert_reminder_user(pool: &PgPool, id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
@@ -1314,10 +1314,10 @@ async fn insert_calendar_event(pool: &PgPool, owner_id: &str, visibility: &str) 
 async fn calendar_event_channel_share_grants_current_participants_view(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let owner = "macro|calendar-owner@example.com";
-    let member = "macro|calendar-member@example.com";
-    let former = "macro|calendar-former@example.com";
-    let stranger = "macro|calendar-stranger@example.com";
+    let owner = "rox|calendar-owner@example.com";
+    let member = "rox|calendar-member@example.com";
+    let former = "rox|calendar-former@example.com";
+    let stranger = "rox|calendar-stranger@example.com";
     let shared = insert_calendar_event(&pool, owner, "default").await;
     let private = insert_calendar_event(&pool, owner, "private").await;
     let unshared = insert_calendar_event(&pool, owner, "default").await;
@@ -1387,7 +1387,7 @@ async fn calendar_event_channel_share_grants_current_participants_view(
 async fn direct_recipients_exclude_inherited_grants(pool: PgPool) -> anyhow::Result<()> {
     let entity_id = Uuid::now_v7();
     for (source, kind) in [
-        ("macro|direct@example.com".to_string(), "user"),
+        ("rox|direct@example.com".to_string(), "user"),
         (Uuid::now_v7().to_string(), "team"),
         (Uuid::now_v7().to_string(), "channel"),
     ] {
@@ -1398,7 +1398,7 @@ async fn direct_recipients_exclude_inherited_grants(pool: PgPool) -> anyhow::Res
         .get_direct_entity_users(&entity_id, EntityType::Call)
         .await?;
     assert_eq!(users.len(), 1);
-    assert_eq!(users[0].as_ref(), "macro|direct@example.com");
+    assert_eq!(users[0].as_ref(), "rox|direct@example.com");
     Ok(())
 }
 

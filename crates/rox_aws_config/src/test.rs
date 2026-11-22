@@ -5,8 +5,8 @@ mod transport;
 
 #[test]
 fn test_transform_path_style_localstack() {
-    let input = "http://localstack:4566/doc-storage/macro%7Cteo%40rox.one/doc/1?x-id=PutObject";
-    let expected = "http://localhost:4566/doc-storage/macro%7Cteo%40rox.one/doc/1?x-id=PutObject";
+    let input = "http://localstack:4566/doc-storage/rox%7Cteo%40rox.one/doc/1?x-id=PutObject";
+    let expected = "http://localhost:4566/doc-storage/rox%7Cteo%40rox.one/doc/1?x-id=PutObject";
 
     let result = transform_local_url(input, None);
     assert_eq!(result, expected);
@@ -14,8 +14,8 @@ fn test_transform_path_style_localstack() {
 
 #[test]
 fn test_transform_path_style_localhost() {
-    let input = "http://localhost:4566/doc-storage/macro%7Cteo%40rox.one/doc/1?x-id=PutObject";
-    let expected = "http://localhost:4566/doc-storage/macro%7Cteo%40rox.one/doc/1?x-id=PutObject";
+    let input = "http://localhost:4566/doc-storage/rox%7Cteo%40rox.one/doc/1?x-id=PutObject";
+    let expected = "http://localhost:4566/doc-storage/rox%7Cteo%40rox.one/doc/1?x-id=PutObject";
 
     let result = transform_local_url(input, None);
     assert_eq!(result, expected);
@@ -115,8 +115,8 @@ fn test_transform_url_default_port_localhost() {
 
 #[test]
 fn test_internal_fetch_rewrites_localhost_to_localstack() {
-    let input = "http://localhost:4566/doc-storage/macro%7Cteo%40rox.one/doc/1";
-    let expected = "http://localstack:4566/doc-storage/macro%7Cteo%40rox.one/doc/1";
+    let input = "http://localhost:4566/doc-storage/rox%7Cteo%40rox.one/doc/1";
+    let expected = "http://localstack:4566/doc-storage/rox%7Cteo%40rox.one/doc/1";
 
     let result = transform_internal_url(input, "http://localstack:4566", None);
     assert_eq!(result, expected);
@@ -179,11 +179,11 @@ fn host_process_keeps_its_configured_localstack_endpoint_for_internal_fetch() {
 #[test]
 fn https_storage_proxy_round_trips_encoded_keys_and_presigned_queries() {
     let endpoint = "https://dev-machine:21909/local-storage";
-    let internal = "http://localstack:4566/doc-storage/macro%7Cuser%40example.com/image/10?X-Amz-Signature=test&x-id=PutObject";
+    let internal = "http://localstack:4566/doc-storage/rox%7Cuser%40example.com/image/10?X-Amz-Signature=test&x-id=PutObject";
     let public = transform_local_url(internal, Some(endpoint));
     assert_eq!(
         public,
-        "https://dev-machine:21909/local-storage/doc-storage/macro%7Cuser%40example.com/image/10?X-Amz-Signature=test&x-id=PutObject"
+        "https://dev-machine:21909/local-storage/doc-storage/rox%7Cuser%40example.com/image/10?X-Amz-Signature=test&x-id=PutObject"
     );
     assert_eq!(
         transform_internal_url(&public, "http://localstack:4566", Some(endpoint)),

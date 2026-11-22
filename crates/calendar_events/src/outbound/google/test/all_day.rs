@@ -5,7 +5,7 @@ fn target() -> ProviderCalendarTarget {
         binding: None,
         provider: crate::domain::models::CalendarProvider::Google,
         observed_access_role: Some("reader".to_owned()),
-        owner_id: "macro|calendar@example.test".to_owned(),
+        owner_id: "rox|calendar@example.test".to_owned(),
         email_link_id: Uuid::now_v7(),
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),

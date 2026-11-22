@@ -279,7 +279,7 @@ where
             .take(6)
             .collect();
         let email = format!("{}-{suffix}@{AGENT_EMAIL_DOMAIN}", slug(&request.name));
-        let user_id = RoxUserIdStr::parse_from_str(&format!("macro|{email}"))
+        let user_id = RoxUserIdStr::parse_from_str(&format!("rox|{email}"))
             .map_err(|_| TeamAgentError::InvalidName)?
             .into_owned();
         tracing::Span::current().record(

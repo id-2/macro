@@ -8,8 +8,8 @@ use crate::outbound::pg_team::PgCalendarTeamRepository;
 async fn routine_sync_keeps_verified_coverage_without_admitting_failed_or_stale_snapshots(
     pool: PgPool,
 ) {
-    let viewer = "macro|sync-viewer@example.com";
-    let owner = "macro|sync-owner@example.com";
+    let viewer = "rox|sync-viewer@example.com";
+    let owner = "rox|sync-owner@example.com";
     insert_team(&pool, viewer, &[viewer, owner]).await;
     let link = insert_link(&pool, owner).await;
     let repo = PgCalendarRepository::new(pool.clone());
@@ -259,9 +259,9 @@ async fn routine_sync_keeps_verified_coverage_without_admitting_failed_or_stale_
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_sources_require_current_membership_and_verified_source_entitlement(pool: PgPool) {
-    let viewer = "macro|team-viewer@example.com";
-    let owner = "macro|team-owner@example.com";
-    let outsider = "macro|outsider@example.com";
+    let viewer = "rox|team-viewer@example.com";
+    let owner = "rox|team-owner@example.com";
+    let outsider = "rox|outsider@example.com";
     let team_id = insert_team(&pool, viewer, &[viewer, owner]).await;
     insert_user(&pool, outsider).await;
     let link = insert_link(&pool, owner).await;
@@ -536,9 +536,9 @@ async fn team_sources_require_current_membership_and_verified_source_entitlement
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_sources_follow_direct_delegation_without_recursive_resharing(pool: PgPool) {
-    let viewer = "macro|delegation-viewer@example.com";
-    let sharer = "macro|delegation-sharer@example.com";
-    let account_owner = "macro|delegation-owner@example.com";
+    let viewer = "rox|delegation-viewer@example.com";
+    let sharer = "rox|delegation-sharer@example.com";
+    let account_owner = "rox|delegation-owner@example.com";
     insert_team(&pool, viewer, &[viewer, sharer]).await;
     insert_user(&pool, account_owner).await;
     let link = insert_link(&pool, account_owner).await;

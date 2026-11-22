@@ -198,7 +198,7 @@ exports[`documents view GraphQL input contract > captures every production tab w
               "and": {
                 "left": {
                   "literal": {
-                    "owner": "macro|phase-0@example.com",
+                    "owner": "rox|phase-0@example.com",
                   },
                 },
                 "right": {
@@ -292,7 +292,7 @@ exports[`documents view GraphQL input contract > captures every production tab w
                 "left": {
                   "not": {
                     "literal": {
-                      "owner": "macro|phase-0@example.com",
+                      "owner": "rox|phase-0@example.com",
                     },
                   },
                 },
@@ -512,7 +512,7 @@ exports[`documents view GraphQL input contract > captures every production tab w
               "and": {
                 "left": {
                   "literal": {
-                    "owner": "macro|phase-0@example.com",
+                    "owner": "rox|phase-0@example.com",
                   },
                 },
                 "right": {
@@ -597,7 +597,7 @@ exports[`documents view GraphQL input contract > captures every production tab w
                 "left": {
                   "not": {
                     "literal": {
-                      "owner": "macro|phase-0@example.com",
+                      "owner": "rox|phase-0@example.com",
                     },
                   },
                 },

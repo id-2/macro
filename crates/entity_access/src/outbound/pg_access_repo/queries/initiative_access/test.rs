@@ -5,9 +5,9 @@ use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|initiative-owner@corp.test";
-const GRANTEE: &str = "macro|initiative-grantee@corp.test";
-const STRANGER: &str = "macro|initiative-stranger@corp.test";
+const OWNER: &str = "rox|initiative-owner@corp.test";
+const GRANTEE: &str = "rox|initiative-grantee@corp.test";
+const STRANGER: &str = "rox|initiative-stranger@corp.test";
 const OWNER_TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_1a01);
 const OTHER_TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_1a02);
 const GRANTED_TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_1a03);
@@ -31,7 +31,7 @@ impl LinkShare {
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::now_v7();
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
 
     sqlx::query!(
         r#"

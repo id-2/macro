@@ -15,8 +15,8 @@ vi.mock('@queries/client', () => ({
   queryClient: { invalidateQueries: vi.fn() },
 }));
 
-const alice = 'macro|alice@example.com';
-const bob = 'macro|bob@example.com';
+const alice = 'rox|alice@example.com';
+const bob = 'rox|bob@example.com';
 const getTeam = vi.mocked(authServiceClient.getTeam);
 const displayName = vi.fn<(userId: string) => string>();
 const disposers: (() => void)[] = [];
@@ -80,15 +80,15 @@ it('offers named human teammates, excluding self, duplicates, bots and malformed
     ok(
       roster([
         alice,
-        'macro|ALICE@example.com',
+        'rox|ALICE@example.com',
         bob,
         bob,
-        'macro|BOB@example.com',
+        'rox|BOB@example.com',
         'bot|00000000-0000-0000-0000-000000000001',
         '00000000-0000-0000-0000-00000000a1a1',
         'invalid',
-        'macro|@',
-        'macro|carol@example.com',
+        'rox|@',
+        'rox|carol@example.com',
       ])
     )
   );
@@ -98,7 +98,7 @@ it('offers named human teammates, excluding self, duplicates, bots and malformed
   expect(source.people()).toEqual([
     { id: bob, email: 'bob@example.com', name: 'Bob Baker' },
     {
-      id: 'macro|carol@example.com',
+      id: 'rox|carol@example.com',
       email: 'carol@example.com',
       name: 'carol@example.com',
     },
@@ -109,10 +109,10 @@ it('offers named human teammates, excluding self, duplicates, bots and malformed
 it("hides a previous account's roster and refreshes for the new account", async () => {
   const { source, setUserId } = setup();
   await vi.waitFor(() => expect(source.people()).toHaveLength(1));
-  setUserId('macro|other@example.com');
+  setUserId('rox|other@example.com');
   expect(source.people()).toEqual([]);
   expect(source.error()).toBeDefined();
-  getTeam.mockResolvedValue(ok(roster(['macro|other@example.com', bob])));
+  getTeam.mockResolvedValue(ok(roster(['rox|other@example.com', bob])));
   source.refresh();
   await vi.waitFor(() => expect(source.error()).toBeUndefined());
   expect(source.people()).toEqual([

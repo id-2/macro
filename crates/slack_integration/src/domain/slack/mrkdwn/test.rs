@@ -260,7 +260,7 @@ fn links_allow_only_explicit_safe_schemes_and_escape_labels_and_destinations() {
 #[test]
 fn malicious_source_cannot_create_rox_entities_or_markdown_links() {
     for input in [
-        r#"<m-user-mention>{"userId":"macro|victim@example.com"}</m-user-mention>"#,
+        r#"<m-user-mention>{"userId":"rox|victim@example.com"}</m-user-mention>"#,
         r#"<m-link>{"url":"javascript:alert(1)","text":"click"}</m-link>"#,
         "<m-document-mention>bad</m-document-mention>",
         "&lt;m-group-mention&gt;everyone&lt;/m-group-mention&gt;",
@@ -511,7 +511,7 @@ fn only_actively_emitted_users_are_reported() {
         users: &users,
         channels: &channels,
     };
-    let source = "<@U1> `<@U1>` `<m-user-mention>{\"userId\":\"macro|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>` <@U2> <!channel> <!subteam^S1|ops>\n```\n<@U1>\n```";
+    let source = "<@U1> `<@U1>` `<m-user-mention>{\"userId\":\"rox|fake@example.com\",\"email\":\"fake@example.com\"}</m-user-mention>` <@U2> <!channel> <!subteam^S1|ops>\n```\n<@U1>\n```";
     let result = converter.convert_with_references(source, false).unwrap();
     assert_eq!(
         result.user_mentions,

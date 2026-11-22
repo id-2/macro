@@ -2,13 +2,13 @@ INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
 VALUES ('b2222222-2222-2222-2222-222222222222', 'owner@example.com', 'owner@example.com', 'stripe_id');
 
 INSERT INTO public."User" ("id", "email", "stripeCustomerId", "rox_user_id")
-VALUES ('macro|owner@example.com', 'owner@example.com', 'stripe_id', 'b2222222-2222-2222-2222-222222222222');
+VALUES ('rox|owner@example.com', 'owner@example.com', 'stripe_id', 'b2222222-2222-2222-2222-222222222222');
 
 INSERT INTO public."Document" ("id", "name", "fileType", "owner")
 VALUES
-    ('htm-document', 'saved page', 'htm', 'macro|owner@example.com'),
-    ('html-document', 'web page', 'html', 'macro|owner@example.com'),
-    ('md-document', 'notes', 'md', 'macro|owner@example.com');
+    ('htm-document', 'saved page', 'htm', 'rox|owner@example.com'),
+    ('html-document', 'web page', 'html', 'rox|owner@example.com'),
+    ('md-document', 'notes', 'md', 'rox|owner@example.com');
 
 INSERT INTO public."DocumentInstance" ("revisionName", "documentId", "sha", "createdAt", "updatedAt")
 VALUES

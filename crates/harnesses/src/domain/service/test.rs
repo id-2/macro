@@ -11,8 +11,8 @@ use crate::domain::{
     ports::{HostedPairingUpsert, OpenPairingCounts, PairingRow},
 };
 
-const OWNER_ID: &str = "macro|owner@example.com";
-const MEMBER_ID: &str = "macro|member@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
+const MEMBER_ID: &str = "rox|member@example.com";
 const CODE: &str = "KX7M-4QHD";
 const TEAM_ID: Uuid = Uuid::from_u128(7);
 
@@ -361,7 +361,7 @@ impl HarnessRepo for FakeRepo {
 
 /// The one agent teammate's computer in these tests, and its agent.
 const AGENT_COMPUTER_ID: ComputerId = ComputerId::new_from_uuid(Uuid::from_u128(0xa6e7));
-const TEAM_AGENT_ID: &str = "macro|agent@example.com";
+const TEAM_AGENT_ID: &str = "rox|agent@example.com";
 
 #[derive(Clone, Default)]
 struct FakeTeamAgents;

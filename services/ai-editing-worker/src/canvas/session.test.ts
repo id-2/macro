@@ -238,7 +238,7 @@ describe('live Canvas editing sessions', () => {
                         id: 'box',
                         at: 0,
                         person: {
-                          userId: 'macro|alice@example.com',
+                          userId: 'rox|alice@example.com',
                           email: 'alice@example.com',
                         },
                       },

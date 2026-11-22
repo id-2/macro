@@ -23,18 +23,18 @@ VALUES
 
 INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
-    ('macro|dave@beta.com', 'dave@beta.com', 'Dave', 'd1111111-1111-1111-1111-111111111111'),
-    ('macro|erin@beta.com', 'erin@beta.com', 'Erin', 'e1111111-1111-1111-1111-111111111111');
+    ('rox|dave@beta.com', 'dave@beta.com', 'Dave', 'd1111111-1111-1111-1111-111111111111'),
+    ('rox|erin@beta.com', 'erin@beta.com', 'Erin', 'e1111111-1111-1111-1111-111111111111');
 
 -- == Team Beta + memberships ==
 INSERT INTO team (id, name, owner_id, seat_count)
 VALUES
-    ('e0000002-0000-0000-0000-000000000002', 'Team Beta', 'macro|dave@beta.com', 2);
+    ('e0000002-0000-0000-0000-000000000002', 'Team Beta', 'rox|dave@beta.com', 2);
 
 INSERT INTO team_user (team_id, user_id, team_role)
 VALUES
-    ('e0000002-0000-0000-0000-000000000002', 'macro|dave@beta.com', 'owner'),
-    ('e0000002-0000-0000-0000-000000000002', 'macro|erin@beta.com', 'member');
+    ('e0000002-0000-0000-0000-000000000002', 'rox|dave@beta.com', 'owner'),
+    ('e0000002-0000-0000-0000-000000000002', 'rox|erin@beta.com', 'member');
 
 INSERT INTO team_crm_settings (team_id, crm_enabled)
 VALUES
@@ -43,8 +43,8 @@ VALUES
 -- == Email links ==
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
-    ('d0000001-0000-0000-0000-000000000001', 'macro|dave@beta.com', 'fa_dave', 'dave@beta.com', 'GMAIL', true, NOW(), NOW()),
-    ('d0000002-0000-0000-0000-000000000002', 'macro|erin@beta.com', 'fa_erin', 'erin@beta.com', 'GMAIL', true, NOW(), NOW());
+    ('d0000001-0000-0000-0000-000000000001', 'rox|dave@beta.com', 'fa_dave', 'dave@beta.com', 'GMAIL', true, NOW(), NOW()),
+    ('d0000002-0000-0000-0000-000000000002', 'rox|erin@beta.com', 'fa_erin', 'erin@beta.com', 'GMAIL', true, NOW(), NOW());
 
 -- Each team contributor has explicitly consented to this primary mailbox.
 INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)

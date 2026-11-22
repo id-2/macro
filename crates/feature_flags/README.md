@@ -11,7 +11,7 @@ use feature_flags::outbound::fake::FakeFeatureFlags;
 use macro_user_id::user_id::RoxUserIdStr;
 
 # async fn example() -> Result<(), rootcause::Report> {
-let user_id = RoxUserIdStr::parse_from_str("macro|person@example.com")?;
+let user_id = RoxUserIdStr::parse_from_str("rox|person@example.com")?;
 let mut feature_flags = FakeFeatureFlags::default();
 feature_flags.set(user_id.clone(), Ok(FlagSnapshot::new([
     ("agent-code-mode".into(), FlagValue::Boolean(true)),

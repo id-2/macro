@@ -51,7 +51,7 @@ fn request(mcp_tools: Option<RemoteMcpToolSet>) -> TurnRequest {
         purpose: TurnPurpose::Conversation,
         session_id: AgentSessionId::new(),
         awaiting: Arc::new(AwaitingUser::default()),
-        owner: Owner::User(RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
+        owner: Owner::User(RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap()),
         model: "unused".into(),
         reasoning_effort: Default::default(),
         speed: Default::default(),

@@ -60,7 +60,7 @@ async fn session_links_require_public_consent_or_owner_team_membership(pool: PgP
 )]
 async fn session_links_preserve_stronger_grants_and_revoke_immediately(pool: PgPool) {
     for (sources, expected) in [
-        (vec!["macro|owner@team.com".to_string()], AccessLevel::Owner),
+        (vec!["rox|owner@team.com".to_string()], AccessLevel::Owner),
         (vec!["channel".to_string()], AccessLevel::Edit),
     ] {
         assert_eq!(
@@ -85,7 +85,7 @@ async fn session_links_preserve_stronger_grants_and_revoke_immediately(pool: PgP
         None,
     );
 
-    sqlx::query!("DELETE FROM team_user WHERE user_id = 'macro|owner@team.com'")
+    sqlx::query!("DELETE FROM team_user WHERE user_id = 'rox|owner@team.com'")
         .execute(&pool)
         .await
         .unwrap();
@@ -204,7 +204,7 @@ async fn session_allowlist_matches_grants_and_respects_requested_ids(pool: PgPoo
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn hidden_sessions_leave_the_allowlist_unless_named(pool: PgPool) {
     let session = uuid::Uuid::now_v7();
-    let viewer = "macro|agent-session-list-viewer@example.com";
+    let viewer = "rox|agent-session-list-viewer@example.com";
     let rox_user_id = uuid::Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",

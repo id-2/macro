@@ -17,7 +17,7 @@ pub(super) fn target() -> ProviderCalendarTarget {
             grant_generation: 3,
         }),
         provider: CalendarProvider::Outlook,
-        owner_id: "macro|owner@example.com".into(),
+        owner_id: "rox|owner@example.com".into(),
         email_link_id: link_id,
         account_id: Uuid::now_v7(),
         calendar_id: Uuid::now_v7(),

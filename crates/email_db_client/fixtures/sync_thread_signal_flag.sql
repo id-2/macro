@@ -25,7 +25,7 @@
 --   sender override both saying signal.
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000d01', 'macro|sigflag_user@example.com', '00000000-0000-0000-0000-000000000d01',
+VALUES ('00000000-0000-0000-0000-000000000d01', 'rox|sigflag_user@example.com', '00000000-0000-0000-0000-000000000d01',
         'sigflag_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_contacts (id, link_id, email_address, created_at, updated_at)

@@ -149,7 +149,7 @@ fn tiny_batches() -> PurgePacing {
 fn gmail_link(email: &str) -> anyhow::Result<Link> {
     Ok(Link {
         id: rox_uuid::generate_uuid_v7(),
-        rox_id: RoxUserIdStr::try_from(format!("macro|{email}"))?,
+        rox_id: RoxUserIdStr::try_from(format!("rox|{email}"))?,
         fusionauth_user_id: "33333333-3333-3333-3333-333333333333".to_string(),
         email_address: EmailStr::try_from(email.to_string())?,
         provider: UserProvider::Gmail,

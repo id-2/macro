@@ -8,7 +8,7 @@ use uuid::Uuid;
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_contacts_returns_visible_ordered_alphabetically(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -40,7 +40,7 @@ async fn list_contacts_returns_visible_ordered_alphabetically(pool: PgPool) -> a
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_contacts_excludes_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -65,7 +65,7 @@ async fn list_contacts_owned_company_with_no_contacts_returns_empty(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -79,7 +79,7 @@ async fn list_contacts_owned_company_with_no_contacts_returns_empty(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_contacts_unknown_company_returns_not_found(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo
@@ -96,10 +96,10 @@ async fn list_contacts_unknown_company_returns_not_found(pool: PgPool) -> anyhow
 async fn list_contacts_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    seed_team(&pool, team_a, "macro|a@test.com").await?;
-    seed_team(&pool, team_b, "macro|b@test.com").await?;
+    seed_team(&pool, team_a, "rox|a@test.com").await?;
+    seed_team(&pool, team_b, "rox|b@test.com").await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
-    let link_a = insert_email_link(&pool, "macro|a@test.com", "a@macro.test").await?;
+    let link_a = insert_email_link(&pool, "rox|a@test.com", "a@macro.test").await?;
     insert_contact_with_source(&pool, company_a, "alice@acme.com", link_a).await?;
 
     // Team B asking for team A's company must 404, not see an empty list.
@@ -117,7 +117,7 @@ async fn list_contacts_does_not_leak_across_teams(pool: PgPool) -> anyhow::Resul
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_contacts_admin_sees_hidden_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -154,7 +154,7 @@ async fn list_contacts_admin_sees_hidden_contacts(pool: PgPool) -> anyhow::Resul
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_contacts_admin_reaches_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;

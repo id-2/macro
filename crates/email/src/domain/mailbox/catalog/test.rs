@@ -3,8 +3,8 @@ use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 use std::sync::{Arc, Mutex};
 
-const CALLER: &str = "macro|reader@example.com";
-const OWNER: &str = "macro|owner@example.com";
+const CALLER: &str = "rox|reader@example.com";
+const OWNER: &str = "rox|owner@example.com";
 const OWN: Uuid = Uuid::from_u128(1);
 const SHARED: Uuid = Uuid::from_u128(2);
 

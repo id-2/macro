@@ -3,12 +3,12 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@corp.test";
-const REQUESTER: &str = "macro|requester@corp.test";
+const OWNER: &str = "rox|owner@corp.test";
+const REQUESTER: &str = "rox|requester@corp.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
 
     sqlx::query!(
         r#"

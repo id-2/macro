@@ -59,7 +59,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
     for until in [now - Duration::seconds(1), now] {
         let result = service
             .set(
-                RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap(),
                 EntityType::Document.with_entity_str("document"),
                 Some(until),
                 now,
@@ -74,7 +74,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
     for until in [Some(now + Duration::hours(1)), None] {
         service
             .set(
-                RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap(),
                 EntityType::Document.with_entity_str("document"),
                 until,
                 now,
@@ -87,7 +87,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
     assert!(
         writes
             .iter()
-            .all(|(user, _)| user == "macro|owner@example.com")
+            .all(|(user, _)| user == "rox|owner@example.com")
     );
     assert!(writes[0].1.is_some());
     assert!(writes[1].1.is_none());
@@ -96,7 +96,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
 #[tokio::test]
 async fn bulk_validates_before_writing_and_deduplicates() {
     let service = ItemNotificationPreferenceService::new(FakeRepository::default());
-    let owner = || RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = || RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap();
     let now = Utc::now();
     let items = || {
         vec![
@@ -146,7 +146,7 @@ async fn bulk_validates_before_writing_and_deduplicates() {
     assert_eq!(
         writes[0],
         (
-            "macro|owner@example.com".to_owned(),
+            "rox|owner@example.com".to_owned(),
             vec!["same".to_owned(), "other".to_owned()],
             Some(future)
         )

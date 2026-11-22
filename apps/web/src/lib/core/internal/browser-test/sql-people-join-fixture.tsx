@@ -14,7 +14,7 @@ const TABLE = '01990000-0000-7000-8000-00000000d001';
 const OWNER = '01990000-0000-7000-8000-00000000c001';
 const EMAIL = '01990000-0000-7000-8000-00000000c002';
 const NAME = '01990000-0000-7000-8000-00000000c003';
-const PERSON = 'macro|late@example.com';
+const PERSON = 'rox|late@example.com';
 async function catalog(): Promise<Catalog> {
   const people = await buildDatabaseSqlCatalog({
     databases: [],

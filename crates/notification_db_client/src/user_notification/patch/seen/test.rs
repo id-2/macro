@@ -8,7 +8,7 @@ use sqlx::{Pool, Postgres};
 )]
 async fn test_patch_seen(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let notification_id = "0193b1ea-a542-7589-893b-2b4a509c1e76";
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
 
     patch_seen(&pool, notification_id, user_id).await?;
 
@@ -32,7 +32,7 @@ async fn test_patch_seen(pool: Pool<Postgres>) -> anyhow::Result<()> {
     fixtures(path = "../../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_bulk_patch_seen(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = "macro|user@user.com";
+    let user_id = "rox|user@user.com";
     let notification_ids = vec![
         rox_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e76")?,
         rox_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e75")?,

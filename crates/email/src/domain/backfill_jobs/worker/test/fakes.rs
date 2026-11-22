@@ -128,7 +128,7 @@ pub(super) fn setup() -> (BackfillService<Fake, Fake, Fake, Fake, Fake>, Fake) {
 pub(super) fn link() -> Link {
     Link {
         id: LINK,
-        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("rox|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "owner".into(),
         email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
         provider: UserProvider::Gmail,
@@ -266,7 +266,7 @@ impl BackfillRepository for Fake {
         Ok(self.0.lock().unwrap().link.clone())
     }
     async fn link_by_email(&self, owner: &str, email: &str) -> Result<Option<Link>, Error> {
-        assert_eq!(owner, "macro|owner@example.com");
+        assert_eq!(owner, "rox|owner@example.com");
         assert_eq!(email, "owner@example.com");
         self.call("link_by_email")?;
         Ok(self.0.lock().unwrap().link.clone())
@@ -533,7 +533,7 @@ impl BackfillWritePermit for Fake {
 }
 impl BackfillCrm for Fake {
     async fn get_team_id_for_user(&self, user: &str) -> Result<Option<Uuid>, CrmError> {
-        assert_eq!(user, "macro|owner@example.com");
+        assert_eq!(user, "rox|owner@example.com");
         self.crm_call("team")?;
         Ok(self.0.lock().unwrap().team)
     }
@@ -543,7 +543,7 @@ impl BackfillCrm for Fake {
         user: &str,
     ) -> Result<Option<EmailContributionMailbox>, CrmError> {
         assert_eq!(team, TEAM);
-        assert_eq!(user, "macro|owner@example.com");
+        assert_eq!(user, "rox|owner@example.com");
         self.crm_call("consent")?;
         Ok(self
             .0

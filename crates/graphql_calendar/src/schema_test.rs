@@ -7,7 +7,7 @@ use crate::{CalendarMutationRoot, GraphqlCalendarQuery};
 fn calendar_types_match_the_shared_schema() {
     let generated = Schema::build(
         GraphqlCalendarQuery::new(
-            RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|viewer@example.com").unwrap(),
         ),
         CalendarMutationRoot,
         EmptySubscription,

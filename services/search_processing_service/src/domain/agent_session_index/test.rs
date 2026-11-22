@@ -38,7 +38,7 @@ impl SearchSnapshotService for Source {
                     id: id.as_uuid(),
                     name: "searchable title".into(),
                     owner_id: rox_user_id::user_id::RoxUserIdStr::try_from(
-                        "macro|test@example.com".to_string(),
+                        "rox|test@example.com".to_string(),
                     )
                     .unwrap(),
                     bot_id: Uuid::from_u128(2),

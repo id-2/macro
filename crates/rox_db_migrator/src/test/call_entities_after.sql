@@ -8,12 +8,12 @@ DELETE FROM calls WHERE id = '019a0000-0000-7000-8000-000000000012';
 -- Calls created after deployment also receive a durable identity immediately.
 INSERT INTO "SharePermission" (id) VALUES ('call-model-new');
 INSERT INTO calls (id, room_name, created_by, share_permission_id, created_at) VALUES
-('019a0000-0000-7000-8000-000000000013', 'new-native-room', 'macro|call-model-a@test.com', 'call-model-new', '2026-01-02T10:00:00Z');
+('019a0000-0000-7000-8000-000000000013', 'new-native-room', 'rox|call-model-a@test.com', 'call-model-new', '2026-01-02T10:00:00Z');
 DO $$ BEGIN
     ASSERT EXISTS (
         SELECT 1 FROM call_entities
         WHERE id = '019a0000-0000-7000-8000-000000000013'
-            AND user_id = 'macro|call-model-a@test.com'
+            AND user_id = 'rox|call-model-a@test.com'
             AND created_via = 'native'
             AND started_at = '2026-01-02T10:00:00Z'::timestamptz
             AND share_permission_id = 'call-model-new'
@@ -53,16 +53,16 @@ END $$;
 -- Bare manual/imported records require no room, people, media, or timing.
 INSERT INTO "SharePermission" (id) VALUES ('call-model-import-a'), ('call-model-import-b');
 INSERT INTO call_entities (id, user_id, created_via, share_permission_id) VALUES
-('019a0000-0000-7000-8000-000000000020', 'macro|call-model-a@test.com', 'import', 'call-model-import-a'),
-('019a0000-0000-7000-8000-000000000021', 'macro|call-model-b@test.com', 'manual', 'call-model-import-b');
+('019a0000-0000-7000-8000-000000000020', 'rox|call-model-a@test.com', 'import', 'call-model-import-a'),
+('019a0000-0000-7000-8000-000000000021', 'rox|call-model-b@test.com', 'manual', 'call-model-import-b');
 INSERT INTO call_entity_sources (call_id, user_id, namespace, provider, object_type, external_id) VALUES
-('019a0000-0000-7000-8000-000000000020', 'macro|call-model-a@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one'),
-('019a0000-0000-7000-8000-000000000021', 'macro|call-model-b@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one');
+('019a0000-0000-7000-8000-000000000020', 'rox|call-model-a@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one'),
+('019a0000-0000-7000-8000-000000000021', 'rox|call-model-b@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one');
 DO $$ BEGIN
     ASSERT (SELECT started_at IS NULL AND ended_at IS NULL AND duration_ms IS NULL FROM call_entities WHERE id = '019a0000-0000-7000-8000-000000000020');
     BEGIN
         INSERT INTO call_entity_sources (call_id, user_id, namespace, provider, object_type, external_id) VALUES
-        ('019a0000-0000-7000-8000-000000000021', 'macro|call-model-a@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one');
+        ('019a0000-0000-7000-8000-000000000021', 'rox|call-model-a@test.com', 'account-1', 'granola', 'note', 'opaque:/note#one');
         RAISE EXCEPTION 'duplicate source identity was accepted';
     EXCEPTION WHEN unique_violation THEN NULL; END;
     BEGIN
@@ -138,7 +138,7 @@ DO $$ BEGIN
     ASSERT NOT EXISTS (SELECT 1 FROM "SharePermission" WHERE id IN ('call-model-live', 'call-model-archive', 'call-model-import-a'));
 END $$;
 
-DELETE FROM "User" WHERE id = 'macro|call-model-b@test.com';
+DELETE FROM "User" WHERE id = 'rox|call-model-b@test.com';
 DO $$ BEGIN
     ASSERT NOT EXISTS (SELECT 1 FROM call_entities);
     ASSERT NOT EXISTS (SELECT 1 FROM call_entity_sources);

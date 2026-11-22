@@ -20,7 +20,7 @@ use super::{health, mount_at_root_and_prefix, *};
 const ACCESS_TOKEN_COOKIE: &str = "macro-access-token";
 const INTERNAL_API_KEY_HEADER: &str = "x-internal-auth-key";
 const TEST_INTERNAL_API_KEY: &str = "test-internal-key";
-const TEST_USER_ID: &str = "macro|image-proxy-test@example.com";
+const TEST_USER_ID: &str = "rox|image-proxy-test@example.com";
 
 fn test_context() -> ApiContext {
     let authorization_service = RoxAuthorizationServiceImpl::new(

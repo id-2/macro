@@ -9,7 +9,7 @@ use properties::PropertyOptionInfo;
 use super::*;
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|owner@example.com").unwrap()
 }
 
 fn event(name: &str, message_id: Option<Uuid>) -> EventReference {
@@ -118,7 +118,7 @@ fn message(content: &str) -> Message {
         id: Uuid::nil(),
         parent: MessageParent::Channel(Uuid::nil()),
         thread_id: None,
-        sender_id: "macro|sender@example.com".to_owned().try_into().unwrap(),
+        sender_id: "rox|sender@example.com".to_owned().try_into().unwrap(),
         guest_name: None,
         imported_author: None,
         bot_profile: None,
@@ -250,7 +250,7 @@ fn calls_show_who_joined_and_what_they_said() {
         call_id: Uuid::nil(),
         channel_id: None,
         room_name: Some("room".into()),
-        created_by: "macro|owner@example.com".into(),
+        created_by: "rox|owner@example.com".into(),
         started_at: at,
         ended_at: Some(at + chrono::Duration::minutes(30)),
         duration_ms: Some(1_800_000),
@@ -270,7 +270,7 @@ fn calls_show_who_joined_and_what_they_said() {
         user_access_level: None,
         viewer_has_declined: false,
         participants: vec![CallRecordParticipant {
-            user_id: "macro|owner@example.com".into(),
+            user_id: "rox|owner@example.com".into(),
             joined_at: at,
             left_at: None,
         }],
@@ -278,7 +278,7 @@ fn calls_show_who_joined_and_what_they_said() {
         transcript: vec![CallRecordTranscriptSegment {
             transcript_id: Uuid::nil(),
             segment_id: None,
-            speaker_id: "macro|owner@example.com".into(),
+            speaker_id: "rox|owner@example.com".into(),
             diarized_speaker_id: None,
             content: "When do you need SSO?".into(),
             started_at: at,

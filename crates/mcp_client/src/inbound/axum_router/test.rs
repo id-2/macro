@@ -130,7 +130,7 @@ impl McpServerStore for FakeStore {
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|user-1@example.com").unwrap()
+    RoxUserIdStr::parse_from_str("rox|user-1@example.com").unwrap()
 }
 
 fn server() -> McpServerRecord {

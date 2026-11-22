@@ -68,7 +68,7 @@ impl DiscussionContextReader for Context {
     }
 }
 fn event() -> MessageEvent {
-    let actor = "macro|author@example.com".to_owned();
+    let actor = "rox|author@example.com".to_owned();
     let parent = MessageParent::parse("document", "legacy-document").unwrap();
     let message = Message {
         kind: MessageKind::Message,

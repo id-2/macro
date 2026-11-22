@@ -28,7 +28,7 @@ async fn create_mints_a_meeting_and_returns_its_join_link() {
     Mock::given(method("POST"))
         .and(path("/call/meetings"))
         .and(header(INTERNAL_API_KEY_HEADER, "secret"))
-        .and(header(INTERNAL_ROX_USER_ID_HEADER, "macro|ada@rox.one"))
+        .and(header(INTERNAL_ROX_USER_ID_HEADER, "rox|ada@rox.one"))
         .and(body_json(serde_json::json!({
             "preparationId": null,
             "title": "Intro — Ada",
@@ -45,7 +45,7 @@ async fn create_mints_a_meeting_and_returns_its_join_link() {
         .await;
     let links = HttpMeetingLinks::new(server.uri(), "https://rox.one", "secret");
     let created = links
-        .create_meeting_link("macro|ada@rox.one", request())
+        .create_meeting_link("rox|ada@rox.one", request())
         .await
         .unwrap();
     assert_eq!(created.id, meeting_id);
@@ -61,14 +61,14 @@ async fn cancel_deletes_the_meeting_for_the_organizer() {
     let meeting_id = Uuid::from_u128(9);
     Mock::given(method("DELETE"))
         .and(path(format!("/call/meetings/{meeting_id}")))
-        .and(header(INTERNAL_ROX_USER_ID_HEADER, "macro|ada@rox.one"))
+        .and(header(INTERNAL_ROX_USER_ID_HEADER, "rox|ada@rox.one"))
         .respond_with(ResponseTemplate::new(204))
         .expect(1)
         .mount(&server)
         .await;
     let links = HttpMeetingLinks::new(server.uri(), "https://rox.one/", "secret");
     links
-        .cancel_meeting_link("macro|ada@rox.one", meeting_id)
+        .cancel_meeting_link("rox|ada@rox.one", meeting_id)
         .await
         .unwrap();
 }

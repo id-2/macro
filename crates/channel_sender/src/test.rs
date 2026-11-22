@@ -15,7 +15,7 @@ fn guest_identity_is_distinct_and_round_trips() {
     assert_eq!(sender.copied().into_owned(), sender);
     for invalid in [
         "guest|",
-        "guest|macro|alice@example.com",
+        "guest|rox|alice@example.com",
         "guest|not-a-uuid",
         "guest|00000000000000000000000000000001",
     ] {
@@ -36,9 +36,9 @@ fn anonymous_participant_is_display_only() {
 
 #[test]
 fn sender_round_trips_user_storage_string() {
-    let sender = ChannelSender::parse_from_str("macro|alice@example.com").unwrap();
+    let sender = ChannelSender::parse_from_str("rox|alice@example.com").unwrap();
 
-    assert_eq!(sender.as_ref(), "macro|alice@example.com");
+    assert_eq!(sender.as_ref(), "rox|alice@example.com");
     assert!(matches!(sender.0, InnerVal::User(_)));
 }
 
@@ -59,7 +59,7 @@ fn sender_round_trips_bot_storage_string() {
 
 #[test]
 fn fallback_user_name_uses_email_local_part() {
-    let user_id = RoxUserIdStr::parse_from_str("macro|shepherd.hatton@gmail.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("rox|shepherd.hatton@gmail.com").unwrap();
 
     assert_eq!(user_id.email_part().local_part(), "shepherd.hatton");
 }
@@ -79,7 +79,7 @@ fn bot_sender_into_owned_and_copied_preserve_contents() {
 
 #[test]
 fn user_sender_into_owned_and_copied_preserve_contents() {
-    let storage = "macro|alice@example.com";
+    let storage = "rox|alice@example.com";
 
     let copied_value = ChannelSender::parse_from_str(storage).unwrap();
     let copied = copied_value.copied();

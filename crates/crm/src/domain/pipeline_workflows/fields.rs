@@ -525,10 +525,10 @@ fn person(field: &str, value: &str, viewer: &RoxUserIdStr<'_>) -> Result<String,
     if value.eq_ignore_ascii_case("me") {
         return Ok(viewer.as_ref().to_owned());
     }
-    let id = if value.to_lowercase().starts_with("macro|") {
+    let id = if value.to_lowercase().starts_with("rox|") {
         value.to_lowercase()
     } else if value.contains('@') {
-        format!("macro|{}", value.to_lowercase())
+        format!("rox|{}", value.to_lowercase())
     } else {
         String::new()
     };
@@ -537,7 +537,7 @@ fn person(field: &str, value: &str, viewer: &RoxUserIdStr<'_>) -> Result<String,
         .map_err(|_| {
             format!(
                 "\"{field}\" takes a person: \"me\", an email address, or a Rox user id like \
-                 macro|sam@example.com, not \"{value}\"."
+                 rox|sam@example.com, not \"{value}\"."
             )
         })
 }

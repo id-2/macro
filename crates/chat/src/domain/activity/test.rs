@@ -33,7 +33,7 @@ fn message(role: ChatMessageRole, actor: Option<RoxUserIdStr<'static>>) -> ChatT
 fn created_and_user_message_map_to_activities() {
     let created = envelope(ChatTopicEvent::Created(ChatCreatedMetadata {
         chat_id: "chat-1".to_string(),
-        owner: Owner::User(user("macro|owner@example.com")),
+        owner: Owner::User(user("rox|owner@example.com")),
         name: "planning".to_string(),
         project_id: None,
     }));
@@ -45,7 +45,7 @@ fn created_and_user_message_map_to_activities() {
 
     let sent = envelope(message(
         ChatMessageRole::User,
-        Some(user("macro|owner@example.com")),
+        Some(user("rox|owner@example.com")),
     ));
     let Ingest::Insert(activities) = sent.event.ingest(sent.event_id) else {
         panic!("expected activities");
@@ -55,7 +55,7 @@ fn created_and_user_message_map_to_activities() {
 
 #[test]
 fn created_derives_an_actor_for_every_owner_kind() {
-    let user = user("macro|owner@example.com");
+    let user = user("rox|owner@example.com");
     let bot = bot_id::ROX_AI_BOT_ID;
     for (owner, expected_actor) in [
         (Owner::User(user.clone()), Actor::new_from_user(user)),
@@ -85,7 +85,7 @@ fn created_derives_an_actor_for_every_owner_kind() {
 fn assistant_and_actorless_messages_are_dropped() {
     let assistant = envelope(message(
         ChatMessageRole::Assistant,
-        Some(user("macro|owner@example.com")),
+        Some(user("rox|owner@example.com")),
     ));
     assert_eq!(assistant.event.ingest(assistant.event_id), Ingest::Ignore);
 

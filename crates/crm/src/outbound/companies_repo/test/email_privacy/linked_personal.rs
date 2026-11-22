@@ -15,7 +15,7 @@ use rox_user_id::user_id::RoxUserIdStr;
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyhow::Result<()> {
-    let member = "macro|member@example.com";
+    let member = "rox|member@example.com";
     let reader_team = Uuid::now_v7();
     seed_team(&pool, reader_team, member).await?;
     sqlx::query!(
@@ -46,7 +46,7 @@ async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyho
     .enumerate()
     {
         let team = Uuid::now_v7();
-        let owner = format!("macro|owner-{index}@example.com");
+        let owner = format!("rox|owner-{index}@example.com");
         seed_team(&pool, team, &owner).await?;
         // A user has one current team. Move this isolated reader into each
         // case's team without granting any independent mailbox access.
@@ -321,7 +321,7 @@ async fn reassignment_waits_for_population_then_blocks_disabled_parent_writes(
     assert_eq!(changed.last_interaction, at);
     // A second consenting member exposes forbidden new source insertion, not
     // merely the ON CONFLICT no-op of an already attached mailbox.
-    let other = "macro|other@example.com";
+    let other = "rox|other@example.com";
     seed_team(&pool, Uuid::now_v7(), other).await?;
     let other_link = insert_email_link(&pool, other, "other@example.com").await?;
     consent_to_mailbox(&pool, team, other_link).await?;

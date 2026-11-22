@@ -18,7 +18,7 @@ const LINKS = {
   },
   users: {
     '12345678123412341234123456789abc': {
-      userId: 'macro|teo@acme.test',
+      userId: 'rox|teo@acme.test',
       email: 'teo@acme.test',
     },
   },
@@ -94,7 +94,7 @@ describe('Notion markdown to Lexical', () => {
       'text',
     ]);
     expect(children(paragraph)[1]).toMatchObject({
-      userId: 'macro|teo@acme.test',
+      userId: 'rox|teo@acme.test',
       email: 'teo@acme.test',
     });
     expect(text(paragraph)).toBe('Ask  or @Ghost');

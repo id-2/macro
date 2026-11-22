@@ -188,7 +188,7 @@ fn due_action() -> ScheduledAction {
     let now = Utc::now();
     ScheduledAction {
         id: Some(generate_uuid_v7()),
-        owner: Owner::from_principal_str("macro|polling-dispatcher@test.com")
+        owner: Owner::from_principal_str("rox|polling-dispatcher@test.com")
             .expect("test owner should be valid"),
         name: "test action".to_string(),
         trigger: ActionTrigger::Cron {

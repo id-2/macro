@@ -60,9 +60,9 @@ async fn only_one_replica_locks_an_account_and_discovery_skips_it(
     options: PgConnectOptions,
 ) {
     let pool = pool_options.connect_with(options.clone()).await.unwrap();
-    let connected = insert_account(&pool, "macro|connected", "connected").await;
-    let pairing = insert_account(&pool, "macro|pairing", "pairing").await;
-    insert_account(&pool, "macro|logged-out", "logged_out").await;
+    let connected = insert_account(&pool, "rox|connected", "connected").await;
+    let pairing = insert_account(&pool, "rox|pairing", "pairing").await;
+    insert_account(&pool, "rox|logged-out", "logged_out").await;
     let tracker = TaskTracker::new();
     let first = PgAccountLocks::connect(&options, KEEPALIVE, &tracker)
         .await
@@ -76,14 +76,14 @@ async fn only_one_replica_locks_an_account_and_discovery_skips_it(
 
     sqlx::query!(
         r#"INSERT INTO whatsapp_pairing (id, account_id, user_id, generation, state, expires_at)
-        VALUES ($1, $2, 'macro|pairing', 1, 'waiting', now() + interval '5 minutes')"#,
+        VALUES ($1, $2, 'rox|pairing', 1, 'waiting', now() + interval '5 minutes')"#,
         Uuid::now_v7(),
         pairing,
     )
     .execute(&pool)
     .await
     .unwrap();
-    insert_account(&pool, "macro|stale-pairing", "pairing").await;
+    insert_account(&pool, "rox|stale-pairing", "pairing").await;
 
     let mut candidates = directory.candidates(10).await.unwrap();
     candidates.sort();
@@ -109,7 +109,7 @@ async fn killing_the_lock_connection_frees_its_locks_and_reports_the_loss(
     options: PgConnectOptions,
 ) {
     let pool = pool_options.connect_with(options.clone()).await.unwrap();
-    let account = insert_account(&pool, "macro|owner", "connected").await;
+    let account = insert_account(&pool, "rox|owner", "connected").await;
     let tracker = TaskTracker::new();
     let doomed = PgAccountLocks::connect(&options, KEEPALIVE, &tracker)
         .await
@@ -206,7 +206,7 @@ async fn a_draining_replica_hands_its_account_over_without_waiting_for_a_rescan(
     options: PgConnectOptions,
 ) {
     let pool = pool_options.connect_with(options.clone()).await.unwrap();
-    let account = insert_account(&pool, "macro|owner", "connected").await;
+    let account = insert_account(&pool, "rox|owner", "connected").await;
     let tracker = TaskTracker::new();
     let mut draining = start_replica(&pool, &options, &tracker).await;
     let (first_owner, _) = draining.started.recv().await.unwrap();

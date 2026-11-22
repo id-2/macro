@@ -87,7 +87,7 @@ mod test {
         GetEmailsRequest {
             view: PreviewView::StandardLabel(PreviewViewStandardLabel::All),
             link_ids: vec![Uuid::from_u128(46)],
-            rox_id: RoxUserIdStr::parse_from_str("macro|member@example.com").unwrap(),
+            rox_id: RoxUserIdStr::parse_from_str("rox|member@example.com").unwrap(),
             limit: Some(25),
             query,
             include_frecency: true,

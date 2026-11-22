@@ -15,7 +15,7 @@ fn record_with_participants(user_ids: &[&str]) -> CallRecord {
         call_id: Uuid::now_v7(),
         channel_id: Some(Uuid::now_v7()),
         room_name: Some("room".to_string()),
-        created_by: "macro|creator@test.com".to_string(),
+        created_by: "rox|creator@test.com".to_string(),
         started_at: now,
         ended_at: None,
         duration_ms: None,
@@ -69,11 +69,11 @@ fn assert_call_recency(item: &SoupItem, expected: DateTime<Utc>) {
 
 #[test]
 fn active_call_recency_uses_started_at() {
-    let record = record_with_participants(&["macro|a@test.com"]);
+    let record = record_with_participants(&["rox|a@test.com"]);
     let started_at = record.started_at;
     let item = SoupItem::Call(SoupCallRecord::from_record_for_user(
         record,
-        "macro|a@test.com",
+        "rox|a@test.com",
     ));
 
     assert_call_recency(&item, started_at);
@@ -81,13 +81,13 @@ fn active_call_recency_uses_started_at() {
 
 #[test]
 fn finished_call_recency_uses_ended_at() {
-    let mut record = record_with_participants(&["macro|a@test.com"]);
+    let mut record = record_with_participants(&["rox|a@test.com"]);
     let ended_at = record.started_at + Duration::minutes(30);
     record.ended_at = Some(ended_at);
     record.is_active = false;
     let item = SoupItem::Call(SoupCallRecord::from_record_for_user(
         record,
-        "macro|a@test.com",
+        "rox|a@test.com",
     ));
 
     assert_call_recency(&item, ended_at);
@@ -95,8 +95,8 @@ fn finished_call_recency_uses_ended_at() {
 
 #[test]
 fn call_record_status_uses_record_status_when_present() {
-    let record = record_with_status(CallStatus::Missed, &["macro|a@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let record = record_with_status(CallStatus::Missed, &["rox|a@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
 
     assert_eq!(soup.status, CallStatus::Missed);
     assert!(!soup.attended);
@@ -106,15 +106,15 @@ fn call_record_status_uses_record_status_when_present() {
 fn call_record_status_attended_true_only_for_attended() {
     let attended = SoupCallRecord::from_record_for_user(
         record_with_status(CallStatus::Attended, &[]),
-        "macro|a@test.com",
+        "rox|a@test.com",
     );
     let missed = SoupCallRecord::from_record_for_user(
-        record_with_status(CallStatus::Missed, &["macro|a@test.com"]),
-        "macro|a@test.com",
+        record_with_status(CallStatus::Missed, &["rox|a@test.com"]),
+        "rox|a@test.com",
     );
     let unattended = SoupCallRecord::from_record_for_user(
-        record_with_status(CallStatus::Unattended, &["macro|a@test.com"]),
-        "macro|a@test.com",
+        record_with_status(CallStatus::Unattended, &["rox|a@test.com"]),
+        "rox|a@test.com",
     );
 
     assert!(attended.attended);
@@ -124,8 +124,8 @@ fn call_record_status_attended_true_only_for_attended() {
 
 #[test]
 fn call_record_status_falls_back_to_participant_attended_when_status_absent() {
-    let record = record_with_participants(&["macro|a@test.com", "macro|b@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let record = record_with_participants(&["rox|a@test.com", "rox|b@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
 
     assert_eq!(soup.status, CallStatus::Attended);
     assert!(soup.attended);
@@ -133,8 +133,8 @@ fn call_record_status_falls_back_to_participant_attended_when_status_absent() {
 
 #[test]
 fn call_record_status_falls_back_to_unattended_when_status_absent() {
-    let record = record_with_participants(&["macro|a@test.com", "macro|b@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|c@test.com");
+    let record = record_with_participants(&["rox|a@test.com", "rox|b@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|c@test.com");
 
     assert_eq!(soup.status, CallStatus::Unattended);
     assert!(!soup.attended);
@@ -142,16 +142,16 @@ fn call_record_status_falls_back_to_unattended_when_status_absent() {
 
 #[test]
 fn from_record_for_user_sets_attended_true_when_user_is_participant() {
-    let record = record_with_participants(&["macro|a@test.com", "macro|b@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let record = record_with_participants(&["rox|a@test.com", "rox|b@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
     assert!(soup.attended);
     assert_eq!(soup.participants.len(), 2);
 }
 
 #[test]
 fn from_record_for_user_sets_attended_false_when_user_not_participant() {
-    let record = record_with_participants(&["macro|a@test.com", "macro|b@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|c@test.com");
+    let record = record_with_participants(&["rox|a@test.com", "rox|b@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|c@test.com");
     assert!(!soup.attended);
     assert_eq!(soup.participants.len(), 2);
 }
@@ -159,23 +159,23 @@ fn from_record_for_user_sets_attended_false_when_user_not_participant() {
 #[test]
 fn from_record_for_user_attended_false_when_no_participants() {
     let record = record_with_participants(&[]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
     assert!(!soup.attended);
     assert!(soup.participants.is_empty());
 }
 
 #[test]
 fn from_record_for_user_passes_summary_through() {
-    let mut record = record_with_participants(&["macro|a@test.com"]);
+    let mut record = record_with_participants(&["rox|a@test.com"]);
     record.summary = Some("AI summary".to_string());
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
     assert_eq!(soup.summary.as_deref(), Some("AI summary"));
 }
 
 #[test]
 fn from_record_for_user_summary_none_when_record_has_none() {
-    let record = record_with_participants(&["macro|a@test.com"]);
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|a@test.com");
+    let record = record_with_participants(&["rox|a@test.com"]);
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|a@test.com");
     assert!(soup.summary.is_none());
 }
 
@@ -190,7 +190,7 @@ fn standalone_call_retains_guest_name_and_has_no_channel() {
         joined_at: Utc::now(),
         left_at: None,
     }];
-    let soup = SoupCallRecord::from_record_for_user(record, "macro|owner@example.com");
+    let soup = SoupCallRecord::from_record_for_user(record, "rox|owner@example.com");
     assert_eq!(soup.channel_id, None);
     assert!(soup.participants.is_empty());
     assert_eq!(soup.guests[0].id, guest_id.as_uuid());

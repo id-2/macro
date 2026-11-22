@@ -15,14 +15,14 @@ describe('activity', () => {
             data: {
               activities: [
                 {
-                  actorId: 'macro|ada@example.com',
+                  actorId: 'rox|ada@example.com',
                   entityType: 'document',
                   entityId: '0192d1a0-0000-7000-8000-000000000001',
                   action: { type: 'edited' },
                   occurredAt: '2026-11-04T10:00:00Z',
                 },
                 {
-                  actorId: 'macro|ada@example.com',
+                  actorId: 'rox|ada@example.com',
                   entityType: 'channel_message',
                   entityId: '0192d1a0-0000-7000-8000-000000000002',
                   action: { type: 'created' },
@@ -47,7 +47,7 @@ describe('activity', () => {
     expect(range.truncated).toBe(true);
     const [edited, message] = range.activities;
     expect(edited.actor).toBeInstanceOf(User);
-    expect(edited.actor.id).toBe('macro|ada@example.com');
+    expect(edited.actor.id).toBe('rox|ada@example.com');
     expect(edited.entity?.type).toBe('document');
     expect(edited.entity?.entity).toBeInstanceOf(Document);
     expect(edited.entity?.entity.id).toBe(

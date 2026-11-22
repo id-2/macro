@@ -12,11 +12,11 @@ impl rox_authorization::JwtValidator for TestIdentity {
         rootcause::Report<rox_authorization::RoxAuthorizationError>,
     > {
         let user_id = match jwt {
-            "owner" => "macro|owner@example.com",
-            "other" => "macro|other@example.com",
-            "reader" => "macro|reader@example.com",
-            "user" => "macro|user@example.com",
-            "resident" => "macro|resident@example.com",
+            "owner" => "rox|owner@example.com",
+            "other" => "rox|other@example.com",
+            "reader" => "rox|reader@example.com",
+            "user" => "rox|user@example.com",
+            "resident" => "rox|resident@example.com",
             _ => {
                 return Err(rootcause::Report::new(
                     rox_authorization::RoxAuthorizationError::InvalidCredentials,
@@ -102,9 +102,9 @@ async fn computer_route_access(
                 kind: "roxd".to_owned(),
                 name: "Computer".to_owned(),
                 owner: HarnessOwner::User {
-                    user_id: "macro|owner@example.com".to_owned(),
+                    user_id: "rox|owner@example.com".to_owned(),
                 },
-                created_by: "macro|owner@example.com".to_owned(),
+                created_by: "rox|owner@example.com".to_owned(),
                 created_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 updated_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 allow_permission_bypass: false,
@@ -137,7 +137,7 @@ async fn computer_route_access(
                         },
                         signed_in_by: Some(
                             rox_user_id::user_id::RoxUserIdStr::try_from(
-                                "macro|owner@example.com".to_owned(),
+                                "rox|owner@example.com".to_owned(),
                             )
                             .unwrap(),
                         ),
@@ -151,7 +151,7 @@ async fn computer_route_access(
     repo.expect_harness_access().returning(|_, caller| {
         Box::pin(async move {
             Ok(match caller.as_ref() {
-                "macro|owner@example.com" => harnesses::domain::models::HarnessAccess::Owner,
+                "rox|owner@example.com" => harnesses::domain::models::HarnessAccess::Owner,
                 _ => harnesses::domain::models::HarnessAccess::None,
             })
         })
@@ -168,7 +168,7 @@ async fn computer_route_access(
     let tasks = tokio_util::task::TaskTracker::new();
     let shutdown = tokio_util::sync::CancellationToken::new();
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
-    for user in ["macro|owner@example.com", "macro|other@example.com"] {
+    for user in ["rox|owner@example.com", "rox|other@example.com"] {
         flags.set(
             rox_user_id::user_id::RoxUserIdStr::try_from(user.to_owned()).unwrap(),
             Ok(feature_flags::FlagSnapshot::new([(
@@ -228,7 +228,7 @@ async fn computer_route_access(
             serde_json::json!({
                 "mode": "own_account",
                 "account": {
-                    "signedInBy": "macro|owner@example.com",
+                    "signedInBy": "rox|owner@example.com",
                     "signedInAt": "2026-01-02T00:00:00Z",
                     "expiresAt": null,
                 },
@@ -386,7 +386,7 @@ async fn a_completion_whose_caller_left_still_records_its_signer() {
         authorization_state: rox_authorization::RoxAuthorizationState::new(Arc::new(())),
     };
     let signer =
-        rox_user_id::user_id::RoxUserIdStr::try_from("macro|owner@example.com".to_owned())
+        rox_user_id::user_id::RoxUserIdStr::try_from("rox|owner@example.com".to_owned())
             .unwrap();
     let computer = computer_id::ComputerId::new_from_uuid(uuid::Uuid::from_u128(1));
 
@@ -485,9 +485,9 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
                 name: "Computer".to_owned(),
                 // "owner" bought it, then left the team.
                 owner: HarnessOwner::User {
-                    user_id: "macro|owner@example.com".to_owned(),
+                    user_id: "rox|owner@example.com".to_owned(),
                 },
-                created_by: "macro|owner@example.com".to_owned(),
+                created_by: "rox|owner@example.com".to_owned(),
                 created_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 updated_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 allow_permission_bypass: true,
@@ -507,7 +507,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
     repo.expect_harness_access().returning(|_, caller| {
         Box::pin(async move {
             Ok(match caller.as_ref() {
-                "macro|other@example.com" => HarnessAccess::Owner,
+                "rox|other@example.com" => HarnessAccess::Owner,
                 _ => HarnessAccess::None,
             })
         })
@@ -524,7 +524,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
         NoUserApiKeyAuthorizer,
     );
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
-    for user in ["macro|owner@example.com", "macro|other@example.com"] {
+    for user in ["rox|owner@example.com", "rox|other@example.com"] {
         flags.set(
             rox_user_id::user_id::RoxUserIdStr::try_from(user.to_owned()).unwrap(),
             Ok(feature_flags::FlagSnapshot::new([(

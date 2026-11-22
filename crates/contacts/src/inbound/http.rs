@@ -54,7 +54,7 @@ pub struct SearchPeopleParams {
 #[derive(Deserialize, Serialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchedPerson {
-    /// The person's user ID (`macro|<email>`).
+    /// The person's user ID (`rox|<email>`).
     #[schema(value_type = String)]
     pub user_id: RoxUserIdStr<'static>,
     /// Resolved name, as the contact directory shows it; null when unknown.

@@ -19,11 +19,11 @@ async fn edits_preserve_contact_identity_history_archive_and_sources(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
     let other = insert_company(&pool, team, true, &["example.org"]).await?;
-    let link = insert_email_link(&pool, "macro|owner@example.com", "owner@example.com").await?;
+    let link = insert_email_link(&pool, "rox|owner@example.com", "owner@example.com").await?;
     let id = insert_contact_with_source(&pool, company, "person@example.com", link).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     repo.set_contact_hidden(&team, &id, true).await?;
@@ -96,7 +96,7 @@ async fn edits_preserve_contact_identity_history_archive_and_sources(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn edits_reject_duplicate_addresses_without_merging(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
     let id = insert_contact(&pool, company, "first@example.com").await?;
@@ -141,8 +141,8 @@ async fn edits_enforce_team_visibility_without_requiring_consent(
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let foreign_team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
-    seed_team(&pool, foreign_team, "macro|other@example.org").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
+    seed_team(&pool, foreign_team, "rox|other@example.org").await?;
     enable_crm_for_team(&pool, team).await?;
     enable_crm_for_team(&pool, foreign_team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
@@ -213,7 +213,7 @@ async fn moving_cannot_reveal_a_contact_below_an_archived_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
     let destination = insert_company(&pool, team, true, &["example.org"]).await?;
@@ -247,10 +247,10 @@ async fn single_and_bulk_teardown_keep_company_before_source_lock_order(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
-    let link = insert_email_link(&pool, "macro|owner@example.com", "owner@example.com").await?;
+    let link = insert_email_link(&pool, "rox|owner@example.com", "owner@example.com").await?;
     let id = insert_contact_with_source(&pool, company, "person@example.com", link).await?;
     let gate = std::sync::Arc::new(super::ContactWriteGate::default());
     let mut single_repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -295,7 +295,7 @@ async fn single_and_bulk_teardown_keep_company_before_source_lock_order(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_edits_require_known_personal_providers(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let company = insert_company(&pool, team, true, &["example.com"]).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -345,7 +345,7 @@ async fn concurrent_additions_reject_duplicates_and_apply_each_edit_whole(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
-    seed_team(&pool, team, "macro|owner@example.com").await?;
+    seed_team(&pool, team, "rox|owner@example.com").await?;
     enable_crm_for_team(&pool, team).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     let first = repo
@@ -388,7 +388,7 @@ async fn concurrent_additions_reject_duplicates_and_apply_each_edit_whole(
     held.sort();
     assert_eq!(held, ["a@example.com", "b@example.com"]);
     let foreign = Uuid::now_v7();
-    seed_team(&pool, foreign, "macro|other@example.org").await?;
+    seed_team(&pool, foreign, "rox|other@example.org").await?;
     enable_crm_for_team(&pool, foreign).await?;
     let foreign_contact = repo
         .create_contact_for_team(&foreign, None, "Other", chrono::Utc::now())

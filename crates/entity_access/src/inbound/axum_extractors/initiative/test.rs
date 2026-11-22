@@ -28,7 +28,7 @@ use crate::{
 };
 
 const INITIATIVE_ID: &str = "01a0a11f-b147-79fe-a5f1-87833710bbeb";
-const HARNESS_ACTING_USER_ID: &str = "macro|harness-acting-user@example.com";
+const HARNESS_ACTING_USER_ID: &str = "rox|harness-acting-user@example.com";
 
 type ViewExtractor =
     InitiativeAccessExtractor<ViewAccessLevel, FakeEntityAccessService, FakeAuthorizationService>;

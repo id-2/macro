@@ -90,7 +90,7 @@ where
 #[derive(Debug, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestAccountManagerBody {
-    /// The other account (`macro|...`).
+    /// The other account (`rox|...`).
     #[schema(value_type = String)]
     pub counterparty_id: RoxUserIdStr<'static>,
     /// The side the caller takes.

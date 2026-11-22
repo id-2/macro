@@ -34,7 +34,7 @@ async fn propagation_waits_for_revocation_before_reading_project_grants(pool: Po
         .await
         .unwrap();
     sqlx::query!(
-        "DELETE FROM entity_access WHERE entity_id = $1 AND entity_type = 'project' AND source_type = 'user' AND source_id = 'macro|testuser@test.com'",
+        "DELETE FROM entity_access WHERE entity_id = $1 AND entity_type = 'project' AND source_type = 'user' AND source_id = 'rox|testuser@test.com'",
         ROOT_PROJECT_ID,
     )
     .execute(revocation.as_mut())
@@ -144,7 +144,7 @@ async fn source_entities_returns_direct_shares_across_projects(pool: Pool<Postgr
 
     let user_entry = result
         .iter()
-        .find(|e| e.source_id == "macro|testuser@test.com")
+        .find(|e| e.source_id == "rox|testuser@test.com")
         .unwrap();
     assert!(matches!(
         user_entry.source_type,
@@ -208,7 +208,7 @@ async fn source_entities_excludes_non_project_entity_type(pool: Pool<Postgres>) 
     assert!(
         result
             .iter()
-            .all(|e| e.source_id != "macro|testuser@test.com"
+            .all(|e| e.source_id != "rox|testuser@test.com"
                 || matches!(e.source_type, EntityAccessSourceType::User))
     );
 }
@@ -303,9 +303,9 @@ async fn source_entities_for_full_tree_walk_returns_only_direct_shares(pool: Poo
         .filter(|e| matches!(e.source_type, EntityAccessSourceType::User))
         .collect();
     assert_eq!(users.len(), 3);
-    assert!(users.iter().any(|e| e.source_id == "macro|user_a@test.com" && e.access_level == AccessLevel::Owner));
-    assert!(users.iter().any(|e| e.source_id == "macro|user_b@test.com" && e.access_level == AccessLevel::Owner));
-    assert!(users.iter().any(|e| e.source_id == "macro|user_c@test.com" && e.access_level == AccessLevel::Owner));
+    assert!(users.iter().any(|e| e.source_id == "rox|user_a@test.com" && e.access_level == AccessLevel::Owner));
+    assert!(users.iter().any(|e| e.source_id == "rox|user_b@test.com" && e.access_level == AccessLevel::Owner));
+    assert!(users.iter().any(|e| e.source_id == "rox|user_c@test.com" && e.access_level == AccessLevel::Owner));
 
     // 2 channel shares
     let channels: Vec<_> = result
@@ -416,7 +416,7 @@ async fn add_entity_to_project_inserts_access_for_all_ancestor_shares(pool: Pool
     // user_a: owner, granted from project_a
     let ua = rows
         .iter()
-        .find(|r| r.source_id == "macro|user_a@test.com")
+        .find(|r| r.source_id == "rox|user_a@test.com")
         .unwrap();
     assert_eq!(ua.access_level, AccessLevel::Owner);
     assert_eq!(
@@ -427,7 +427,7 @@ async fn add_entity_to_project_inserts_access_for_all_ancestor_shares(pool: Pool
     // user_b: owner, granted from project_b
     let ub = rows
         .iter()
-        .find(|r| r.source_id == "macro|user_b@test.com")
+        .find(|r| r.source_id == "rox|user_b@test.com")
         .unwrap();
     assert_eq!(ub.access_level, AccessLevel::Owner);
     assert_eq!(
@@ -438,7 +438,7 @@ async fn add_entity_to_project_inserts_access_for_all_ancestor_shares(pool: Pool
     // user_c: owner, granted from project_c
     let uc = rows
         .iter()
-        .find(|r| r.source_id == "macro|user_c@test.com")
+        .find(|r| r.source_id == "rox|user_c@test.com")
         .unwrap();
     assert_eq!(uc.access_level, AccessLevel::Owner);
     assert_eq!(
@@ -501,10 +501,10 @@ async fn add_bot_owned_child_project_keeps_its_owner_grants_and_inherits_the_par
                 "comment",
                 Some(parent_id.as_str()),
             ),
-            ("user", "macro|owner@test.com", "owner", None),
+            ("user", "rox|owner@test.com", "owner", None),
             (
                 "user",
-                "macro|owner@test.com",
+                "rox|owner@test.com",
                 "owner",
                 Some(parent_id.as_str())
             ),

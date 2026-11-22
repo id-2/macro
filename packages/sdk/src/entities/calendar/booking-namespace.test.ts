@@ -18,7 +18,7 @@ const draft: BookingLinkDraft = {
     googleMeet: false,
     enabled: true,
     mode: 'individual',
-    hosts: ['macro|owner@example.com'],
+    hosts: ['rox|owner@example.com'],
     beforeMinutes: 0,
     afterMinutes: 0,
     noticeMinutes: 60,
@@ -54,7 +54,7 @@ const booking: BookingRecord = {
   startsAt: '2026-01-05T09:00:00Z',
   endsAt: '2026-01-05T09:30:00Z',
   timeZone: 'UTC',
-  hosts: ['macro|owner@example.com'],
+  hosts: ['rox|owner@example.com'],
   status: 'confirmed',
   attendance: 'unknown',
   rescheduleCount: 0,
@@ -74,7 +74,7 @@ describe('calendar.booking', () => {
           return {
             data: {
               teamIds: ['team-1'],
-              userId: 'macro|owner@example.com',
+              userId: 'rox|owner@example.com',
               profileId: 'profile-1',
               revision: 3,
               schedules: [],
@@ -92,7 +92,7 @@ describe('calendar.booking', () => {
     });
 
     expect(queries).toEqual([{ query: { teamId: 'team-1', query: 'intro' } }]);
-    expect(listing.host.id).toBe('macro|owner@example.com');
+    expect(listing.host.id).toBe('rox|owner@example.com');
     expect(listing.teams.map((t) => t.id)).toEqual(['team-1']);
     expect(listing.pageUrl).toBe('https://rox.one/app/book/profile-1');
     const [link] = listing.links;
@@ -202,7 +202,7 @@ describe('calendar.booking', () => {
     });
     if (!found) throw new Error('expected a booking');
     expect((await found.hosts()).map((host) => host.id)).toEqual([
-      'macro|owner@example.com',
+      'rox|owner@example.com',
     ]);
     const [slot] = await found.rescheduleSlots('2026-01-06');
     if (!slot) throw new Error('expected a slot');

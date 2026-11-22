@@ -40,7 +40,7 @@ export async function fetchContactDirectoryPage(
             nodes: [
               {
                 id: 'server-scoped-id',
-                userId: 'macro|server@example.com',
+                userId: 'rox|server@example.com',
                 email: 'server@example.com',
                 name: 'Server match',
               },
@@ -65,11 +65,11 @@ export async function fetchContactDirectoryByIds(
       id: viewer,
       contactsByUserIds: userIds.flatMap((userId) => {
         let name: string | undefined;
-        if (userId === 'macro|selected@example.com') name = 'Selected Person';
-        else if (userId === 'macro|viewer@example.com') name = 'Viewer';
-        else if (userId === 'macro|match@example.com') name = 'Broader match';
-        else if (/^macro\|person\d+@example\.com$/.test(userId))
-          name = `Person ${userId.slice(12).split('@')[0]}`;
+        if (userId === 'rox|selected@example.com') name = 'Selected Person';
+        else if (userId === 'rox|viewer@example.com') name = 'Viewer';
+        else if (userId === 'rox|match@example.com') name = 'Broader match';
+        else if (/^rox\|person\d+@example\.com$/.test(userId))
+          name = `Person ${userId.slice(10).split('@')[0]}`;
         if (!name) return [];
         return [
           {
@@ -77,7 +77,7 @@ export async function fetchContactDirectoryByIds(
               'GraphqlContact:'.length
             ),
             userId,
-            email: userId.slice(6),
+            email: userId.slice(4),
             name,
           },
         ];

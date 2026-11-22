@@ -9,7 +9,7 @@ fn a_ping_stamped_ahead_of_this_instance_clock_is_active() {
         entity_id: "doc".to_owned(),
         connection_id: "connection".to_owned(),
         created_at: 1_000_000,
-        user_id: "macro|user@example.com".to_owned(),
+        user_id: "rox|user@example.com".to_owned(),
         last_ping: Some(1_000_500),
     };
 
@@ -25,7 +25,7 @@ fn an_entry_not_pinged_within_the_threshold_is_inactive() {
         entity_id: "doc".to_owned(),
         connection_id: "connection".to_owned(),
         created_at: 1_000_000,
-        user_id: "macro|user@example.com".to_owned(),
+        user_id: "rox|user@example.com".to_owned(),
         last_ping: Some(1_000_000),
     };
 
@@ -42,7 +42,7 @@ fn an_open_entry_never_pinged_counts_from_creation() {
         entity_id: "doc".to_owned(),
         connection_id: "connection".to_owned(),
         created_at: 1_000_000,
-        user_id: "macro|user@example.com".to_owned(),
+        user_id: "rox|user@example.com".to_owned(),
         last_ping: None,
     };
 

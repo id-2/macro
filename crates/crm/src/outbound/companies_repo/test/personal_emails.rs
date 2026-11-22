@@ -12,7 +12,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 /// A consumer provider. Email sync files only these addresses without a
 /// company, and no reserved example domain is one.
@@ -344,7 +344,7 @@ async fn create_contact_for_team_without_company(pool: PgPool) -> anyhow::Result
 async fn a_shared_personal_provider_is_not_the_users_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let mailbox = personal("me");
-    let owner = format!("macro|{mailbox}");
+    let owner = format!("rox|{mailbox}");
     let owner = owner.as_str();
     seed_team(&pool, team_id, owner).await?;
     enable_crm_for_team(&pool, team_id).await?;
@@ -423,7 +423,7 @@ async fn assigned_personal_sync_keeps_admission_archive_and_team_boundaries(
     let first = insert_company(&pool, team, true, &["example.com"]).await?;
     let second = insert_company(&pool, team, false, &["example.org"]).await?;
     let foreign = Uuid::now_v7();
-    seed_team(&pool, foreign, "macro|other@example.org").await?;
+    seed_team(&pool, foreign, "rox|other@example.org").await?;
     enable_crm_for_team(&pool, foreign).await?;
     let foreign_contact = repo
         .create_contact_for_team(&foreign, Some(&email), "Other", Utc::now())

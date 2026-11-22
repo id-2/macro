@@ -7,7 +7,7 @@ use std::sync::{
 };
 
 fn owner() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|one-shot@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|one-shot@example.com".to_owned()).unwrap()
 }
 
 #[derive(Default)]

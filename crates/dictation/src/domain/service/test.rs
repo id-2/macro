@@ -65,7 +65,7 @@ fn service() -> (
 }
 
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from("macro|dictation-test@example.com".to_owned()).unwrap()
+    RoxUserIdStr::try_from("rox|dictation-test@example.com".to_owned()).unwrap()
 }
 
 fn language() -> Option<LanguageHint> {

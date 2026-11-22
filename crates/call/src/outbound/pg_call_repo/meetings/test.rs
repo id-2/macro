@@ -3,9 +3,9 @@ use crate::domain::ports::CallRepository;
 use chrono::{Duration, Utc};
 use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-const OWNER: &str = "macro|user-b@test.com";
+const OWNER: &str = "rox|user-b@test.com";
 const PARTICIPANT_EMAIL: &str = "user-c@test.com";
-const UNRELATED: &str = "macro|user-d@test.com";
+const UNRELATED: &str = "rox|user-d@test.com";
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),

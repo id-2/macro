@@ -345,7 +345,7 @@ fn service(
 }
 
 fn user(label: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
+    RoxUserIdStr::parse_from_str(&format!("rox|{label}@example.com"))
         .unwrap()
         .into_owned()
 }
@@ -619,7 +619,7 @@ async fn a_run_that_keeps_stopping_is_given_up_with_its_rows_back_in_staged(pool
 async fn teammate(pool: &PgPool, label: &str, team: Uuid) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
-    let user_id = format!("macro|{email}");
+    let user_id = format!("rox|{email}");
     sqlx::query!(
         "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
         id,

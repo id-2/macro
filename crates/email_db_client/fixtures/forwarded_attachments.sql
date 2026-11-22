@@ -6,12 +6,12 @@
 ------------------------------------------------------------
 
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000f01', 'macro|fwd_user@example.com', '00000000-0000-0000-0000-000000000f01',
+VALUES ('00000000-0000-0000-0000-000000000f01', 'rox|fwd_user@example.com', '00000000-0000-0000-0000-000000000f01',
         'fwd_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 -- Second link for testing cross-link access prevention
 INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000f02', 'macro|fwd_other@example.com', '00000000-0000-0000-0000-000000000f02',
+VALUES ('00000000-0000-0000-0000-000000000f02', 'rox|fwd_other@example.com', '00000000-0000-0000-0000-000000000f02',
         'fwd_other@example.com', 'GMAIL', true, NOW(), NOW());
 
 ------------------------------------------------------------

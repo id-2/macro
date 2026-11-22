@@ -39,7 +39,7 @@ pub async fn handler(
     _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<UpdateNameWebhook>,
 ) -> Result<Response, Response> {
-    let user_id = "macro|".to_string() + &req.email;
+    let user_id = "rox|".to_string() + &req.email;
     let first_name = req.first_name;
     let last_name = req.last_name;
 

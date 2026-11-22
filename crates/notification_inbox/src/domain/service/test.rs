@@ -119,7 +119,7 @@ fn document_mention(id: u128, message: u128, minute: u32) -> FeedNotification {
         "document_mention",
         json!({
             "documentName": "Plan",
-            "owner": "macro|other@example.com",
+            "owner": "rox|other@example.com",
             "messageId": uuid(message),
             "messageContent": "see doc",
             "channelType": "public",
@@ -669,7 +669,7 @@ async fn clear_of_unread_rows_leaves_read_ones() {
                 1,
                 entity(EntityType::Document, DOC),
                 "task_assigned",
-                json!({ "taskId": "task-1", "assignedBy": "macro|other@example.com", "taskName": "Plan" }),
+                json!({ "taskId": "task-1", "assignedBy": "rox|other@example.com", "taskName": "Plan" }),
                 9,
                 NotificationState::Seen,
             ),
@@ -746,7 +746,7 @@ fn document_task(i: u128) -> FeedNotification {
         0x2000 + i,
         entity(EntityType::Document, 0x1000 + i),
         "task_assigned",
-        json!({ "taskId": format!("task-{i}"), "assignedBy": "macro|other@example.com", "taskName": "Plan" }),
+        json!({ "taskId": format!("task-{i}"), "assignedBy": "rox|other@example.com", "taskName": "Plan" }),
         5,
         NotificationState::Unseen,
     )
@@ -918,7 +918,7 @@ async fn a_group_that_moves_ahead_of_a_running_clear_is_still_cleared() {
                 0x9000,
                 document,
                 "task_assigned",
-                json!({ "taskId": "task-new", "assignedBy": "macro|other@example.com", "taskName": "New" }),
+                json!({ "taskId": "task-new", "assignedBy": "rox|other@example.com", "taskName": "New" }),
                 40,
                 NotificationState::Unseen,
             ));
@@ -1188,7 +1188,7 @@ fn mostly_read() -> Harness {
                 1,
                 entity(EntityType::Document, DOC),
                 "task_assigned",
-                json!({ "taskId": "task-1", "assignedBy": "macro|other@example.com", "taskName": "Plan" }),
+                json!({ "taskId": "task-1", "assignedBy": "rox|other@example.com", "taskName": "Plan" }),
                 10,
                 NotificationState::Seen,
             ),
@@ -1319,7 +1319,7 @@ async fn new_activity_brings_a_read_row_back_into_an_unread_inbox() {
             8,
             entity(EntityType::Document, DOC),
             "task_assigned",
-            json!({ "taskId": "task-1", "assignedBy": "macro|other@example.com", "taskName": "Plan" }),
+            json!({ "taskId": "task-1", "assignedBy": "rox|other@example.com", "taskName": "Plan" }),
             11,
             NotificationState::Unseen,
         ));

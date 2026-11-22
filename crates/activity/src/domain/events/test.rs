@@ -14,7 +14,7 @@ fn activity(action: CommonAction) -> Activity {
     Activity::common(
         Uuid::from_u128(7),
         0,
-        Actor::new_from_user(user("macro|teo@example.com")),
+        Actor::new_from_user(user("rox|teo@example.com")),
         None,
         EntityType::Document,
         "doc-1",
@@ -47,8 +47,8 @@ fn unknown_action_tags_survive_the_wire() {
         agent_correlation_id: None,
         agent_verb: Some("future_verb".to_string()),
         id: Uuid::from_u128(1),
-        actor_id: "macro|teo@example.com".to_string(),
-        subject_id: "macro|teo@example.com".to_string(),
+        actor_id: "rox|teo@example.com".to_string(),
+        subject_id: "rox|teo@example.com".to_string(),
         entity_type: EntityType::Document,
         entity_id: "doc-1".to_string(),
         action: "transmogrified".to_string(),
@@ -74,7 +74,7 @@ fn corrupt_actor_rows_are_skipped() {
         agent_verb: None,
         id: Uuid::from_u128(2),
         actor_id: "not-a-principal".to_string(),
-        subject_id: "macro|teo@example.com".to_string(),
+        subject_id: "rox|teo@example.com".to_string(),
         entity_type: EntityType::Document,
         entity_id: "doc-1".to_string(),
         action: "edited".to_string(),
@@ -91,8 +91,8 @@ fn payload_actions_carry_their_columns() {
     let activity = Activity::common(
         source,
         1,
-        Actor::new_from_user(user("macro|teo@example.com")),
-        Some(user("macro|boss@example.com")),
+        Actor::new_from_user(user("rox|teo@example.com")),
+        Some(user("rox|boss@example.com")),
         EntityType::Chat,
         "chat-1",
         CommonAction::PropertyChanged(PropertyChange {
@@ -104,7 +104,7 @@ fn payload_actions_carry_their_columns() {
     );
 
     let row = ActivityWireRow::from_activity(&activity);
-    assert_eq!(row.subject_id, "macro|boss@example.com");
+    assert_eq!(row.subject_id, "rox|boss@example.com");
     assert_eq!(row.action, "property_changed");
     assert_eq!(
         row.action_payload,
@@ -112,5 +112,5 @@ fn payload_actions_carry_their_columns() {
     );
 
     let record = row.into_record().expect("decodes");
-    assert_eq!(record.subject_id, "macro|boss@example.com");
+    assert_eq!(record.subject_id, "rox|boss@example.com");
 }

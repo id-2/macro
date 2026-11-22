@@ -17,16 +17,16 @@ INSERT INTO comms_channels (
   id, name, channel_type, org_id, owner_id, created_at, updated_at
 ) VALUES (
   '00000000-0000-0000-0000-000000000c05', 'no-activity', 'public', NULL,
-  'macro|user-a@test.com', '2024-01-01 12:00:00+00', '2024-01-02 12:00:00+00'
+  'rox|user-a@test.com', '2024-01-01 12:00:00+00', '2024-01-02 12:00:00+00'
 );
 
 INSERT INTO comms_channel_participants (channel_id, user_id, role, joined_at) VALUES (
-  '00000000-0000-0000-0000-000000000c05', 'macro|user-a@test.com', 'owner',
+  '00000000-0000-0000-0000-000000000c05', 'rox|user-a@test.com', 'owner',
   '2024-01-01 12:00:00+00'
 );
 
 INSERT INTO comms_activity (id, user_id, channel_id, viewed_at) VALUES
-  ('00000000-0000-0000-0000-000000000a01', 'macro|user-a@test.com',
+  ('00000000-0000-0000-0000-000000000a01', 'rox|user-a@test.com',
    '00000000-0000-0000-0000-000000000c01', '2024-01-01 00:00:00+00'),
-  ('00000000-0000-0000-0000-000000000a03', 'macro|user-a@test.com',
+  ('00000000-0000-0000-0000-000000000a03', 'rox|user-a@test.com',
    '00000000-0000-0000-0000-000000000c03', '2024-01-04 00:00:00+00');

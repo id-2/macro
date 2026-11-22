@@ -3,7 +3,7 @@ use super::*;
 #[test]
 fn a_missing_limit_and_snippet_length_ask_for_the_defaults() {
     let (user, limit, snippet_chars) = parse_request(
-        "macro|owner@example.com".to_owned(),
+        "rox|owner@example.com".to_owned(),
         RecentMessagesQuery {
             limit: None,
             snippet_chars: None,
@@ -11,7 +11,7 @@ fn a_missing_limit_and_snippet_length_ask_for_the_defaults() {
     )
     .unwrap();
 
-    assert_eq!(user.as_ref(), "macro|owner@example.com");
+    assert_eq!(user.as_ref(), "rox|owner@example.com");
     assert_eq!(limit, DEFAULT_RECENT_MESSAGES);
     assert_eq!(snippet_chars, DEFAULT_SNIPPET_CHARS);
 }
@@ -19,7 +19,7 @@ fn a_missing_limit_and_snippet_length_ask_for_the_defaults() {
 #[test]
 fn a_given_limit_is_passed_on() {
     let (_, limit, snippet_chars) = parse_request(
-        "macro|owner@example.com".to_owned(),
+        "rox|owner@example.com".to_owned(),
         RecentMessagesQuery {
             limit: Some(5),
             snippet_chars: Some(500),

@@ -27,7 +27,7 @@ describe('createActorName', () => {
   });
 
   it('resolves other users through displayName', () => {
-    expect(nameOf(context, 'macro|sarah@example.com')).toBe('sarah');
+    expect(nameOf(context, 'rox|sarah@example.com')).toBe('sarah');
   });
 
   it('names the system principal "System"', () => {

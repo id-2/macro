@@ -24,7 +24,7 @@ use entity_access::domain::models::{
 use item_filters::ast::{crm_association::CrmAssociation as Record, document::DocumentLiteral};
 use models_properties::EntityType as PropertyEntityType;
 
-const USER: &str = "macro|test@example.com";
+const USER: &str = "rox|test@example.com";
 const COMPANY: Uuid = Uuid::from_u128(0xc0);
 const CONTACT: Uuid = Uuid::from_u128(0xc1);
 const SIBLING_CONTACT: Uuid = Uuid::from_u128(0xc2);

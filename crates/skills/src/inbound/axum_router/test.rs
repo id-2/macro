@@ -21,7 +21,7 @@ use super::{SkillRouterState, skills_router};
 use crate::domain::model::{SkillContent, SkillError, SkillMatchType, SkillSummary};
 use crate::domain::ports::SkillService;
 
-const USER_ID: &str = "macro|skills-router@example.com";
+const USER_ID: &str = "rox|skills-router@example.com";
 const DEPLOY_SKILL: Uuid = uuid::uuid!("0190b6a5-6a40-7c4e-8b1e-2f6d1f0a9c11");
 
 #[derive(Debug, PartialEq)]

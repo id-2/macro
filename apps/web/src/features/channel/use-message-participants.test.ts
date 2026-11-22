@@ -12,7 +12,7 @@ vi.mock('./use-channel-participants', () => ({
   useChannelParticipants: (channelId: () => string) => ({
     users: () =>
       channelId()
-        ? [{ id: 'macro|member@example.com', email: '', name: 'Member' }]
+        ? [{ id: 'rox|member@example.com', email: '', name: 'Member' }]
         : [],
     ids: () => [],
   }),
@@ -24,8 +24,8 @@ vi.mock('@queries/team/teams', () => ({
     },
     data: {
       members: [
-        { user_id: 'macro|seller@example.com' },
-        { user_id: 'macro|owner@example.com' },
+        { user_id: 'rox|seller@example.com' },
+        { user_id: 'rox|owner@example.com' },
       ],
     },
   }),
@@ -56,15 +56,15 @@ it('keeps CRM/channel rosters scoped and delegates discussion people to bounded 
     const ids = () => participants()?.map((user) => user.id);
 
     expect(ids()).toEqual([
-      'macro|seller@example.com',
-      'macro|owner@example.com',
+      'rox|seller@example.com',
+      'rox|owner@example.com',
     ]);
     expect(participants()?.[0].email).toBe('seller@example.com');
 
     setParent({ type: 'crm_contact', id: 'contact' });
     expect(ids()).toEqual([
-      'macro|seller@example.com',
-      'macro|owner@example.com',
+      'rox|seller@example.com',
+      'rox|owner@example.com',
     ]);
 
     setParent({ type: 'document', id: 'document' });
@@ -76,7 +76,7 @@ it('keeps CRM/channel rosters scoped and delegates discussion people to bounded 
     expect(participants()).toBeUndefined();
 
     setParent({ type: 'channel', id: 'channel' });
-    expect(ids()).toEqual(['macro|member@example.com']);
+    expect(ids()).toEqual(['rox|member@example.com']);
     dispose();
   });
 });

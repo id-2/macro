@@ -69,7 +69,7 @@ fn guest_names_are_bounded_normalized_and_not_identities() {
     }
     let guest = GuestId::generate();
     assert_eq!(GuestId::parse_rtc_identity(&guest.to_string()), Some(guest));
-    assert!(GuestId::parse_rtc_identity("macro|a@b.com").is_none());
+    assert!(GuestId::parse_rtc_identity("rox|a@b.com").is_none());
     assert!(GuestId::parse_rtc_identity("agent-transcriber").is_none());
     assert!(GuestId::parse_rtc_identity("guest:admin").is_none());
 }

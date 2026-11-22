@@ -15,7 +15,7 @@ fn author_only_channel_match_without_highlight_keeps_deep_link() {
             serde_json::json!({
                 "entity_id": channel_id, "message_id": message_id,
                 "thread_id": thread.unwrap_or(message_id), "channel_type": "private",
-                "sender_id": "macro|system@rox.one", "mentions": [],
+                "sender_id": "rox|system@rox.one", "mentions": [],
                 "imported_author": "quartzarchivebot"
             }),
         )
@@ -35,7 +35,7 @@ fn author_only_channel_match_without_highlight_keeps_deep_link() {
         };
         assert_eq!(goto.channel_message_id, message_id);
         assert_eq!(goto.thread_id, thread);
-        assert_eq!(goto.sender_id, "macro|system@rox.one");
+        assert_eq!(goto.sender_id, "rox|system@rox.one");
     }
 }
 
@@ -163,7 +163,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "thread_id": "019a5a07-a1ed-7342-93a7-861582b59a55",
               "sent_at_millis": 1762447040000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1762447044000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -201,7 +201,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1759266586,
               "sent_at_millis": 1759241406000_i64,
               "sender": "events@pulumi.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1759266586000_i64,
               "recipients": [
                 "hutch@rox.one"
@@ -224,7 +224,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1752523635,
               "updated_at_millis": 1752523635000_i64,
               "file_type": "pdf",
-              "owner_id": "macro|teo@rox.one",
+              "owner_id": "rox|teo@rox.one",
               "document_id": "013021c7-5e14-4aab-855e-01413fff85dc",
               "document_version_id": 10091,
               "entity_id": "013021c7-5e14-4aab-855e-01413fff85dc",
@@ -261,7 +261,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761742084,
               "sent_at_millis": 1761742081000_i64,
               "sender": "noreply@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761742084000_i64,
               "recipients": [
                 "will@thehutchery.com"
@@ -285,7 +285,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1752522588,
               "updated_at_millis": 1752522588000_i64,
               "file_type": "pdf",
-              "owner_id": "macro|teo@rox.one",
+              "owner_id": "rox|teo@rox.one",
               "document_id": "71ff8822-b421-4cab-b23e-f65355bf90d4",
               "document_version_id": 511386,
               "entity_id": "71ff8822-b421-4cab-b23e-f65355bf90d4",
@@ -326,7 +326,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761313391,
               "sent_at_millis": 1761313387000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761313391000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -368,7 +368,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761848053,
               "sent_at_millis": 1761848050000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761848053000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -410,7 +410,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761252711,
               "sent_at_millis": 1761252648000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761252711000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -449,7 +449,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761833465,
               "sent_at_millis": 1761833460000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761833465000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -491,7 +491,7 @@ fn test_deserialization() -> anyhow::Result<()> {
               "updated_at": 1761753548,
               "sent_at_millis": 1761753544000_i64,
               "sender": "notifications@github.com",
-              "user_id": "macro|hutch@rox.one",
+              "user_id": "rox|hutch@rox.one",
               "updated_at_millis": 1761753548000_i64,
               "recipients": [
                 "macro-api@noreply.github.com"
@@ -1125,7 +1125,7 @@ fn calendar_source_routes_by_matched_clause_not_shape() -> anyhow::Result<()> {
     let source = serde_json::json!({
         "entity_id": "0197a863-0000-7000-8000-0000000000c1",
         "name": "Standup",
-        "owner_id": "macro|user@user.com",
+        "owner_id": "rox|user@user.com",
         "source_link_id": "0197a863-0000-7000-8000-0000000000c2",
         "ical_uid": "abc123@google.com",
         "status": "confirmed",
@@ -1153,7 +1153,7 @@ fn an_unknown_clause_is_rejected_not_guessed() {
     let source = serde_json::json!({
         "entity_id": "0197a863-0000-7000-8000-0000000000c1",
         "name": "Something",
-        "owner_id": "macro|user@user.com"
+        "owner_id": "rox|user@user.com"
     });
     assert!(
         UnifiedSearchIndex::from_matched(&["reminders".to_string()], source.clone()).is_err(),
@@ -1176,7 +1176,7 @@ fn calendar_hit_carries_its_title_highlight() -> anyhow::Result<()> {
         source: serde_json::json!({
             "entity_id": "0197a863-0000-7000-8000-0000000000c1",
             "name": "Standup",
-            "owner_id": "macro|user@user.com",
+            "owner_id": "rox|user@user.com",
             "source_link_id": "0197a863-0000-7000-8000-0000000000c2",
             "ical_uid": "abc123@google.com",
             "updated_at_millis": 1783000000000_i64
@@ -1208,7 +1208,7 @@ fn an_unplaceable_hit_is_dropped_without_failing_the_page() {
         source: serde_json::json!({
             "entity_id": "0197a863-0000-7000-8000-000000000001",
             "name": "Mobile Redesign",
-            "owner_id": "macro|user@user.com",
+            "owner_id": "rox|user@user.com",
             "updated_at_millis": 1783000000000_i64
         }),
         highlight: None,
@@ -1252,7 +1252,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             "channels",
             serde_json::json!({
                 "entity_id": id(1), "channel_type": "standard", "org_id": null,
-                "message_id": id(2), "thread_id": id(2), "sender_id": "macro|a",
+                "message_id": id(2), "thread_id": id(2), "sender_id": "rox|a",
                 "mentions": [], "updated_at_millis": 1_783_000_000_000_i64
             }),
         ),
@@ -1260,7 +1260,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             "documents_v2",
             "documents",
             serde_json::json!({
-                "entity_id": id(3), "document_name": "Spec", "owner_id": "macro|a",
+                "entity_id": id(3), "document_name": "Spec", "owner_id": "rox|a",
                 "file_type": "md", "updated_at_millis": 1_783_000_000_001_i64
             }),
         ),
@@ -1268,7 +1268,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             "chats_v2",
             "chats",
             serde_json::json!({
-                "entity_id": id(4), "user_id": "macro|a", "title": "Chat",
+                "entity_id": id(4), "user_id": "rox|a", "title": "Chat",
                 "updated_at_millis": 1_783_000_000_002_i64
             }),
         ),
@@ -1278,7 +1278,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             serde_json::json!({
                 "entity_id": id(5), "message_id": id(6), "sender": "a@x.com",
                 "recipients": ["b@x.com"], "cc": [], "bcc": [], "labels": [],
-                "link_id": id(7), "user_id": "macro|a", "subject": "Hi",
+                "link_id": id(7), "user_id": "rox|a", "subject": "Hi",
                 "sent_at_millis": 1_783_000_000_003_i64
             }),
         ),
@@ -1294,7 +1294,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             "projects_v1",
             "projects",
             serde_json::json!({
-                "entity_id": id(10), "name": "Redesign", "owner_id": "macro|a",
+                "entity_id": id(10), "name": "Redesign", "owner_id": "rox|a",
                 "updated_at_millis": 1_783_000_000_005_i64
             }),
         ),
@@ -1302,7 +1302,7 @@ fn a_mixed_response_routes_every_entity_to_its_own_type() -> anyhow::Result<()> 
             "calendar_events_v1",
             "calendar_events",
             serde_json::json!({
-                "entity_id": id(11), "name": "Standup", "owner_id": "macro|a",
+                "entity_id": id(11), "name": "Standup", "owner_id": "rox|a",
                 "source_link_id": id(12), "ical_uid": "abc@google.com",
                 "updated_at_millis": 1_783_000_000_006_i64
             }),
@@ -1443,7 +1443,7 @@ fn project_hit_deserializes_and_converts() -> anyhow::Result<()> {
             "_source": {
               "entity_id": "0197a863-0000-7000-8000-000000000001",
               "name": "Mobile Redesign",
-              "owner_id": "macro|user@user.com",
+              "owner_id": "rox|user@user.com",
               "parent_project_id": "0197a863-0000-7000-8000-000000000002",
               "created_at_millis": 1770000000000_i64,
               "updated_at_millis": 1783000000000_i64,

@@ -210,7 +210,7 @@ const requestRecord: AccessRequest = {
   id: 'request-1',
   createdAt: '',
   updatedAt: '',
-  requesterId: 'macro|requester@example.test',
+  requesterId: 'rox|requester@example.test',
   requestedLevel: 'view',
   revision: 4,
   status: 'pending',

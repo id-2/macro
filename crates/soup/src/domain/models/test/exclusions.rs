@@ -71,7 +71,7 @@ fn request<T>(filter: T, follow_up: bool) -> SoupRequest<T> {
         limit: 50,
         cursor: SoupQuery::Simple(SimpleQueryInner(cursor)),
         sort_direction: SoupSortDirection::Desc,
-        user: RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("rox|user@test.com").unwrap(),
         email_preview_view: PreviewView::default(),
         link_ids: vec![id(3)],
     }
@@ -79,7 +79,7 @@ fn request<T>(filter: T, follow_up: bool) -> SoupRequest<T> {
 
 fn team_receipt() -> EntityAccessReceipt<MemberTeamRole> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("rox|user@example.com").unwrap(),
         &id(4).to_string(),
         EntityType::Team,
     )

@@ -245,7 +245,7 @@ where
         let org_id = None;
         if req.participants.is_empty() && req.channel_type != ChannelType::Private {
             return Err(ChannelMutationErr::BadRequest(
-                "participants must be a non-empty list of 'macro|<email>'".to_string(),
+                "participants must be a non-empty list of 'rox|<email>'".to_string(),
             ));
         }
 
@@ -332,7 +332,7 @@ where
         let actor = require_user_actor(&actor)?;
         if req.recipients.is_empty() {
             return Err(ChannelMutationErr::BadRequest(
-                "recipients must be a non-empty list of 'macro|<email>'".to_string(),
+                "recipients must be a non-empty list of 'rox|<email>'".to_string(),
             ));
         }
 

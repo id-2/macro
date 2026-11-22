@@ -5,7 +5,7 @@ use super::*;
 use crate::domain::ports::BotAuthorizationRepo as _;
 
 const TOKEN: &str = "mbot_authorization_test_secret";
-const USER_ID: &str = "macro|bot-authorization@example.com";
+const USER_ID: &str = "rox|bot-authorization@example.com";
 const USER_EMAIL: &str = "bot-authorization@example.com";
 const FUSION_USER_ID: &str = "fusion-bot-authorization";
 

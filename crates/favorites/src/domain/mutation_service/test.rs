@@ -16,7 +16,7 @@ use uuid::Uuid;
 use super::*;
 use crate::domain::ports::{FavoriteView, FavoritesAuthorizer};
 
-const USER_ID: &str = "macro|favorites-mutation@example.com";
+const USER_ID: &str = "rox|favorites-mutation@example.com";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum ServiceCall {

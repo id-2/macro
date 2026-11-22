@@ -36,7 +36,7 @@ fn team() -> TeamId {
     Uuid::from_u128(1).try_into().unwrap()
 }
 fn user() -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str("macro|admin@example.com")
+    RoxUserIdStr::parse_from_str("rox|admin@example.com")
         .unwrap()
         .into_owned()
 }
@@ -479,7 +479,7 @@ async fn receipts_revalidate_disclosure_without_hiding_selected_work_or_failing_
     );
     assert_eq!(svc.create(access(team()), command).await.unwrap(), detail);
     // Another admin must be checked as the viewer, not the original requesting admin.
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com").unwrap();
     svc.progress(
         receipt(team(), EntityAccessAuth::Authenticated(other)),
         JobCommand { job_id: job },
@@ -488,7 +488,7 @@ async fn receipts_revalidate_disclosure_without_hiding_selected_work_or_failing_
     .unwrap();
     assert_eq!(
         fake.0.lock().unwrap().disclosure_calls.last().unwrap().0,
-        "macro|other@example.com"
+        "rox|other@example.com"
     );
     fake.0.lock().unwrap().fail_disclosure = true;
     let complete = svc
@@ -960,7 +960,7 @@ async fn shape_only_seal_and_other_admin_notify_original_requester_only() {
     )
     .await
     .unwrap();
-    let other = RoxUserIdStr::parse_from_str("macro|other@example.com")
+    let other = RoxUserIdStr::parse_from_str("rox|other@example.com")
         .unwrap()
         .into_owned();
     fake.0.lock().unwrap().fail_notification = true;

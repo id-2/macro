@@ -29,17 +29,17 @@ vi.mock('@core/context/user', () => ({
 }));
 
 const seamus: IUser = {
-  id: 'macro|seamus@rox.one',
+  id: 'rox|seamus@rox.one',
   name: 'Seamus Edson',
   email: 'seamus@rox.one',
 };
 const alias: IUser = {
-  id: 'macro|seamus+05@rox.one',
+  id: 'rox|seamus+05@rox.one',
   name: 'seamus+05',
   email: 'seamus+05@rox.one',
 };
 const sean: IUser = {
-  id: 'macro|sean@rox.one',
+  id: 'rox|sean@rox.one',
   name: 'Sean Aye',
   email: 'sean@rox.one',
 };
@@ -131,12 +131,12 @@ it('decorates only the current window and never widens an empty or explicit rost
   await createRoot(async (dispose) => {
     try {
       const person: IUser = {
-        id: 'macro|person@example.com',
+        id: 'rox|person@example.com',
         name: 'Directory person',
         email: 'person@example.com',
       };
       const agent: IUser = {
-        id: 'macro|agent@example.com',
+        id: 'rox|agent@example.com',
         name: 'Available agent',
         email: 'agent@example.com',
       };
@@ -158,13 +158,13 @@ it('decorates only the current window and never widens an empty or explicit rost
       expect(mocks.loadMore).toHaveBeenCalledOnce();
       setWindow([
         userItem({
-          id: 'macro|next@example.com',
+          id: 'rox|next@example.com',
           name: 'Next window',
           email: 'next@example.com',
         }),
       ]);
       expect(new Set(mention.users().map((row) => row.id))).toEqual(
-        new Set(['macro|next@example.com', agent.id])
+        new Set(['rox|next@example.com', agent.id])
       );
       setScope([]);
       expect(mention.users().map((row) => row.id)).toEqual([agent.id]);
@@ -178,7 +178,7 @@ it('decorates only the current window and never widens an empty or explicit rost
       );
       setScope(undefined);
       expect(new Set(mention.users().map((row) => row.id))).toEqual(
-        new Set(['macro|next@example.com', agent.id])
+        new Set(['rox|next@example.com', agent.id])
       );
     } finally {
       dispose();
@@ -222,7 +222,7 @@ it('keeps @here out of composers that do not post to a channel', () => {
 it('lists people before @here for a partial alias and @here first once it is typed in full', () => {
   createRoot((dispose) => {
     const helen: IUser = {
-      id: 'macro|helen@rox.one',
+      id: 'rox|helen@rox.one',
       name: 'Helen Park',
       email: 'helen@rox.one',
     };

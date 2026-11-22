@@ -16,7 +16,7 @@ use tower::ServiceExt;
 
 use super::*;
 
-const USER_ID: &str = "macro|favorites-router@rox.one";
+const USER_ID: &str = "rox|favorites-router@rox.one";
 const VALID_JWT: &str = "valid";
 
 #[derive(Clone)]

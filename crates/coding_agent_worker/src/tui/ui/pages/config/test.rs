@@ -42,11 +42,11 @@ fn short_config_keeps_selected_settings_and_web_owned_values_visible() {
         kind: "roxd".to_owned(),
         name: "Desk".to_owned(),
         owner: HarnessOwner::User {
-            user_id: "macro|user".to_owned(),
+            user_id: "rox|user".to_owned(),
         },
         access: Default::default(),
         shared_team_ids: vec![uuid::Uuid::nil()],
-        created_by: "macro|user".to_owned(),
+        created_by: "rox|user".to_owned(),
         created_at: chrono::Utc::now(),
         updated_at: chrono::Utc::now(),
         connected: true,

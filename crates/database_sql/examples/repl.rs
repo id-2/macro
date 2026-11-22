@@ -155,7 +155,7 @@ fn seed() -> Vec<Row> {
                 (AMOUNT, Cell::Number(12000.0)),
                 (STAGE, Cell::Options(vec![OptionId::from_uuid(WON)])),
                 (CLOSED_AT, date(2026, 9, 1)),
-                (OWNER, Cell::Entities(vec!["macro|sam@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|sam@example.com".into()])),
                 (TAGS, Cell::Options(vec![OptionId::from_uuid(VIP)])),
                 (DONE, Cell::Bool(true)),
             ],
@@ -166,7 +166,7 @@ fn seed() -> Vec<Row> {
                 (NAME, Cell::Text("Globex".into())),
                 (AMOUNT, Cell::Number(3000.0)),
                 (STAGE, Cell::Options(vec![OptionId::from_uuid(LEAD)])),
-                (OWNER, Cell::Entities(vec!["macro|sam@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|sam@example.com".into()])),
             ],
         ),
         row(
@@ -175,7 +175,7 @@ fn seed() -> Vec<Row> {
                 (NAME, Cell::Text("Hooli".into())),
                 (STAGE, Cell::Options(vec![OptionId::from_uuid(WON)])),
                 (CLOSED_AT, date(2026, 9, 15)),
-                (OWNER, Cell::Entities(vec!["macro|ana@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|ana@example.com".into()])),
                 (
                     TAGS,
                     Cell::Options(vec![OptionId::from_uuid(VIP), OptionId::from_uuid(RENEWAL)]),
@@ -196,7 +196,7 @@ fn seed() -> Vec<Row> {
             vec![
                 (NAME, Cell::Text("Umbrella".into())),
                 (AMOUNT, Cell::Number(45000.0)),
-                (OWNER, Cell::Entities(vec!["macro|ana@example.com".into()])),
+                (OWNER, Cell::Entities(vec!["rox|ana@example.com".into()])),
             ],
         ),
     ]

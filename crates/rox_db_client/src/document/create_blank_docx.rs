@@ -176,7 +176,7 @@ mod tests {
         let document_metadata = create_blank_docx(
             pool.clone(),
             "document-name",
-            RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|user@user.com").unwrap(),
             None,
             &SharePermissionV2::new_document_share_permission(Some(FileType::Docx), None),
             vec![SaveBomPart {
@@ -190,7 +190,7 @@ mod tests {
         assert_eq!(document_metadata.document_name, "document-name".to_string());
         assert_eq!(
             document_metadata.owner,
-            Owner::from_principal_str("macro|user@user.com").unwrap()
+            Owner::from_principal_str("rox|user@user.com").unwrap()
         );
 
         Ok(())

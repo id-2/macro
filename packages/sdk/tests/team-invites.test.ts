@@ -45,7 +45,7 @@ const currentTeam = () =>
       id: TEAM_ID,
       name: 'Acme',
       slug: 'acme',
-      owner_id: 'macro|owner@example.com',
+      owner_id: 'rox|owner@example.com',
     },
     members: [],
   });
@@ -55,7 +55,7 @@ const INVITE = {
   email: 'new.person@example.com',
   team_id: TEAM_ID,
   team_role: 'member',
-  invited_by: 'macro|owner@example.com',
+  invited_by: 'rox|owner@example.com',
   created_at: '2026-01-01T00:00:00Z',
   last_sent_at: '2026-01-02T00:00:00Z',
 };
@@ -189,7 +189,7 @@ describe('Team.invites', () => {
     expect(await pending?.email()).toBe('new.person@example.com');
     expect(await pending?.role()).toBe('member');
     expect(await pending?.lastSentAt()).toBe('2026-01-02T00:00:00Z');
-    expect((await pending?.invitedBy())?.id).toBe('macro|owner@example.com');
+    expect((await pending?.invitedBy())?.id).toBe('rox|owner@example.com');
     expect(
       requests.map((request) =>
         new URL(request.url).searchParams.get('team_id'),

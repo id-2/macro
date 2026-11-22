@@ -10,7 +10,7 @@ use crate::domain::{
 };
 
 const RAW_TOKEN: &str = "mbot_test_secret";
-const OWNER_ID: &str = "macro|owner@example.com";
+const OWNER_ID: &str = "rox|owner@example.com";
 const FUSION_USER_ID: &str = "fusion-owner";
 const ORGANIZATION_ID: i32 = 42;
 
@@ -253,7 +253,7 @@ async fn authorizes_current_team_member_and_rejects_non_member() {
 #[tokio::test]
 async fn rejects_consistent_claims_for_a_user_who_is_not_the_owner() {
     let non_owner = ResolvedBotActingUser {
-        rox_user_id: RoxUserIdStr::try_from("macro|other@example.com".to_string()).unwrap(),
+        rox_user_id: RoxUserIdStr::try_from("rox|other@example.com".to_string()).unwrap(),
         fusion_user_id: "fusion-other".to_string(),
         organization_id: Some(ORGANIZATION_ID),
     };

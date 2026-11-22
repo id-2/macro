@@ -365,7 +365,7 @@ async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyh
     sqlx::query!(
         r#"
         INSERT INTO team_user (team_id, user_id, team_role)
-        VALUES ($1, 'macro|u1@gamma.test', 'member'), ($1, 'macro|u3@gamma.test', 'member')
+        VALUES ($1, 'rox|u1@gamma.test', 'member'), ($1, 'rox|u3@gamma.test', 'member')
         "#,
         delta,
     )
@@ -374,7 +374,7 @@ async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyh
     sqlx::query!(
         r#"
         INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
-        VALUES ($1, 'macro|u3@gamma.test', $2, TRUE)
+        VALUES ($1, 'rox|u3@gamma.test', $2, TRUE)
         "#,
         delta,
         gamma_link(3),
@@ -384,7 +384,7 @@ async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyh
     sqlx::query!(
         r#"
         INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain)
-        VALUES ($1, 'macro|u1@gamma.test', 'dense.test')
+        VALUES ($1, 'rox|u1@gamma.test', 'dense.test')
         "#,
         delta,
     )

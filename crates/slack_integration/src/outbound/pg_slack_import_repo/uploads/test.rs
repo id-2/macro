@@ -1,6 +1,6 @@
 use super::*;
 
-const ADMIN: &str = "macro|archive@example.com";
+const ADMIN: &str = "rox|archive@example.com";
 
 fn admin() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(ADMIN).unwrap()
@@ -15,7 +15,7 @@ async fn fixture(pool: &PgPool) -> (PgSlackImportRepo, TeamId, TeamId) {
         user, foreign,
     ).execute(pool).await.unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, 'archive@example.com', $2), ('macro|foreign@example.com', 'foreign@example.com', $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, 'archive@example.com', $2), ('rox|foreign@example.com', 'foreign@example.com', $3)"#,
         ADMIN,
         user,
         foreign,
@@ -24,7 +24,7 @@ async fn fixture(pool: &PgPool) -> (PgSlackImportRepo, TeamId, TeamId) {
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Archive', $3), ($2, 'Foreign', 'macro|foreign@example.com')",
+        "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Archive', $3), ($2, 'Foreign', 'rox|foreign@example.com')",
         team,
         foreign,
         ADMIN,

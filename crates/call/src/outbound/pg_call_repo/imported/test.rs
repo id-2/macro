@@ -25,7 +25,7 @@ const LATEST_FIRST: CallRecordPage = CallRecordPage {
 };
 
 fn user(name: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
+    RoxUserIdStr::parse_from_str(&format!("rox|{name}@test.com"))
         .unwrap()
         .into_owned()
 }
@@ -147,7 +147,7 @@ async fn imported_call_record_reads_source_and_transcript(
         .get_call_record_by_call_id(&call_id)
         .await?
         .expect("imported call should be readable");
-    assert_eq!(record.created_by, "macro|import-a@test.com");
+    assert_eq!(record.created_by, "rox|import-a@test.com");
     assert_eq!(record.channel_id, None);
     let source = record.source.expect("imported calls carry their source");
     assert_eq!(source.provider, CallProvider::Granola);

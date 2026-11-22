@@ -52,7 +52,7 @@ describe('useRoutinePromptMentionUsers', () => {
     state.people = [
       {
         data: {
-          id: 'macro|person@example.com',
+          id: 'rox|person@example.com',
           name: 'Person',
           email: 'person@example.com',
         },
@@ -64,13 +64,13 @@ describe('useRoutinePromptMentionUsers', () => {
     createRoot((dispose) => {
       const users = useRoutinePromptMentionUsers();
       expect(users().map((user) => user.id)).toEqual([
-        'macro|person@example.com',
+        'rox|person@example.com',
         ROX_AGENT_PRINCIPAL_ID,
       ]);
 
       state.agents = [savedAgent('saved-agent', 'Saved', 'none')];
       expect(users().map((user) => user.id)).toEqual([
-        'macro|person@example.com',
+        'rox|person@example.com',
         ROX_AGENT_PRINCIPAL_ID,
         'bot|saved-agent',
       ]);

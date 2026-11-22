@@ -93,7 +93,7 @@ async fn queues_the_stored_owner_before_deleting_the_document(pool: PgPool) {
     let expected = [
         (
             "90000000-0000-0000-0000-000000000031",
-            "macro|typed-owner@example.com",
+            "rox|typed-owner@example.com",
         ),
         (
             "90000000-0000-0000-0000-000000000033",

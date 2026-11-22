@@ -4,7 +4,7 @@ use rox_uuid::Uuid;
 
 use super::*;
 
-const OWNER: &str = "macro|owner@example.com";
+const OWNER: &str = "rox|owner@example.com";
 
 /// Every user is on `tier`; every team is paid for by [`OWNER`].
 struct Plans {

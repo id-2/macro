@@ -4,9 +4,9 @@ use rox_user_id::user_id::RoxUserIdStr;
 use rox_uuid::Uuid;
 use model_owner::Owner;
 
-const OWNER: &str = "macro|owner@example.com";
-const TEAMMATE: &str = "macro|teammate@example.com";
-const STRANGER: &str = "macro|stranger@example.com";
+const OWNER: &str = "rox|owner@example.com";
+const TEAMMATE: &str = "rox|teammate@example.com";
+const STRANGER: &str = "rox|stranger@example.com";
 
 struct Directory {
     facts: BotFacts,

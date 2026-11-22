@@ -67,13 +67,13 @@ test("the prompt: the request, the people, why, the snapshot, the diff", () => {
 });
 
 test("the ids a snapshot names, the owner first", () => {
-	const owner = "macro|owner@example.com";
+	const owner = "rox|owner@example.com";
 	expect(
 		mentionedIds(
-			`x macro|a.b@example.com y ${owner} z macro|a.b@example.com`,
+			`x rox|a.b@example.com y ${owner} z rox|a.b@example.com`,
 			owner,
 		),
-	).toEqual([owner, "macro|a.b@example.com"]);
+	).toEqual([owner, "rox|a.b@example.com"]);
 });
 
 /** A tick with everything faked, and a record of what it did. */

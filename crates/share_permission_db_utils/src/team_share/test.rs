@@ -207,7 +207,7 @@ async fn database_without_permissions_is_shared_once_its_permission_exists(
     sqlx::query!("INSERT INTO databases (id) VALUES ('20000000-0000-0000-0000-000000000011')")
         .execute(tx.as_mut())
         .await?;
-    sqlx::query!("INSERT INTO database_entities (database_id, name, user_id) VALUES ('20000000-0000-0000-0000-000000000011', 'Database', 'macro|owner@example.com')")
+    sqlx::query!("INSERT INTO database_entities (database_id, name, user_id) VALUES ('20000000-0000-0000-0000-000000000011', 'Database', 'rox|owner@example.com')")
         .execute(tx.as_mut())
         .await?;
     let facts = load_facts(&mut tx, &entity).await?;
@@ -259,14 +259,14 @@ async fn load_facts_prefers_active_call_over_archived_record_with_same_id(
         r#"INSERT INTO call_records
             (id, channel_id, room_name, created_by, started_at, duration_ms, share_permission_id)
         VALUES ('20000000-0000-0000-0000-000000000005', '40000000-0000-0000-0000-000000000001',
-            'active', 'macro|other@example.com', now(), 0, 'active-call')"#
+            'active', 'rox|other@example.com', now(), 0, 'active-call')"#
     )
     .execute(tx.as_mut())
     .await?;
 
     let facts = load_facts(&mut tx, &active_call()).await?;
 
-    assert_eq!(facts.owner.principal_id(), "macro|owner@example.com");
+    assert_eq!(facts.owner.principal_id(), "rox|owner@example.com");
     assert_eq!(facts.current, None);
     Ok(())
 }
@@ -303,7 +303,7 @@ async fn initialize_call_grants_view_to_creator_team_or_nothing(
     );
 
     // A creator without a team: nothing is promised, revision stays 0.
-    sqlx::query!("DELETE FROM team_user WHERE user_id = 'macro|owner@example.com'")
+    sqlx::query!("DELETE FROM team_user WHERE user_id = 'rox|owner@example.com'")
         .execute(tx.as_mut())
         .await?;
     let entity = archived_call();
@@ -370,7 +370,7 @@ async fn apply_project_team_share_copies_and_clears_nested_contents(
     .await?;
     sqlx::query!(
         r#"INSERT INTO "Document" (id, name, owner, "projectId")
-        VALUES ($1, 'Later', 'macro|owner@example.com', $2)"#,
+        VALUES ($1, 'Later', 'rox|owner@example.com', $2)"#,
         nested_id.to_string(),
         project_id,
     )
@@ -464,7 +464,7 @@ async fn typed_owner_facts_match_sql_audiences_without_owner_escalation(
     use models_permissions::share_permission::team_share::TeamSharePolicyError;
 
     let team = Uuid::parse_str("90000000-0000-0000-0000-000000000011")?;
-    let actor = RoxUserIdStr::parse_from_str("macro|typed-owner@example.com")?;
+    let actor = RoxUserIdStr::parse_from_str("rox|typed-owner@example.com")?;
     let mut tx = pool.begin().await?;
     for (suffix, has_team) in [
         (31, true),

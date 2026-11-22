@@ -30,7 +30,7 @@ fn main() -> anyhow::Result<()> {
 
     let rox_user_id = read_arg("macro-user-id")
         .or_else(|| seed_user.map(|user| user.user_id.clone()))
-        .unwrap_or_else(|| format!("macro|{email}"));
+        .unwrap_or_else(|| format!("rox|{email}"));
     let fusion_user_id = read_arg("fusion-user-id")
         .or_else(|| seed_user.map(|user| user.fusion_user_id.clone()))
         .or_else(|| seed_user.map(|user| user.rox_user_id.clone()))

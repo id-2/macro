@@ -20,7 +20,7 @@ const session: AgentSessionResponse = {
   name: 'Agent Session',
   archivedBy: null,
   archivedAt: null,
-  ownerId: 'macro|owner@example.com',
+  ownerId: 'rox|owner@example.com',
   sandboxSize: 'default',
   status: { kind: 'no_messages' },
   workspace: '/workspace',
@@ -223,7 +223,7 @@ describe('AgentSession', () => {
   test('registers, unregisters, and lists work as entity handles', async () => {
     const registration = {
       id: '0198a4cc-e138-7670-a308-a6b766602702',
-      accountId: 'macro|agent@example.com',
+      accountId: 'rox|agent@example.com',
       agentSessionId: sessionId,
       registeredAt: '2026-08-24T12:00:00Z',
     };
@@ -249,7 +249,7 @@ describe('AgentSession', () => {
     const [listed] = await macro.agentSessions.registeredWork();
 
     expect(registered.session.id).toBe(sessionId);
-    expect(registered.account.id).toBe('macro|agent@example.com');
+    expect(registered.account.id).toBe('rox|agent@example.com');
     expect(registered.registeredAt).toBe('2026-08-24T12:00:00Z');
     expect(listed?.session.id).toBe(sessionId);
     expect(
@@ -668,9 +668,9 @@ describe('AgentSession', () => {
             serverName: 'Rox',
             toolName: 'send_email',
             arguments: { to: 'a' },
-            requestedBy: 'macro|teammate@example.com',
+            requestedBy: 'rox|teammate@example.com',
             status: 'approved',
-            resolvedBy: 'macro|owner@example.com',
+            resolvedBy: 'rox|owner@example.com',
             remembered: false,
           },
           {
@@ -680,7 +680,7 @@ describe('AgentSession', () => {
             serverName: 'Gmail',
             toolName: 'send_email',
             arguments: { to: 'b' },
-            requestedBy: 'macro|teammate@example.com',
+            requestedBy: 'rox|teammate@example.com',
             status: 'pending',
             resolvedBy: null,
             remembered: false,
@@ -716,7 +716,7 @@ describe('AgentSession', () => {
       id: 'approval-pending',
       sessionId,
     });
-    expect(pending[0]?.requestedBy?.id).toBe('macro|teammate@example.com');
+    expect(pending[0]?.requestedBy?.id).toBe('rox|teammate@example.com');
     expect(pending[0]).toMatchObject({
       serverName: 'Gmail',
       toolName: 'send_email',
@@ -780,7 +780,7 @@ describe('AgentSession', () => {
                 actionId,
                 kind: 'prompt',
                 prompt: 'Also update the docs',
-                actorUserId: 'macro|teammate@example.com',
+                actorUserId: 'rox|teammate@example.com',
                 createdAt: '2026-08-24T12:01:00Z',
               },
             ],
@@ -799,7 +799,7 @@ describe('AgentSession', () => {
     expect(queued?.actionId).toBe(actionId);
     expect(queued?.kind).toBe('prompt');
     expect(queued?.prompt).toBe('Also update the docs');
-    expect(queued?.actorUserId).toBe('macro|teammate@example.com');
+    expect(queued?.actorUserId).toBe('rox|teammate@example.com');
     expect(queued?.createdAt).toBe('2026-08-24T12:01:00Z');
 
     await queued?.edit('Also update the README');
@@ -841,7 +841,7 @@ test('session activity keeps invocation filters and lazily advances its cursor',
           id: `row-${requests.length}`,
           agent_correlation_id: invocationId,
           actor_id: 'bot|0198a4cc-e138-7670-a308-a6b766602701',
-          subject_id: 'macro|owner@example.com',
+          subject_id: 'rox|owner@example.com',
           entity_type: 'document',
           entity_id: 'document-fixture',
           action: 'edited',

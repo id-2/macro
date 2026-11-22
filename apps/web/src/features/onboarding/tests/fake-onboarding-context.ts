@@ -94,7 +94,7 @@ export type FakeOnboardingWorld = {
 
 export type FakeEvent = { event: string; data: unknown };
 
-export const FAKE_VIEWER_ID = 'macro|ada@acme.com';
+export const FAKE_VIEWER_ID = 'rox|ada@acme.com';
 
 export function defaultFakeWorld(): FakeOnboardingWorld {
   return {

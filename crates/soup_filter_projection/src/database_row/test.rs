@@ -7,7 +7,7 @@ fn a_row_projects_its_table_and_nothing_a_row_cannot_have() {
     let document = project_database_row(DatabaseRowProjectionInput {
         record_key: RecordKey::new(format!("GraphqlSoupDatabaseRow:{row}")).unwrap(),
         id: row,
-        owner: "macro|owner@databases.test".into(),
+        owner: "rox|owner@databases.test".into(),
         table_id: deals,
         created_at: "2026-01-01T00:00:00Z".parse().unwrap(),
         updated_at: "2026-01-02T00:00:00Z".parse().unwrap(),
@@ -25,7 +25,7 @@ fn a_row_projects_its_table_and_nothing_a_row_cannot_have() {
             },
             ExactFact {
                 attribute: vocabulary::owner(),
-                value: ExactValue::utf8("macro|owner@databases.test").unwrap(),
+                value: ExactValue::utf8("rox|owner@databases.test").unwrap(),
             },
             ExactFact {
                 attribute: vocabulary::table_id(),

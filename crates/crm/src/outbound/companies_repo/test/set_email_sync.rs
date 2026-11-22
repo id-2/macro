@@ -13,7 +13,7 @@ async fn set_email_sync_disable_preserves_contacts_and_sources(pool: PgPool) -> 
     // controlled by `hidden`. Teams that want to drop contacts should
     // hide the company.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, true, &["acme.com"]).await?;
     let link_id = insert_email_link(&pool, owner_id, "owner@macro.test").await?;
@@ -35,7 +35,7 @@ async fn set_email_sync_disable_preserves_contacts_and_sources(pool: PgPool) -> 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_enable_preserves_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     // Start disabled with a lingering contact — re-enabling must NOT touch it.
     let company_id = insert_company(&pool, team_id, false, &["acme.com"]).await?;
@@ -54,7 +54,7 @@ async fn set_email_sync_enable_preserves_contacts(pool: PgPool) -> anyhow::Resul
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_returns_not_found_for_unknown_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
 
     let repo = CompaniesRepositoryImpl::new(pool);
     let result = repo.set_email_sync(&team_id, &Uuid::now_v7(), false).await;
@@ -70,8 +70,8 @@ async fn set_email_sync_returns_not_found_for_unknown_company(pool: PgPool) -> a
 async fn set_email_sync_isolates_companies_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
-    let owner_a = "macro|owner_a@test.com";
-    let owner_b = "macro|owner_b@test.com";
+    let owner_a = "rox|owner_a@test.com";
+    let owner_b = "rox|owner_b@test.com";
     seed_team(&pool, team_a, owner_a).await?;
     seed_team(&pool, team_b, owner_b).await?;
     let company_a = insert_company(&pool, team_a, true, &["acme.com"]).await?;
@@ -97,7 +97,7 @@ async fn set_email_sync_disable_handles_multi_domain_company(pool: PgPool) -> an
     // Multi-domain companies lock each (team, domain) on disable; the
     // flag flips but contacts/sources/domains are preserved.
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id =
         insert_company(&pool, team_id, true, &["acme.com", "acme.io", "acme.co"]).await?;
@@ -124,7 +124,7 @@ async fn set_email_sync_disable_handles_multi_domain_company(pool: PgPool) -> an
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_enable_refuses_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
-    let owner_id = "macro|owner@test.com";
+    let owner_id = "rox|owner@test.com";
     seed_team(&pool, team_id, owner_id).await?;
     let company_id = insert_company(&pool, team_id, false, &["acme.com"]).await?;
     sqlx::query(r#"UPDATE crm_companies SET hidden = TRUE WHERE id = $1"#)
@@ -151,7 +151,7 @@ async fn set_email_sync_disable_allowed_on_hidden_company(pool: PgPool) -> anyho
     // a no-op-shaped call but must not error — the hidden check only
     // fires on the enable path.
     let team_id = Uuid::now_v7();
-    seed_team(&pool, team_id, "macro|owner@test.com").await?;
+    seed_team(&pool, team_id, "rox|owner@test.com").await?;
     let company_id = insert_company(&pool, team_id, false, &["acme.com"]).await?;
     sqlx::query(r#"UPDATE crm_companies SET hidden = TRUE WHERE id = $1"#)
         .bind(company_id)

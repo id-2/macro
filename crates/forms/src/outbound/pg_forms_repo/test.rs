@@ -26,8 +26,8 @@ use crate::domain::models::{
 use crate::domain::ports::FormsRepo;
 use crate::domain::sharing::FormSharingRepo;
 
-const OWNER: &str = "macro|owner@forms-repo.test";
-const RESPONDENT: &str = "macro|respondent@forms-repo.test";
+const OWNER: &str = "rox|owner@forms-repo.test";
+const RESPONDENT: &str = "rox|respondent@forms-repo.test";
 
 fn user(id: &'static str) -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str(id).unwrap()
@@ -46,7 +46,7 @@ struct Table {
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let email = user_id.trim_start_matches("macro|");
+    let email = user_id.trim_start_matches("rox|");
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,

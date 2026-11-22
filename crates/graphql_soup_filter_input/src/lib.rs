@@ -710,7 +710,7 @@ enum GraphqlDocumentLiteral {
     Id(ID),
     /// The project id option.
     ProjectId(ID),
-    /// The owner principal option — a user (`macro|<email>`), a bot
+    /// The owner principal option — a user (`rox|<email>`), a bot
     /// (`bot|<uuid>`), or a team (a bare hyphenated uuid).
     Owner(String),
     /// The importance option.
@@ -839,7 +839,7 @@ enum GraphqlProjectLiteral {
     ProjectId(ID),
     /// The project id self option.
     ProjectIdSelf(ID),
-    /// The owner principal option — a user (`macro|<email>`), a bot
+    /// The owner principal option — a user (`rox|<email>`), a bot
     /// (`bot|<uuid>`), or a team (a bare hyphenated uuid).
     Owner(String),
     /// The importance option.
@@ -881,7 +881,7 @@ enum GraphqlChatLiteral {
     Role(GraphqlChatRole),
     /// The chat id option.
     ChatId(ID),
-    /// The owner principal option — a user (`macro|<email>`), a bot
+    /// The owner principal option — a user (`rox|<email>`), a bot
     /// (`bot|<uuid>`), or a team (a bare hyphenated uuid).
     Owner(String),
     /// The importance option.
@@ -1271,7 +1271,7 @@ enum GraphqlAgentSessionLiteral {
     Include(bool),
     /// The id option.
     Id(ID),
-    /// The owner principal option — a user (`macro|<email>`), a bot
+    /// The owner principal option — a user (`rox|<email>`), a bot
     /// (`bot|<uuid>`), or a team (a bare hyphenated uuid).
     Owner(String),
     /// Who started the session. Narrows the sessions a query asks for; it

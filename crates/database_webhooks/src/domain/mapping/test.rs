@@ -82,7 +82,7 @@ fn an_object_is_one_row_of_cells_by_column_name() {
         "Duration (min)": 45,
         "Recording": null,
         "Needs follow-up": true,
-        "Owner": "macro|alice@acme.com",
+        "Owner": "rox|alice@acme.com",
         "Account": "00000000-0000-0000-0000-0000000000c8",
         "Status": "Scheduled"
     });
@@ -119,7 +119,7 @@ fn an_object_is_one_row_of_cells_by_column_name() {
                 column: OWNER,
                 value: CellValue::Entities(vec![EntityRef {
                     entity_type: EntityKind::User,
-                    entity_id: "macro|alice@acme.com".to_string(),
+                    entity_id: "rox|alice@acme.com".to_string(),
                 }]),
             },
             CellWrite {

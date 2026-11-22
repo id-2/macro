@@ -12,7 +12,7 @@ use std::sync::Mutex;
 use tower::ServiceExt as _;
 use uuid::Uuid;
 
-const USER_ID: &str = "macro|painter@example.com";
+const USER_ID: &str = "rox|painter@example.com";
 const STATIC_FILE_ID: Uuid = Uuid::from_u128(0x123);
 
 /// Admits the one token `valid`, as the user above.

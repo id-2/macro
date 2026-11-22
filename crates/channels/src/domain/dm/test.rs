@@ -1,7 +1,7 @@
 use super::*;
 
 fn user(local: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{local}@test.com")).unwrap()
+    RoxUserIdStr::try_from(format!("rox|{local}@test.com")).unwrap()
 }
 
 #[test]

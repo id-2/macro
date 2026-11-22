@@ -19116,7 +19116,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -19337,7 +19337,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The type of an entity in Macro",
+              "description": "The type of an entity in Rox",
               "enum": [
                 "user",
                 "chat",
@@ -28689,7 +28689,7 @@
     "/whatsapp/chats": {
       "get": {
         "tags": ["whatsapp_linked::inbound::router"],
-        "summary": "The caller's WhatsApp chat list (groups and direct chats), newest\nactivity first, with what can be added to Macro.",
+        "summary": "The caller's WhatsApp chat list (groups and direct chats), newest\nactivity first, with what can be added to Rox.",
         "operationId": "whatsapp_chats",
         "responses": {
           "200": {
@@ -29346,7 +29346,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -29639,7 +29639,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by session owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
+            "description": "Filter by session owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
           }
         }
       },
@@ -32918,7 +32918,7 @@
             "items": {
               "$ref": "#/components/schemas/CallRecordParticipant"
             },
-            "description": "Macro-account participants (both active and historic)."
+            "description": "Rox-account participants (both active and historic)."
           },
           "recordingPreviewUrl": {
             "type": ["string", "null"],
@@ -32948,7 +32948,7 @@
               },
               {
                 "$ref": "#/components/schemas/CallRecordSource",
-                "description": "External provenance for calls imported from another provider; `None`\nfor calls recorded in Macro."
+                "description": "External provenance for calls imported from another provider; `None`\nfor calls recorded in Rox."
               }
             ]
           },
@@ -34978,7 +34978,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by chat owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by chat owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -35064,7 +35064,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -36111,7 +36111,7 @@
             "items": {
               "$ref": "#/components/schemas/SlackUserId"
             },
-            "description": "Complete source member list, including members unknown to Macro."
+            "description": "Complete source member list, including members unknown to Rox."
           },
           "messageCount": {
             "type": ["integer", "null"],
@@ -38196,7 +38196,7 @@
       },
       "CustomSpeakerAssignment": {
         "type": "object",
-        "description": "One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.",
+        "description": "One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.",
         "required": ["diarizedSpeakerId", "customSpeaker"],
         "properties": {
           "customSpeaker": {
@@ -39133,7 +39133,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by document owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by document owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -43444,7 +43444,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -43925,7 +43925,7 @@
           },
           {
             "type": "object",
-            "description": "Macro ids: people as macro| user ids, records or other items.",
+            "description": "Rox ids: people as rox| user ids, records or other items.",
             "required": ["value", "type"],
             "properties": {
               "type": {
@@ -43937,7 +43937,7 @@
                 "items": {
                   "type": "string"
                 },
-                "description": "Macro ids: people as macro| user ids, records or other items."
+                "description": "Rox ids: people as rox| user ids, records or other items."
               }
             }
           }
@@ -43982,7 +43982,7 @@
         "properties": {
           "method": {
             "type": "string",
-            "description": "Provider method, stored verbatim; only `popup` fires Macro\nnotifications."
+            "description": "Provider method, stored verbatim; only `popup` fires Rox\nnotifications."
           },
           "minutes": {
             "type": "integer",
@@ -44649,7 +44649,7 @@
           "receivedAt": {
             "type": "string",
             "format": "date-time",
-            "description": "Timestamp first received by Macro."
+            "description": "Timestamp first received by Rox."
           },
           "replyTo": {
             "type": ["string", "null"],
@@ -44784,7 +44784,7 @@
       },
       "ExternalChatPoll": {
         "type": "object",
-        "description": "A poll, read-only in Macro.",
+        "description": "A poll, read-only in Rox.",
         "required": ["question", "options", "selectableCount", "voters"],
         "properties": {
           "options": {
@@ -45366,7 +45366,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -45422,7 +45422,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -45559,7 +45559,7 @@
           },
           "value": {
             "type": ["string", "null"],
-            "description": "One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true/false, or a date."
+            "description": "One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true/false, or a date."
           },
           "values": {
             "type": ["array", "null"],
@@ -47834,7 +47834,7 @@
         "properties": {
           "recipient_id": {
             "type": "string",
-            "description": "Recipient user id (`macro|...`) or agent persona id (`bot|...`)."
+            "description": "Recipient user id (`rox|...`) or agent persona id (`bot|...`)."
           }
         }
       },
@@ -48706,7 +48706,7 @@
       "GuestId": {
         "type": "string",
         "format": "uuid",
-        "description": "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Macro user\nids. Only the server mints them; Macro users keep `macro|…` identities,\nso an RTC identity classifies as exactly one of the two."
+        "description": "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Rox user\nids. Only the server mints them; Rox users keep `rox|…` identities,\nso an RTC identity classifies as exactly one of the two."
       },
       "GuestJoinRequest": {
         "type": "object",
@@ -49252,7 +49252,7 @@
       },
       "ImportPipelineCsvRequest": {
         "type": "object",
-        "description": "A CSV to import: exactly one of its text or a CSV file in Macro.",
+        "description": "A CSV to import: exactly one of its text or a CSV file in Rox.",
         "properties": {
           "csv": {
             "type": ["string", "null"],
@@ -49676,7 +49676,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by initiative owner principal — a user ('macro|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
+            "description": "Filter by initiative owner principal — a user ('rox|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
           }
         }
       },
@@ -55079,7 +55079,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Filter by project owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "description": "Filter by project owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           },
           "project_ids": {
             "type": "array",
@@ -55494,7 +55494,7 @@
           },
           {
             "type": "object",
-            "description": "Database-scoped property: the definition is a column of one Macro\ndatabase and is invisible to the shared user/team property namespace.",
+            "description": "Database-scoped property: the definition is a column of one Rox\ndatabase and is invisible to the shared user/team property namespace.",
             "required": ["database_id", "scope"],
             "properties": {
               "database_id": {
@@ -56042,7 +56042,7 @@
           },
           "counterpartyId": {
             "type": "string",
-            "description": "The other account (`macro|...`)."
+            "description": "The other account (`rox|...`)."
           }
         }
       },
@@ -58547,7 +58547,7 @@
       },
       "SoupCallRecordParticipant": {
         "type": "object",
-        "description": "A Macro-account participant in a call record, as displayed in Soup.",
+        "description": "A Rox-account participant in a call record, as displayed in Soup.",
         "required": ["userId", "joinedAt"],
         "properties": {
           "joinedAt": {
@@ -58647,7 +58647,7 @@
                 "items": {
                   "$ref": "#/components/schemas/SoupCallRecordParticipant"
                 },
-                "description": "Macro-account participants in the call."
+                "description": "Rox-account participants in the call."
               },
               "startedAt": {
                 "type": "string",
@@ -60377,7 +60377,7 @@
           },
           {
             "type": "string",
-            "description": "Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}</m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}</m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}</m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9/28/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search/read results; do not invent them. Other Markdown is literal."
+            "description": "Text, or a formula starting with =, at most 10,000 characters. Rox links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}</m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}</m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}</m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9/28/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search/read results; do not invent them. Other Markdown is literal."
           },
           {
             "type": "null",
@@ -65339,7 +65339,7 @@
           },
           "canAdd": {
             "type": "boolean",
-            "description": "\"Add to Macro\" works now."
+            "description": "\"Add to Rox\" works now."
           },
           "cannotAddReason": {
             "oneOf": [

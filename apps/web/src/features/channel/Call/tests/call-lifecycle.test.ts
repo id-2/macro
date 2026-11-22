@@ -24,7 +24,7 @@ const token: CallTokenResponse = {
   roomName: 'room-1',
   token: 'token',
   serverUrl: 'ws://localhost',
-  participantId: 'macro|test@example.com',
+  participantId: 'rox|test@example.com',
   started: false,
   shareToken: null,
 } satisfies CallTokenResponse;

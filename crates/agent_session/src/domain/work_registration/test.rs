@@ -21,7 +21,7 @@ fn registration_of(session: AgentSessionId, owner: &str) -> WorkRegistration {
 
 fn edit_access(session: AgentSessionId) -> EntityAccessReceipt<EditAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(
-        account("macro|caller@example.com"),
+        account("rox|caller@example.com"),
         Entity {
             entity_id: session.to_string(),
             entity_type: EntityType::AgentSession,
@@ -163,7 +163,7 @@ fn service(
 #[tokio::test]
 async fn registering_tells_viewers_only_when_it_created_the_registration() {
     let session = AgentSessionId::new();
-    let caller = account("macro|caller@example.com");
+    let caller = account("rox|caller@example.com");
 
     let (created, signal) = service(
         FakeRepo {
@@ -189,7 +189,7 @@ async fn registering_tells_viewers_only_when_it_created_the_registration() {
 #[tokio::test]
 async fn unregistering_tells_viewers_only_when_it_ended_something() {
     let session = AgentSessionId::new();
-    let caller = account("macro|caller@example.com");
+    let caller = account("rox|caller@example.com");
 
     let (ended, signal) = service(
         FakeRepo {
@@ -211,12 +211,12 @@ async fn a_viewer_reads_only_registrations_of_sessions_it_can_view() {
     let viewable = AgentSessionId::new();
     let hidden = AgentSessionId::new();
     let failing = AgentSessionId::new();
-    let shown = registration_of(viewable, "macro|agent@example.com");
+    let shown = registration_of(viewable, "rox|agent@example.com");
     let repo = FakeRepo {
         active: vec![
-            registration_of(hidden, "macro|agent@example.com"),
+            registration_of(hidden, "rox|agent@example.com"),
             shown.clone(),
-            registration_of(failing, "macro|agent@example.com"),
+            registration_of(failing, "rox|agent@example.com"),
         ],
         ..FakeRepo::default()
     };
@@ -228,8 +228,8 @@ async fn a_viewer_reads_only_registrations_of_sessions_it_can_view() {
 
     let visible = service
         .visible_registrations(
-            &account("macro|viewer@example.com"),
-            &[account("macro|agent@example.com")],
+            &account("rox|viewer@example.com"),
+            &[account("rox|agent@example.com")],
         )
         .await
         .unwrap();
@@ -241,9 +241,9 @@ async fn a_viewer_reads_only_registrations_of_sessions_it_can_view() {
 async fn changes_name_only_what_the_viewer_can_view_and_refetch_for_the_rest() {
     let viewable = AgentSessionId::new();
     let hidden = AgentSessionId::new();
-    let active = registration_of(viewable, "macro|agent@example.com");
-    let ended = registration_of(viewable, "macro|agent@example.com");
-    let on_archived = registration_of(viewable, "macro|other@example.com");
+    let active = registration_of(viewable, "rox|agent@example.com");
+    let ended = registration_of(viewable, "rox|agent@example.com");
+    let on_archived = registration_of(viewable, "rox|other@example.com");
     let state = |registration: &WorkRegistration, ended: bool, session_archived: bool| {
         WorkRegistrationState {
             registration: registration.clone(),
@@ -260,8 +260,8 @@ async fn changes_name_only_what_the_viewer_can_view_and_refetch_for_the_rest() {
         ..FakeRepo::default()
     };
     let (service, _) = service(repo, vec![viewable]);
-    let viewer = account("macro|viewer@example.com");
-    let accounts = [account("macro|agent@example.com")];
+    let viewer = account("rox|viewer@example.com");
+    let accounts = [account("rox|agent@example.com")];
 
     let changes = service
         .changes(&viewer, &accounts, &[viewable], Utc::now())
@@ -276,7 +276,7 @@ async fn changes_name_only_what_the_viewer_can_view_and_refetch_for_the_rest() {
         }
     );
 
-    let revoked = registration_of(hidden, "macro|agent@example.com");
+    let revoked = registration_of(hidden, "rox|agent@example.com");
     let repo = FakeRepo {
         states: vec![state(&revoked, false, false), state(&revoked, true, false)],
         ..FakeRepo::default()

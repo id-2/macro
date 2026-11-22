@@ -243,7 +243,7 @@ async fn wait_until(mut condition: impl FnMut() -> bool) {
 }
 
 fn user(local: &str) -> RoxUserIdStr<'static> {
-    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
+    RoxUserIdStr::try_from(format!("rox|{local}@example.com")).expect("valid user id")
 }
 
 fn document(id: &str) -> Entity<'static> {

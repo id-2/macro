@@ -461,7 +461,7 @@ private final class CallPiPParticipantView: UIView {
         let words = title
             .split { $0.isWhitespace || $0 == "@" || $0 == "." || $0 == "|" }
             .map(String.init)
-            .filter { !$0.isEmpty && $0.lowercased() != "macro" }
+            .filter { !$0.isEmpty && $0.lowercased() != "rox" }
         if words.count >= 2 {
             return "\(words[0].prefix(1))\(words[1].prefix(1))".uppercased()
         }

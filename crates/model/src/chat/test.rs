@@ -3,7 +3,7 @@ use serde_json::json;
 
 use super::{Chat, ChatBasic};
 
-const USER_OWNER: &str = "macro|test@example.com";
+const USER_OWNER: &str = "rox|test@example.com";
 const BOT_OWNER: &str = "bot|00000000-0000-0000-0000-00000000a1a1";
 const TEAM_OWNER: &str = "01234567-89ab-cdef-0123-456789abcdef";
 

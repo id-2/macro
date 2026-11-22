@@ -22,7 +22,7 @@ async fn detached_fleet_precedes_missing_rows_and_all_side_effects() {
                 billing: PurchaseBilling::Stripe,
                 purchase_key: key("buy-dialog-1"),
                 team_id: TEAM,
-                created_by: RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+                created_by: RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap(),
                 size: ComputerSize::Standard,
                 name: None,
                 extra_items: vec![],

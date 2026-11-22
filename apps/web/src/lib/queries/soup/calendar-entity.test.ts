@@ -74,7 +74,7 @@ function calendarItem(notifications: Notification[] = [reminder()]) {
     data: {
       id: 'event',
       title: 'Friday deployment',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       status: 'confirmed',
       time: {
         kind: 'timed',

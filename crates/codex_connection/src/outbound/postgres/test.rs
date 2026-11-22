@@ -136,7 +136,7 @@ fn credentials(expires_at: u64) -> codex_cloud_agents::domain::Credentials {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn separate_service_replicas_rotate_one_owner_token_once(pool: PgPool) {
     use crate::domain::{ConnectionService, ConnectionServiceImpl, StoredConnection};
-    let owner = "macro|owner@example.com";
+    let owner = "rox|owner@example.com";
     user(&pool, owner).await;
     let cipher = Arc::new(Cipher::default());
     let repository = Arc::new(PostgresRepository::new(pool.clone(), cipher.clone()));

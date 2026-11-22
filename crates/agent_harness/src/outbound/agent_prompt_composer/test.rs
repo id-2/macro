@@ -67,7 +67,7 @@ async fn the_trigger_reaches_the_lexical_service_beside_the_people() {
             }),
         },
         assigned_by: ContextPerson {
-            id: "macro|julia@example.com".to_owned(),
+            id: "rox|julia@example.com".to_owned(),
             name: "Julia".to_owned(),
             email: Some("julia@example.com".to_owned()),
         },
@@ -94,8 +94,8 @@ async fn the_trigger_reaches_the_lexical_service_beside_the_people() {
         serde_json::json!({
             "promptMarkdown": "Work on the task",
             "instructions": "Be brief.",
-            "owner": { "id": "macro|julia@example.com", "name": "julia@example.com" },
-            "sender": { "id": "macro|julia@example.com", "name": "julia@example.com" },
+            "owner": { "id": "rox|julia@example.com", "name": "julia@example.com" },
+            "sender": { "id": "rox|julia@example.com", "name": "julia@example.com" },
             "currentTime": {
                 "iso": "2026-09-24T16:03:36-04:00",
                 "local": "Thursday, September 24, 2026, 4:03 PM",
@@ -114,7 +114,7 @@ async fn the_trigger_reaches_the_lexical_service_beside_the_people() {
                     }
                 },
                 "assigned_by": {
-                    "id": "macro|julia@example.com",
+                    "id": "rox|julia@example.com",
                     "name": "Julia",
                     "email": "julia@example.com"
                 },

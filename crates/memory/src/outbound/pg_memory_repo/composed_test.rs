@@ -12,14 +12,14 @@ async fn explicit_edits_compare_revisions_and_cascade(pool: PgPool) {
         INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
-    SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
+    SELECT 'rox|memory@example.com', 'memory@example.com', id FROM created"#,
         rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|memory@example.com").unwrap();
     assert_eq!(repo.explicit(&user).await.unwrap().revision, 0);
     let first = repo.save_explicit(&user, 0, "Be concise").await.unwrap();
     assert_eq!(first.revision, 1);
@@ -36,7 +36,7 @@ async fn explicit_edits_compare_revisions_and_cascade(pool: PgPool) {
         repo.explicit(&user).await.unwrap().content,
         "Be concise\nUse Rust"
     );
-    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'macro|memory@example.com'"#)
+    sqlx::query!(r#"DELETE FROM "User" WHERE id = 'rox|memory@example.com'"#)
         .execute(&pool)
         .await
         .unwrap();
@@ -50,14 +50,14 @@ async fn generation_is_atomic_and_daily_rows_are_immutable(pool: PgPool) {
         INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
-    SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
+    SELECT 'rox|memory@example.com', 'memory@example.com', id FROM created"#,
         rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool);
-    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|memory@example.com").unwrap();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     let mut daily = Activity {
         granularity: Granularity::Day,
@@ -90,14 +90,14 @@ async fn leases_preserve_first_failed_day_and_catch_up_sequentially(pool: PgPool
         INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
-    SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
+    SELECT 'rox|memory@example.com', 'memory@example.com', id FROM created"#,
         rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("rox|memory@example.com").unwrap();
     repo.enroll(&user).await.unwrap();
     sqlx::query!(
         "UPDATE memory_refresh_job SET created_at = '2026-06-18 12:00:00+00' WHERE user_id = $1",

@@ -48,7 +48,7 @@ vi.mock('@core/constant/allBlocks', () => ({
 }));
 
 const SESSION = '0198a4cc-e138-7670-a308-a6b766602700';
-const ME = { userId: 'macro|owner@example.com', clientId: 'tab-1' };
+const ME = { userId: 'rox|owner@example.com', clientId: 'tab-1' };
 
 const routes: SplitRoutes = {
   definitions: [

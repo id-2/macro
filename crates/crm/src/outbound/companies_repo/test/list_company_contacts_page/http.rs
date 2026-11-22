@@ -23,9 +23,9 @@ use std::sync::Arc;
 use tower::ServiceExt;
 
 /// The owner `seed_company` gives its team.
-const OWNER: &str = "macro|owner@owner.test";
-const MEMBER: &str = "macro|member@owner.test";
-const OUTSIDER: &str = "macro|outsider@outsider.test";
+const OWNER: &str = "rox|owner@owner.test";
+const MEMBER: &str = "rox|member@owner.test";
+const OUTSIDER: &str = "rox|outsider@outsider.test";
 
 /// Signs in as the user its bearer token names.
 #[derive(Clone)]

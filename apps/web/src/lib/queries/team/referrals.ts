@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/solid-query';
 
 async function addInvitedContact(email: string) {
   const result = await contactsClient.addContact(
-    `macro|${email.toLowerCase()}`
+    `rox|${email.toLowerCase()}`
   );
   if (result.isErr()) {
     Telemetry.error(result.error, { surface: 'team-invitations' });

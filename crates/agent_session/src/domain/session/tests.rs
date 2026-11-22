@@ -556,7 +556,7 @@ fn queued_actions_carry_their_sender_onto_the_wire() {
         })
         .collect();
     assert_eq!(senders.len(), 1);
-    assert_eq!(senders[0].to_string(), "macro|owner@example.com");
+    assert_eq!(senders[0].to_string(), "rox|owner@example.com");
 }
 
 #[test]
@@ -730,7 +730,7 @@ fn a_users_answer_is_sent_as_the_agents_response_and_attributed_to_them() {
     };
     assert_eq!(
         from.as_ref().map(ToString::to_string).as_deref(),
-        Some("macro|owner@example.com")
+        Some("rox|owner@example.com")
     );
     assert_eq!(
         permission_outcome(&effects[0], &permission_id(0)),

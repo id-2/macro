@@ -12,7 +12,7 @@ fn raw_chat() -> SoupItem<()> {
         id: Uuid::nil(),
         name: "Test chat".to_string(),
         model: Some("openai/gpt-5.6".to_string()),
-        owner_id: Owner::try_from("macro|test@example.com".to_string()).unwrap(),
+        owner_id: Owner::try_from("rox|test@example.com".to_string()).unwrap(),
         project_id: None,
         is_persistent: true,
         created_at: DateTime::<Utc>::default(),

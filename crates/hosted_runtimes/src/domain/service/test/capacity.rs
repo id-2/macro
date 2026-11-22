@@ -17,7 +17,7 @@ proptest::proptest! {
                     billing: PurchaseBilling::Comped { reason: "capacity test".to_owned() },
                     purchase_key: key(&format!("buy-dialog-{index}")),
                     team_id: TEAM,
-                    created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+                    created_by: RoxUserIdStr::try_from("rox|owner@example.com".to_owned()).unwrap(),
                     size: match size { 0 => ComputerSize::Standard, 1 => ComputerSize::Large, _ => ComputerSize::Xl },
                     name: None, extra_items: vec![],
                 }).await;
@@ -51,7 +51,7 @@ async fn sizes_too_large_to_ever_wake_are_not_offered_or_sold() {
     let offers = service
         .offers(
             TEAM,
-            RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap(),
         )
         .await
         .unwrap();
@@ -107,7 +107,7 @@ async fn offers_list_runnable_sizes_and_mark_unsellable_ones_sold_out() {
         let offers = service
             .offers(
                 TEAM,
-                RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+                RoxUserIdStr::try_from("rox|admin@example.com".to_owned()).unwrap(),
             )
             .await
             .unwrap();

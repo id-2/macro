@@ -34,7 +34,7 @@ const threadRowEntry = () =>
       entityType: 'CHANNEL',
       channelName: 'General',
       channelType: 'PUBLIC',
-      ownerId: 'macro|viewer@example.com',
+      ownerId: 'rox|viewer@example.com',
       createdAt: '2026-01-01T00:00:00Z',
       updatedAt: '2026-01-01T00:00:00Z',
       participants: [],
@@ -59,7 +59,7 @@ const threadRowEntry = () =>
               __typename: 'GraphqlChannelReplyMetadata',
               channelReplyThreadId: 'root',
               channelReplyMessageId: 'reply',
-              channelReplyUserId: 'macro|colleague@example.com',
+              channelReplyUserId: 'rox|colleague@example.com',
               channelReplySenderDisplayName: null,
               channelReplyMessageContent: 'on it',
               channelReplyHasAttachments: false,
@@ -204,7 +204,7 @@ describe('toInboxGroup', () => {
             latestAt: '2026-02-01T10:09:00Z',
             actor: {
               kind: 'USER',
-              principalId: 'macro|ana@example.com',
+              principalId: 'rox|ana@example.com',
               name: null,
             },
             actions: [
@@ -233,7 +233,7 @@ describe('toInboxGroup', () => {
       group?.rows.map((row) => ({ actor: row.actor, actions: row.actions }))
     ).toEqual([
       {
-        actor: { kind: 'user', id: 'macro|ana@example.com' },
+        actor: { kind: 'user', id: 'rox|ana@example.com' },
         actions: [
           { kind: 'approve', targetId: 'r1' },
           { kind: 'deny', targetId: 'r1' },
@@ -366,7 +366,7 @@ describe('toInboxGroup for a runtime', () => {
         id: '0198a4cc-e138-7670-a308-a6b766602712',
         entityType: 'HARNESS',
         harnessName: 'render-box',
-        ownerId: 'macro|viewer@example.com',
+        ownerId: 'rox|viewer@example.com',
         createdAt: '2026-01-01T00:00:00Z',
         updatedAt: '2026-01-01T00:00:00Z',
       },
@@ -392,7 +392,7 @@ describe('toInboxGroup for a runtime', () => {
               createdAt: '2026-02-01T10:09:00Z',
               viewedAt: null,
               updatedAt: '2026-02-01T10:09:00Z',
-              senderId: 'macro|colleague@example.com',
+              senderId: 'rox|colleague@example.com',
               metadata: {
                 __typename: 'GraphqlEntityAccessRequestedMetadata',
                 entityAccessRequestedRequestId: 'r-1',
@@ -415,7 +415,7 @@ describe('toInboxGroup for a runtime', () => {
           type: 'harness',
           id: '0198a4cc-e138-7670-a308-a6b766602712',
           name: 'render-box',
-          ownerId: 'macro|viewer@example.com',
+          ownerId: 'rox|viewer@example.com',
         },
         notifications: [
           {

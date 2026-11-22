@@ -32,7 +32,7 @@ const notifications: { path: string; auth: string | null; body: unknown }[] =
 function token(
   id: string,
   permission: 'view' | 'comment' | 'edit' | 'owner' = 'edit',
-  userId = 'macro|spreadsheet-test@example.com'
+  userId = 'rox|spreadsheet-test@example.com'
 ) {
   const header = Buffer.from(
     JSON.stringify({ alg: 'HS256', typ: 'JWT' })
@@ -226,7 +226,7 @@ describe('real spreadsheet editing worker and sync Durable Object', () => {
         auth: 'local',
         body: {
           actor: 'spreadsheet-test-agent',
-          on_behalf_of: 'macro|spreadsheet-test@example.com',
+          on_behalf_of: 'rox|spreadsheet-test@example.com',
         },
       })
     );
@@ -293,7 +293,7 @@ describe('real spreadsheet editing worker and sync Durable Object', () => {
       ],
     });
     const response = (await sync.fetch(
-      `https://sync.test/document/${id}/connect?token=${token(id, 'edit', 'macro|collaborator@example.com')}`,
+      `https://sync.test/document/${id}/connect?token=${token(id, 'edit', 'rox|collaborator@example.com')}`,
       {
         headers: { Upgrade: 'websocket' },
       }

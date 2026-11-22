@@ -149,7 +149,7 @@ fn columns_take_the_closest_rox_type_and_titles_and_relations_wait() {
 fn people_cells_hold_only_notion_users_matched_to_team_members() {
     let alice = NotionId::parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap();
     let outsider = NotionId::parse("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap();
-    let alice_user = RoxUserIdStr::parse_from_str("macro|alice@acme.test")
+    let alice_user = RoxUserIdStr::parse_from_str("rox|alice@acme.test")
         .unwrap()
         .into_owned();
     let people: PeopleMap = [
@@ -190,7 +190,7 @@ fn people_cells_hold_only_notion_users_matched_to_team_members() {
         ),
         Some(CellValue::Entities(vec![EntityRef {
             entity_type: EntityKind::User,
-            entity_id: "macro|alice@acme.test".to_string(),
+            entity_id: "rox|alice@acme.test".to_string(),
         }]))
     );
 }

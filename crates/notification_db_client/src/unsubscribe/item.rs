@@ -82,8 +82,8 @@ mod tests {
         assert_eq!(
             result,
             vec![
-                "macro|user@user.com".to_string(),
-                "macro|user2@user.com".to_string()
+                "rox|user@user.com".to_string(),
+                "rox|user2@user.com".to_string()
             ]
         );
 
@@ -97,12 +97,12 @@ mod tests {
     async fn test_upsert_unsubscribed_item_user(
         pool: sqlx::Pool<sqlx::Postgres>,
     ) -> anyhow::Result<()> {
-        upsert_unsubscribed_item_user(&pool, "macro|user@user.com", "document-one", "document")
+        upsert_unsubscribed_item_user(&pool, "rox|user@user.com", "document-one", "document")
             .await?;
 
         let result = sqlx::query!(
             r#"
-            SELECT user_id, item_id, item_type FROM user_notification_item_unsubscribe WHERE item_id = 'document-one' AND user_id = 'macro|user@user.com'
+            SELECT user_id, item_id, item_type FROM user_notification_item_unsubscribe WHERE item_id = 'document-one' AND user_id = 'rox|user@user.com'
             "#,
         )
         .fetch_optional(&pool)
@@ -120,11 +120,11 @@ mod tests {
     async fn test_remove_unsubscribed_item_user(
         pool: sqlx::Pool<sqlx::Postgres>,
     ) -> anyhow::Result<()> {
-        remove_unsubscribed_item_user(&pool, "macro|user@user.com", "document-one").await?;
+        remove_unsubscribed_item_user(&pool, "rox|user@user.com", "document-one").await?;
 
         let result = sqlx::query!(
             r#"
-            SELECT user_id, item_id, item_type FROM user_notification_item_unsubscribe WHERE item_id = 'document-one' AND user_id = 'macro|user@user.com'
+            SELECT user_id, item_id, item_type FROM user_notification_item_unsubscribe WHERE item_id = 'document-one' AND user_id = 'rox|user@user.com'
             "#,
         )
         .fetch_optional(&pool)

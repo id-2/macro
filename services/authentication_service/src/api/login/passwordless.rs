@@ -108,7 +108,7 @@ pub async fn handler(
             if !req.is_agent {
                 revert_unconfirmed_agent(
                     &ctx,
-                    &format!("macro|{lowercase_email}"),
+                    &format!("rox|{lowercase_email}"),
                     &lowercase_email,
                 )
                 .await;
@@ -175,7 +175,7 @@ pub async fn handler(
 
                     if let Some(referral_code) = req.referral_code {
                         tracing::trace!(referral_code, "referral code found");
-                        let rox_user_id = format!("macro|{}", req.email.to_lowercase());
+                        let rox_user_id = format!("rox|{}", req.email.to_lowercase());
                         let referrerd_user_id = RoxUserId::parse_from_str(&rox_user_id)
                             .map_err(|_| {
                                 (

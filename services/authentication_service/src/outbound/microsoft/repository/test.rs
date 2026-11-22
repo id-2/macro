@@ -56,7 +56,7 @@ async fn credential_acquisition_fences_mailbox_custody_and_revocation_preserves_
         .await
         .unwrap();
     let link = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES ($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",link,owner.to_string(),grant).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES ($1,'rox|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",link,owner.to_string(),grant).execute(&db).await.unwrap();
     assert!(repo.active_grant(link, 1, 1).await.is_ok());
     assert!(repo.disconnecting_grant(link, 1, 1).await.is_err());
     sqlx::query!(
@@ -164,7 +164,7 @@ async fn reconnect_stages_exact_attempt_and_fences_rotation_only_after_adoption(
         .await
         .unwrap();
     let link = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES ($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",link,owner.to_string(),first_id).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES ($1,'rox|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",link,owner.to_string(),first_id).execute(&db).await.unwrap();
     let grant = repo.active_grant(link, 1, 1).await.unwrap();
     let lease = rox_uuid::generate_uuid_v7();
     assert!(repo.acquire_refresh(&grant, lease).await.unwrap());
@@ -278,7 +278,7 @@ async fn expired_unadopted_grants_are_collected_without_deleting_custodian_crede
     let repo = PgMicrosoftGrants::new(db.clone());
     let owner = owner(&db).await;
     let link = Uuid::new_v4();
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK')",link,owner.to_string()).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'rox|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK')",link,owner.to_string()).execute(&db).await.unwrap();
     let mut grants = Vec::new();
     for _ in 0..3 {
         let attempt = pending(owner);
@@ -293,7 +293,7 @@ async fn expired_unadopted_grants_are_collected_without_deleting_custodian_crede
             repo.abandon_link(attempt.id).await.unwrap();
         }
     }
-    sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES($1,'macro|outlook-test@example.com',$2,$3,2,'{}')",link,owner.to_string(),grants[1]).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES($1,'rox|outlook-test@example.com',$2,$3,2,'{}')",link,owner.to_string(),grants[1]).execute(&db).await.unwrap();
     sqlx::query!("UPDATE microsoft_oauth_grant_versions SET created_at=now()-interval '2 days'")
         .execute(&db)
         .await
@@ -332,9 +332,9 @@ async fn deleted_owner_grants_expire_without_another_sign_in_and_teardown_grants
         grants.push(grant);
     }
     let link = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,2)",link,owner.to_string(),grants[1]).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES($1,'rox|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,2)",link,owner.to_string(),grants[1]).execute(&db).await.unwrap();
     sqlx::query!("UPDATE email_links SET grant_id=$2,grant_generation=3,is_sync_active=false,disconnect_requested_at=now() WHERE id=$1",link,grants[2]).execute(&db).await.unwrap();
-    sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES($1,'macro|outlook-test@example.com',$2,$3,4,'{}')",link,owner.to_string(),grants[3]).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES($1,'rox|outlook-test@example.com',$2,$3,4,'{}')",link,owner.to_string(),grants[3]).execute(&db).await.unwrap();
     sqlx::query!("DELETE FROM rox_user WHERE id=$1", owner)
         .execute(&db)
         .await
@@ -388,7 +388,7 @@ async fn grant_expiry_cannot_race_an_in_progress_mailbox_adoption(db: PgPool) {
             .unwrap(),
         0
     );
-    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",rox_uuid::generate_uuid_v7(),owner.to_string(),grant).execute(&mut *adoption).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES($1,'rox|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,1)",rox_uuid::generate_uuid_v7(),owner.to_string(),grant).execute(&mut *adoption).await.unwrap();
     adoption.commit().await.unwrap();
     assert_eq!(
         crate::domain::microsoft::collect_expired_grants(&repo)

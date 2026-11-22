@@ -11,7 +11,7 @@ fn checkpoint(part_index: u32, record_index: u32) -> Checkpoint {
 
 async fn target(pool: &PgPool) -> Uuid {
     let id = Uuid::now_v7();
-    sqlx::query!("INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'historical', 'private', 'macro|lifecycle@example.com')", id).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'historical', 'private', 'rox|lifecycle@example.com')", id).execute(pool).await.unwrap();
     id
 }
 
@@ -27,7 +27,7 @@ fn message(team: TeamId, channel: Uuid, seconds: u32) -> HistoricalMessage {
         parent_id: None,
         orphaned_thread_ts: None,
         sender: HistoricalSender::User(
-            RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            RoxUserIdStr::parse_from_str("rox|lifecycle@example.com").unwrap(),
         ),
         imported_author: None,
         content: "historical".into(),

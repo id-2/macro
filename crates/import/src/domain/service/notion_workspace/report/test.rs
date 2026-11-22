@@ -29,7 +29,7 @@ fn row(
     };
     ImportEntity {
         id: Uuid::now_v7(),
-        user_id: "macro|owner@acme.test".to_string(),
+        user_id: "rox|owner@acme.test".to_string(),
         team_id: None,
         source: ImportSource::Notion,
         kind,
