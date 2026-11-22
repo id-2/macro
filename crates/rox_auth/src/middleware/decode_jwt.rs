@@ -126,11 +126,14 @@ pub struct RoxAccessToken {
     pub email: String,
     /// The fusionauth id of the user
     pub fusion_user_id: String,
-    /// The macro user id of the user
+    /// The Rox user id of the user. Tokens minted before the rename carry
+    /// the claim under its previous name, so both spellings read here.
+    #[serde(alias = "macro_user_id")]
     pub rox_user_id: String,
     /// The organization id for the user if they belong to one
     pub rox_organization_id: Option<i32>,
-    /// The root macro id. If provided, if None, use fusion_user_id
+    /// The root Rox id. If provided, if None, use fusion_user_id
+    #[serde(alias = "root_macro_id")]
     pub root_rox_id: Option<String>,
 }
 

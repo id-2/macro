@@ -16,7 +16,7 @@ function populate(jwt, user, _registration) {
 
     if (response.status === 200) {
     var jsonResponse = JSON.parse(response.body);
-    jwt.macro_user_id = jsonResponse.user_id;
+    jwt.rox_user_id = jsonResponse.user_id;
 
     if (jsonResponse.root_rox_id) {
       jwt.root_rox_id = jsonResponse.root_rox_id;

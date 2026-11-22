@@ -5,7 +5,9 @@ use crate::{
     error::ParseErr,
     lowercased::Lowercase,
 };
-use nom::{Finish, IResult, Parser, bytes::complete::tag, character::complete::char};
+use nom::{
+    Finish, IResult, Parser, branch::alt, bytes::complete::tag, character::complete::char,
+};
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
@@ -14,9 +16,16 @@ mod tests;
 
 const ROX_PREFIX: &str = "rox";
 
+/// The pre-rename prefix. Ids minted before the rename are still stored in
+/// sessions and tokens, so they parse; every new id uses the prefix above.
+const LEGACY_PREFIX: &str = "macro";
+
 fn rox_user_id(input: &str) -> IResult<&str, RoxUserId<ArcCowStr<'_>>> {
     let (rest, ((prefix, pipe), email)) =
-        tag(ROX_PREFIX).and(char('|')).and(email).parse(input)?;
+        alt((tag(ROX_PREFIX), tag(LEGACY_PREFIX)))
+            .and(char('|'))
+            .and(email)
+            .parse(input)?;
     let email_part = email.map(|_| ());
     // add 1 for the length of char
     let email_part_offset = prefix.len() + pipe.len_utf8();

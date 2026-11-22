@@ -47,7 +47,7 @@ docker_up *ARGS:
 # Reset and seed deterministic data used by local E2E tests.
 local-e2e-seed:
   just run_dbs -d
-  -just crates/macro_db_client/drop_db -y -f
+  -just crates/rox_db_client/drop_db -y -f
   just initialize_dbs
   just tooling/seed_cli/local-e2e-smoke
 
@@ -135,8 +135,8 @@ import 'tooling/just/rust.just'
 setup_local_dbs:
   # run dbs detached
   just run_dbs -d
-  just crates/macro_db_client/create_db
-  just crates/macro_db_client/migrate_db
+  just crates/rox_db_client/create_db
+  just crates/rox_db_client/migrate_db
   @echo "Local databases initialized"
   {{ database_compose }} stop
 
