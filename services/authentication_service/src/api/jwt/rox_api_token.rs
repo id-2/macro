@@ -22,7 +22,7 @@ pub struct RoxApiTokenQuery {
     pub email: Option<String>,
 }
 
-/// Generates a macro-api-token using the user's macro-access-token
+/// Generates a rox-key- API token using the user session
 /// You can either have your access token in the cookies or in the request
 /// headers
 /// Authorization: Bearer <access_token>
