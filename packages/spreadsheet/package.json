@@ -1,7 +1,7 @@
 {
   "name": "@rox-one/spreadsheet",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "exports": {
     "./*": "./src/*.ts"

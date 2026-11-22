@@ -1,7 +1,7 @@
 {
   "name": "@rox-one/email-renderer",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "type": "module",
   "exports": {
     ".": "./src/core/index.ts",

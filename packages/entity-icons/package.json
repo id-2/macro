@@ -1,10 +1,10 @@
 {
-	"name": "@rox-one/entity-icons",
-	"version": "0.1.0",
-	"private": true,
-	"type": "module",
-	"exports": {
-		".": "./catalog.generated.ts",
-		"./svg/*": "./svg/*"
-	}
+  "name": "@rox-one/entity-icons",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "exports": {
+    ".": "./catalog.generated.ts",
+    "./svg/*": "./svg/*"
+  }
 }

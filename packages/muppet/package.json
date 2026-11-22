@@ -1,7 +1,7 @@
 {
   "name": "@rox-one/muppet",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "exports": {
     "./core/*": "./core/*.ts",
