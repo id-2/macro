@@ -119,7 +119,7 @@ await check("bundle-codesign", async () => {
 
 // ── launch ──────────────────────────────────────────────────────────────
 // A clean HOME: the app creates its data directories as a first-time user.
-const home = join(tmpdir(), `macro-qa-home-${process.pid}`);
+const home = join(tmpdir(), `rox-qa-home-${process.pid}`);
 mkdirSync(home, { recursive: true });
 const realHome = homedir();
 const appLog = join(out, "app.log");

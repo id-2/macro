@@ -10,7 +10,7 @@ if (!serial)
 const adb =
   process.env.ADB ??
   `${process.env.HOME}/Library/Android/sdk/platform-tools/adb`;
-const output = process.env.ANDROID_SMOKE_OUTPUT ?? '/tmp/macro-task03-smoke';
+const output = process.env.ANDROID_SMOKE_OUTPUT ?? '/tmp/rox-task03-smoke';
 const packageName = 'com.macro.workspace.mobile';
 const port = 9236;
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -218,7 +218,7 @@ try {
       viewport: {left:viewport?.offsetLeft ?? 0,top:viewport?.offsetTop ?? 0,
         width:viewport?.width ?? innerWidth,height:viewport?.height ?? innerHeight}};
   })()`);
-  const hierarchyPath = `/data/local/tmp/macro-android-smoke-${runId}.xml`;
+  const hierarchyPath = `/data/local/tmp/rox-android-smoke-${runId}.xml`;
   let hierarchy;
   try {
     await adbRun('shell', 'uiautomator', 'dump', hierarchyPath);

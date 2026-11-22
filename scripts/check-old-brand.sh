@@ -56,6 +56,24 @@ scan_python() {
   fi
 }
 
+# The app shell and build scripts carry strings the type-based scan misses:
+# the bundle-build meta tag the native updater reads, cache prefixes and
+# placeholders. The retirement worker keeps the old cache names on purpose to
+# delete them, and link fixtures quote the upstream repository by its real name.
+scan_web() {
+  local hits
+  hits=$(grep -rnE '\bmacro[-_]|MACRO_[A-Z]' \
+    --include='*.html' --include='*.mjs' --include='*.js' apps/web 2>/dev/null \
+    | grep -vE 'node_modules|/dist/|/target/' \
+    | grep -vE 'macro-shell-|macro-assets-|macro-inc/|macro-access-token|macro-refresh-token|x-macro-internal-call|macro://' \
+    | head -20)
+  if [ -n "$hits" ]; then
+    echo "Old name in the web shell or build scripts:"
+    printf '%s\n' "$hits"
+    fail=1
+  fi
+}
+
 scan_names() {
   local names
   names=$(find crates services apps/web/src packages -type f \( -name 'macro_*' -o -name '*_macro_*' \) 2>/dev/null | grep -v '/migrations/' | head -20)
@@ -67,6 +85,7 @@ scan_names() {
 }
 
 scan_content
+scan_web
 scan_python
 scan_names
 

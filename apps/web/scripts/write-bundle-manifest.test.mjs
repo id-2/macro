@@ -6,13 +6,13 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 function build(env) {
-  const dir = mkdtempSync(join(tmpdir(), 'macro-manifest-'));
+  const dir = mkdtempSync(join(tmpdir(), 'rox-manifest-'));
   try {
     mkdirSync(join(dir, 'scripts'));
     mkdirSync(join(dir, 'dist'));
     copyFileSync(new URL('./write-bundle-manifest.mjs', import.meta.url), join(dir, 'scripts/build.mjs'));
     writeFileSync(join(dir, 'package.json'), '{"version":"2.5.0"}');
-    writeFileSync(join(dir, 'dist/index.html'), '__MACRO_BUNDLE_BUILD__');
+    writeFileSync(join(dir, 'dist/index.html'), '__ROX_BUNDLE_BUILD__');
     execFileSync(process.execPath, [join(dir, 'scripts/build.mjs')], { env: { PATH: process.env.PATH, BUNDLE_BUILD_NUMBER: '20', ...env }, stdio: 'pipe' });
     return JSON.parse(readFileSync(join(dir, 'dist/bundle-manifest.json'), 'utf8'));
   } finally {
