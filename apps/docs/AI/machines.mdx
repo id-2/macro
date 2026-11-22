@@ -1,0 +1,139 @@
+---
+title: "Machines"
+sidebarTitle: "Machines"
+icon: "server"
+description: "Connect your computer, share it with your team, and choose which machine an agent runs on."
+---
+
+## Agents and machines
+
+An **agent** is the name, instructions, and model you @mention. A **machine** is where that agent runs: on Rox's built-in machines, in Cursor, or on a computer of your own.
+
+Manage both in the same place: agents in **Settings → Agents**, machines in **Settings → Machines**. The Machines page is also at [that address](/settings/runtimes).
+
+## What a machine holds
+
+A machine is not the agent. It holds the folder your agent works in, the coding agent installed there, and the credentials that agent uses. Two agents pointed at the same machine share its files and its sign-ins.
+
+<RoxComputer />
+
+## Connect your own computer
+
+Your own computer runs **roxd**, the Rox daemon. It connects out to Rox, so you do not need a public address, port forwarding, or an HTTPS tunnel.
+
+<Warning>
+  Your local agent can run commands and edit files on your computer. Choose a dedicated workspace, and leave permission bypass off unless you intend to let agents act without asking.
+</Warning>
+
+### On the Rox desktop app
+
+The desktop app bundles `roxd`. Open **Settings → Machines** and use the **Run agents on this computer** card:
+
+- **Set up** looks for a coding agent already installed on this computer.
+- **Set up** that agent configures, pairs, and starts `roxd`, then creates the agent for you. No terminal and no pairing code.
+- **Options** chooses a different agent, sets the **Workspace folder**, and turns on **Full access**.
+
+Keep the app open while the machine runs.
+
+### From a terminal
+
+Use this for servers, a second computer, or any computer without the desktop app. Full installation steps are in [Bring your own agent](/AI/bring-your-own); the short version:
+
+<Steps>
+  <Step title="Install and start roxd">
+    Install `roxd`, then run it in a terminal. On first launch, **Quickstart** lists the agents it found on your computer. Pick one or enter a **Custom command**, set **Workspace** to the folder your agent should work in, and choose **Create and pair**.
+
+    The **Pair roxd** panel prints a device code and a link to Rox.
+  </Step>
+
+  <Step title="Enter the code in Rox">
+    Open **Settings → Machines → New machine**. Enter the code under **Pairing code** and click **Look up**.
+  </Step>
+
+  <Step title="Review and approve">
+    The page shows the code, the requested name, the host, and how many minutes it stays valid. Check that the code matches the one in your terminal, edit **Name** if you like, choose who may use the machine, then click **Approve**.
+
+    <Tabs>
+      <Tab title="Private">
+        Only you can run agents on this machine. You can open it to teammates later in its Share menu.
+      </Tab>
+      <Tab title="Team">
+        Your team can run agents on this machine. This needs a team; the option is disabled without one.
+      </Tab>
+    </Tabs>
+
+    **Allow bypassing permission requests** is off by default. When it is on, agents on this machine can run commands and edit files without asking. Only turn it on if you trust everyone who can create agents on this machine. You can change it later under **Options** on the machine's row.
+  </Step>
+
+  <Step title="Let roxd connect">
+    After approval, `roxd` connects by itself. Its row in **Your machines** shows a green dot and **Connected**. Keep `roxd` running and the computer awake while you use the machine.
+  </Step>
+</Steps>
+
+The machine's name, access, and permission bypass live in Rox, not in `roxd.toml`. Leave the terminal open; it shows your sessions and logs.
+
+## Share a machine with your team
+
+Open the **Share** button on a machine's row in **Your machines**. The menu lists the people on your team and your machine's access rules. You can only share a machine with teammates: there are no links, no channels, and nobody outside your team.
+
+### Everyone at once
+
+Turn on **Team machine**. The row then reads **Team machine** instead of **Private**, and every member of your team becomes a **User** of the machine. Turn it off to return to only you and the people you named below.
+
+<Note>
+  Turning **Team machine** off removes access from everyone who had it only through the team. Agents living on this machine that need that access are shut down until it is given back, and Rox asks you to confirm first.
+</Note>
+
+### One person at a time
+
+Under **Add teammates**, search for a person and click **Add**. Each person gets a role, which you change from the dropdown on their row:
+
+- **User** can run agents on this computer, using its files and credentials.
+- **Read** can see what is on the machine but cannot run agents.
+
+**Remove** takes the person off the list. If an agent living on this machine depends on that person's access, Rox names the agent and asks before shutting it down.
+
+### Access requests
+
+A teammate who opens **Settings → Machines** sees your machine under **Teammates' machines**, with their own access and a **Request access** button. Their request appears under **Access requests** in your Share menu, and you can **Approve** or **Deny** it. Until you decide, their button reads **Requested** and can be used to cancel.
+
+A request can also come on behalf of an agent. The menu marks those as **Asked by an agent on their behalf**.
+
+## Choose a machine when you create an agent
+
+<Steps>
+  <Step title="Open the agent form">
+    Go to **Settings → Agents** and click **Add agent**. Set **Name**, **@tag**, and **Instructions**.
+  </Step>
+
+  <Step title="Pick where it runs">
+    Under **Where it runs**, choose **On your machine**, then pick the computer in the **Machine** list and a model. **In Rox** and **In Cursor** are the other places an agent can run; **Rox computer** runs it on a hosted machine your team bought.
+  </Step>
+
+  <Step title="Choose who can use the agent">
+    Under **Who can use it**, pick **Private** for an agent only you can use, or **Team** for one your team can use in shared channels.
+  </Step>
+</Steps>
+
+@mention the agent to start a session on the machine.
+
+An offline machine stays selectable, and its row in the list says **Offline**. An agent bound to it starts working once the machine reconnects. A machine shared with your team is marked **Team machine** in that list, so you can tell whose computer a new agent will run on.
+
+## Keep a machine connected
+
+Each row in **Your machines** shows its status and when it last connected. **Rename** and **Remove** sit next to **Share** and **Options**.
+
+- **Options** opens the **Don't ask before acting** switch. Only the machine's owner can change it, and turning it on asks you to confirm first.
+- **Remove** unpairs the machine. Its agents stop, and you have to pair the computer again before using it. Removing does not touch the files on your computer.
+- **Offline** on the row means `roxd` is not running, the computer is asleep, or it cannot reach Rox. Start `roxd` again; it reloads its saved configuration from any folder.
+
+For a second machine on the same computer, run `roxd --profile work`. Each profile pairs as its own machine, shows up as a separate row, and can be shared with a different set of people.
+
+## Troubleshooting
+
+- **A teammate cannot see my machine:** check the **Share** menu. The machine is **Private** until you add them or turn on **Team machine**.
+- **My agent says it stopped for lack of access:** an owner of the machine removed the access it runs on. Ask them to add it back; the agent resumes when they do.
+- **Pairing code is rejected:** codes expire. Run `roxd` again, press <kbd>p</kbd> to print a new one, and enter that.
+- **A machine shows as offline after I moved computers:** a machine belongs to the computer it was paired on. Pair the new computer as a new machine.
+
+To connect a hosted Cursor machine instead, see [Cursor](/AI/cursor). To learn more about using agents, see [Agents](/product/agents).
