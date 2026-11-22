@@ -9,17 +9,28 @@ use url::Url;
 #[non_exhaustive]
 pub struct RoxScheme(pub Url);
 
+/// The custom URL scheme this build mints and hands to the router.
+pub const APP_SCHEME: &str = "rox";
+/// The pre-rename custom scheme. Links minted by an older build, an installed
+/// app or a cached web bundle still use it, so it stays registered and accepted.
+pub const LEGACY_APP_SCHEME: &str = "macro";
+
+/// Whether `scheme` is one of the app's custom URL schemes.
+pub fn is_app_scheme(scheme: &str) -> bool {
+    scheme == APP_SCHEME || scheme == LEGACY_APP_SCHEME
+}
+
 impl RoxScheme {
     pub fn new(url: Url) -> Result<Self, SchemeError> {
-        let "macro" = url.scheme() else {
+        if !is_app_scheme(url.scheme()) {
             return Err(SchemeError::InvalidScheme {
-                expected: "macro".to_string(),
+                expected: format!("{APP_SCHEME} or {LEGACY_APP_SCHEME}"),
                 found: url.scheme().to_string(),
             });
-        };
+        }
         Ok(Self(url))
     }
-    /// turn a http(s) url into a macro scheme url
+    /// turn a http(s) url into a rox scheme url
     #[tracing::instrument(skip(url), err)]
     pub fn from_url(url: &Url) -> Result<Self, SchemeError> {
         let ("http" | "https" | "tauri") = url.scheme() else {

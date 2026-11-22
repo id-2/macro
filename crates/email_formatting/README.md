@@ -25,9 +25,9 @@ Digest and invitation templates render the wordmark as text — `Rox` in a semib
 20px/24px link to `https://rox.one`, matching the FusionAuth templates — so they fetch
 no image and need no asset deployed.
 
-Authentication templates use `https://rox.one/app/macro-email-logo.png`, served from
-`apps/web/public/macro-email-logo.png`. This 192 × 192 PNG is an export of the
-current `apps/web/src/components/icon/macro-logo.svg` with fill `#222222` on white.
+Authentication templates use `https://rox.one/app/rox-email-logo.png`, served from
+`apps/web/public/rox-email-logo.png`. This 192 × 192 PNG is an export of the
+current `apps/web/src/components/icon/rox-logo.svg` with fill `#222222` on white.
 The opaque background keeps the mark legible when an email client changes colors.
 Use the existing SVG as the source when regenerating the raster asset.
 

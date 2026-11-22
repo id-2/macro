@@ -8,7 +8,6 @@ use axum_extra::{
     headers::{Authorization, authorization::Bearer},
 };
 use cookie::Cookie;
-use rox_env::Environment;
 
 use crate::constant::{
     ROX_REFRESH_TOKEN_HEADER, access_token_cookie_names, refresh_token_cookie_names,

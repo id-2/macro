@@ -3,7 +3,9 @@ mod test;
 
 use crate::api::{
     context::TokenContext,
-    utils::{create_access_token_cookie, create_refresh_token_cookie},
+    utils::{
+        create_access_token_cookie, create_refresh_token_cookie, expired_legacy_session_cookies,
+    },
 };
 use axum::{
     Extension, Json,
@@ -166,6 +168,14 @@ pub async fn handler(
     // Add in cookies to response
     cookies.add(create_access_token_cookie(&access_token));
     cookies.add(create_refresh_token_cookie(&refresh_token));
+
+    // The refresh token was just rotated, which is also the point where a
+    // session that still presented a legacy `macro-*` cookie moves to the
+    // current `rox-*` names: expire the old ones so the browser stops sending
+    // a duplicate, stale pair alongside them.
+    for cookie in expired_legacy_session_cookies() {
+        cookies.add(cookie);
+    }
 
     Ok(Json(UserTokensResponse {
         access_token,

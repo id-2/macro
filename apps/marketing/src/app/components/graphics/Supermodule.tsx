@@ -171,7 +171,7 @@ export function Supermodule(props: {
             transform={FRONT_CAP_ROX_TRANSFORM}
           >
             <image
-              href="/macro-favicon.svg"
+              href="/rox-favicon.svg"
               x="31.5"
               y="0"
               width="119"

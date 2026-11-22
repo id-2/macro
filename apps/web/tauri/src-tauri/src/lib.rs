@@ -27,7 +27,11 @@ use tauri::{AppHandle, Emitter, Manager, RunEvent, Runtime};
 mod android_tls;
 mod tauri_protocol;
 
-pub(crate) const APP_SCHEME: &str = "macro";
+/// The custom URL scheme this build mints and routes into the SPA.
+pub(crate) const APP_SCHEME: &str = "rox";
+/// The pre-rename custom scheme. Installed apps and cached web bundles still
+/// emit `macro://` links, so it stays registered and keeps routing.
+pub(crate) const LEGACY_APP_SCHEME: &str = "macro";
 use tauri_plugin_deep_link::DeepLinkExt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;

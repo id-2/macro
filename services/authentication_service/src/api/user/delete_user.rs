@@ -10,7 +10,9 @@ use tower_cookies::Cookies;
 use crate::api::{
     context::{ApiContext, AuthorizationService},
     jwt_session::JwtSessionContext,
-    utils::{create_access_token_cookie, create_refresh_token_cookie},
+    utils::{
+        create_access_token_cookie, create_refresh_token_cookie, expired_legacy_session_cookies,
+    },
 };
 
 use model::response::{ErrorResponse, GenericSuccessResponse};
@@ -51,6 +53,12 @@ pub async fn handler(
     let mut refresh_token_cookie = create_refresh_token_cookie("");
     refresh_token_cookie.set_expires(Some(time::OffsetDateTime::now_utc()));
     cookies.add(refresh_token_cookie);
+
+    // The legacy `macro-*` cookies are still accepted on read, so the ended
+    // session must expire them too.
+    for cookie in expired_legacy_session_cookies() {
+        cookies.add(cookie);
+    }
 
     // Logout of fusionauth when the request used a FusionAuth session.
     if let Some(jwt_context) = jwt_session

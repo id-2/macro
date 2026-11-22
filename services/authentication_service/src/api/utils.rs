@@ -1,7 +1,7 @@
 use crate::api::context::ApiContext;
 use cookie::{Cookie, SameSite};
 use email::domain::ports::{FirstInboxProvisionOutcome, FirstInboxProvisioner};
-use rox_auth::constant::{ROX_ACCESS_TOKEN_COOKIE, ROX_REFRESH_TOKEN_COOKIE};
+use rox_auth::constant::{access_token_cookie_names, refresh_token_cookie_names};
 use rox_env::Environment;
 use rox_env_var::maybe_env_vars;
 use rand::{Rng, seq::SliceRandom};
@@ -92,23 +92,15 @@ fn same_site() -> SameSite {
     }
 }
 
-pub fn create_access_token_cookie(token: &str) -> Cookie<'static> {
-    let same_site = same_site();
-    let domain = domain();
-    let access_token_cookie_name = match Environment::new_or_prod() {
-        Environment::Production => ROX_ACCESS_TOKEN_COOKIE.to_string(),
-        Environment::Develop => format!("dev-{ROX_ACCESS_TOKEN_COOKIE}"),
-        Environment::Local => format!("local-{ROX_ACCESS_TOKEN_COOKIE}"),
-    };
-
-    let mut cookie = Cookie::new(
-        access_token_cookie_name,
-        token.to_owned(), // Convert the borrowed str to an owned String
-    );
+/// Builds a session cookie with the attributes every session cookie shares:
+/// secure, http-only, the environment's `SameSite`/domain, site-wide path and a
+/// one-year expiry.
+fn session_cookie(name: String, token: &str) -> Cookie<'static> {
+    let mut cookie = Cookie::new(name, token.to_owned());
     cookie.set_secure(true);
     cookie.set_http_only(true);
-    cookie.set_same_site(same_site);
-    if let Some(domain) = domain {
+    cookie.set_same_site(same_site());
+    if let Some(domain) = domain() {
         cookie.set_domain(domain);
     }
     cookie.set_path("/");
@@ -118,29 +110,32 @@ pub fn create_access_token_cookie(token: &str) -> Cookie<'static> {
     cookie
 }
 
+pub fn create_access_token_cookie(token: &str) -> Cookie<'static> {
+    session_cookie(access_token_cookie_names()[0].clone(), token)
+}
+
 pub fn create_refresh_token_cookie(token: &str) -> Cookie<'static> {
-    let same_site = same_site();
-    let domain = domain();
-    let refresh_token_cookie_name = match Environment::new_or_prod() {
-        Environment::Production => ROX_REFRESH_TOKEN_COOKIE.to_string(),
-        Environment::Develop => format!("dev-{ROX_REFRESH_TOKEN_COOKIE}"),
-        Environment::Local => format!("local-{ROX_REFRESH_TOKEN_COOKIE}"),
-    };
-    let mut cookie = Cookie::new(
-        refresh_token_cookie_name,
-        token.to_owned(), // Convert the borrowed str to an owned String
-    );
-    cookie.set_secure(true);
-    cookie.set_http_only(true);
-    cookie.set_same_site(same_site);
-    if let Some(domain) = domain {
-        cookie.set_domain(domain);
-    }
-    cookie.set_path("/");
-    cookie.set_expires(Some(
-        time::OffsetDateTime::now_utc() + time::Duration::days(365),
-    ));
-    cookie
+    session_cookie(refresh_token_cookie_names()[0].clone(), token)
+}
+
+/// Cookies that expired the pre-rename `macro-*` session cookies the browser
+/// may still carry. Sent wherever the session is rotated or ended: the server
+/// accepts the legacy names on read, so an ended session has to clear them too
+/// or the browser would keep authenticating with them.
+pub fn expired_legacy_session_cookies() -> Vec<Cookie<'static>> {
+    let names = [
+        access_token_cookie_names()[1].clone(),
+        refresh_token_cookie_names()[1].clone(),
+    ];
+    let expires = Some(time::OffsetDateTime::now_utc());
+    names
+        .into_iter()
+        .map(|name| {
+            let mut cookie = session_cookie(name, "");
+            cookie.set_expires(expires);
+            cookie
+        })
+        .collect()
 }
 
 /// If this account was created during the auth flow that is completing (the

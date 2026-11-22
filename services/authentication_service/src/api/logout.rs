@@ -47,6 +47,12 @@ pub async fn handler(
     refresh_token_cookie.set_expires(Some(time::OffsetDateTime::now_utc()));
     cookies.add(refresh_token_cookie);
 
+    // The legacy `macro-*` cookies are still accepted on read, so an ended
+    // session must expire them or the browser would stay authenticated.
+    for cookie in expired_legacy_session_cookies() {
+        cookies.add(cookie);
+    }
+
     // Logout of fusionauth when the request used a FusionAuth session.
     if let Some(jwt_context) = jwt_session
         && let Err(e) = ctx.auth_client.logout(&jwt_context.tid).await

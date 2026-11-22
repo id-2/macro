@@ -150,7 +150,7 @@ impl RoxNavigationPlugin {
 
     #[tracing::instrument(ret, level = tracing::Level::DEBUG, skip(self))]
     fn as_app_link(&self, url: &Url) -> Option<RoxScheme> {
-        if url.scheme() == "macro" {
+        if scheme::is_app_scheme(url.scheme()) {
             return RoxScheme::new(url.clone()).ok();
         }
         if !is_app_link(self.app_link_hosts, url) {
