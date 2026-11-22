@@ -10,4 +10,4 @@ fi
 cp -v "${appimages[@]}" artifacts/
 chmod 0755 artifacts/*.AppImage
 cp apps/web/tauri/desktop-release.json artifacts/linux-x86_64.release.json
-(cd artifacts && sha256sum -- *.AppImage > macro-appimage-SHA256SUMS)
+(cd artifacts && sha256sum -- *.AppImage > rox-appimage-SHA256SUMS)

@@ -56,7 +56,7 @@ export function createManifest(directory, tag, repository) {
     if (!metadata.enabled || metadata.version !== identity.version || metadata.nativeBuild !== identity.nativeBuild) {
       throw new Error(`Packaged identity disagrees with release tag for ${target}`);
     }
-    const matches = files.filter((name) => name === `Macro-${identity.version}${suffix}`);
+    const matches = files.filter((name) => name === `Rox-${identity.version}${suffix}`);
     if (matches.length !== 1) throw new Error(`Missing updater artifact for ${target}`);
     const name = matches[0];
     const signature = readFileSync(join(directory, `${name}.sig`), 'utf8').trim();
@@ -66,7 +66,7 @@ export function createManifest(directory, tag, repository) {
       signature,
     };
   }
-  return { version: identity.version, notes: `Macro ${identity.tag}`, platforms };
+  return { version: identity.version, notes: `Rox ${identity.tag}`, platforms };
 }
 
 function main([command, ...args]) {

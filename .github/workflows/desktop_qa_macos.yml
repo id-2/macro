@@ -134,16 +134,16 @@ jobs:
         app_dir="$RUNNER_TEMP/macro-qa"
         rm -rf "$app_dir"
         mkdir -p "$app_dir"
-        cp -a "$RUNNER_TEMP/qa-app-result/Macro.app" "$app_dir/Macro.app"
-        chmod -R u+w "$app_dir/Macro.app"
+        cp -a "$RUNNER_TEMP/qa-app-result/Rox.app" "$app_dir/Rox.app"
+        chmod -R u+w "$app_dir/Rox.app"
 
         # The copy moved the bundle, so seal it again. Ad-hoc is enough to launch a
         # locally built app; the release signing identity is not needed for QA.
-        codesign --force --deep --sign - "$app_dir/Macro.app" ||
+        codesign --force --deep --sign - "$app_dir/Rox.app" ||
           echo "::warning::ad-hoc codesign failed; the bundle-codesign check will say why"
 
-        echo "QA_APP=$app_dir/Macro.app" >> "$GITHUB_ENV"
-        du -sh "$app_dir/Macro.app"
+        echo "QA_APP=$app_dir/Rox.app" >> "$GITHUB_ENV"
+        du -sh "$app_dir/Rox.app"
       shell: bash
     - name: cargo test (src-tauri)
       if: inputs.suite == 'full'

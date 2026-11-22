@@ -81,7 +81,7 @@ pub fn build_dmg_job(ref_expr: &str) -> Job {
         .add_step(prepare_cloudkit_tcp())
         .add_step(notarize_dmg())
         .add_step(steps::upload_artifact(
-            "macro-dmg-${{ steps.metadata.outputs.safe_tag }}",
+            "rox-dmg-${{ steps.metadata.outputs.safe_tag }}",
             xtask_paths::runtime_path!("artifacts/*"),
         ))
 }

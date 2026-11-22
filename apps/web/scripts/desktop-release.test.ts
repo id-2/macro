@@ -30,15 +30,15 @@ describe('desktop releases', () => {
     const tag = 'v2026.10.6.1';
     const identity = releaseIdentity(tag);
     for (const [target, suffix] of [['darwin-aarch64', 'aarch64-darwin.app.tar.gz'], ['linux-x86_64', 'x86_64-linux.AppImage']]) {
-      const name = `Macro-${identity.version}-${suffix}`;
+      const name = `Rox-${identity.version}-${suffix}`;
       writeFileSync(join(dir, name), 'artifact');
       writeFileSync(join(dir, `${name}.sig`), 'signature');
       writeFileSync(join(dir, `${target}.release.json`), JSON.stringify({ ...identity, enabled: true }));
     }
     const manifest = createManifest(dir, tag, 'macro-inc/macro');
     expect(Object.keys(manifest.platforms)).toEqual(['darwin-aarch64', 'linux-x86_64']);
-    expect(manifest.platforms['darwin-aarch64'].url).toContain('/v2026.10.6.1/Macro-2026.1006.1-');
-    rmSync(join(dir, 'Macro-2026.1006.1-x86_64-linux.AppImage.sig'));
+    expect(manifest.platforms['darwin-aarch64'].url).toContain('/v2026.10.6.1/Rox-2026.1006.1-');
+    rmSync(join(dir, 'Rox-2026.1006.1-x86_64-linux.AppImage.sig'));
     expect(() => createManifest(dir, tag, 'macro-inc/macro')).toThrow();
   });
 });

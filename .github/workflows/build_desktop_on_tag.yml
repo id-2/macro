@@ -186,12 +186,12 @@ jobs:
         cp -v "${appimages[@]}" artifacts/
         chmod 0755 artifacts/*.AppImage
         cp apps/web/tauri/desktop-release.json artifacts/linux-x86_64.release.json
-        (cd artifacts && sha256sum -- *.AppImage > macro-appimage-SHA256SUMS)
+        (cd artifacts && sha256sum -- *.AppImage > rox-appimage-SHA256SUMS)
       shell: bash
-    - name: Upload macro-appimage-${{ steps.metadata.outputs.safe_tag }} artifact
+    - name: Upload rox-appimage-${{ steps.metadata.outputs.safe_tag }} artifact
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: macro-appimage-${{ steps.metadata.outputs.safe_tag }}
+        name: rox-appimage-${{ steps.metadata.outputs.safe_tag }}
         path: artifacts/*
         if-no-files-found: error
         retention-days: '30'
@@ -530,8 +530,8 @@ jobs:
         # Nix outputs are read-only; stapler must write Apple's ticket into the copy.
         chmod u+w artifacts/*.dmg
         mkdir -p updater-app
-        cp -a result/Macro.app updater-app/
-        chmod -R u+w updater-app/Macro.app
+        cp -a result/Rox.app updater-app/
+        chmod -R u+w updater-app/Rox.app
         cp apps/web/tauri/desktop-release.json artifacts/darwin-aarch64.release.json
       shell: bash
     - name: Validate signed DMG
@@ -827,27 +827,27 @@ jobs:
 
         # The updater ships the app rather than the DMG. Notarize and staple that exact
         # final app too; stapling only the disk image does not staple the updater app.
-        ditto -c -k --keepParent updater-app/Macro.app "$credentials_dir/updater-app.zip"
+        ditto -c -k --keepParent updater-app/Rox.app "$credentials_dir/updater-app.zip"
         xcrun notarytool submit "$credentials_dir/updater-app.zip" \
           --key "$credentials_dir/AuthKey.p8" --key-id "$key_id" --issuer "$issuer" \
           --wait --timeout 30m --output-format json > "$credentials_dir/app-submission.json"
         jq -e '.status == "Accepted"' "$credentials_dir/app-submission.json" > /dev/null
         cloudkit_diagnostics
-        run_stapler_pair updater-app/Macro.app
-        codesign --verify --deep --strict --verbose=2 updater-app/Macro.app
-        spctl --assess --type execute --verbose=2 updater-app/Macro.app
+        run_stapler_pair updater-app/Rox.app
+        codesign --verify --deep --strict --verbose=2 updater-app/Rox.app
+        spctl --assess --type execute --verbose=2 updater-app/Rox.app
         version=$(jq -er '.version' apps/web/tauri/desktop-release.json)
-        COPYFILE_DISABLE=1 tar -czf "artifacts/Macro-${version}-aarch64-darwin.app.tar.gz" -C updater-app Macro.app
+        COPYFILE_DISABLE=1 tar -czf "artifacts/Rox-${version}-aarch64-darwin.app.tar.gz" -C updater-app Rox.app
 
         # Stapling changes the DMG bytes, so checksum the final distributable.
-        (cd artifacts && shasum -a 256 -- *.dmg > macro-dmg-SHA256SUMS)
+        (cd artifacts && shasum -a 256 -- *.dmg > rox-dmg-SHA256SUMS)
       shell: bash
       env:
         DOPPLER_TOKEN: ${{ secrets.MACOS_RELEASE_DOPPLER_TOKEN }}
-    - name: Upload macro-dmg-${{ steps.metadata.outputs.safe_tag }} artifact
+    - name: Upload rox-dmg-${{ steps.metadata.outputs.safe_tag }} artifact
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: macro-dmg-${{ steps.metadata.outputs.safe_tag }}
+        name: rox-dmg-${{ steps.metadata.outputs.safe_tag }}
         path: artifacts/*
         if-no-files-found: error
         retention-days: '30'
@@ -998,7 +998,7 @@ jobs:
         # A failed publication can be resumed if every existing asset has identical bytes.
         if ! gh release view "$RELEASE_TAG" --repo "$RELEASE_REPOSITORY" >/dev/null 2>&1; then
           gh release create "$RELEASE_TAG" --repo "$RELEASE_REPOSITORY" --verify-tag \
-            --title "Macro $RELEASE_TAG" --notes "Desktop release $RELEASE_TAG" --latest=false
+            --title "Rox $RELEASE_TAG" --notes "Desktop release $RELEASE_TAG" --latest=false
         fi
         work_dir=$(mktemp -d)
         trap 'rm -rf "$work_dir"' EXIT

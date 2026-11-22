@@ -22,7 +22,7 @@
       appVersion = desktopRelease.version;
       desktopPlugins = {
         desktop-update.enabled = desktopRelease.enabled;
-        macro-bundle-updater.nativeBuild = desktopRelease.nativeBuild;
+        rox-bundle-updater.nativeBuild = desktopRelease.nativeBuild;
         updater = {
           pubkey = desktopRelease.publicKey;
           endpoints = [ desktopRelease.endpoint ];
@@ -107,7 +107,7 @@
       };
 
       cacheWasmPackage = craneLib.mkCargoDerivation {
-        pname = "macro-cache-wasm";
+        pname = "rox-cache-wasm";
         version = appVersion;
         src = jsSrc;
         cargoArtifacts = null;
@@ -157,7 +157,7 @@
         in
         craneLib.mkCargoDerivation (
           {
-            pname = "macro-${dir}-wasm";
+            pname = "rox-${dir}-wasm";
             version = appVersion;
             src = jsSrc;
             cargoArtifacts = null;
@@ -313,7 +313,7 @@
       '';
 
       frontend = pkgs.stdenvNoCC.mkDerivation {
-        pname = "macro-tauri-frontend";
+        pname = "rox-tauri-frontend";
         version = appVersion;
         src = jsSrc;
 
@@ -428,7 +428,7 @@
       };
 
       tauri = crane-tauri.lib.buildTauriApp { inherit pkgs craneLib; } {
-        pname = "macro-tauri-desktop";
+        pname = "rox-tauri-desktop";
         version = appVersion;
         binaryName = "app";
         src = ../apps/web/tauri;
@@ -489,7 +489,7 @@
       gioTlsModulePath = "${pkgs.glib-networking}/lib/gio/modules";
 
       wrappedTauriDesktop = pkgs.symlinkJoin {
-        name = "macro-tauri-desktop-${appVersion}";
+        name = "rox-tauri-desktop-${appVersion}";
         paths = [ tauriDesktopUnwrapped ];
         nativeBuildInputs = [ pkgs.makeWrapper ];
         postBuild = ''
@@ -529,16 +529,16 @@
               ]
             }"
 
-          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/32x32.png} "$out/share/icons/hicolor/32x32/apps/macro.png"
-          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/64x64.png} "$out/share/icons/hicolor/64x64/apps/macro.png"
-          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/128x128.png} "$out/share/icons/hicolor/128x128/apps/macro.png"
-          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/icon.png} "$out/share/icons/hicolor/256x256/apps/macro.png"
-          install -Dm0644 /dev/stdin "$out/share/applications/macro.desktop" <<EOF
+          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/32x32.png} "$out/share/icons/hicolor/32x32/apps/rox.png"
+          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/64x64.png} "$out/share/icons/hicolor/64x64/apps/rox.png"
+          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/128x128.png} "$out/share/icons/hicolor/128x128/apps/rox.png"
+          install -Dm0644 ${../apps/web/tauri/src-tauri/icons/icon.png} "$out/share/icons/hicolor/256x256/apps/rox.png"
+          install -Dm0644 /dev/stdin "$out/share/applications/rox.desktop" <<EOF
           [Desktop Entry]
           Type=Application
-          Name=Macro
+          Name=Rox
           Exec=$out/bin/app %U
-          Icon=macro
+          Icon=rox
           Categories=Office;Utility;
           MimeType=x-scheme-handler/rox;x-scheme-handler/macro;
           EOF
@@ -1098,7 +1098,7 @@
         test -d "$dest/Chromium Embedded Framework.framework"
       '';
       tauriDesktopCefApp = cefCraneLib.mkCargoDerivation {
-        pname = "macro-tauri-desktop-cef-app";
+        pname = "rox-tauri-desktop-cef-app";
         version = appVersion;
         src = cefAppSrc;
         cargoArtifacts = null;
@@ -1154,12 +1154,12 @@
           fi
           test -d "$appPath/Contents/Frameworks/Chromium Embedded Framework.framework"
           mkdir -p "$out"
-          cp -a "$appPath" "$out/Macro.app"
+          cp -a "$appPath" "$out/Rox.app"
         '';
         doInstallCargoArtifacts = false;
       };
       tauriDesktopDmg = pkgs.stdenvNoCC.mkDerivation {
-        pname = "macro-tauri-desktop-dmg";
+        pname = "rox-tauri-desktop-dmg";
         version = appVersion;
         APPLE_SIGNING_IDENTITY = tauriDesktopDmgSigningIdentity;
         MACOS_PROVISIONING_PROFILE = tauriDesktopDmgProvisioningProfile;
@@ -1180,8 +1180,8 @@
             exit 1
           fi
           export PATH="$PATH:/usr/bin:/bin:/usr/sbin:/sbin"
-          appPath="$TMPDIR/Macro.app"
-          cp -a ${tauriDesktopCefApp}/Macro.app "$appPath"
+          appPath="$TMPDIR/Rox.app"
+          cp -a ${tauriDesktopCefApp}/Rox.app "$appPath"
           chmod -R u+w "$appPath"
 
           bundle_nix_dylibs() {
@@ -1344,11 +1344,11 @@
           mkdir -p "$out"
           # Export the final, relocated and signed app for updater packaging.
           # Notarization, stapling and updater signing happen outside the store.
-          cp -a "$appPath" "$out/Macro.app"
-          dmgPath="$out/Macro-${appVersion}-${system}.dmg"
+          cp -a "$appPath" "$out/Rox.app"
+          dmgPath="$out/Rox-${appVersion}-${system}.dmg"
           # Package a drag-to-install volume, including Finder's icon layout.
-          dmgRoot=$(mktemp -d "$TMPDIR/macro-dmg.XXXXXX")
-          cp -a "$appPath" "$dmgRoot/Macro.app"
+          dmgRoot=$(mktemp -d "$TMPDIR/rox-dmg.XXXXXX")
+          cp -a "$appPath" "$dmgRoot/Rox.app"
           ln -s /Applications "$dmgRoot/Applications"
           ${pkgs.python3.withPackages (ps: [ ps.ds-store ])}/bin/python \
             ${./dmg-layout.py} "$dmgRoot"
@@ -1364,7 +1364,7 @@
           hdiutil create \
             -fs APFS \
             -size "$dmgSizeMiB"m \
-            -volname "Macro" \
+            -volname "Rox" \
             -srcfolder "$dmgRoot" \
             -ov \
             -format UDZO \
@@ -1412,7 +1412,7 @@
         tauri.commonArgs
         // {
           cargoArtifacts = tauri.cargoArtifacts;
-          pname = "macro-tauri-desktop-appimage";
+          pname = "rox-tauri-desktop-appimage";
           TAURI_CONFIG = tauriAppImageConfig;
           nativeBuildInputs = tauri.commonArgs.nativeBuildInputs ++ [
             pkgs.cargo-tauri
@@ -1472,8 +1472,8 @@
             fi
 
             mkdir -p "$out"
-            cp "$appimagePath" "$out/Macro-${appVersion}-${system}.AppImage"
-            chmod 0755 "$out/Macro-${appVersion}-${system}.AppImage"
+            cp "$appimagePath" "$out/Rox-${appVersion}-${system}.AppImage"
+            chmod 0755 "$out/Rox-${appVersion}-${system}.AppImage"
           '';
           doInstallCargoArtifacts = false;
         }

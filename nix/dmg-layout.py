@@ -33,5 +33,5 @@ with DSStore.open(str(Path(sys.argv[1]) / ".DS_Store"), "w+") as store:
         "showIconPreview": True,
         "showItemInfo": False,
     }
-    store["Macro.app"]["Iloc"] = (150, 140)
+    store["Rox.app"]["Iloc"] = (150, 140)
     store["Applications"]["Iloc"] = (410, 140)

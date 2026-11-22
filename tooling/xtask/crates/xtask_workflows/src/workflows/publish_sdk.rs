@@ -1,4 +1,4 @@
-//! `Publish SDK` — validates and publishes `@macro-inc/sdk` when an `sdk-v*` tag
+//! `Publish SDK` — validates and publishes `@rox-one/sdk` when an `sdk-v*` tag
 //! is pushed. Generated into `publish-sdk.yml`.
 
 use gh_workflow::{
@@ -25,7 +25,7 @@ pub fn publish_sdk() -> Workflow {
 
 fn publish() -> Job {
     Job::default()
-        .name("Publish @macro-inc/sdk")
+        .name("Publish @rox-one/sdk")
         // npm trusted publishing only supports GitHub-hosted runners.
         .runs_on("ubuntu-latest")
         .permissions(

@@ -61,7 +61,7 @@ pub fn build_appimage_job(ref_expr: &str) -> Job {
         .add_step(nix_build_appimage())
         .add_step(collect_appimage())
         .add_step(steps::upload_artifact(
-            "macro-appimage-${{ steps.metadata.outputs.safe_tag }}",
+            "rox-appimage-${{ steps.metadata.outputs.safe_tag }}",
             xtask_paths::runtime_path!("artifacts/*"),
         ))
         .add_step(steps::teardown_nix())

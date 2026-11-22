@@ -87,4 +87,4 @@ version=$(jq -er '.version' apps/web/tauri/desktop-release.json)
 COPYFILE_DISABLE=1 tar -czf "artifacts/Rox-${version}-aarch64-darwin.app.tar.gz" -C updater-app Rox.app
 
 # Stapling changes the DMG bytes, so checksum the final distributable.
-(cd artifacts && shasum -a 256 -- *.dmg > macro-dmg-SHA256SUMS)
+(cd artifacts && shasum -a 256 -- *.dmg > rox-dmg-SHA256SUMS)
