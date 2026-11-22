@@ -120,7 +120,7 @@ describe('ReadActivity renderer', () => {
   it('reuses activity property and entity display resolution', async () => {
     const { container } = renderTool([
       {
-        actorId: 'rox|user@example.com',
+        actorId: 'macro|user@example.com',
         entityType: 'document',
         entityId: 'document-raw-id',
         action: {
@@ -150,7 +150,7 @@ describe('ReadActivity renderer', () => {
   it('renders an unsupported entity type without leaking the raw id', () => {
     const { container } = renderTool([
       {
-        actorId: 'rox|user@example.com',
+        actorId: 'macro|user@example.com',
         entityType: 'agent_session',
         entityId: 'agent-session-raw-id',
         action: { type: 'created' },
@@ -166,7 +166,7 @@ describe('ReadActivity renderer', () => {
   it('renders a database as a named entity', () => {
     const { container } = renderTool([
       {
-        actorId: 'rox|user@example.com',
+        actorId: 'macro|user@example.com',
         entityType: 'database',
         entityId: 'database-raw-id',
         action: { type: 'created' },

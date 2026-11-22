@@ -235,7 +235,7 @@ it('maps agent sessions without discarding persona, favorites or notifications',
     sessionName: 'Fix mentions',
     archivedBy: 'PULL_REQUEST_MERGED',
     archivedAt: '2026-01-03T00:00:00Z',
-    ownerId: 'rox|owner@example.com',
+    ownerId: 'macro|owner@example.com',
     botId: 'bot',
     harness: 'cursor',
     repoUrl: 'https://github.com/rox/rox',
@@ -490,7 +490,7 @@ vi.mock('@rox-one/observability', () => ({
       }),
   },
 }));
-vi.mock('@service-auth/fetch', () => ({ getMacroApiToken: vi.fn() }));
+vi.mock('@service-auth/fetch', () => ({ getRoxApiToken: vi.fn() }));
 vi.mock('graphql-ws', () => ({
   createClient: () => ({ subscribe: vi.fn(), dispose: vi.fn() }),
 }));
@@ -736,7 +736,7 @@ describe('GraphQL Soup chat models', () => {
         id: 'chat-model',
         chatName: 'Chat',
         model,
-        ownerId: 'rox|owner@example.com',
+        ownerId: 'macro|owner@example.com',
         entityType: 'CHAT' as GraphqlSoupEntityType,
         displayName: 'Chat',
         projectId: null,
@@ -782,7 +782,7 @@ describe('GraphQL Soup document sub types', () => {
         entityType: 'DOCUMENT' as GraphqlSoupEntityType,
         displayName: 'Plan',
         documentName: 'Plan',
-        ownerId: 'rox|owner@example.com',
+        ownerId: 'macro|owner@example.com',
         fileType: 'md',
         projectId: null,
         viewedAt: null,

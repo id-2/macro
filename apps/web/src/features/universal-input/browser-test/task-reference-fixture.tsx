@@ -14,7 +14,7 @@ import {
 } from './contact-directory-fixture';
 
 export type TaskValues = ReturnType<typeof createTaskFieldSource>['values'];
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 
 export function seedTaskReferences(client: QueryClient) {
   client.setQueryData(authKeys.userInfo.queryKey, {
@@ -46,13 +46,13 @@ export function seedTaskReferences(client: QueryClient) {
   );
   registerContactFixture([
     {
-      id: 'rox|person99999@example.com',
+      id: 'macro|person99999@example.com',
       name: 'Off Window',
       email: 'person99999@example.com',
     },
-    { id: 'rox|one@example.com', name: 'Shared', email: 'one@example.com' },
+    { id: 'macro|one@example.com', name: 'Shared', email: 'one@example.com' },
     {
-      id: 'rox|two@example.com',
+      id: 'macro|two@example.com',
       name: 'Shared Person',
       email: 'two@example.com',
     },

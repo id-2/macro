@@ -35,7 +35,7 @@ export function roxCallUrl(value: string): string | undefined {
 }
 
 /** The shared meeting travels in ordinary calendar fields and external invites. */
-export function calendarMacroCallUrl(event: CalendarCallContent) {
+export function calendarRoxCallUrl(event: CalendarCallContent) {
   for (const content of [
     event.conferenceUrl,
     event.location,
@@ -50,7 +50,7 @@ export function calendarMacroCallUrl(event: CalendarCallContent) {
 }
 
 /** Remove only the paragraph generated for this meeting, preserving user text. */
-export function removeCalendarMacroCall(
+export function removeCalendarRoxCall(
   content: Pick<CalendarCallContent, 'description' | 'location'>,
   existingUrl: string | undefined
 ) {
@@ -66,7 +66,7 @@ export function removeCalendarMacroCall(
             .replace(/<[^>]+>/g, '')
             .replace(/&amp;/g, '&')
             .trim();
-          const linkedUrl = calendarMacroCallUrl({ description: paragraph });
+          const linkedUrl = calendarRoxCallUrl({ description: paragraph });
           // Invitations saved by earlier releases say "Join Rox call"; keep
           // reading that wording so old events still lose their generated line.
           const textUrl = text.match(
@@ -86,19 +86,19 @@ export function removeCalendarMacroCall(
 
 /** The location event details show: empty when it is only the meeting's Rox call link. */
 export function calendarEventLocation(event: CalendarCallContent) {
-  return removeCalendarMacroCall(
+  return removeCalendarRoxCall(
     { location: event.location },
-    calendarMacroCallUrl(event)
+    calendarRoxCallUrl(event)
   ).location.trim();
 }
 
 /** Attach one invitation link without replacing a physical location or notes. */
-export function attachCalendarMacroCall(
+export function attachCalendarRoxCall(
   content: Pick<CalendarCallContent, 'description' | 'location'>,
   url: string,
   existingUrl?: string
 ) {
-  const clean = removeCalendarMacroCall(content, existingUrl ?? url);
+  const clean = removeCalendarRoxCall(content, existingUrl ?? url);
   return {
     description: `${clean.description}${clean.description ? '\n' : ''}<p>Join Rox call: <a href="${url}">${url}</a></p>`,
     location: clean.location.trim() ? clean.location : url,

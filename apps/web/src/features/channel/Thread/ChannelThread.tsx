@@ -2,7 +2,7 @@ import { DebugSuspense } from '@channel/DebugSuspense';
 import { useUserId } from '@core/context/user';
 import { useMessageViewerOverride } from '@core/messages/message-transport';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { thrownResultErrorHasCode } from '@core/util/result';
 import { MarkMessageNotifications } from '@notifications/components/MarkMessageNotifications';
 import { MessageReadVisibilityProvider } from '@notifications/components/MessageReadVisibility';
@@ -45,7 +45,7 @@ export function ChannelThread(props: ThreadProps) {
   const accountUserId = useUserId();
   const userId = useMessageViewerOverride() ?? accountUserId;
   const replyUserId = () => userId() ?? props.data().sender_id;
-  const roxId = () => tryMacroId(replyUserId());
+  const roxId = () => tryRoxId(replyUserId());
   const displayName = () => getDisplayName(roxId());
   const thread = () => props.data().thread;
   const hasReplies = () => thread().reply_count > 0;

@@ -15,7 +15,7 @@ import {
 } from '@core/component/LexicalMarkdown/theme';
 import { UserIcon } from '@core/component/UserIcon';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { formatRelativeDay } from '@core/util/dateParser';
 import { plural } from '@core/util/string';
 import {
@@ -429,7 +429,7 @@ const createSenderDisplayName = (
 ) => {
   const roxId = () => {
     const id = senderId();
-    return id ? tryMacroId(id) : undefined;
+    return id ? tryRoxId(id) : undefined;
   };
 
   const displayName = () => {

@@ -23,7 +23,7 @@ export const postMeta: PostMeta = {
   ctaButtonName: 'blog_why_rox_is_open_source_cta',
 };
 
-export default function WhyMacroIsOpenSourcePost() {
+export default function WhyRoxIsOpenSourcePost() {
   return (
     <div class="wos-post">
       <article>

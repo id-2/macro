@@ -26,8 +26,8 @@ import { type Accessor, batch, createMemo, createSignal } from 'solid-js';
 import type { CalendarEvent } from '../../types';
 import { isTimedPointEvent } from '../../utils/calendar-date';
 import {
-  calendarMacroCallUrl,
-  removeCalendarMacroCall,
+  calendarRoxCallUrl,
+  removeCalendarRoxCall,
 } from '../../utils/rox-call-link';
 import {
   buildRecurrenceLines,
@@ -224,7 +224,7 @@ export function calendarSelectionToEditorInitialValues(
 function initialConferenceChoice(
   event: CalendarEvent
 ): EventEditorConferenceChoice {
-  if (calendarMacroCallUrl(event)) return 'rox';
+  if (calendarRoxCallUrl(event)) return 'rox';
   if (!event.conferenceUrl) return 'none';
   return event.conferenceProvider === 'google_meet' ||
     event.conferenceProvider === 'microsoft_teams'
@@ -254,7 +254,7 @@ export function calendarEventToEditorInitialValues(
   event: CalendarEvent
 ): EventEditorInitialValues {
   const guests = eventGuestEmails(event).join(', ');
-  const content = removeCalendarMacroCall(event, calendarMacroCallUrl(event));
+  const content = removeCalendarRoxCall(event, calendarRoxCallUrl(event));
 
   if (event.allDay) {
     const start = isDateOnly(event.start)
@@ -398,7 +398,7 @@ export function initialGuestOptions(
     return (
       existing ??
       recipientEntityMapper('custom')({
-        id: `rox|${email}`,
+        id: `macro|${email}`,
         email,
         invalid: false,
       })

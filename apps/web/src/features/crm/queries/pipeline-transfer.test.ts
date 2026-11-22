@@ -17,7 +17,7 @@ const pipeline: Pipeline = {
   id: 'pipeline',
   teamId: 'team',
   name: 'Deals',
-  userId: 'rox|owner@rox.one',
+  userId: 'macro|owner@rox.one',
   recordType: 'company',
   databaseId: 'database',
   tableId: 'table',

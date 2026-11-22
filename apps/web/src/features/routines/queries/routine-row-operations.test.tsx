@@ -27,7 +27,7 @@ vi.mock('@queries/client', async () => {
 
 const routine = (id: string, name: string): ScheduledAction => ({
   id,
-  owner: 'rox|owner@example.com',
+  owner: 'macro|owner@example.com',
   name,
   kind: 'Agent',
   task: { steps: [] },

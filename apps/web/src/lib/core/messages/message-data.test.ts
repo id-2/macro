@@ -7,7 +7,7 @@ const message: Message = {
   parent: { type: 'document', id: 'doc' },
   thread_id: 'root',
   sender_id: 'bot|00000000-0000-0000-0000-000000000001',
-  triggered_by: 'rox|user@example.com',
+  triggered_by: 'macro|user@example.com',
   bot_profile: { name: 'Researcher', avatar_url: null },
   imported_author: null,
   content: 'Answer',

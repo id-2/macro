@@ -6,7 +6,7 @@ import {
 
 const mocks = vi.hoisted(() => ({
   enabled: true,
-  userId: 'rox|recipient@example.com',
+  userId: 'macro|recipient@example.com',
   subscribe: vi.fn(),
 }));
 vi.mock('@core/constant/featureFlags', () => ({
@@ -23,7 +23,7 @@ const payload = {
   meeting_id: 'meeting-1',
   share_token: 'standalone-share-token',
   title: 'Planning',
-  created_by: 'rox|caller@example.com',
+  created_by: 'macro|caller@example.com',
   invited_at: '2026-09-23T14:00:00Z',
   expires_at: '2026-09-23T14:00:30Z',
 };
@@ -31,7 +31,7 @@ const payload = {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.enabled = true;
-  mocks.userId = 'rox|recipient@example.com';
+  mocks.userId = 'macro|recipient@example.com';
 });
 
 describe('meeting invitation events', () => {
@@ -112,7 +112,7 @@ describe('meeting invitation events', () => {
     });
     deliver({
       type: 'meeting_answered',
-      data: { meeting_id: 'meeting-1', user_id: 'rox|other@example.com' },
+      data: { meeting_id: 'meeting-1', user_id: 'macro|other@example.com' },
     });
     expect(onAnswered).not.toHaveBeenCalled();
     deliver({

@@ -50,7 +50,7 @@ import { TauriWebSocketWrapper } from '@rox-one/collaboration/websocket/platform
 import { Telemetry } from '@rox-one/observability';
 import { notificationStateFromGraphql } from '@notifications/notification-state';
 import { localDraftQueueLifecycle } from '@queries/email/local-drafts';
-import { getMacroApiToken } from '@service-auth/fetch';
+import { getRoxApiToken } from '@service-auth/fetch';
 import type { ApiUserNotification } from '@service-notification/generated/schemas/apiUserNotification';
 import type { ChannelType } from '@service-notification/generated/schemas/channelType';
 import type { ExternalChatProvider } from '@service-notification/generated/schemas/externalChatProvider';
@@ -150,7 +150,7 @@ async function authorizedDssGraphqlFetch(
 ): Promise<Response> {
   const parent = Telemetry.captureContext();
   if (ENABLE_BEARER_TOKEN_AUTH) {
-    const apiToken = await getMacroApiToken();
+    const apiToken = await getRoxApiToken();
     return await platformFetch(input, {
       ...init,
       headers: mergeHeaders(init?.headers, {
@@ -469,7 +469,7 @@ function createGraphqlSoupWebSocketClient(
   const resolveWebSocketUrl = createGraphqlSoupWebSocketUrlResolver({
     dssHost,
     bearerTokenAuth: ENABLE_BEARER_TOKEN_AUTH,
-    getApiToken: getMacroApiToken,
+    getApiToken: getRoxApiToken,
     refreshCookieAuth: fetchToken,
   });
   const liveness = createGraphqlSoupWebSocketLiveness(() => client.terminate());

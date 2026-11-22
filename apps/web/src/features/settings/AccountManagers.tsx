@@ -1,7 +1,7 @@
 import { formatLocale, t } from '@app/lib/i18n';
 import { LoadingSpinner } from '@core/component/LoadingSpinner';
 import { toast } from '@core/component/Toast/Toast';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import XIcon from '@icon/system/regular/x.svg';
 import {
   useAccountManagersQuery,
@@ -13,7 +13,7 @@ import { createSignal, For, Show } from 'solid-js';
 import { SettingsCard, SettingsPage } from './primitives';
 
 const managerName = (grant: AccountManagerGrant) =>
-  getDisplayName(tryMacroId(grant.managerUserId));
+  getDisplayName(tryRoxId(grant.managerUserId));
 
 export function AccountManagers() {
   const grantsQuery = useAccountManagersQuery();

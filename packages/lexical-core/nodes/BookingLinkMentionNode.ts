@@ -32,7 +32,7 @@ const ROX_BOOKING_URL_PATTERN =
   /^https?:\/\/(?:www\.)?(?:rox\.one|localhost:\d+|dev\.rox\.one|staging\.rox\.one)\/app\/book\/([^/?#]+)(?:\/([^/?#]+))?(?:[?#].*)?$/;
 
 /** Check whether a URL is a valid Rox booking link. */
-export function isMacroBookingUrl(url: string): boolean {
+export function isRoxBookingUrl(url: string): boolean {
   return ROX_BOOKING_URL_PATTERN.test(url);
 }
 

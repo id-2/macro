@@ -106,7 +106,7 @@ describe('createRetirableCacheHost', () => {
 
   it('publishes and searches people through the app wrapper, retiring captured capabilities too', async () => {
     const scope = {
-      identity: 'rox|viewer@example.com',
+      identity: 'macro|viewer@example.com',
       storageGeneration: '00000000-0000-4000-8000-000000000001',
     };
     const epoch = '00000000-0000-4000-8000-000000000002';
@@ -189,7 +189,7 @@ describe('createRetirableCacheHost', () => {
 
   it('does not mask scope or persistence errors from a supported person host', async () => {
     const scope = {
-      identity: 'rox|viewer@example.com',
+      identity: 'macro|viewer@example.com',
       storageGeneration: '00000000-0000-4000-8000-000000000001',
     };
     const error = new Error('cache hydration scope changed');

@@ -1,7 +1,7 @@
 import { AgentRuntime } from '@app/features/runtime-sharing/views/AgentRuntime';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
 import { isBotPrincipalId } from '@core/constant/roxAgent';
-import { isAgentAccount, tryMacroId } from '@core/user';
+import { isAgentAccount, tryRoxId } from '@core/user';
 import { createSignal, For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { AgentTag } from './AgentTag';
@@ -99,7 +99,7 @@ function UserCardBody(props: {
             <div class="truncate text-base font-semibold text-ink">
               {props.user.displayName}
             </div>
-            <Show when={isAgentAccount(tryMacroId(props.user.id ?? ''))}>
+            <Show when={isAgentAccount(tryRoxId(props.user.id ?? ''))}>
               <AgentTag />
             </Show>
           </div>

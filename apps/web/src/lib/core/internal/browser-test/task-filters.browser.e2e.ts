@@ -51,7 +51,7 @@ test('Tasks people filters page lazily and keep semantic Me, fixed self and unkn
   if (phone) await found.click();
   else await found.locator('[data-multiselect-checkbox]').click();
   await expect(page.getByTestId('task-facets')).toContainText(
-    'rox|match@example.com'
+    'macro|match@example.com'
   );
   await expect(page.getByTestId('task-facets')).toContainText(
     'unavailable-person'
@@ -91,12 +91,12 @@ for (const label of [
     await input.press('Enter');
     const id =
       label === 'Late Person'
-        ? 'rox|late@example.com'
+        ? 'macro|late@example.com'
         : label === 'Family, Given'
-          ? 'rox|comma@example.com'
+          ? 'macro|comma@example.com'
           : label === '@viewer'
             ? '@viewer'
-            : 'rox|viewer@example.com';
+            : 'macro|viewer@example.com';
     await expect(page.getByTestId('task-facets')).toHaveText(
       JSON.stringify({ status: ['completed'], assignees: [id] })
     );
@@ -106,7 +106,7 @@ for (const label of [
     ).not.toContainText('Selected Person');
     await expect(
       page.getByTestId('task-completion-requests')
-    ).not.toContainText('rox|person0');
+    ).not.toContainText('macro|person0');
     if (label.includes('Person') || label.includes(','))
       await expect(page.getByTestId('task-reference-requests')).toContainText(
         'after-empty-budget'
@@ -164,7 +164,7 @@ test('Task planner keeps incomplete offline evidence unresolved and succeeds on 
   await expect(page.getByTestId('task-facets')).toHaveText(
     JSON.stringify({
       status: ['completed'],
-      assignees: ['rox|late@example.com'],
+      assignees: ['macro|late@example.com'],
     })
   );
 });

@@ -11,7 +11,7 @@ import type { SidePanelSectionLayout } from '@components/app/side-panel/SidePane
 import { References } from '@core/component/References';
 import { useUserId } from '@core/context/user';
 import { getDisplayNameParts } from '@core/user';
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import type { DateValue } from '@core/util/date';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { OwnerLabel } from '@entity/owner/owner-display';
@@ -203,7 +203,7 @@ function SharingSectionContent(props: { record: CallRecord }) {
       ? t('calls.detailLiveSharing')
       : t('calls.detailOwnerSharing');
   const readOnlyReason = () => {
-    const name = getDisplayNameParts(tryMacroId(record().createdBy));
+    const name = getDisplayNameParts(tryRoxId(record().createdBy));
     const hasResolvedName = name.firstName || name.lastName;
     if (!hasResolvedName) return t('calls.detailSharingStarter');
     return t('calls.detailSharingStarterNamed', { name: name.fullName });

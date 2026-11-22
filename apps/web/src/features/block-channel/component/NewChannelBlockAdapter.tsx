@@ -189,7 +189,7 @@ function NewTop(props: { channelId: string }) {
 
   // Seed for "Ask Rox": a new chat with this channel @mentioned, so the
   // user does not have to create an agent and mention the channel by hand.
-  const askMacroEntity = () => {
+  const askRoxEntity = () => {
     const type = channelType();
     if (!type) return undefined;
     return {
@@ -262,11 +262,11 @@ function NewTop(props: { channelId: string }) {
               label: () => t('entityActions.askMacro'),
               icon: ChatWithAgentIcon,
               action: () => {
-                const entity = askMacroEntity();
+                const entity = askRoxEntity();
                 if (!entity) return;
                 fireAndForget(openChatWithAgent(entity), 'channel-header');
               },
-              condition: () => !!askMacroEntity(),
+              condition: () => !!askRoxEntity(),
             },
             {
               group: 'file',

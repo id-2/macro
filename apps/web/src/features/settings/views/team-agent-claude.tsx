@@ -1,7 +1,7 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
-import { enableMacroComputers } from '@core/constant/featureFlags';
+import { enableRoxComputers } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { ClaudeSignInEntry } from '@queries/computers/claude';
 import {
@@ -32,7 +32,7 @@ import { AgentClaudeDialog } from './agent-claude-step';
  * everyone else.
  */
 export function TeamAgentClaude(props: { agent: TeamAgent }) {
-  const computers = useFeatureFlag(enableMacroComputers);
+  const computers = useFeatureFlag(enableRoxComputers);
   const harnesses = useHarnessesQuery();
   const harness = () => {
     if (!computers().enabled) return undefined;

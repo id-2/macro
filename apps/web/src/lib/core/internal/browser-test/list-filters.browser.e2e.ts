@@ -59,7 +59,7 @@ for (const view of ['drive', 'notes']) {
     if (phone) await match.click();
     else await match.locator('[data-multiselect-checkbox]').click();
     await expect(page.getByTestId('selected-ids')).toContainText(
-      'rox|match@example.com'
+      'macro|match@example.com'
     );
     await expect(page.getByTestId('selected-ids')).toContainText(
       'unavailable-person'
@@ -70,7 +70,7 @@ for (const view of ['drive', 'notes']) {
         .getByRole('button', { name: 'Select only Broader match' })
         .click();
       await expect(page.getByTestId('selected-ids')).toHaveText(
-        '["rox|match@example.com"]'
+        '["macro|match@example.com"]'
       );
       await expect(input).toBeFocused();
     }

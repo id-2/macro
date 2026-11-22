@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { useChannelParticipants } from '@channel/use-channel-participants';
 import { useUserId } from '@core/context/user';
-import { isAgentAccount, tryMacroId } from '@core/user';
+import { isAgentAccount, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import WarningCircleIcon from '@icon/system/regular/warning-circle.svg';
 import { useIsTeamAdmin } from '@queries/team/teams';
@@ -23,7 +23,7 @@ function useDmAgentAccount(channelId: () => string) {
     const other = ids.find((id) => id !== userId());
     // A DM has two people; only an agent account can be a team agent.
     if (!other || ids.length !== 2) return undefined;
-    return isAgentAccount(tryMacroId(other)) ? other : undefined;
+    return isAgentAccount(tryRoxId(other)) ? other : undefined;
   };
 }
 

@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   failure: vi.fn(),
 }));
 vi.mock('@app/features/integrations/mcp-setup/RoxMcpSetupModal', () => ({
-  openMacroMcpSetupModal: vi.fn(),
+  openRoxMcpSetupModal: vi.fn(),
 }));
 vi.mock('@core/component/LexicalMarkdown/utils', () => ({
   editorStateAsMarkdown: () => 'Document body',
@@ -21,7 +21,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
   toast: { success: mocks.success, failure: mocks.failure },
 }));
 vi.mock('@core/user', () => ({
-  tryMacroId: () => undefined,
+  tryRoxId: () => undefined,
   roxIdToEmail: (id: string) => id,
 }));
 vi.mock('@core/util/branchName', () => ({

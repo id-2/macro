@@ -20,7 +20,7 @@ vi.mock('@service-storage/graphql-contacts', () => ({
 }));
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const person = {
-  userId: 'rox|sam@example.com',
+  userId: 'macro|sam@example.com',
   email: 'sam@example.com',
   name: 'Sam',
 };

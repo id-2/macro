@@ -24,7 +24,7 @@ export const ROX_CODER_HANDLE = 'coder';
  * Whether an id refers to the Rox Coding Agent bot. Accepts both the bare UUID and
  * the `bot|<uuid>` participant/sender form.
  */
-export function isMacroCoderId(id: string | undefined): boolean {
+export function isRoxCoderId(id: string | undefined): boolean {
   if (!id) return false;
   const bare = id.startsWith('bot|') ? id.slice('bot|'.length) : id;
   return bare === ROX_CODER_BOT_ID;

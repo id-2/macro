@@ -1,5 +1,5 @@
 /** Public repository metadata; never send Rox credentials to GitHub. */
-export async function getMacroGithubStars(
+export async function getRoxGithubStars(
   signal?: AbortSignal
 ): Promise<number> {
   const response = await fetch('https://api.github.com/repos/rox-inc/rox', {

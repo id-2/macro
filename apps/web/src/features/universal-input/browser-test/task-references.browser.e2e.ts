@@ -10,7 +10,7 @@ test('resolves off-window assignees through empty continuations and blocks ambig
   const submit = page.getByRole('button', { name: 'Create task', exact: true });
   await input.fill('Assign task to Off Window');
   await expect(page.getByTestId('task-reference-values')).toContainText(
-    'rox|person99999@example.com'
+    'macro|person99999@example.com'
   );
   await expect(page.getByTestId('task-reference-pages')).toHaveText('2');
   await expect(submit).toBeEnabled();
@@ -50,7 +50,7 @@ test('leaves offline evidence unresolved and recovers without changing the task 
   await context.setOffline(false);
   await page.evaluate(() => window.dispatchEvent(new Event('online')));
   await expect(page.getByTestId('task-reference-values')).toContainText(
-    'rox|person99999@example.com'
+    'macro|person99999@example.com'
   );
   await expect(submit).toBeEnabled();
 });

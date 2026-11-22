@@ -21,7 +21,7 @@ import type {
   MessageActions,
 } from '@core/messages/types';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import type { IUser } from '@core/user/types';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ShareFatIcon from '@phosphor/share-fat.svg';
@@ -783,7 +783,7 @@ export function ExternalChatView(props: {
                                 : composerNote(
                                     group(),
                                     getDisplayName(
-                                      tryMacroId(group().ownerId)
+                                      tryRoxId(group().ownerId)
                                     ) || undefined
                                   )}
                             </span>

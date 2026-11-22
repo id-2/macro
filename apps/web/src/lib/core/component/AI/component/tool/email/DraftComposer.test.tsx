@@ -52,7 +52,7 @@ vi.mock('@queries/email/link', () => ({
   useEmailSignature: (id: Accessor<string | undefined>) => () =>
     id() ? `Signature for ${id()}` : undefined,
 }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|self' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|self' }));
 vi.mock('@app/lib/analytics/posthog', () => ({
   useFeatureFlag: () => () => ({ enabled: true }),
 }));

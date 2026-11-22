@@ -1,6 +1,6 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { t } from '@app/lib/i18n';
-import { enableMacroComputers } from '@core/constant/featureFlags';
+import { enableRoxComputers } from '@core/constant/featureFlags';
 import {
   useComputerOffersQuery,
   useComputersQuery,
@@ -15,7 +15,7 @@ export function ConnectedTeamBillingBreakdown(props: {
   teamId?: string;
   billing: SubscriptionBilling;
 }) {
-  const flag = useFeatureFlag(enableMacroComputers);
+  const flag = useFeatureFlag(enableRoxComputers);
   const enabled = () => !flag().loading && flag().enabled && !!props.teamId;
   const computers = useComputersQuery(enabled);
   const offers = useComputerOffersQuery(enabled);

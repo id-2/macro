@@ -23,7 +23,7 @@ vi.mock(
 );
 vi.mock(
   '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin',
-  () => ({ parseMacroAppUrl: () => ({ isValid: false }) })
+  () => ({ parseRoxAppUrl: () => ({ isValid: false }) })
 );
 vi.mock('./spreadsheet-cell-links', () => ({
   SpreadsheetCellLinks: (props: { value: string }) => props.value,

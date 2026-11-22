@@ -128,7 +128,7 @@ function typing(phase: 'thinking' | 'writing' | 'working' | 'waiting') {
       thread_id: null,
       agent: { session_id: 'session', phase },
     },
-    'rox|me@example.com'
+    'macro|me@example.com'
   );
 }
 
@@ -187,8 +187,8 @@ afterEach(() => {
 
 it('shows an agent typing with what it is doing, and nothing for people', () => {
   handleCommsTyping(
-    { action: 'start', parent, user_id: 'rox|you@example.com' },
-    'rox|me@example.com'
+    { action: 'start', parent, user_id: 'macro|you@example.com' },
+    'macro|me@example.com'
   );
   const view = show(() => <AgentTyping parent={parent} threadId={null} />);
   expect(view.queryByRole('status')).toBeNull();

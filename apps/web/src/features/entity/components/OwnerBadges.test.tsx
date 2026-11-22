@@ -2,7 +2,7 @@ import { cleanup, render } from '@solidjs/testing-library';
 import type { JSX } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const PETER = 'rox|peter@example.com';
+const PETER = 'macro|peter@example.com';
 const DEPLOY_BOT = '5f0c8a4e-2d1b-4c3a-9e7f-6a5b4c3d2e1f';
 const ENGINEERING = '01234567-89ab-cdef-0123-456789abcdef';
 
@@ -10,12 +10,12 @@ vi.mock('@core/component/UserIcon', () => ({
   UserIcon: () => <span>avatar</span>,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|me@example.com',
+  useUserId: () => () => 'macro|me@example.com',
 }));
 vi.mock('@core/user', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@core/user')>()),
   getDisplayName: (id: string | undefined) =>
-    id === 'rox|peter@example.com' ? 'Peter Park' : '',
+    id === 'macro|peter@example.com' ? 'Peter Park' : '',
 }));
 vi.mock('@queries/bots/profiles', () => ({
   useBotProfile: () => ({

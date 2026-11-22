@@ -1,5 +1,5 @@
 import { SystemActivityLine } from '@channel/components/SystemActivityRow';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import ImageIcon from '@phosphor/image.svg';
 import PencilIcon from '@phosphor/pencil-simple.svg';
 import PushPinIcon from '@phosphor/push-pin.svg';
@@ -27,7 +27,7 @@ const ICONS = {
 
 /** Rox users go by their Rox name, as their messages do. */
 function named(person: Person): Person {
-  const id = person.userId ? tryMacroId(person.userId) : undefined;
+  const id = person.userId ? tryRoxId(person.userId) : undefined;
   return id ? { ...person, name: getDisplayName(id) } : person;
 }
 

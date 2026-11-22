@@ -123,7 +123,7 @@ describe('email sign-in', () => {
     const { fake } = setup({
       world: {
         user: {
-          id: 'rox|member@acme.com',
+          id: 'macro|member@acme.com',
           email: 'member@acme.com',
           tutorialComplete: false,
           isAgent: false,
@@ -141,7 +141,7 @@ describe('email sign-in', () => {
 
     fake.update((draft) => {
       draft.user = {
-        id: 'rox|another@acme.com',
+        id: 'macro|another@acme.com',
         email: 'another@acme.com',
         tutorialComplete: false,
         isAgent: false,
@@ -170,7 +170,7 @@ describe('email sign-in', () => {
         'sendCode:returning@acme.com',
         'verify:returning@acme.com:424242',
         'completeLogin',
-        'identify:rox|returning@acme.com',
+        'identify:macro|returning@acme.com',
       ])
     );
     expect(fake.events()).toContainEqual({

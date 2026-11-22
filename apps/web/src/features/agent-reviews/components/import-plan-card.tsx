@@ -196,7 +196,7 @@ type ImportPlanCardProps = {
   totals: ImportTotal[];
   /** What planning is doing, while the plan is still being made. */
   planningStatus: string;
-  alreadyInMacroSummary: string;
+  alreadyInRoxSummary: string;
   /** Objects a teammate already imported, left out of the plan tree. */
   alreadyInMacro: (ImportPlanEntry & { alreadyImported: ImportedCopy })[];
   /** Where a teammate's copy opens; `undefined` when it cannot be linked. */
@@ -392,7 +392,7 @@ function PlanContents(
       </Show>
       <Show when={props.alreadyInMacro.length > 0}>
         <AlreadyInMacro
-          summary={props.alreadyInMacroSummary}
+          summary={props.alreadyInRoxSummary}
           entries={props.alreadyInMacro}
           entityHref={props.entityHref}
           onOpenEntity={props.onOpenEntity}

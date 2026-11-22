@@ -12,7 +12,7 @@ vi.mock('@core/component/UserIcon', () => ({
 vi.mock('@core/user', () => ({
   getDisplayName: (id: string) => id,
   idToEmail: (id: string) => id,
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 vi.mock('@ui', async () => ({
   ...(await import('@ui/components/Badge')),

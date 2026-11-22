@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { selectOpenPullRequests } from './open-pull-requests';
 import { conversationMode } from './recent-conversations';
 
-const ownerId = 'rox|me@example.com';
+const ownerId = 'macro|me@example.com';
 
 describe('selectOpenPullRequests', () => {
   it('keeps only the owner’s active coding sessions with open or draft PRs, newest first', () => {
@@ -47,7 +47,7 @@ describe('selectOpenPullRequests', () => {
     const otherOwner: AgentSessionEntity = {
       ...session,
       id: 'other-owner',
-      ownerId: 'rox|other@example.com',
+      ownerId: 'macro|other@example.com',
     };
     const chat: ChatEntity = {
       type: 'chat',

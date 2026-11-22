@@ -47,7 +47,7 @@ describe('createCalendarEventToEditorInitialValues', () => {
 
   it('maps the requested conferencing onto the editor choice', () => {
     expect(
-      createCalendarEventToEditorInitialValues(event({ addMacroCall: true }))
+      createCalendarEventToEditorInitialValues(event({ addRoxCall: true }))
         .conference
     ).toBe('rox');
     expect(
@@ -153,7 +153,7 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
       event({ addConference: true }),
       true
     );
-    expect(rox.addMacroCall).toBe(true);
+    expect(rox.addRoxCall).toBe(true);
     expect(rox.addConference).toBe(false);
 
     const meet = editorSubmitValuesToCreateCalendarEvent(
@@ -161,10 +161,10 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
         conferenceChoice: 'google_meet',
         conference: 'google_meet',
       }),
-      event({ addMacroCall: true }),
+      event({ addRoxCall: true }),
       true
     );
-    expect(meet.addMacroCall).toBe(false);
+    expect(meet.addRoxCall).toBe(false);
     expect(meet.addConference).toBe(true);
 
     const teams = editorSubmitValuesToCreateCalendarEvent(
@@ -172,19 +172,19 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
         conferenceChoice: 'microsoft_teams',
         conference: 'microsoft_teams',
       }),
-      event({ addMacroCall: true }),
+      event({ addRoxCall: true }),
       true
     );
-    expect(teams.addMacroCall).toBe(false);
+    expect(teams.addRoxCall).toBe(false);
     expect(teams.addConference).toBe(true);
     expect(teams).not.toHaveProperty('addGoogleMeet');
 
     const none = editorSubmitValuesToCreateCalendarEvent(
       submitValues({ conferenceChoice: 'none' }),
-      event({ addMacroCall: true }),
+      event({ addRoxCall: true }),
       true
     );
-    expect(none.addMacroCall).toBe(false);
+    expect(none.addRoxCall).toBe(false);
     expect(none.addConference).toBe(false);
   });
 
@@ -194,10 +194,10 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
         conferenceChoice: 'rox',
         outOfOffice: { autoDeclineMode: 'decline_none' },
       }),
-      event({ addMacroCall: true }),
+      event({ addRoxCall: true }),
       true
     );
-    expect(merged.addMacroCall).toBe(false);
+    expect(merged.addRoxCall).toBe(false);
     expect(merged.addConference).toBe(false);
   });
 });

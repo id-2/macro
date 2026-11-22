@@ -9,7 +9,7 @@ import {
 } from '@core/constant/featureFlags';
 import { useEmail, useUserId } from '@core/context/user';
 import { getDisplayName } from '@core/user/displayName';
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import { getDefaultTimezone } from '@core/util/cron';
 import { writeClipboardData } from '@core/util/dataTransfer';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -99,7 +99,7 @@ function useActivator(): Accessor<Activator | undefined> {
     return {
       userId: id,
       email: address,
-      displayName: getDisplayName(tryMacroId(id)) || undefined,
+      displayName: getDisplayName(tryRoxId(id)) || undefined,
       timezone: getDefaultTimezone(),
     };
   };
@@ -169,7 +169,7 @@ function ActivateTemplate(
       onOpenChange={props.onOpenChange}
       name={props.template.name}
       authorName={
-        getDisplayName(tryMacroId(props.template.author)) || 'its author'
+        getDisplayName(tryRoxId(props.template.author)) || 'its author'
       }
       triggers={triggerLines(props.template.trigger)}
       instructions={
@@ -292,7 +292,7 @@ function EnabledRoutineTemplatePage(props: {
             <RoutineTemplateView
               template={current()}
               authorName={
-                getDisplayName(tryMacroId(current().author)) || 'Someone'
+                getDisplayName(tryRoxId(current().author)) || 'Someone'
               }
               canActivate={current().author !== userId()}
               triggers={triggerLines(current().trigger)}
@@ -458,7 +458,7 @@ export function RoutineTemplateCard(props: { routineId: string }) {
           name={template().name}
           description={template().description}
           authorName={
-            getDisplayName(tryMacroId(template().author)) || 'Someone'
+            getDisplayName(tryRoxId(template().author)) || 'Someone'
           }
           triggers={triggerLines(template().trigger)}
           activeCount={template().active_count}

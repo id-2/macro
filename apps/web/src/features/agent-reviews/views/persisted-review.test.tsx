@@ -24,7 +24,7 @@ vi.mock('../queries/reviews', () => ({
   useReviewActions: () => ({ reload: vi.fn(), decide: reviews.decide }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|owner@rox.local',
+  useUserId: () => () => 'macro|owner@rox.local',
 }));
 function Card(props: { review: Review; actions: ReviewActions }) {
   return (
@@ -71,7 +71,7 @@ vi.mock('./review-stack', () => ({
 const importReview: Review = {
   id: 'review',
   sessionId: 'session',
-  actingUser: 'rox|owner@rox.local',
+  actingUser: 'macro|owner@rox.local',
   executionId: null,
   kind: 'import',
   title: 'Review',
@@ -92,7 +92,7 @@ const importReview: Review = {
 const emailReview: Review = {
   id: 'review',
   sessionId: 'session',
-  actingUser: 'rox|owner@rox.local',
+  actingUser: 'macro|owner@rox.local',
   executionId: null,
   kind: 'email',
   title: 'Review',

@@ -75,7 +75,7 @@ vi.mock('@core/signal/profilePicture', () => ({
 
 vi.mock('@core/user', () => ({
   isAgentAccount: () => true,
-  tryMacroId: (identity: string) => identity,
+  tryRoxId: (identity: string) => identity,
   getDisplayName: (identity: string) =>
     mocks.displayNames.get(identity) ?? identity,
 }));
@@ -836,7 +836,7 @@ it.each(['speaker', 'sidebar'] as const)(
 );
 
 describe('CallOverlay Work', () => {
-  const account = 'rox|agent@example.com';
+  const account = 'macro|agent@example.com';
   const row: WorkItem = {
     registrationId: 'registration-1',
     accountId: account,

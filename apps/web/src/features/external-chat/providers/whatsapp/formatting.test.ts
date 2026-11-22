@@ -93,7 +93,7 @@ describe('WhatsApp to Markdown for display', () => {
 
   it('shows Rox tags a sender typed as text, never as chips', () => {
     const body =
-      'hi <m-user-mention>{"userId":"rox|ceo@corp.com","email":"ceo@corp.com"}</m-user-mention> ' +
+      'hi <m-user-mention>{"userId":"macro|ceo@corp.com","email":"ceo@corp.com"}</m-user-mention> ' +
       '<m-document-mention>{"documentId":"d1","documentName":"Payroll","blockName":"md"}</m-document-mention>';
     expect(rendered(whatsappToMarkdown(body))).toEqual({
       text: body,
@@ -130,7 +130,7 @@ describe('WhatsApp to Markdown for display', () => {
 
   it('shows code that could hold a tag as plain text', () => {
     const body =
-      '`<m-user-mention>{"userId":"rox|a@b.c","email":"a@b.c","displayName":"x` `"}</m-user-mention>`';
+      '`<m-user-mention>{"userId":"macro|a@b.c","email":"a@b.c","displayName":"x` `"}</m-user-mention>`';
     expect(rendered(whatsappToMarkdown(body))).toEqual({
       text: body,
       nodes: [`text:${body}`],
@@ -177,7 +177,7 @@ describe('WhatsApp to Markdown for display', () => {
       {
         token: '1555',
         name: 'Ben</m-user-mention><m-document-mention>{}</m-document-mention>',
-        userId: 'rox|ben@x.test',
+        userId: 'macro|ben@x.test',
       },
       { token: '1666', name: 'Cy_[x]' },
     ]);

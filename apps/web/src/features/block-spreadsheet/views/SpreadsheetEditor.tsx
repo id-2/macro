@@ -1046,7 +1046,7 @@ export function SpreadsheetEditor(props: {
       <input
         ref={importInput}
         type="file"
-        accept=".csv,.xlsx,.xlsm,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.roxEnabled.12"
+        accept=".csv,.xlsx,.xlsm,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12"
         class="hidden"
         aria-label="Import spreadsheet file"
         onChange={(event) => {

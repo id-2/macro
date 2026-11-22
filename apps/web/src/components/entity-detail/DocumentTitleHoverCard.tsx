@@ -1,7 +1,7 @@
 import { QUERY_FILTERS_BASE } from '@app/features/next-soup/filters/query-filters';
 import { UserIcon } from '@core/component/UserIcon';
 import { useQuickAccess } from '@core/context/quickAccess';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { type DateValue, formatDate } from '@core/util/date';
 import { useSoupItemsQuery } from '@queries/soup/items';
 import { HoverCard } from '@ui';
@@ -63,7 +63,7 @@ function DocumentTitleDetails(props: DocumentTitleProps) {
         </Show>
         <div class="min-w-0 truncate text-xs">
           <Show when={ownerId()} fallback="Not available">
-            {(owner) => getDisplayName(tryMacroId(owner())) || owner()}
+            {(owner) => getDisplayName(tryRoxId(owner())) || owner()}
           </Show>
         </div>
       </div>

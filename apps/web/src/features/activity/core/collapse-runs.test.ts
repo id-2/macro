@@ -19,7 +19,7 @@ function event(
   clock += 1;
   return {
     id,
-    actorId: 'rox|sarah@example.com',
+    actorId: 'macro|sarah@example.com',
     entityId: 'doc-1',
     entityType: 'document',
     occurredAt: new Date(
@@ -69,11 +69,11 @@ describe('collapseRuns', () => {
   it('breaks a run on a different actor, entity, or action kind', () => {
     const entries = collapseRuns([
       event('a'),
-      event('b', { actorId: 'rox|joe@example.com' }),
-      event('c', { actorId: 'rox|joe@example.com' }),
-      event('d', { actorId: 'rox|joe@example.com', entityId: 'doc-2' }),
+      event('b', { actorId: 'macro|joe@example.com' }),
+      event('c', { actorId: 'macro|joe@example.com' }),
+      event('d', { actorId: 'macro|joe@example.com', entityId: 'doc-2' }),
       event('e', {
-        actorId: 'rox|joe@example.com',
+        actorId: 'macro|joe@example.com',
         entityId: 'doc-2',
         action: { kind: 'opened' },
       }),

@@ -11,7 +11,7 @@ import {
   legacyContentRoute,
   notFoundRoute,
 } from '@app/routes/routes';
-import { createMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { createRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import type { EmailEntity } from '@entity';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeCopyLinkAction } from './make-copy-link-action';
@@ -46,14 +46,14 @@ const routes = createRoutesManifest({
   ],
   defaultRoute: () => paneRoute({ id: emailSplitRoute.id, params: {} }),
 } satisfies SplitRoutes);
-const resolveMention = createMacroMentionLinkResolver(routes);
+const resolveMention = createRoxMentionLinkResolver(routes);
 
 const threadId = '019a1f40-2c7e-7d10-9a4b-6f2b0c1d2e3f';
 const thread: EmailEntity = {
   type: 'email',
   id: threadId,
   name: 'hello from my outlook to your outlook',
-  ownerId: 'rox|teo@rox.one',
+  ownerId: 'macro|teo@rox.one',
   isRead: true,
   isDraft: false,
   isImportant: true,

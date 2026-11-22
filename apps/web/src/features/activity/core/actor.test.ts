@@ -3,9 +3,9 @@ import { parseActor } from './actor';
 
 describe('parseActor', () => {
   it('parses users from rox ids', () => {
-    expect(parseActor('rox|sarah@example.com')).toEqual({
+    expect(parseActor('macro|sarah@example.com')).toEqual({
       kind: 'user',
-      id: 'rox|sarah@example.com',
+      id: 'macro|sarah@example.com',
     });
   });
 
@@ -22,9 +22,9 @@ describe('parseActor', () => {
       raw: 'system:nightly',
     });
     expect(parseActor('bot|')).toEqual({ kind: 'unknown', raw: 'bot|' });
-    expect(parseActor('rox|no-at-sign')).toEqual({
+    expect(parseActor('macro|no-at-sign')).toEqual({
       kind: 'unknown',
-      raw: 'rox|no-at-sign',
+      raw: 'macro|no-at-sign',
     });
   });
 });

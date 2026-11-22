@@ -27,7 +27,7 @@ vi.mock('../computers/views/BillingComputers', () => ({
   BillingComputers: () => <p>Existing computers view</p>,
 }));
 
-const [roxFlag, setMacroFlag] = createSignal({
+const [roxFlag, setRoxFlag] = createSignal({
   enabled: false,
   loading: true,
 });
@@ -50,7 +50,7 @@ const billing: SubscriptionBilling = {
   ],
 };
 beforeEach(() => {
-  setMacroFlag({ enabled: false, loading: true });
+  setRoxFlag({ enabled: false, loading: true });
   mocks.offersRequest.mockClear();
 });
 afterEach(cleanup);
@@ -64,13 +64,13 @@ it('waits for the rollout before choosing the existing view or the breakdown', (
   expect(mocks.inventoryEnabled()).toBe(false);
   expect(mocks.offersRequest).not.toHaveBeenCalled();
 
-  setMacroFlag({ enabled: false, loading: false });
+  setRoxFlag({ enabled: false, loading: false });
   expect(screen.getByText('Existing computers view')).toBeTruthy();
   expect(screen.queryByText('Build box · Standard')).toBeNull();
   expect(mocks.inventoryEnabled()).toBe(false);
   expect(mocks.offersRequest).not.toHaveBeenCalled();
 
-  setMacroFlag({ enabled: true, loading: false });
+  setRoxFlag({ enabled: true, loading: false });
   expect(screen.queryByText('Existing computers view')).toBeNull();
   expect(screen.getByText('Human seats')).toBeTruthy();
   expect(screen.getByText('Build box · Standard')).toBeTruthy();

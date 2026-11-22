@@ -111,7 +111,7 @@ it('starts only for authenticated identities, drains on logout, and replaces acc
 
 it('ends activation spans and connects even when identity hashing fails', async () => {
   telemetry.hash.mockRejectedValue(new Error('unavailable'));
-  setUserId('rox|private@example.test');
+  setUserId('macro|private@example.test');
   setAuthenticated(true);
   createRoot((cleanup) => {
     dispose = cleanup;

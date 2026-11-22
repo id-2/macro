@@ -32,7 +32,7 @@ const BLOCK_NAMES: ReadonlySet<string> = new Set([
  * with the same shape that are not entities, such as `/app/booking/<id>`,
  * open as ordinary links.
  */
-export function parseMacroAppLink(
+export function parseRoxAppLink(
   href: string
 ): { blockName: string; documentId: string } | undefined {
   let url: URL;
@@ -61,7 +61,7 @@ export function calendarDescriptionToEditorHtml(raw: string): string {
   if (!safe) return '';
   const doc = parseHtml(safe);
   for (const anchor of doc.body.querySelectorAll('a[href]')) {
-    const target = parseMacroAppLink(anchor.getAttribute('href') ?? '');
+    const target = parseRoxAppLink(anchor.getAttribute('href') ?? '');
     if (!target) continue;
     anchor.setAttribute('data-document-mention', 'true');
     anchor.setAttribute('data-document-id', target.documentId);

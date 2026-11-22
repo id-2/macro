@@ -31,9 +31,9 @@ export function getSenderDisplayName(
 /**
  * Convert the message sender email to a rox id for user tooling.
  */
-export function getSenderMacroId(message: EmailMessage): string | undefined {
+export function getSenderRoxId(message: EmailMessage): string | undefined {
   const senderEmail = message.from?.email;
-  return senderEmail?.includes('@') ? `rox|${senderEmail}` : undefined;
+  return senderEmail?.includes('@') ? `macro|${senderEmail}` : undefined;
 }
 
 interface Recipient {

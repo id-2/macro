@@ -1,5 +1,5 @@
 import { LoadingBlock } from '@core/component/LoadingBlock';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { RoxMark } from '@core/component/RoxMark';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
@@ -258,7 +258,7 @@ function InviteDetails(props: {
   };
   const isDisabled = () => props.isJoining || props.isDeclining;
 
-  const invitedBy = () => getDisplayName(tryMacroId(props.invitedBy));
+  const invitedBy = () => getDisplayName(tryRoxId(props.invitedBy));
 
   return (
     <div class="flex flex-col items-center gap-6 text-center w-full">

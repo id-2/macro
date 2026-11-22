@@ -36,11 +36,11 @@ export function commentNotification(
     createdAt: notification.createdAt,
     viewedAt: null,
     updatedAt: notification.createdAt,
-    senderId: 'rox|colleague@example.com',
+    senderId: 'macro|colleague@example.com',
     metadata: {
       __typename: 'GraphqlCommentedOnDocumentMetadata',
       commentedOnDocumentDocumentName: 'Plan',
-      commentedOnDocumentOwner: 'rox|viewer@example.com',
+      commentedOnDocumentOwner: 'macro|viewer@example.com',
       commentedOnDocumentFileType: 'md',
       commentedOnDocumentSubType: null,
       commentedOnDocumentCommentId: notification.id,
@@ -72,7 +72,7 @@ export function documentEntry(
         entityType: 'DOCUMENT',
         displayName: 'Plan',
         documentName: 'Plan',
-        ownerId: 'rox|viewer@example.com',
+        ownerId: 'macro|viewer@example.com',
         fileType: 'md',
         projectId: null,
         createdAt: '2026-01-01T00:00:00Z',
@@ -131,7 +131,7 @@ export function workFeedPage(
 ) {
   return {
     user: {
-      id: 'rox|viewer@example.com',
+      id: 'macro|viewer@example.com',
       workFeed: { entries, nextCursor, nextPosition },
     },
   };

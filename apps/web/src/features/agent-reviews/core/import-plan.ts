@@ -342,7 +342,7 @@ export function sharingSummary(
 }
 
 /** e.g. "4 already in Rox (imported by ana@acme.com, bo@acme.com)". */
-export function alreadyInMacroSummary(entries: ImportPlanEntry[]): string {
+export function alreadyInRoxSummary(entries: ImportPlanEntry[]): string {
   const copies = alreadyInMacro(entries);
   if (copies.length === 0) return '';
   const by = [...new Set(copies.map((entry) => entry.alreadyImported.by))];

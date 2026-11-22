@@ -8,7 +8,7 @@ import { contactRecordKey } from '@queries/contacts/contact-key';
 import type { ContactReferencePageQueryVariables } from '@service-storage/graphql/generated/graphql';
 import { createSignal } from 'solid-js';
 
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 let people: readonly IUser[] = [];
 export const [referencePages, setReferencePages] = createSignal(0);
 let lookupGate: PromiseWithResolvers<void> | undefined;

@@ -24,9 +24,9 @@ afterEach(() => {
 it('preserves explicit selections and names for newly selected off-window people', () => {
   const original: SelectedEventEditorGuest = {
     kind: 'custom',
-    id: 'rox|EXISTING@example.com',
+    id: 'macro|EXISTING@example.com',
     data: {
-      id: 'rox|EXISTING@example.com',
+      id: 'macro|EXISTING@example.com',
       email: 'EXISTING@example.com',
       invalid: false,
     },
@@ -44,18 +44,18 @@ it('preserves explicit selections and names for newly selected off-window people
   ));
   expect(picker?.config.users).toBeUndefined();
   expect(picker?.selectedOptions()).toEqual(
-    new Set(['rox|existing@example.com'])
+    new Set(['macro|existing@example.com'])
   );
   picker?.onUserSelected?.(
     {
-      id: 'rox|late@example.com',
+      id: 'macro|late@example.com',
       email: 'late@example.com',
       name: 'Resolved private name',
     },
     false
   );
   picker?.setSelectedOptions(
-    new Set(['rox|existing@example.com', 'rox|late@example.com'])
+    new Set(['macro|existing@example.com', 'macro|late@example.com'])
   );
   expect(selected()[0]).toBe(original);
   expect(selected()[1]).toMatchObject({
@@ -64,14 +64,14 @@ it('preserves explicit selections and names for newly selected off-window people
   });
   picker?.onUserSelected?.(
     {
-      id: 'rox|Custom$@example.com',
+      id: 'macro|Custom$@example.com',
       email: 'Custom$@example.com',
       name: 'Custom$@example.com',
     },
     true
   );
   picker?.setSelectedOptions(
-    new Set([...picker.selectedOptions(), 'rox|Custom$@example.com'])
+    new Set([...picker.selectedOptions(), 'macro|Custom$@example.com'])
   );
   expect(selected()[0]).toBe(original);
   expect(selected()[1].data).toMatchObject({ name: 'Resolved private name' });
@@ -95,11 +95,11 @@ it('uses canonical eligibility keys without changing the event-owned guest data'
     />
   ));
   expect(picker?.config.excludedIds?.()).toEqual(
-    new Set(['rox|current@example.com'])
+    new Set(['macro|current@example.com'])
   );
   expect(picker?.config.additionalUsers?.()).toEqual([
     {
-      id: 'rox|current@example.com',
+      id: 'macro|current@example.com',
       email: 'CURRENT@example.com',
       name: 'Event name',
     },

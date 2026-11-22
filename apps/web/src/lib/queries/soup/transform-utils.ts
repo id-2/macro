@@ -7,7 +7,7 @@ import { emailToId } from '@core/user';
 import {
   extractSearchSnippet,
   extractSearchTerms,
-  mergeAdjacentMacroEmTags,
+  mergeAdjacentRoxEmTags,
 } from '@core/util/searchHighlight';
 import type {
   AgentSessionEntity,
@@ -133,7 +133,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
         return contents.map((content) => ({
           type: 'channel' as const,
           id: r.message_id!,
-          content: mergeAdjacentMacroEmTags(content),
+          content: mergeAdjacentRoxEmTags(content),
           senderId: r.sender_id!,
           sentAt: r.created_at!,
           location: {
@@ -149,10 +149,10 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
       contentHitData = data.results.flatMap((r) => {
         const contents = r.highlight.content ?? [];
         return contents.map((content) => {
-          const mergedContent = mergeAdjacentMacroEmTags(content);
+          const mergedContent = mergeAdjacentRoxEmTags(content);
           return {
             type: 'pdf' as const,
-            content: mergeAdjacentMacroEmTags(content),
+            content: mergeAdjacentRoxEmTags(content),
             location: {
               type: 'pdf' as const,
               searchPage: Number(r.node_id),
@@ -173,7 +173,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
         const contents = r.highlight.content ?? [];
         return contents.map((content) => ({
           type: 'md' as const,
-          content: mergeAdjacentMacroEmTags(content),
+          content: mergeAdjacentRoxEmTags(content),
           location: { type: 'md' as const, nodeId: r.node_id! },
         }));
       });
@@ -184,7 +184,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
         const contents = r.highlight.content ?? [];
         return contents.map((content) => ({
           type: 'email' as const,
-          content: mergeAdjacentMacroEmTags(content),
+          content: mergeAdjacentRoxEmTags(content),
           sender: r.pretty_sender!,
           senderId: emailToId(r.sender),
           sentAt: r.sent_at!,
@@ -211,7 +211,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
         return contents.map((content) => ({
           type: 'call_record' as const,
           id: r.transcript_id!,
-          content: mergeAdjacentMacroEmTags(content),
+          content: mergeAdjacentRoxEmTags(content),
           senderId: r.speaker_id!,
           sentAt: r.started_at!,
           videoSeconds,
@@ -228,7 +228,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
       contentHitData = data.results.flatMap((r) => {
         const contents = r.highlight.content ?? [];
         return contents.map((content) => ({
-          content: mergeAdjacentMacroEmTags(content),
+          content: mergeAdjacentRoxEmTags(content),
           location: undefined,
         }));
       });
@@ -262,7 +262,7 @@ const getSearchData = (data: TypedInnerSearchResult): SearchData => {
 
   return {
     nameHighlight: nameHighlight
-      ? mergeAdjacentMacroEmTags(nameHighlight)
+      ? mergeAdjacentRoxEmTags(nameHighlight)
       : null,
     senderHighlightTerms,
     contentHitData: contentHitData.length > 0 ? contentHitData : null,
@@ -349,7 +349,7 @@ export const createSearchResponseItemMapper = (
       case 'company': {
         const primaryDomain = result.domains[0]?.domain;
         const nameHighlight = result.nameHighlighted
-          ? mergeAdjacentMacroEmTags(result.nameHighlighted)
+          ? mergeAdjacentRoxEmTags(result.nameHighlighted)
           : null;
         return [
           {
@@ -502,7 +502,7 @@ export const createSearchResponseItemMapper = (
       case 'channel': {
         if (!result.metadata) return [];
         const nameHighlight = result.highlight.name
-          ? mergeAdjacentMacroEmTags(result.highlight.name)
+          ? mergeAdjacentRoxEmTags(result.highlight.name)
           : null;
         const search: SearchData = {
           nameHighlight,

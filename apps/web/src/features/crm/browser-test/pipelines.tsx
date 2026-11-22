@@ -168,7 +168,7 @@ function Fixture() {
         tableId: crypto.randomUUID(),
         primaryColumnId: 'primary',
         teamId: 'team',
-        userId: 'rox|owner@example.com',
+        userId: 'macro|owner@example.com',
         grant: 'owner',
         createdAt: new Date().toISOString(),
         trashedAt: null,

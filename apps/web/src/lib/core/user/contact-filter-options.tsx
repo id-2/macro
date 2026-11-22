@@ -4,7 +4,7 @@ import { t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
 import type { ContactIdFilterSource } from '@queries/contacts/filter-source';
 import { type Accessor, createMemo } from 'solid-js';
-import { roxIdToEmail, tryMacroId } from './roxId';
+import { roxIdToEmail, tryRoxId } from './roxId';
 import type { IUser } from './types';
 
 /** Shared presentation for suggestion rows and independently resolved chips. */
@@ -13,7 +13,7 @@ export function contactFilterRow(
   user: IUser | undefined,
   viewer: string | undefined
 ) {
-  const roxId = tryMacroId(id.toLowerCase());
+  const roxId = tryRoxId(id.toLowerCase());
   const email = user?.email ?? (roxId ? roxIdToEmail(roxId) : id);
   const name = user?.name || email.split('@')[0] || email;
   const label =

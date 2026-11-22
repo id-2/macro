@@ -10,7 +10,7 @@ import {
   getInitials,
   getInitialsFromName,
   roxIdToEmail,
-  tryMacroId,
+  tryRoxId,
   useIsConnectedSecondaryInbox,
 } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -47,12 +47,12 @@ function ProfileImage(props: {
   photoUrl?: string;
 }) {
   const roxId = createMemo(() =>
-    props.id ? tryMacroId(props.id) : undefined
+    props.id ? tryRoxId(props.id) : undefined
   );
 
   const email = createMemo(() => {
     if (props.id) {
-      const id = tryMacroId(props.id);
+      const id = tryRoxId(props.id);
       return id ? roxIdToEmail(id) : props.email || 'User';
     }
     return props.email || 'User';
@@ -146,7 +146,7 @@ export function UserIcon(props: UserIconProps) {
   const size = () => props.size ?? 'md';
 
   const roxId = createMemo(() =>
-    props.id ? tryMacroId(props.id) : undefined
+    props.id ? tryRoxId(props.id) : undefined
   );
 
   const displayName = () => props.name ?? getDisplayName(roxId());

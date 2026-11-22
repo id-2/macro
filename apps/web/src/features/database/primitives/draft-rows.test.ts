@@ -244,12 +244,12 @@ describe('editable blank row', () => {
     );
     const id = drafts.blankId();
     expect(
-      await drafts.write(id, 'owner', 'rox|ada@example.com', undefined, {
+      await drafts.write(id, 'owner', 'macro|ada@example.com', undefined, {
         dataType: 'ENTITY',
         entityType: 'USER',
       })
     ).toBe(false);
-    expect(drafts.project([])[0].cells.owner).toBe('rox|ada@example.com');
+    expect(drafts.project([])[0].cells.owner).toBe('macro|ada@example.com');
 
     expect(await drafts.write(id, 'owner', 'A plain text value')).toBe(true);
     expect(persisted).toEqual([
@@ -274,7 +274,7 @@ describe('editable blank row', () => {
     const first = drafts.write(
       id,
       'owner',
-      'rox|ada@example.com',
+      'macro|ada@example.com',
       undefined,
       { dataType: 'ENTITY', entityType: 'USER' }
     );

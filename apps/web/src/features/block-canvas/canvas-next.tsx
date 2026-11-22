@@ -1,7 +1,7 @@
 import { useSplitLayout } from '@components/app/split-layout/layout';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { StaticMarkdownContext } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
-import { resolvePastedMacroAppUrl } from '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin';
+import { resolvePastedRoxAppUrl } from '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin';
 import {
   fileTypeToBlockName,
   resolveBlockAlias,
@@ -150,7 +150,7 @@ function EditableCanvasNext(props: {
   const assets = createAssetState(state, canvasAssetSource);
   const insert = createCanvasInsertState(editor.getCamera);
   const { openWithSplit } = useSplitLayout();
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
   let viewport: HTMLElement | undefined;
   const center = () =>
     screenToWorld(editor.getCamera(), {
@@ -161,7 +161,7 @@ function EditableCanvasNext(props: {
     editor,
     state.setNotice,
     (text, html) => {
-      const link = resolvePastedMacroAppUrl(text, resolveAppLink);
+      const link = resolvePastedRoxAppUrl(text, resolveAppLink);
       if (link?.id && link.block) {
         assets.document(
           { id: link.id, name: 'Document', fileType: link.block },

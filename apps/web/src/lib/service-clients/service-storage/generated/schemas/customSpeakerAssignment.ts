@@ -10,7 +10,7 @@
 
 `custom_speaker = None` clears any existing override for this
 `diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is
-expected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);
+expected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);
 the service layer rejects malformed values with `400 Bad Request`.
  */
 export interface CustomSpeakerAssignment {

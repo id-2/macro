@@ -1,4 +1,4 @@
-import { roxIdToEmail, tryMacroId } from '@core/user/roxId';
+import { roxIdToEmail, tryRoxId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { useCurrentTeamQuery } from '@queries/team/teams';
 import * as EmailValidator from 'email-validator';
@@ -21,13 +21,13 @@ export function useMeetingTeammatesSource(
 
   return {
     people: createMemo(() => {
-      const viewerId = tryMacroId(userId() ?? '');
+      const viewerId = tryRoxId(userId() ?? '');
       if (!viewerId || !belongsToViewer()) return [];
       const viewerEmailKey = roxIdToEmail(viewerId).toLowerCase();
       const seen = new Set<string>();
       return (team()?.members ?? []).flatMap(
         (member): MeetingInvitePerson[] => {
-          const id = tryMacroId(member.user_id);
+          const id = tryRoxId(member.user_id);
           if (!id || id === userId()) return [];
           const email = roxIdToEmail(id);
           const emailKey = email.toLowerCase();

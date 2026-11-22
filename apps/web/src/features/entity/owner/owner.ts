@@ -1,4 +1,4 @@
-import { type RoxId, tryMacroId } from '@core/user/roxId';
+import { type RoxId, tryRoxId } from '@core/user/roxId';
 import { isHexHyphenatedId } from '@queries/bots/bot-id';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 
@@ -12,7 +12,7 @@ const BOT_PREFIX = 'bot|';
 
 export function parseOwner(principal: string | undefined): Owner | undefined {
   if (!principal) return undefined;
-  const user = tryMacroId(principal);
+  const user = tryRoxId(principal);
   if (user) return { kind: 'user', id: user };
   if (principal.startsWith(BOT_PREFIX)) {
     const botId = principal.slice(BOT_PREFIX.length);

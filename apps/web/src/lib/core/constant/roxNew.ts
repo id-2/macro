@@ -17,7 +17,7 @@ export const ROX_NEW_PRINCIPAL_ID = `bot|${ROX_NEW_BOT_ID}`;
  * Whether an id refers to the agent-session Rox bot. Accepts both the bare
  * UUID and the `bot|<uuid>` participant/sender form.
  */
-export function isMacroNewId(id: string | undefined): boolean {
+export function isRoxNewId(id: string | undefined): boolean {
   if (!id) return false;
   const bare = id.startsWith('bot|') ? id.slice('bot|'.length) : id;
   return bare === ROX_NEW_BOT_ID;

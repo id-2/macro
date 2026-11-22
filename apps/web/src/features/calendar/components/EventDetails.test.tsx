@@ -16,14 +16,14 @@ vi.mock('@core/mobile/isMobile', () => ({ isMobile: () => false }));
 // back to itself, as the real lookup does.
 vi.mock('@core/user', async (importOriginal) => {
   const names: Record<string, string> = {
-    'rox|bea@outside.example': 'Bea Booker',
-    'rox|me@example.com': 'Mo Viewer',
-    'rox|host@example.com': 'Hana Host',
+    'macro|bea@outside.example': 'Bea Booker',
+    'macro|me@example.com': 'Mo Viewer',
+    'macro|host@example.com': 'Hana Host',
   };
   return {
     ...(await importOriginal<typeof import('@core/user')>()),
     getDisplayName: (id?: string) =>
-      id ? (names[id] ?? id.replace(/^rox\|/, '')) : '',
+      id ? (names[id] ?? id.replace(/^macro\|/, '')) : '',
   };
 });
 

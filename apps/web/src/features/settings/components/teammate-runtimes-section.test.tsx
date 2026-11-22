@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from '@solidjs/testing-library';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TeammateRuntimesSection } from './teammate-runtimes-section';
 
-const VIEWER = 'rox|maya@example.com';
+const VIEWER = 'macro|maya@example.com';
 
 const mocks = vi.hoisted(() => ({
   directory: [] as RegisteredHarness[],
@@ -30,7 +30,7 @@ vi.mock('@queries/harnesses/harnesses', () => ({
 
 vi.mock('@entity/owner/owner-display', () => ({
   OwnerLabel: (props: { ownerId: string }) => (
-    <span>{props.ownerId.replace('rox|', '')}</span>
+    <span>{props.ownerId.replace('macro|', '')}</span>
   ),
 }));
 
@@ -88,7 +88,7 @@ beforeEach(() => {
     runtime(
       '00000000-0000-4000-8000-000000000002',
       'MacBook Pro',
-      'rox|priya@example.com',
+      'macro|priya@example.com',
       {
         access: 'user',
         shared_team_ids: ['team-1'],
@@ -97,7 +97,7 @@ beforeEach(() => {
     runtime(
       '00000000-0000-4000-8000-000000000003',
       'GPU workstation',
-      'rox|priya@example.com',
+      'macro|priya@example.com',
       {
         connected: false,
       }
@@ -105,7 +105,7 @@ beforeEach(() => {
     runtime(
       '00000000-0000-4000-8000-000000000004',
       'Build server',
-      'rox|theo@example.com',
+      'macro|theo@example.com',
       {
         access: 'read',
       }
@@ -113,7 +113,7 @@ beforeEach(() => {
     runtime(
       '00000000-0000-4000-8000-000000000005',
       'Linux desktop',
-      'rox|lena@example.com'
+      'macro|lena@example.com'
     ),
   ];
 });

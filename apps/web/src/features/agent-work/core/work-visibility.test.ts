@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { callWorkAccounts, dmWorkAccount } from './work-visibility';
 
-const isAgentAccount = (id: string) => id === 'rox|agent@example.com';
+const isAgentAccount = (id: string) => id === 'macro|agent@example.com';
 
 describe('dmWorkAccount', () => {
   it('picks the other account when it is an agent', () => {
     expect(
       dmWorkAccount({
         isDirectMessage: true,
-        participantIds: ['rox|me@example.com', 'rox|agent@example.com'],
-        viewerId: 'rox|me@example.com',
+        participantIds: ['macro|me@example.com', 'macro|agent@example.com'],
+        viewerId: 'macro|me@example.com',
         isAgentAccount,
       })
-    ).toBe('rox|agent@example.com');
+    ).toBe('macro|agent@example.com');
   });
 
   it('shows nothing in a DM with a person', () => {
     expect(
       dmWorkAccount({
         isDirectMessage: true,
-        participantIds: ['rox|me@example.com', 'rox|person@example.com'],
-        viewerId: 'rox|me@example.com',
+        participantIds: ['macro|me@example.com', 'macro|person@example.com'],
+        viewerId: 'macro|me@example.com',
         isAgentAccount,
       })
     ).toBeUndefined();
@@ -31,19 +31,19 @@ describe('dmWorkAccount', () => {
       dmWorkAccount({
         isDirectMessage: true,
         participantIds: [
-          'rox|me@example.com',
-          'rox|agent@example.com',
-          'rox|person@example.com',
+          'macro|me@example.com',
+          'macro|agent@example.com',
+          'macro|person@example.com',
         ],
-        viewerId: 'rox|me@example.com',
+        viewerId: 'macro|me@example.com',
         isAgentAccount,
       })
     ).toBeUndefined();
     expect(
       dmWorkAccount({
         isDirectMessage: false,
-        participantIds: ['rox|me@example.com', 'rox|agent@example.com'],
-        viewerId: 'rox|me@example.com',
+        participantIds: ['macro|me@example.com', 'macro|agent@example.com'],
+        viewerId: 'macro|me@example.com',
         isAgentAccount,
       })
     ).toBeUndefined();
@@ -54,11 +54,11 @@ describe('callWorkAccounts', () => {
   it('ignores guests and repeat connections, whatever the join order', () => {
     expect(
       callWorkAccounts([
-        'rox|b@example.com',
+        'macro|b@example.com',
         undefined,
-        'rox|a@example.com',
-        'rox|b@example.com',
+        'macro|a@example.com',
+        'macro|b@example.com',
       ])
-    ).toEqual(['rox|a@example.com', 'rox|b@example.com']);
+    ).toEqual(['macro|a@example.com', 'macro|b@example.com']);
   });
 });

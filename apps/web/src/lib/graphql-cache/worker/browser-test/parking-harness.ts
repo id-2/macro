@@ -38,7 +38,7 @@ globalThis.Worker = new Proxy(nativeWorker, {
   },
 });
 const query = 'query ParkingWitness { user { id } }';
-const data = { user: { id: 'rox|parking-fixture' } };
+const data = { user: { id: 'macro|parking-fixture' } };
 const mutation = gql`mutation ParkingMutation($input: SetEntityPropertyInput!) {
   setEntityProperty(input: $input) { id displayName }
 }`;

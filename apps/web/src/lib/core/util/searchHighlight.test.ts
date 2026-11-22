@@ -3,7 +3,7 @@ import {
   extractSearchSnippet,
   extractSearchTerms,
   highlightTermsInText,
-  mergeAdjacentMacroEmTags,
+  mergeAdjacentRoxEmTags,
   parseSearchHighlightSegments,
   visibleLength,
   windowSearchMatch,
@@ -70,10 +70,10 @@ describe('extractSearchSnippet', () => {
   });
 });
 
-describe('mergeAdjacentMacroEmTags', () => {
+describe('mergeAdjacentRoxEmTags', () => {
   it('merges adjacent tags separated by whitespace', () => {
     expect(
-      mergeAdjacentMacroEmTags(
+      mergeAdjacentRoxEmTags(
         'The <rox_em>quick</rox_em> <rox_em>brown</rox_em> fox'
       )
     ).toBe('The <rox_em>quick brown</rox_em> fox');
@@ -81,7 +81,7 @@ describe('mergeAdjacentMacroEmTags', () => {
 
   it('does not merge tags separated by non-whitespace', () => {
     expect(
-      mergeAdjacentMacroEmTags(
+      mergeAdjacentRoxEmTags(
         '<rox_em>Hello</rox_em>, <rox_em>world</rox_em>'
       )
     ).toBe('<rox_em>Hello</rox_em>, <rox_em>world</rox_em>');
@@ -89,14 +89,14 @@ describe('mergeAdjacentMacroEmTags', () => {
 
   it('merges multiple adjacent tags', () => {
     expect(
-      mergeAdjacentMacroEmTags(
+      mergeAdjacentRoxEmTags(
         '<rox_em>a</rox_em> <rox_em>b</rox_em> <rox_em>c</rox_em>'
       )
     ).toBe('<rox_em>a b c</rox_em>');
   });
 
   it('returns text without tags unchanged', () => {
-    expect(mergeAdjacentMacroEmTags('no tags here')).toBe('no tags here');
+    expect(mergeAdjacentRoxEmTags('no tags here')).toBe('no tags here');
   });
 });
 

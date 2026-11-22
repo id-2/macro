@@ -1,5 +1,5 @@
 import { t } from '@app/lib/i18n';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg';
 import ArrowSquareOut from '@icon/system/regular/arrow-square-out.svg';
@@ -59,7 +59,7 @@ export function CallMiniPlayer(props: {
         name: local
           ? t('calls.you')
           : participant.name?.trim() ||
-            getDisplayName(tryMacroId(participant.identity)) ||
+            getDisplayName(tryRoxId(participant.identity)) ||
             t('calls.guest'),
         speaking,
         hasVideo: !!camera?.track && !camera.isMuted,

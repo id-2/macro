@@ -22,7 +22,7 @@ vi.mock('@queries/soup/normalized-cache', () => ({
   invalidateAllSoup: vi.fn(),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|self',
+  useUserId: () => () => 'macro|self',
   useIsAuthenticated: () => () => true,
 }));
 vi.mock('@queries/client', () => ({
@@ -65,7 +65,7 @@ describe('non-suspending inbox metadata', () => {
     });
     activeClient = client;
     client.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'rox|self',
+      id: 'macro|self',
       authenticated: true,
     });
     clients.push(client);
@@ -99,9 +99,9 @@ describe('non-suspending inbox metadata', () => {
 
     response.resolve({
       links: [
-        link('delegated-primary', 'rox|other', true),
-        link('self-primary', 'rox|self', true),
-        link('shared', 'rox|self', false),
+        link('delegated-primary', 'macro|other', true),
+        link('self-primary', 'macro|self', true),
+        link('shared', 'macro|self', false),
       ],
     });
     await waitFor(() =>

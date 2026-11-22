@@ -101,7 +101,7 @@ vi.mock('@core/component/LexicalMarkdown/theme', () => ({
   singleLineMarkdownTheme: {},
 }));
 vi.mock('@components/app/split-layout/split-router/mention-links', () => ({
-  useMacroMentionLinkResolver: () => undefined,
+  useRoxMentionLinkResolver: () => undefined,
 }));
 vi.mock('@ui', () => ({
   Surface: (props: { children?: JSX.Element }) => props.children,

@@ -18,9 +18,9 @@ vi.mock('@service-storage/graphql-contacts', () => ({
   fetchContactDirectoryByIds: vi.fn(),
   fetchContactDirectoryPage: vi.fn(),
 }));
-const VIEWER = 'rox|viewer@example.com';
-const PERSON = 'rox|person@example.com';
-const OTHER = 'rox|other@example.com';
+const VIEWER = 'macro|viewer@example.com';
+const PERSON = 'macro|person@example.com';
+const OTHER = 'macro|other@example.com';
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const signal = () => new AbortController().signal;
 function contact(userId: string) {
@@ -99,7 +99,7 @@ it('bounds raw input before deduplication and empty input performs no IO', async
   expect(
     contactLookupIds({
       kind: 'ids',
-      values: ['rox|PERSON@example.com', PERSON],
+      values: ['macro|PERSON@example.com', PERSON],
     })
   ).toEqual([PERSON]);
   await expect(

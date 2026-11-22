@@ -2,7 +2,7 @@ import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { EntityIcon as CoreEntityIcon } from '@core/component/EntityIcon';
 import { enableDatabases, enableForms } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
-import { tryMacroId, useDisplayName } from '@core/user';
+import { tryRoxId, useDisplayName } from '@core/user';
 import { useAllProperties } from '@property/editor/hooks/useAllProperties';
 import { usePropertyEntityDisplay } from '@property/hooks';
 import type { PropertyDefinitionDomain } from '@property/types';
@@ -115,7 +115,7 @@ function appActivityContext(): ActivityContext {
     graphql: () => getGraphqlSoupClient(),
     currentUserId: () => userId() ?? '',
     displayName: (actorId) => {
-      const id = tryMacroId(actorId());
+      const id = tryRoxId(actorId());
       if (!id) return () => undefined;
       const [name] = useDisplayName(id, { emailFallback: 'local-part' });
       return name;

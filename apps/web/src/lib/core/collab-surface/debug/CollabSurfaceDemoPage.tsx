@@ -1,4 +1,4 @@
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { Block, type BlockName } from '@core/block';
 import { createSignal, Show } from 'solid-js';
 import { CollabMdSurface } from '../CollabMdSurface';
@@ -40,7 +40,7 @@ export default function CollabSurfaceDemoPage() {
   const [surfaceId, setSurfaceId] = createSignal<string>(crypto.randomUUID());
   const [seedMarkdown, setSeedMarkdown] = createSignal('# Hello surface');
   const [mounted, setMounted] = createSignal<Mounted>();
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
 
   const open = () => {
     setMounted(undefined);

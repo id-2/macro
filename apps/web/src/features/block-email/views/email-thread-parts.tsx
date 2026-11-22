@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import type { EmailThreadListNavigation } from '@app/features/email-thread/context/email-thread-context';
 import { useEmailThreadState } from '@app/features/email-thread/context/email-thread-state-context';
 import type { BlockTool } from '@components/app/block-tool';
@@ -149,7 +149,7 @@ export function EmailThreadActions(props: {
       <HeaderActionGroup label="Actions" size="md">
         <Show when={context.thread()?.db_id}>
           {(id) => (
-            <AskMacroButton
+            <AskRoxButton
               grouped
               size="icon-md"
               entity={{ type: 'email', id: id(), name: props.title }}

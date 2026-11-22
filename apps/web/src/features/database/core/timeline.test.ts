@@ -31,7 +31,7 @@ const launch = {
   cells: {
     dates: '2026-03-02T00:00:00.000Z/2026-03-06T00:00:00.000Z',
     stage: 'Build',
-    owner: 'rox|ada@rox.one',
+    owner: 'macro|ada@rox.one',
   },
 };
 const research = {
@@ -43,7 +43,7 @@ const kickoff = {
   cells: {
     dates: '2026-02-23T00:00:00.000Z/2026-02-23T00:00:00.000Z',
     stage: null,
-    owner: 'rox|ada@rox.one',
+    owner: 'macro|ada@rox.one',
   },
 };
 

@@ -4,7 +4,7 @@ import {
   useAuthorName,
 } from '@block-md/history/author';
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayNameParts, roxIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayNameParts, roxIdToEmail, tryRoxId } from '@core/user';
 import { formatRelativeTimestamp } from '@entity';
 import { useNodeBlameQuery } from '@queries/blame';
 import { createScheduled, debounce } from '@solid-primitives/scheduled';
@@ -26,7 +26,7 @@ function UserLine(props: { authorId: string; editedAt: Date }) {
   const name = useAuthorName(
     () => props.authorId,
     (userId) => {
-      const roxId = tryMacroId(userId);
+      const roxId = tryRoxId(userId);
       return (
         getDisplayNameParts(roxId).firstName ||
         (roxId ? roxIdToEmail(roxId) : userId)

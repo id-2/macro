@@ -34,8 +34,8 @@ const assignees: EntityProperty = {
   valueType: 'ENTITY',
   specificEntityType: 'USER',
   value: [
-    { entity_id: 'rox|alice@example.com', entity_type: 'USER' },
-    { entity_id: 'rox|bob@example.com', entity_type: 'USER' },
+    { entity_id: 'macro|alice@example.com', entity_type: 'USER' },
+    { entity_id: 'macro|bob@example.com', entity_type: 'USER' },
   ],
 };
 
@@ -47,21 +47,21 @@ afterEach(() => {
 it('keeps each avatar in place while the assignees re-emit', () => {
   const [property, setProperty] = createSignal(assignees);
   const view = render(() => <PropertyUserStack property={property()} />);
-  const alice = view.getByText('rox|alice@example.com');
+  const alice = view.getByText('macro|alice@example.com');
 
   setProperty({
     ...assignees,
     value: [
-      { entity_id: 'rox|alice@example.com', entity_type: 'USER' },
-      { entity_id: 'rox|bob@example.com', entity_type: 'USER' },
-      { entity_id: 'rox|carol@example.com', entity_type: 'USER' },
+      { entity_id: 'macro|alice@example.com', entity_type: 'USER' },
+      { entity_id: 'macro|bob@example.com', entity_type: 'USER' },
+      { entity_id: 'macro|carol@example.com', entity_type: 'USER' },
     ],
   });
 
-  expect(view.getByText('rox|alice@example.com')).toBe(alice);
+  expect(view.getByText('macro|alice@example.com')).toBe(alice);
   expect(avatars.mounts).toEqual([
-    'rox|alice@example.com',
-    'rox|bob@example.com',
-    'rox|carol@example.com',
+    'macro|alice@example.com',
+    'macro|bob@example.com',
+    'macro|carol@example.com',
   ]);
 });

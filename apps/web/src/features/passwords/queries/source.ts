@@ -94,7 +94,7 @@ export function createPasswordSource(
             method,
             headers: {
               'Content-Type': 'application/json',
-              'X-Macro-Passwords': '1',
+              'X-Rox-Passwords': '1',
             },
             body: payload,
             signal: scope.signal,

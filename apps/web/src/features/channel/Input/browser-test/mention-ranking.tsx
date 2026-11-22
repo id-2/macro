@@ -109,7 +109,7 @@ function useList(
     options?.buckets ??
     args.filter((bucket): bucket is Bucket => typeof bucket === 'string');
   const people = createContactDirectoryWindow(
-    () => ({ userId: 'rox|viewer@example.com' }),
+    () => ({ userId: 'macro|viewer@example.com' }),
     async (viewer, _host, request) => {
       setPeopleReads((count) => count + 1);
       setLastPeopleRead(
@@ -134,7 +134,7 @@ function useList(
         offline: false,
         query: request.query,
         users: ids.map((i) => ({
-          id: `rox|person${i}@example.com`,
+          id: `macro|person${i}@example.com`,
           email: `person${i}@example.com`,
           name:
             i === 99_999
@@ -248,7 +248,7 @@ function Fixture() {
                                 if (CRM_SCENARIO)
                                   return [
                                     {
-                                      id: 'rox|member@example.com',
+                                      id: 'macro|member@example.com',
                                       email: 'member@example.com',
                                       name: 'Acme member',
                                     },

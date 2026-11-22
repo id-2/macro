@@ -1,4 +1,4 @@
-import { getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayNameParts, tryRoxId } from '@core/user';
 import type { HistorySession } from '@service-sync/client';
 import { cn } from '@ui';
 import { type Accessor, createMemo, For, Show } from 'solid-js';
@@ -16,7 +16,7 @@ type HistorySessionListProps = {
 function UserName(props: { userId: string }) {
   const name = useAuthorName(
     () => props.userId,
-    (id) => getDisplayNameParts(tryMacroId(id)).firstName
+    (id) => getDisplayNameParts(tryRoxId(id)).firstName
   );
   return <>{name()}</>;
 }

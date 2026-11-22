@@ -78,7 +78,7 @@ describe('installed Solid Query resource behavior', () => {
     const action: ScheduledAction = {
       id: 'cron',
       name: 'Cached cron',
-      owner: 'rox|owner@example.com',
+      owner: 'macro|owner@example.com',
       kind: 'Agent',
       trigger: { type: 'cron', schedule: '0 0 9 * * 2', timezone: 'UTC' },
       task: { steps: [] },

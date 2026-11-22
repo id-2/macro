@@ -727,7 +727,7 @@ describe('removeSearchEntities', () => {
       type: 'agentSession',
       id: 'session-1',
       name: 'Search verification',
-      owner_id: 'rox|owner@example.com',
+      owner_id: 'macro|owner@example.com',
       bot_id: 'bot-1',
       created_at: '2026-09-11T00:00:00Z',
       updated_at: '2026-09-11T00:00:00Z',
@@ -1553,8 +1553,8 @@ describe('insertSoupEntity — folder membership gate', () => {
 /** Shared's request scope must also gate immediate cache admission, even when
  * restored/mutable client predicates no longer contain `shared-entity`. */
 describe('insertSoupEntity — Shared Files ownership gate', () => {
-  const ME = 'rox|me@example.com';
-  const OTHER = 'rox|other@example.com';
+  const ME = 'macro|me@example.com';
+  const OTHER = 'macro|other@example.com';
   const FOLDER = 'folder-1';
   const GROUP = 'in_progress';
 

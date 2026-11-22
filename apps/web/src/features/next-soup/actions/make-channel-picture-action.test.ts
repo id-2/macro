@@ -26,7 +26,7 @@ const channel = (
     type: 'channel',
     id: 'c1',
     name: 'Design',
-    ownerId: 'rox|other@example.com',
+    ownerId: 'macro|other@example.com',
     channelType: 'private',
     ...overrides,
   }) as EntityData;

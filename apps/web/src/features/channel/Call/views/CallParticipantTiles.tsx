@@ -2,7 +2,7 @@ import { t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
 import { touchHandler } from '@core/directive/touchHandler';
 import { isMobile } from '@core/mobile/isMobile';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import PinIcon from '@icon/system/regular/push-pin.svg';
 import UnpinIcon from '@icon/system/regular/push-pin-slash.svg';
@@ -336,7 +336,7 @@ export function ParticipantTile(props: {
   pinEnabled: boolean;
 }) {
   const callCtx = useCallContext();
-  const roxId = () => tryMacroId(props.participant.identity);
+  const roxId = () => tryRoxId(props.participant.identity);
   const displayName = () =>
     props.participant.name?.trim() ||
     (roxId() ? getDisplayName(roxId()) : t('calls.guest'));
@@ -442,7 +442,7 @@ export function ScreenShareTile(props: {
   pinEnabled: boolean;
 }) {
   const callCtx = useCallContext();
-  const roxId = () => tryMacroId(props.participant.identity);
+  const roxId = () => tryRoxId(props.participant.identity);
   const displayName = () =>
     props.participant.name?.trim() ||
     (roxId() ? getDisplayName(roxId()) : t('calls.guest'));

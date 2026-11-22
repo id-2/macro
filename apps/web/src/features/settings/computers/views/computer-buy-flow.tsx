@@ -3,7 +3,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserId } from '@core/context/user';
 import { isMobile } from '@core/mobile/isMobile';
-import { getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayNameParts, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
 import {
@@ -34,7 +34,7 @@ import {
 export function useViewerFirstName() {
   const userId = useUserId();
   return () =>
-    getDisplayNameParts(tryMacroId(userId() ?? '')).firstName || undefined;
+    getDisplayNameParts(tryRoxId(userId() ?? '')).firstName || undefined;
 }
 
 /** "Maya's Agent Box", or "Agent Box" without a first name. */

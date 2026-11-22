@@ -28,7 +28,7 @@ vi.mock('@core/user', () => ({
   recipientEntityMapper: () => (value: unknown) => value,
 }));
 vi.mock('@components/app/split-layout/split-router/mention-links', () => ({
-  useMacroMentionLinkResolver: () => () => undefined,
+  useRoxMentionLinkResolver: () => () => undefined,
 }));
 vi.mock(
   '@core/component/LexicalMarkdown/component/core/MarkdownTextarea',

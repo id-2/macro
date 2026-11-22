@@ -22,7 +22,7 @@ vi.mock('@core/constant/featureFlags', async (importOriginal) => ({
 }));
 vi.mock('@core/user', () => ({
   getDisplayName: () => 'Eric',
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 vi.mock('@core/util/openInNewSplit', () => ({
   openInNewSplitForMention: () => true,
@@ -97,7 +97,7 @@ it.each<{
       targetMessageId: 'message-id',
       targetThreadId: 'root-id',
       displayText: 'Quoted text',
-      senderId: 'rox|eric@rox.test',
+      senderId: 'macro|eric@rox.test',
       key: 'node-key',
       theme: {},
     };
@@ -116,7 +116,7 @@ it('opens a quoted project message through the project opener', () => {
       targetMessageId="message-id"
       targetThreadId="root-id"
       displayText="Quoted text"
-      senderId="rox|eric@rox.test"
+      senderId="macro|eric@rox.test"
       key="node-key"
       theme={{}}
     />

@@ -3,7 +3,7 @@ import {
   getDisplayName,
   getDisplayNameParts,
   roxIdToEmail,
-  tryMacroId,
+  tryRoxId,
 } from '@core/user';
 import {
   useChannelAccessRequestQuery,
@@ -26,11 +26,11 @@ import {
 
 function name(id: string | null | undefined): string {
   if (!id) return 'Someone';
-  return getBotDisplayName(id) || getDisplayName(tryMacroId(id)) || 'Someone';
+  return getBotDisplayName(id) || getDisplayName(tryRoxId(id)) || 'Someone';
 }
 
 function requesterName(id: string, stored: string | undefined): string {
-  return requesterLabel(getDisplayNameParts(tryMacroId(id)), stored, name(id));
+  return requesterLabel(getDisplayNameParts(tryRoxId(id)), stored, name(id));
 }
 
 /** App composition uses the same cached principal names as channel messages. */
@@ -98,7 +98,7 @@ function AccessRequestActivity(props: {
   const participants = useChannelParticipantsQuery(() => props.channelId);
   const resolve = useResolveChannelAccessRequestMutation();
   const requesterEmail = () => {
-    const id = tryMacroId(props.event.actorId);
+    const id = tryRoxId(props.event.actorId);
     return id ? roxIdToEmail(id) : undefined;
   };
   const isParticipant = () =>

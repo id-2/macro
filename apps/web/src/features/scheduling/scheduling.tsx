@@ -12,7 +12,7 @@ import { enableCalendarScheduling } from '@core/constant/featureFlags';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserContext } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, roxIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, roxIdToEmail, tryRoxId } from '@core/user';
 import { writeClipboardData } from '@core/util/dataTransfer';
 import { getWebOrigin } from '@core/util/webOrigin';
 import { useCurrentTeamQuery } from '@queries/team/teams';
@@ -44,7 +44,7 @@ function SchedulingHost(props: ParentProps) {
   const currentTeam = () => (team.isSuccess ? team.data : undefined);
   const members = () => {
     const result = (currentTeam()?.members ?? []).map((member) => {
-      const id = tryMacroId(member.user_id);
+      const id = tryRoxId(member.user_id);
       return {
         id: member.user_id,
         name: id ? getDisplayName(id) : member.user_id,
@@ -53,7 +53,7 @@ function SchedulingHost(props: ParentProps) {
     });
     const userId = user.userId();
     if (userId && !result.some((member) => member.id === userId)) {
-      const id = tryMacroId(userId);
+      const id = tryRoxId(userId);
       result.push({
         id: userId,
         name: id ? getDisplayName(id) : userId,

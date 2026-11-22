@@ -47,7 +47,7 @@ describe('selectEntityActivity', () => {
       events: [
         {
           id: 'evt-1',
-          actorId: 'rox|sarah@example.com',
+          actorId: 'macro|sarah@example.com',
           entityId: 'doc-1',
           entityType: 'document',
           occurredAt: '2026-08-21T12:00:00.000Z',

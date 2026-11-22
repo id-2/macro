@@ -7,12 +7,12 @@ import {
 } from './incoming-meeting-invitations';
 
 const NOW = new Date('2026-09-23T14:00:00Z');
-const USER = 'rox|recipient@example.com';
+const USER = 'macro|recipient@example.com';
 const invitation: MeetingInvitation = {
   meetingId: 'meeting-1',
   shareToken: 'standalone-token',
   title: 'Planning',
-  createdBy: 'rox|caller@example.com',
+  createdBy: 'macro|caller@example.com',
   invitedAt: NOW.toISOString(),
   expiresAt: new Date(NOW.getTime() + 30_000).toISOString(),
 };
@@ -141,7 +141,7 @@ describe('incoming meeting invitations', () => {
     incoming.receive(invitation);
     incoming.answered({
       meetingId: 'meeting-1',
-      userId: 'rox|other@example.com',
+      userId: 'macro|other@example.com',
     });
     expect(incoming.invitations()).toHaveLength(1);
     incoming.answered({ meetingId: 'meeting-1', userId: USER });
@@ -154,11 +154,11 @@ describe('incoming meeting invitations', () => {
     incoming.receive(invitation);
     incoming.resolve({
       meetingId: 'meeting-1',
-      userId: 'rox|other@example.com',
+      userId: 'macro|other@example.com',
       resolvedAt: invitation.invitedAt,
     });
     expect(incoming.invitations()).toHaveLength(1);
-    setUserId('rox|other@example.com');
+    setUserId('macro|other@example.com');
     await settleNotification();
     expect(incoming.invitations()).toEqual([]);
     expect(stopRing).toHaveBeenCalledOnce();

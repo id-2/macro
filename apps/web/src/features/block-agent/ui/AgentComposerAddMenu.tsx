@@ -219,7 +219,7 @@ export function AgentComposerAddMenu(props: {
                           }
                         : undefined
                     }
-                    onOpenMacroMcp={() => {
+                    onOpenRoxMcp={() => {
                       setTarget(undefined);
                       settings.openSettings('Agent');
                     }}

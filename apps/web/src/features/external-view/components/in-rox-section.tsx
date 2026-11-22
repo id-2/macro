@@ -87,7 +87,7 @@ function ChatRow(props: {
  * groups, then each community's groups, like Chat's rail. Folded sections
  * show their unread count.
  */
-export function InMacroChats(props: {
+export function InRoxChats(props: {
   /** The provider's name: "WhatsApp chats in Rox". */
   label: string;
   chats: ChatSummary[] | undefined;

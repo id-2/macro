@@ -15,7 +15,7 @@ vi.mock('../client', () => ({
 vi.mock('@service-auth/client', () => ({
   authServiceClient: { getUserName: getName },
 }));
-const identity = { id: 'rox|viewer@example.com', authenticated: true };
+const identity = { id: 'macro|viewer@example.com', authenticated: true };
 beforeEach(async () => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   getName.mockReset();
@@ -59,7 +59,7 @@ it('rejects a late editable-name response after account replacement', async () =
   const rejected = expect(pending).rejects.toThrow();
   client.setQueryData(authKeys.userInfo.queryKey, {
     ...identity,
-    id: 'rox|other@example.com',
+    id: 'macro|other@example.com',
   });
   held.resolve(ok({ id: 'old-profile', first_name: 'Private old' }));
   await rejected;

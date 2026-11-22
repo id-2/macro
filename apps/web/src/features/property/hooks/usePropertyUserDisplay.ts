@@ -1,5 +1,5 @@
 import { isBotPrincipalId } from '@core/constant/roxAgent';
-import { getDisplayName, getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayName, getDisplayNameParts, tryRoxId } from '@core/user';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 import { useBotProfile } from '@queries/bots/profiles';
 import { queryReadyGate } from '@queries/gate';
@@ -19,11 +19,11 @@ export function usePropertyUserDisplay(id: Accessor<string>) {
     return source && queryReadyGate(source) ? source.data : undefined;
   };
   const userName = () =>
-    getDisplayNameParts(tryMacroId(id()), { emailFallback: 'local-part' });
+    getDisplayNameParts(tryRoxId(id()), { emailFallback: 'local-part' });
   const name = () =>
     isAgent()
       ? (profile()?.name ?? firstPartyBotName(id()) ?? 'Agent')
-      : getDisplayName(tryMacroId(id()));
+      : getDisplayName(tryRoxId(id()));
 
   return {
     name,

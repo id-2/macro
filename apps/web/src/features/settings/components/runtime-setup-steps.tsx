@@ -1,7 +1,8 @@
+import { toast } from '@core/component/Toast/Toast';
 import { isDesktopPlatform } from '@core/util/platform';
 import ArrowUpRightIcon from '@icon/system/regular/arrow-up-right.svg';
 import { cn } from '@ui';
-import { type JSX, Show } from 'solid-js';
+import { createSignal, type JSX, onCleanup, Show } from 'solid-js';
 
 /** One numbered step in a connection guide; steps share a connecting rail. */
 export function SetupStep(props: {
@@ -58,14 +59,62 @@ export function SetupField(props: { class?: string; children: JSX.Element }) {
 const INSTALL_SCRIPT_BASE =
   'https://raw.githubusercontent.com/agisota/macro/main/crates/coding_agent_worker/install';
 
+/**
+ * The install lines as they are shown and as they are copied, so the address
+ * of the installer is written once. The macOS line carries the same address
+ * as the roxd install snippet in agent-setup-markdown.ts.
+ */
+const INSTALL_LINE_MACOS = `curl -fsSL ${INSTALL_SCRIPT_BASE}/install.sh | sh`;
+const INSTALL_LINE_WINDOWS = `irm ${INSTALL_SCRIPT_BASE}/install.ps1 | iex`;
+
+const COPIED_MS = 2000;
+
+/** Copies the given line and says so for two seconds. */
+function CopyCommand(props: { text: string }) {
+  const [copied, setCopied] = createSignal(false);
+  let resetTimer: ReturnType<typeof setTimeout> | undefined;
+
+  onCleanup(() => clearTimeout(resetTimer));
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(props.text);
+    } catch {
+      toast.failure('Could not copy the command');
+      return;
+    }
+    clearTimeout(resetTimer);
+    setCopied(true);
+    resetTimer = setTimeout(() => setCopied(false), COPIED_MS);
+  };
+
+  return (
+    <button
+      type="button"
+      aria-label="Copy the install command"
+      class="shrink-0 self-start rounded-md border border-edge-muted px-2 py-1 font-sans text-xs font-medium text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink focus-visible:outline-accent"
+      onClick={copy}
+    >
+      {copied() ? 'Copied' : 'Copy'}
+    </button>
+  );
+}
+
 /** A shell command to type, behind its prompt; long commands wrap. */
-function SetupCommand(props: { prompt: string; command: string }) {
+function SetupCommand(props: {
+  prompt: string;
+  command: string;
+  copyable?: boolean;
+}) {
   return (
     <div class="flex gap-2 rounded-lg border border-edge-muted bg-ink/[0.025] px-3 py-2 font-mono text-sm text-ink">
       <span aria-hidden="true" class="select-none text-ink-extra-muted">
         {props.prompt}
       </span>
-      <code class="min-w-0 [overflow-wrap:anywhere]">{props.command}</code>
+      <code class="min-w-0 flex-1 [overflow-wrap:anywhere]">{props.command}</code>
+      <Show when={props.copyable}>
+        <CopyCommand text={props.command} />
+      </Show>
     </div>
   );
 }
@@ -85,15 +134,9 @@ export function RuntimeSetupSteps(props: { children: JSX.Element }) {
       <ol aria-label="Machine setup steps" class="list-none">
         <SetupStep number={1} title="Install roxd">
           <p>On macOS or Linux, run in a terminal:</p>
-          <SetupCommand
-            prompt="$"
-            command={`curl -fsSL ${INSTALL_SCRIPT_BASE}/install.sh | sh`}
-          />
+          <SetupCommand prompt="$" command={INSTALL_LINE_MACOS} copyable />
           <p>On Windows, run in PowerShell:</p>
-          <SetupCommand
-            prompt=">"
-            command={`irm ${INSTALL_SCRIPT_BASE}/install.ps1 | iex`}
-          />
+          <SetupCommand prompt=">" command={INSTALL_LINE_WINDOWS} copyable />
           <p>Run it again later to update roxd.</p>
         </SetupStep>
         <SetupStep number={2} title="Run roxd">

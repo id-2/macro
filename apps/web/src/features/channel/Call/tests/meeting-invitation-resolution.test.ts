@@ -28,7 +28,7 @@ it('publishes account-scoped meeting resolutions locally and across tabs', async
   const unsubscribe = subscribeToMeetingInvitationResolutions(listener);
   const resolution = {
     meetingId: 'meeting-1',
-    userId: 'rox|recipient@example.com',
+    userId: 'macro|recipient@example.com',
     resolvedAt: '2026-09-23T14:00:00Z',
   };
   publishMeetingInvitationResolution(resolution);
@@ -57,7 +57,7 @@ it('accepts storage fallback delivery and rejects malformed resolutions', async 
   });
   const resolution = {
     meetingId: 'meeting-1',
-    userId: 'rox|recipient@example.com',
+    userId: 'macro|recipient@example.com',
     resolvedAt: '2026-09-23T14:00:01Z',
   };
   window.dispatchEvent(

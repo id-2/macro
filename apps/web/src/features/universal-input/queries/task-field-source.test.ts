@@ -192,7 +192,7 @@ it('resolves an off-window assignee from per-label evidence without requesting a
   query.data = [ASSIGNEES];
   references.lookup.mockReturnValue([
     {
-      userId: 'rox|person99999@example.com',
+      userId: 'macro|person99999@example.com',
       email: 'person99999@example.com',
       name: 'Person 99999',
     },
@@ -221,7 +221,7 @@ it('resolves an off-window assignee from per-label evidence without requesting a
             valueType: 'ENTITY',
             refs: [
               {
-                entity_id: 'rox|person99999@example.com',
+                entity_id: 'macro|person99999@example.com',
                 entity_type: 'USER',
               },
             ],
@@ -239,7 +239,7 @@ it('resolves an explicit authorized identity without requiring a display name', 
   query.data = [ASSIGNEES];
   references.lookup.mockReturnValue([
     {
-      userId: 'rox|known@example.com',
+      userId: 'macro|known@example.com',
       email: 'known@example.com',
       name: null,
     },
@@ -248,7 +248,7 @@ it('resolves an explicit authorized identity without requiring a display name', 
     try {
       const fields = fieldsSchema.parse({
         properties: JSON.stringify([
-          { name: 'Assignees', values: ['rox|known@example.com'] },
+          { name: 'Assignees', values: ['macro|known@example.com'] },
         ]),
       });
       const source = createTaskFieldSource(
@@ -262,7 +262,7 @@ it('resolves an explicit authorized identity without requiring a display name', 
           [SYSTEM_PROPERTY_IDS.ASSIGNEES]: {
             valueType: 'ENTITY',
             refs: [
-              { entity_id: 'rox|known@example.com', entity_type: 'USER' },
+              { entity_id: 'macro|known@example.com', entity_type: 'USER' },
             ],
           },
         },
@@ -288,12 +288,12 @@ it('keeps incomplete and ambiguous evidence unresolved rather than choosing a de
       expect(source.values(fields).unresolved).toEqual(['Assignees']);
       references.lookup.mockReturnValue([
         {
-          userId: 'rox|one@example.com',
+          userId: 'macro|one@example.com',
           email: 'one@example.com',
           name: 'Shared',
         },
         {
-          userId: 'rox|two@example.com',
+          userId: 'macro|two@example.com',
           email: 'two@example.com',
           name: 'Shared Person',
         },
@@ -304,7 +304,7 @@ it('keeps incomplete and ambiguous evidence unresolved rather than choosing a de
       ).toBeUndefined();
       references.lookup.mockReturnValue([
         {
-          userId: 'rox|two@example.com',
+          userId: 'macro|two@example.com',
           email: 'two@example.com',
           name: 'Shared Person',
         },

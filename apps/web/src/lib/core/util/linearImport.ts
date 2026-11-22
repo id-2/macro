@@ -109,7 +109,7 @@ type RoxTaskDraft = {
   warnings: readonly string[];
 };
 
-export function linearCsvRecordToMacroTaskDraft(args: {
+export function linearCsvRecordToRoxTaskDraft(args: {
   record: Record<string, string>;
   assigneeUserId?: string | null;
 }): RoxTaskDraft {

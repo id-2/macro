@@ -52,7 +52,7 @@ export type CreateCalendarEvent_Deserialize =
       /**  Reminder configuration. */
       reminders?: EventRemindersInput | null;
       /**  Whether to attach a Rox meeting link. */
-      addMacroCall?: boolean;
+      addRoxCall?: boolean;
       /**  Kind of event to create. */
       eventType?: CalendarEventTypeInput;
       /**  Out-of-office decline behavior. */
@@ -87,7 +87,7 @@ export type CreateCalendarEvent_Serialize = {
   /**  Reminder configuration. */
   reminders: EventRemindersInput | null;
   /**  Whether to attach a Rox meeting link. */
-  addMacroCall: boolean;
+  addRoxCall: boolean;
   /**  Whether to attach the calendar provider's meeting conference. */
   addConference: boolean;
   /**  Kind of event to create. */

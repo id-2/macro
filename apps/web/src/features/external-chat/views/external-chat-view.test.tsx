@@ -36,7 +36,7 @@ vi.mock('@components/app/split-layout/layout', async (importOriginal) => {
   };
 });
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|me@example.test',
+  useUserId: () => () => 'macro|me@example.test',
 }));
 vi.mock('@core/component/UserIcon', () => ({
   UserIcon: () => <span data-testid="rox-avatar" />,
@@ -453,7 +453,7 @@ it('renders every WhatsApp message type with Chat parts and small cards', () => 
         forwarded: true,
         body: 'Hey @15550001111 and @15550002222, see https://example.com',
         mentions: [
-          { token: '15550001111', name: 'Ben', userId: 'rox|ben@x.test' },
+          { token: '15550001111', name: 'Ben', userId: 'macro|ben@x.test' },
           { token: '15550002222', name: 'Cy Ode' },
         ],
       },
@@ -555,7 +555,7 @@ it('renders every WhatsApp message type with Chat parts and small cards', () => 
   // A Rox user becomes Chat's mention chip; anyone else their name.
   expect(
     document.querySelector(
-      '[data-user-mention][data-user-id="rox|ben@x.test"]'
+      '[data-user-mention][data-user-id="macro|ben@x.test"]'
     )
   ).toBeTruthy();
   expect(screen.getByText('@Cy Ode')).toBeTruthy();

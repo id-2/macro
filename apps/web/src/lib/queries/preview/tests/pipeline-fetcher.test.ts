@@ -20,7 +20,7 @@ import { fetchRestPreviewBatch } from '../fetchers';
 const pipeline = {
   id: 'sales',
   name: 'Sales',
-  userId: 'rox|owner@rox.one',
+  userId: 'macro|owner@rox.one',
   trashedAt: null,
 };
 
@@ -37,7 +37,7 @@ it('previews a pipeline by name, and a trashed or missing one as deleted', async
     loading: false,
     rawName: 'Sales',
     name: 'Sales',
-    owner: 'rox|owner@rox.one',
+    owner: 'macro|owner@rox.one',
   });
 
   getCrmPipeline.mockResolvedValueOnce(

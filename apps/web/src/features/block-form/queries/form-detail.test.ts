@@ -169,7 +169,7 @@ describe('the booking step', () => {
     id: 'form-1',
     name: 'Design partner intake',
     description: '',
-    ownerId: 'rox|owner@example.com',
+    ownerId: 'macro|owner@example.com',
     databaseId: 'database-1',
     tableId: 'table-1',
     audience: 'public',

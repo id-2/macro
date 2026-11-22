@@ -5,15 +5,15 @@ import { ExternalChatContextProvider } from '@app/features/external-chat/context
 import { createExternalChatCapabilities } from '@app/features/external-chat/queries/capabilities';
 import { externalChatApi } from '@app/features/external-chat/queries/production-api';
 import { ExternalChatView } from '@app/features/external-chat/views/external-chat-view';
-import { InMacroChats } from '@app/features/external-view/components/in-macro-section';
+import { InRoxChats } from '@app/features/external-view/components/in-rox-section';
 import { initializeLexical } from '@core/component/LexicalMarkdown/init';
 import { getPermissions } from '@core/component/SharePermissions';
 import { ShareTrigger } from '@core/component/TopBar/ShareButton';
 import { useShareModal } from '@core/component/TopBar/shareModal';
 import { useUserId } from '@core/context/user';
 import { Route, Router } from '@solidjs/router';
-import { macroDarkTheme } from '@theme/themes/macro-dark';
-import { macroLightTheme } from '@theme/themes/macro-light';
+import { roxDarkTheme } from '@theme/themes/rox-dark';
+import { roxLightTheme } from '@theme/themes/rox-light';
 import { themeCssVars } from '@theme/utils/themeCssVars';
 import { onMount, Show, Suspense } from 'solid-js';
 // The app's styles, so the page and its screenshots look like the app.
@@ -134,16 +134,16 @@ function ChatHarness(props: { chatId: string }) {
 }
 
 /** External's sidebar section over the real chats query. */
-function InMacroHarness() {
+function InRoxHarness() {
   const userId = useUserId();
   const chats = useExternalChatsQuery(externalChatApi, () => userId() ?? '');
   const sections = createOpenSections(
-    'macro:whatsapp:sidebar-sections:v2',
+    'rox:whatsapp:sidebar-sections:v2',
     userId
   );
   return (
     <main class="w-72 bg-panel p-2 text-ink">
-      <InMacroChats
+      <InRoxChats
         label="WhatsApp"
         chats={queryReadyGate(chats) ? chats.data : undefined}
         isPending={chats.isPending}
@@ -162,14 +162,14 @@ function Page() {
   onMount(() => {
     const dark = matchMedia('(prefers-color-scheme: dark)').matches;
     for (const [key, token] of Object.entries(
-      themeCssVars(dark ? macroDarkTheme : macroLightTheme)
+      themeCssVars(dark ? roxDarkTheme : roxLightTheme)
     ))
       document.documentElement.style.setProperty(key, token);
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
     document.documentElement.dataset.themeLight = String(!dark);
   });
   const search = new URLSearchParams(location.search);
-  if (search.get('view') === 'in-macro') return <InMacroHarness />;
+  if (search.get('view') === 'in-macro') return <InRoxHarness />;
   const chatId = search.get('chat');
   if (chatId)
     return (
@@ -180,7 +180,7 @@ function Page() {
   const production = createWhatsAppLinkedCapabilities({
     openChat: (chatId) => window.openedChats.push(chatId),
     sections: createOpenSections(
-      'macro:whatsapp:chat-sections:v2',
+      'rox:whatsapp:chat-sections:v2',
       useUserId()
     ),
   });

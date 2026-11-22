@@ -2,7 +2,7 @@ import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
 const CALL = '00000000-0000-7000-8000-0000000ca110';
 const GUEST_MESSAGE = '00000000-0000-7000-8000-0000000a0001';
-const MEMBER = 'rox|me@example.com';
+const MEMBER = 'macro|me@example.com';
 const GUEST = 'guest:guest-1';
 const OPAQUE = 'participant:00000000-0000-5000-8000-000000000001';
 const PATH = '/src/features/channel/Call/chat/browser-test/call-chat.html';

@@ -10,8 +10,8 @@ import { createMemo, createSignal, onCleanup, Show } from 'solid-js';
 export function ChannelRecipientFixture() {
   const [open, setOpen] = createSignal(false);
   const [members, setMembers] = createSignal([
-    'rox|viewer@example.com',
-    'rox|person0@example.com',
+    'macro|viewer@example.com',
+    'macro|person0@example.com',
   ]);
   const [added, setAdded] = createSignal<string[]>([]);
   const [requests, setRequests] = createSignal(0);
@@ -46,7 +46,7 @@ export function ChannelRecipientFixture() {
       (!request.query || request.query === 'late')
     ) {
       const i = position++;
-      const id = `rox|person${i}@example.com`;
+      const id = `macro|person${i}@example.com`;
       if (!exclude.has(id))
         users.push({
           id,
@@ -75,7 +75,7 @@ export function ChannelRecipientFixture() {
   };
   const source: RecipientSourceFactory<'user'> = (input) =>
     createContactRecipientSource(
-      () => ({ userId: 'rox|viewer@example.com' }),
+      () => ({ userId: 'macro|viewer@example.com' }),
       input,
       () => false,
       read
@@ -85,7 +85,7 @@ export function ChannelRecipientFixture() {
     setMembers((old) => [...old, ...ids]);
   };
   const joined = () =>
-    setMembers((old) => [...old, 'rox|person99999@example.com']);
+    setMembers((old) => [...old, 'macro|person99999@example.com']);
   window.addEventListener('fixture-member-joined', joined);
   onCleanup(() => window.removeEventListener('fixture-member-joined', joined));
   const panel =
@@ -104,8 +104,8 @@ export function ChannelRecipientFixture() {
               team={{
                 name: 'Example team',
                 memberIds: [
-                  'rox|person0@example.com',
-                  'rox|teammate@example.com',
+                  'macro|person0@example.com',
+                  'macro|teammate@example.com',
                 ],
               }}
               teamLoading={false}

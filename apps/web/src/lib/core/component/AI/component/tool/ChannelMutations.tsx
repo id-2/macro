@@ -48,7 +48,7 @@ function ChannelPreview(props: { channelId: string }) {
 }
 
 function displayParticipant(id: string) {
-  return id.startsWith('rox|') ? id.slice('rox|'.length) : id;
+  return id.startsWith('macro|') ? id.slice('macro|'.length) : id;
 }
 
 const createChannelHandler = createToolRenderer({

@@ -71,7 +71,7 @@ function prioritizeInternalPeople<T extends CommandMenuItem>(items: T[]): T[] {
   );
 }
 
-function isMacroPerson(item: CommandMenuItem) {
+function isRoxPerson(item: CommandMenuItem) {
   return item.bucket === 'dm' || item.bucket === 'person';
 }
 
@@ -172,7 +172,7 @@ export function rankCommandSearchItems<T extends CommandMenuItem>(
       (left, right) =>
         right.nameMatchRank - left.nameMatchRank ||
         Number(withTeammate(right.item)) - Number(withTeammate(left.item)) ||
-        Number(isMacroPerson(right.item)) - Number(isMacroPerson(left.item)) ||
+        Number(isRoxPerson(right.item)) - Number(isRoxPerson(left.item)) ||
         right.combinedScore - left.combinedScore ||
         compareRecency(left.item, right.item)
     );

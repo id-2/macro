@@ -43,7 +43,7 @@ const database: EntityItem<DatabaseEntity> = {
     type: 'database',
     id: 'db-1',
     name: 'Party Planner',
-    ownerId: 'rox|wolf@rox.one',
+    ownerId: 'macro|wolf@rox.one',
     grant: 'owner',
   },
 };

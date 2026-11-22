@@ -10,7 +10,7 @@ import { entityMessagesClient } from './messages';
 const parent = { type: 'channel', id: 'channel-1' } as const;
 const activity = {
   id: 'activity-1',
-  actor_id: 'rox|user@example.com',
+  actor_id: 'macro|user@example.com',
   occurred_at: '2026-10-07T12:00:00Z',
   action: 'renamed',
   payload: { to: 'Planning' },

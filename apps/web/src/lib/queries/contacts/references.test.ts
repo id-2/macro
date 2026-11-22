@@ -19,7 +19,7 @@ vi.mock('@service-storage/graphql-contacts', () => ({
   fetchContactDirectoryPage: vi.fn(),
   fetchContactDirectoryByIds: vi.fn(),
 }));
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const REQUEST: ContactReferenceRequest = {
   labels: ['Sam'],
@@ -28,10 +28,10 @@ const REQUEST: ContactReferenceRequest = {
 };
 const signal = () => new AbortController().signal;
 const contact = (local: string, name: string | null) => ({
-  id: contactRecordKey(VIEWER, `rox|${local}@example.com`).slice(
+  id: contactRecordKey(VIEWER, `macro|${local}@example.com`).slice(
     'GraphqlContact:'.length
   ),
-  userId: `rox|${local}@example.com`,
+  userId: `macro|${local}@example.com`,
   email: `${local}@example.com`,
   name,
 });
@@ -66,7 +66,7 @@ function host() {
               complete: true,
               people: [
                 {
-                  userId: 'rox|sam@example.com',
+                  userId: 'macro|sam@example.com',
                   email: 'sam@example.com',
                   name: 'Sam',
                 },
@@ -103,7 +103,7 @@ it('uses complete scoped native evidence without fetching or retaining a directo
     network
   );
   expect(result.source).toBe('cache');
-  expect(result.matches[0].people[0].userId).toBe('rox|sam@example.com');
+  expect(result.matches[0].people[0].userId).toBe('macro|sam@example.com');
   expect(result.matches[0].complete).toBe(true);
   expect(cache.people.resolveReferences).toHaveBeenCalledWith({
     scope: { identity: VIEWER, storageGeneration: GENERATION },
@@ -128,7 +128,7 @@ it('samples completeness before the native scan, never after an intervening hydr
           complete: true,
           people: [
             {
-              userId: 'rox|sam@example.com',
+              userId: 'macro|sam@example.com',
               email: 'sam@example.com',
               name: 'Sam',
             },
@@ -177,7 +177,7 @@ it('follows empty exact pages and exhausts the exact pass before calling one mat
   ]);
   expect(result.matches[0]).toMatchObject({
     complete: true,
-    people: [{ userId: 'rox|late@example.com' }],
+    people: [{ userId: 'macro|late@example.com' }],
   });
 });
 
@@ -210,8 +210,8 @@ it('uses first-name fallback only after exact exhaustion and stops at two distin
     'FIRST_NAME',
   ]);
   expect(result.matches[0].people.map((user) => user.userId)).toEqual([
-    'rox|one@example.com',
-    'rox|two@example.com',
+    'macro|one@example.com',
+    'macro|two@example.com',
   ]);
   expect(result.matches[0].complete).toBe(true);
 });
@@ -246,7 +246,7 @@ it('shares one fallback page budget and leaves unexhausted evidence incomplete',
   expect(result.matches[0].complete).toBe(true);
   expect(result.matches[1]).toMatchObject({
     complete: false,
-    people: [{ userId: 'rox|taylor@example.com' }],
+    people: [{ userId: 'macro|taylor@example.com' }],
   });
 });
 
@@ -254,7 +254,7 @@ it('resolves explicit identities separately and does not reinterpret an external
   const network = reads();
   network.lookup.mockResolvedValue({
     users: [
-      { id: 'rox|sam@example.com', email: 'sam@example.com', name: 'Sam' },
+      { id: 'macro|sam@example.com', email: 'sam@example.com', name: 'Sam' },
     ],
     unresolved: [],
     source: 'server',
@@ -270,7 +270,7 @@ it('resolves explicit identities separately and does not reinterpret an external
       ...REQUEST,
       labels: [
         'SAM@example.com',
-        'rox|sam@example.com',
+        'macro|sam@example.com',
         'external$@example.com',
         'Research @ Home',
       ],
@@ -280,7 +280,7 @@ it('resolves explicit identities separately and does not reinterpret an external
   );
   expect(network.lookup.mock.calls[0][2]).toEqual({
     kind: 'ids',
-    values: ['rox|sam@example.com', 'rox|sam@example.com'],
+    values: ['macro|sam@example.com', 'macro|sam@example.com'],
   });
   expect(network.page).toHaveBeenCalledOnce();
   expect(network.page.mock.calls[0][0].search).toBe('research @ home');
@@ -314,13 +314,13 @@ it('filters fallback inboxes without mistaking a short page for exhaustion', asy
     {
       ...REQUEST,
       excludeSecondaryInboxes: true,
-      secondaryInboxIds: ['rox|SECONDARY@example.com'],
+      secondaryInboxIds: ['macro|SECONDARY@example.com'],
     },
     signal(),
     network
   );
   expect(result.matches[0].people.map((person) => person.userId)).toEqual([
-    'rox|person@example.com',
+    'macro|person@example.com',
   ]);
   expect(network.page).toHaveBeenCalledTimes(2);
 });
@@ -365,7 +365,7 @@ it('keeps offline partial evidence explicitly incomplete and performs no offline
 });
 
 it('keeps the exact lookup identity bound distinct from the smaller name-query bound', async () => {
-  const id = `rox|${'a'.repeat(600)}@example.com`;
+  const id = `macro|${'a'.repeat(600)}@example.com`;
   const network = reads();
   network.lookup.mockResolvedValue({
     users: [{ id, email: id.slice(6), name: 'Legacy identity' }],
@@ -390,7 +390,7 @@ it('resolves cached literal identities without claiming a partial directory is c
   const network = reads();
   network.lookup.mockResolvedValue({
     users: [
-      { id: 'rox|sam@example.com', email: 'sam@example.com', name: 'Sam' },
+      { id: 'macro|sam@example.com', email: 'sam@example.com', name: 'Sam' },
     ],
     unresolved: [],
     source: 'cache',
@@ -405,7 +405,7 @@ it('resolves cached literal identities without claiming a partial directory is c
     false
   );
   expect(result.matches[0].complete).toBe(true);
-  expect(result.matches[0].people[0].userId).toBe('rox|sam@example.com');
+  expect(result.matches[0].people[0].userId).toBe('macro|sam@example.com');
   expect(network.lookup.mock.calls[0][5]).toBe(false);
   expect(cache.people.resolveReferences).not.toHaveBeenCalled();
   expect(network.page).not.toHaveBeenCalled();
@@ -430,7 +430,7 @@ it('rejects scope changes, foreign records, nonmatching responses and nonadvanci
   expect(network.page).not.toHaveBeenCalled();
   network.page.mockResolvedValue({
     user: {
-      id: 'rox|other@example.com',
+      id: 'macro|other@example.com',
       contacts: { nodes: [], nextCursor: null },
     },
   });

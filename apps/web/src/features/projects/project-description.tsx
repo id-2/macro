@@ -1,4 +1,4 @@
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { CollabMarkdownEditor } from '@core/collab-surface/CollabMarkdownEditor';
 import { Button } from '@ui';
 import { createMemo, createSignal, onCleanup, Show, Suspense } from 'solid-js';
@@ -15,7 +15,7 @@ function DescriptionSession(props: {
   return (
     <>
       <CollabMarkdownEditor
-        resolveAppLink={useMacroMentionLinkResolver()}
+        resolveAppLink={useRoxMentionLinkResolver()}
         sourceId={props.projectId}
         session={session}
         canEdit={() => props.canEdit}

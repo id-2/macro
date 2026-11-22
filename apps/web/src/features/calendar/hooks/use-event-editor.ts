@@ -52,9 +52,9 @@ import {
   viewerReplacesGuests,
 } from '../utils/event-guest-editing';
 import {
-  attachCalendarMacroCall,
-  calendarMacroCallUrl,
-  removeCalendarMacroCall,
+  attachCalendarRoxCall,
+  calendarRoxCallUrl,
+  removeCalendarRoxCall,
 } from '../utils/rox-call-link';
 
 const EDIT_DISABLED_FIELDS = {
@@ -312,13 +312,13 @@ export function useEventEditor(props: UseEventEditorProps) {
     setSaveError(undefined);
 
     const event = props.event();
-    const existingMeetingUrl = event ? calendarMacroCallUrl(event) : undefined;
-    const cleanContent = removeCalendarMacroCall(values, existingMeetingUrl);
-    const wantsMacroCall =
+    const existingMeetingUrl = event ? calendarRoxCallUrl(event) : undefined;
+    const cleanContent = removeCalendarRoxCall(values, existingMeetingUrl);
+    const wantsRoxCall =
       values.conferenceChoice === 'rox' &&
       !values.outOfOffice &&
       event?.eventType !== 'out_of_office';
-    const needsCall = () => props.roxCallsEnabled() && wantsMacroCall;
+    const needsCall = () => props.roxCallsEnabled() && wantsRoxCall;
     const canManageCall =
       !event || (editsPrimaryCopy(event) && viewerReplacesGuests(event));
     if (
@@ -375,19 +375,19 @@ export function useEventEditor(props: UseEventEditorProps) {
 
       const effectiveScope: CalendarUpdateScope = scope ?? 'all';
       const targetsOneOccurrence = effectiveScope === 'this_event';
-      const initialContent = removeCalendarMacroCall(event, existingMeetingUrl);
+      const initialContent = removeCalendarRoxCall(event, existingMeetingUrl);
       const content =
         event.eventType === 'out_of_office' ||
         (existingMeetingUrl &&
-          wantsMacroCall &&
+          wantsRoxCall &&
           cleanContent.location === initialContent.location &&
           cleanContent.description === initialContent.description)
           ? {
               location: event.location ?? '',
               description: event.description ?? '',
             }
-          : existingMeetingUrl && wantsMacroCall
-            ? attachCalendarMacroCall(
+          : existingMeetingUrl && wantsRoxCall
+            ? attachCalendarRoxCall(
                 cleanContent,
                 existingMeetingUrl,
                 existingMeetingUrl
@@ -468,7 +468,7 @@ export function useEventEditor(props: UseEventEditorProps) {
 
       if (needsCall() && canManageCall && !existingMeetingUrl) {
         const meetingUrl = await createScheduledMeeting(values);
-        const linkedContent = attachCalendarMacroCall(cleanContent, meetingUrl);
+        const linkedContent = attachCalendarRoxCall(cleanContent, meetingUrl);
         if (needsCall())
           await update.mutateAsync({
             ...updateArgs,

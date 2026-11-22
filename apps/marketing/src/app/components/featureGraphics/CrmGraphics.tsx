@@ -1,8 +1,8 @@
 import IconCompany from '@icon/system/regular/buildings.svg';
 import IconRoxDocs from '@icon/system/regular/file.svg';
-import IconMacroTasks from '@icon/system/regular/list-checks.svg';
+import IconRoxTasks from '@icon/system/regular/list-checks.svg';
 import IconSearch from '@icon/system/regular/magnifying-glass.svg';
-import IconMacroCall from '@icon/system/regular/phone-call.svg';
+import IconRoxCall from '@icon/system/regular/phone-call.svg';
 import {
   createEffect,
   createSignal,
@@ -478,7 +478,7 @@ function MentionPill(props: {
       </Show>
       <Show when={isTask}>
         <span style={mentionIconWrap}>
-          <IconMacroTasks
+          <IconRoxTasks
             style={{
               color: TASK_GREEN,
               display: 'block',
@@ -490,7 +490,7 @@ function MentionPill(props: {
       </Show>
       <Show when={props.kind === 'call'}>
         <span style={mentionIconWrap}>
-          <IconMacroCall
+          <IconRoxCall
             style={{
               color: CALL_TEAL,
               display: 'block',

@@ -3,7 +3,7 @@ import { SplitHeaderRight } from '@components/app/split-layout/components/SplitH
 import { UserGroup } from '@core/component/UserGroup';
 import { useChannel } from '@core/context/channels';
 import { isMobile } from '@core/mobile/isMobile';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import PhoneIcon from '@icon/system/regular/phone.svg';
 import { Telemetry } from '@rox-one/observability';
 import { useActiveCallQuery, useLiveCallRecordQuery } from '@queries/call/call';
@@ -25,7 +25,7 @@ import { ActiveCallHeader } from './views/ActiveCallHeader';
 
 function ParticipantFirstName(props: { id: string }) {
   const name = createMemo(() => {
-    const fullName = getDisplayName(tryMacroId(props.id));
+    const fullName = getDisplayName(tryRoxId(props.id));
     return fullName.trim().split(/\s+/)[0] || fullName || 'Someone';
   });
 

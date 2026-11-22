@@ -2,8 +2,8 @@ import { requestBotDetail } from '@app/features/channel/Bots/botSettingsState';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import type { UserCardAction } from '@core/component/userCardActions';
 import { botManagement, enableChatV3Agents } from '@core/constant/featureFlags';
-import { isBotPrincipalId, isMacroAgentId } from '@core/constant/roxAgent';
-import { isMacroNewId } from '@core/constant/roxNew';
+import { isBotPrincipalId, isRoxAgentId } from '@core/constant/roxAgent';
+import { isRoxNewId } from '@core/constant/roxNew';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserId } from '@core/context/user';
 import GearIcon from '@phosphor/gear.svg';
@@ -47,7 +47,7 @@ export function createBotSettingsUserCardAction(
     const botId = id.startsWith('bot|') ? id.slice('bot|'.length) : id;
 
     if (agentsFlag().enabled) {
-      if (isMacroAgentId(botId) || isMacroNewId(botId)) {
+      if (isRoxAgentId(botId) || isRoxNewId(botId)) {
         return { type: 'agents' };
       }
       const agents = agentsQuery.isSuccess ? agentsQuery.data : [];

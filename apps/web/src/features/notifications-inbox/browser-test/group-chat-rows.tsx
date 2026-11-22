@@ -25,7 +25,7 @@ import type { NotificationInboxRow } from '../context/notifications-inbox-contex
 import { describeInboxCard } from '../primitives/describe-row';
 import { InboxRowAvatar } from '../views/inbox-row-avatar';
 
-const VIEWER_ID = 'rox|viewer@example.test';
+const VIEWER_ID = 'macro|viewer@example.test';
 
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   id: VIEWER_ID,
@@ -53,7 +53,7 @@ const PEOPLE = [
   'Vic',
   'Wes',
 ];
-const idOf = (name: string) => `rox|${name.toLowerCase()}@example.test`;
+const idOf = (name: string) => `macro|${name.toLowerCase()}@example.test`;
 const nameOf = (id: string) =>
   PEOPLE.find((name) => idOf(name) === id) ?? 'Someone';
 

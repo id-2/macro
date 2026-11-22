@@ -1,5 +1,5 @@
 import { UserCardTrigger } from '@core/component/UserCardTrigger';
-import { getDisplayNameParts, roxIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayNameParts, roxIdToEmail, tryRoxId } from '@core/user';
 import type { UserMentionDecoratorProps } from '@rox-one/lexical-core';
 import { cn } from '@ui';
 import { createEffect, createMemo, useContext } from 'solid-js';
@@ -26,7 +26,7 @@ export function UserMention(props: UserMentionDecoratorProps) {
   const propDisplayName = () => props.displayName?.trim() ?? '';
 
   const roxId = createMemo(() =>
-    props.userId ? tryMacroId(userId()) : undefined
+    props.userId ? tryRoxId(userId()) : undefined
   );
 
   const email = createMemo(() => {

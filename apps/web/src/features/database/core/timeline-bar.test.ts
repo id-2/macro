@@ -80,7 +80,7 @@ const launch = {
     dates: '2026-03-09T14:30:00.000Z/2026-03-09T21:00:00.000Z',
     stage: 'Plan',
     labels: '["Gone","Design","Web"]',
-    owner: 'rox|ada@example.com',
+    owner: 'macro|ada@example.com',
     budget: null,
   },
 };

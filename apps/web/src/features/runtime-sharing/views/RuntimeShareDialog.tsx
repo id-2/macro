@@ -11,7 +11,7 @@ import {
   ShareDialogFrame,
 } from '@core/component/TopBar/ShareDialogFrame';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { OwnerLabel } from '@entity/owner/owner-display';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
@@ -126,7 +126,7 @@ function RuntimeShareMenu(props: { harness: Harness; open: boolean }) {
         (id) =>
           id !== userId() &&
           !grantedIds().includes(id) &&
-          getDisplayName(tryMacroId(id)).toLowerCase().includes(query)
+          getDisplayName(tryRoxId(id)).toLowerCase().includes(query)
       );
   };
 

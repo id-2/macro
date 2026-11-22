@@ -14,9 +14,9 @@ vi.mock('../utils', () => ({
 import { makeMoveToProjectAction } from './make-move-to-project-action';
 
 const entity = (type: EntityData['type']) =>
-  ({ type, id: 'e1', name: 'Thing', ownerId: 'rox|me' }) as EntityData;
+  ({ type, id: 'e1', name: 'Thing', ownerId: 'macro|me' }) as EntityData;
 
-const { canExecute } = makeMoveToProjectAction({ userId: () => 'rox|me' });
+const { canExecute } = makeMoveToProjectAction({ userId: () => 'macro|me' });
 
 describe('makeMoveToProjectAction.canExecute', () => {
   it('offers moving what the move mutation moves', () => {
@@ -30,7 +30,7 @@ describe('makeMoveToProjectAction.canExecute', () => {
     expect(
       canExecute({
         ...entity('document'),
-        ownerId: 'rox|other',
+        ownerId: 'macro|other',
       } as EntityData)
     ).toBe(false);
   });

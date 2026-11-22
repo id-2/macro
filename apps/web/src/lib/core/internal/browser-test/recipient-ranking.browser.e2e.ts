@@ -13,7 +13,7 @@ test('filters automated user suggestions but accepts their complete typed addres
   );
   await input.press('Enter');
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|notifications@example.com"]'
+    '["macro|notifications@example.com"]'
   );
 });
 
@@ -28,13 +28,13 @@ test('exact recipient addresses beat recent word matches and retain selection ac
   );
   await input.press('Enter');
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|person@example.com"]'
+    '["macro|person@example.com"]'
   );
   await input.fill('recent');
   await expect(page.getByRole('option').first()).toContainText(
     'recent@example.com'
   );
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|person@example.com"]'
+    '["macro|person@example.com"]'
   );
 });

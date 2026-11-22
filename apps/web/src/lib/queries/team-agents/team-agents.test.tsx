@@ -30,12 +30,12 @@ import {
 } from './team-agents';
 
 const ada: TeamAgent = {
-  userId: 'rox|ada@agents.rox.invalid',
+  userId: 'macro|ada@agents.rox.invalid',
   teamId: 'team-1',
   name: 'Ada',
   jobDescription: 'Triage support email.',
   personality: 'Warm.',
-  createdBy: 'rox|admin@example.com',
+  createdBy: 'macro|admin@example.com',
   computerId: null,
   status: 'provisioning',
   createdAt: '2026-11-11T00:00:00Z',
@@ -43,7 +43,7 @@ const ada: TeamAgent = {
 
 const grace: TeamAgent = {
   ...ada,
-  userId: 'rox|grace@agents.rox.invalid',
+  userId: 'macro|grace@agents.rox.invalid',
   name: 'Grace',
   status: 'running',
 };

@@ -6,7 +6,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    rox_id: 'rox|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: false,
     calendar_disabled: false,
@@ -18,7 +18,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
 describe('toCalendarAccounts', () => {
   it('offers reconnect when an expired Google grant still has stored calendar scopes', () => {
     expect(
-      toCalendarAccounts([link('a', { needs_reauth: true })], 'rox|self')[0]
+      toCalendarAccounts([link('a', { needs_reauth: true })], 'macro|self')[0]
     ).toMatchObject({
       action: 'reconnect',
       consentScopes: 'gmail_and_calendar',
@@ -26,7 +26,7 @@ describe('toCalendarAccounts', () => {
   });
 
   it('offers turn-off for an inbox that already has calendar', () => {
-    expect(toCalendarAccounts([link('a')], 'rox|self')).toEqual([
+    expect(toCalendarAccounts([link('a')], 'macro|self')).toEqual([
       {
         provider: 'GMAIL',
         linkId: 'a',
@@ -39,7 +39,7 @@ describe('toCalendarAccounts', () => {
 
   it('offers enable for an inbox missing calendar permission', () => {
     const links = [link('a', { needs_calendar_permission: true })];
-    expect(toCalendarAccounts(links, 'rox|self')).toEqual([
+    expect(toCalendarAccounts(links, 'macro|self')).toEqual([
       {
         provider: 'GMAIL',
         linkId: 'a',
@@ -54,7 +54,7 @@ describe('toCalendarAccounts', () => {
     const links = [
       link('a', { needs_calendar_permission: true, calendar_disabled: true }),
     ];
-    expect(toCalendarAccounts(links, 'rox|self')[0]?.action).toBe('enable');
+    expect(toCalendarAccounts(links, 'macro|self')[0]?.action).toBe('enable');
   });
 
   it.each([false, true])(
@@ -67,7 +67,7 @@ describe('toCalendarAccounts', () => {
           calendar_disabled: disabled,
         }),
       ];
-      expect(toCalendarAccounts(links, 'rox|self')[0]).toMatchObject({
+      expect(toCalendarAccounts(links, 'macro|self')[0]).toMatchObject({
         action: 'enable',
         consentScopes: 'gmail_and_calendar',
       });
@@ -78,7 +78,7 @@ describe('toCalendarAccounts', () => {
     const links = [
       link('a', { needs_calendar_permission: true, has_calendar_data: true }),
     ];
-    expect(toCalendarAccounts(links, 'rox|self')[0]?.action).toBe('enable');
+    expect(toCalendarAccounts(links, 'macro|self')[0]?.action).toBe('enable');
   });
 
   it('sorts the primary inbox first and keeps the rest in order', () => {
@@ -88,13 +88,13 @@ describe('toCalendarAccounts', () => {
       link('third'),
     ];
     expect(
-      toCalendarAccounts(links, 'rox|self').map((a) => a.linkId)
+      toCalendarAccounts(links, 'macro|self').map((a) => a.linkId)
     ).toEqual(['primary', 'second', 'third']);
   });
 
   it('drops delegated inboxes the viewer does not own', () => {
-    const links = [link('own'), link('shared', { rox_id: 'rox|other' })];
-    expect(toCalendarAccounts(links, 'rox|self')).toEqual([
+    const links = [link('own'), link('shared', { rox_id: 'macro|other' })];
+    expect(toCalendarAccounts(links, 'macro|self')).toEqual([
       {
         provider: 'GMAIL',
         linkId: 'own',
@@ -109,7 +109,7 @@ describe('toCalendarAccounts', () => {
     expect(
       toCalendarAccounts(
         [link('rox', { provider: 'ROX', is_primary: true })],
-        'rox|self'
+        'macro|self'
       )
     ).toEqual([]);
   });

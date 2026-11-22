@@ -1,4 +1,4 @@
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import CalendarCheck from '@icon/system/regular/calendar-check.svg';
 import type { NamedTool } from '@service-cognition/generated/tools/tool';
 import { format } from 'date-fns';
@@ -16,7 +16,7 @@ function AvailabilityResponse(props: { data: Availability }) {
         {(member) => (
           <Tool.ListItem>
             <span class="min-w-0 flex-1 truncate text-xs text-ink">
-              {getDisplayName(tryMacroId(member.userId)) || 'Teammate'}
+              {getDisplayName(tryRoxId(member.userId)) || 'Teammate'}
             </span>
             <span class="text-xs text-ink-muted">
               {member.coverage === 'unknown'

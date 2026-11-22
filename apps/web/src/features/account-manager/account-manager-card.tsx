@@ -1,7 +1,7 @@
 import { formatLocale, t } from '@app/lib/i18n';
 import { CredentialField } from '@channel/Bots/CredentialField';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import XIcon from '@icon/system/regular/x.svg';
 import {
   useAccountManagerGrantQuery,
@@ -57,7 +57,7 @@ function GrantContent(props: { grant: AccountManagerGrant }) {
     const other = isManager()
       ? props.grant.managedUserId
       : props.grant.managerUserId;
-    return getDisplayName(tryMacroId(other));
+    return getDisplayName(tryRoxId(other));
   };
   const askedByViewer = () =>
     props.grant.requestedBy === (isManager() ? 'manager' : 'managed');

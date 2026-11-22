@@ -4,8 +4,8 @@ import { calendarDescriptionText } from './calendar-description';
 import { type CalendarPerson, findOrganizer } from './event-attribution';
 import { formatEventSchedule, parseCalendarDate } from './event-schedule';
 import {
-  calendarMacroCallUrl,
-  removeCalendarMacroCall,
+  calendarRoxCallUrl,
+  removeCalendarRoxCall,
 } from './rox-call-link';
 import { eventRecurrenceDescription } from './recurrence';
 
@@ -30,7 +30,7 @@ export function eventForwardSummary(
   event: CalendarEvent,
   timeFormat: CalendarTimeFormat
 ): string {
-  const content = removeCalendarMacroCall(event, calendarMacroCallUrl(event));
+  const content = removeCalendarRoxCall(event, calendarRoxCallUrl(event));
   const schedule = formatEventSchedule(event, timeFormat);
   const zone = event.allDay
     ? undefined

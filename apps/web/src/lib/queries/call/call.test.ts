@@ -49,7 +49,7 @@ const summary = (over: Partial<ActiveCallSummary>): ActiveCallSummary => ({
   callId: 'call-1',
   channelId: 'channel-1',
   createdAt: '2026-08-21T09:00:00.000Z',
-  createdBy: 'rox|a@test.com',
+  createdBy: 'macro|a@test.com',
   participantCount: 2,
   ...over,
 });
@@ -58,7 +58,7 @@ const started = (over: Partial<CallActiveResponse>): CallActiveResponse => ({
   callId: 'call-new',
   channelId: 'channel-new',
   createdAt: '2026-08-21T10:00:00.000Z',
-  createdBy: 'rox|b@test.com',
+  createdBy: 'macro|b@test.com',
   ...over,
 });
 
@@ -116,7 +116,7 @@ const record = (over: Partial<CallRecord>): CallRecord => ({
   callId: 'call-1',
   channelId: 'channel-1',
   discussion: { kind: 'call_chat', call_id: 'call-1' },
-  createdBy: 'rox|a@test.com',
+  createdBy: 'macro|a@test.com',
   isActive: false,
   participants: [],
   guests: [],
@@ -184,7 +184,7 @@ describe('call team sharing helpers', () => {
       sharePermissionFromCallRecord(
         record({
           callId: 'call-live',
-          createdBy: 'rox|owner@test.com',
+          createdBy: 'macro|owner@test.com',
           isActive: true,
           shareWithTeam: true,
           teamShareAccessLevel: null,
@@ -192,7 +192,7 @@ describe('call team sharing helpers', () => {
       )
     ).toEqual({
       id: 'call-live',
-      owner: 'rox|owner@test.com',
+      owner: 'macro|owner@test.com',
       teamShareAccessLevel: 'view',
     });
     expect(
@@ -204,7 +204,7 @@ describe('call team sharing helpers', () => {
       )
     ).toEqual({
       id: 'call-1',
-      owner: 'rox|a@test.com',
+      owner: 'macro|a@test.com',
       teamShareAccessLevel: null,
     });
   });
@@ -215,7 +215,7 @@ describe('call team sharing helpers', () => {
       ok(
         record({
           callId: 'call-live',
-          createdBy: 'rox|owner@test.com',
+          createdBy: 'macro|owner@test.com',
           isActive: true,
           shareWithTeam: true,
           teamShareAccessLevel: null,
@@ -230,7 +230,7 @@ describe('call team sharing helpers', () => {
     if (result.isOk()) {
       expect(result.value).toEqual({
         id: 'call-live',
-        owner: 'rox|owner@test.com',
+        owner: 'macro|owner@test.com',
         teamShareAccessLevel: 'view',
       });
     }
@@ -360,7 +360,7 @@ describe('refetchLeftCallRecord', () => {
 
   it('refetches the left call record even with no mounted reader', async () => {
     const participant = {
-      userId: 'rox|a@test.com',
+      userId: 'macro|a@test.com',
       joinedAt: '2026-08-21T09:00:00.000Z',
     };
     queryClient.setQueryData(

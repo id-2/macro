@@ -392,7 +392,7 @@ function created(body: ActionConfiguration): ScheduledAction {
         ? body.run_visibility
         : 'unlisted',
     id: 'new-routine',
-    owner: 'rox|owner@example.com',
+    owner: 'macro|owner@example.com',
     created_at: '2026-09-28T00:00:00Z',
     updated_at: '2026-09-28T00:00:00Z',
     configuration_revision: 1,

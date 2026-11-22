@@ -19,7 +19,7 @@ const result = (id: string): ContactResolution => ({
 
 it('keeps selection lookup separate from suggestions and ignores superseded results', async () => {
   const client = new QueryClient();
-  const [selected, setSelected] = createSignal(['rox|first@example.com']);
+  const [selected, setSelected] = createSignal(['macro|first@example.com']);
   const started = Promise.withResolvers<void>();
   const pending = Promise.withResolvers<ContactResolution>();
   const current = Promise.withResolvers<void>();
@@ -52,13 +52,13 @@ it('keeps selection lookup separate from suggestions and ignores superseded resu
     </QueryClientProvider>
   ));
   await started.promise;
-  setSelected(['rox|second@example.com']);
+  setSelected(['macro|second@example.com']);
   expect(selection!.data()).toBeUndefined();
   await current.promise;
-  pending.resolve(result('rox|first@example.com'));
+  pending.resolve(result('macro|first@example.com'));
   await pending.promise;
-  expect(selection!.data()?.users[0]?.id).toBe('rox|second@example.com');
-  expect(selected()).toEqual(['rox|second@example.com']);
+  expect(selection!.data()?.users[0]?.id).toBe('macro|second@example.com');
+  expect(selected()).toEqual(['macro|second@example.com']);
   expect(resolver.mock.calls[0][3].aborted).toBe(true);
   mounted.unmount();
   client.clear();

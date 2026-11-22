@@ -22,7 +22,7 @@ export function OnboardingContactsFixture() {
     ...defaultFakeWorld(),
     contacts: [],
     viewer: {
-      id: 'rox|viewer@example.com',
+      id: 'macro|viewer@example.com',
       email: 'VIEWER@team.example.com',
       tutorialComplete: false,
       licensed: false,

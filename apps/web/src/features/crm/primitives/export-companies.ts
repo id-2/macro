@@ -92,7 +92,7 @@ export function createCrmExport(
     if (value.type === 'EntityReference')
       return value.value
         .map((ref) =>
-          ref.entity_id.startsWith('rox|')
+          ref.entity_id.startsWith('macro|')
             ? idToEmail(ref.entity_id)
             : ref.entity_id
         )

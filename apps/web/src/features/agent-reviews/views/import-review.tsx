@@ -73,7 +73,7 @@ export function ImportReview(props: {
         sharingSummary={review.sharingSummary()}
         totals={review.totals()}
         planningStatus={review.planningStatus()}
-        alreadyInMacroSummary={review.alreadyInMacroSummary()}
+        alreadyInRoxSummary={review.alreadyInRoxSummary()}
         alreadyInMacro={review.alreadyInMacro()}
         entityHref={(copy) => {
           const block = copyBlock(copy);

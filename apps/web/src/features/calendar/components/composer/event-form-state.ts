@@ -1,5 +1,5 @@
 import type { DateTimeRangeProps } from '@app/components/date-time-range/date-time-range-fields';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import type { CalendarUpdateScope } from '@service-email/client';
 import type { JSX } from 'solid-js';
 import { createEffect, createSignal, createUniqueId } from 'solid-js';
@@ -213,7 +213,7 @@ export function createEventForm(props: EventFormProps) {
     ids,
     controller,
     state,
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     isEdit,
     formIsDisabled,
     editScope,

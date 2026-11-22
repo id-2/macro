@@ -73,12 +73,12 @@ const readDirectory: typeof readContactDirectory = async (
     users: ids.map((id) =>
       id === -1
         ? {
-            id: 'rox|sender@example.com',
+            id: 'macro|sender@example.com',
             email: 'sender@example.com',
             name: 'Directory sender',
           }
         : {
-            id: `rox|person${id}@example.com`,
+            id: `macro|person${id}@example.com`,
             email: `person${id}@example.com`,
             name: id === 99_999 ? 'Late Person' : `Person ${id}`,
           }
@@ -101,7 +101,7 @@ const context: EmailComposeContext = {
   createRecipientSource: directoryEnabled
     ? (input) =>
         createContactRecipientSource(
-          () => ({ userId: 'rox|me@example.com' }),
+          () => ({ userId: 'macro|me@example.com' }),
           input,
           () => false,
           readDirectory

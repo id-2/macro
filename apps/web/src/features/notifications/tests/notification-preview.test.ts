@@ -33,12 +33,12 @@ function createEmailNotification(
 describe('new_email notification', () => {
   it('prefers senderId over metadata sender', () => {
     const notification = createEmailNotification(
-      'rox|preferred@example.com',
+      'macro|preferred@example.com',
       'fallback@example.com'
     );
 
     // sender_id is directly available on the notification
-    expect(notification.sender_id).toBe('rox|preferred@example.com');
+    expect(notification.sender_id).toBe('macro|preferred@example.com');
   });
 
   it('falls back to metadata sender when senderId is null', () => {

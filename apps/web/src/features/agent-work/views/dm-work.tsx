@@ -4,7 +4,7 @@ import { SidePanel, useSidePanel } from '@components/app/side-panel';
 import { UserIcon } from '@core/component/UserIcon';
 import { enableAgentWork } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, isAgentAccount, tryMacroId } from '@core/user';
+import { getDisplayName, isAgentAccount, tryRoxId } from '@core/user';
 import { subscribeGraphqlSoupReconnected } from '@service-storage/graphql-soup';
 import {
   type Accessor,
@@ -54,7 +54,7 @@ export function DmWorkProvider(
       isDirectMessage: props.isDirectMessage,
       participantIds: props.participantIds,
       viewerId: viewerId(),
-      isAgentAccount: (id) => isAgentAccount(tryMacroId(id)),
+      isAgentAccount: (id) => isAgentAccount(tryRoxId(id)),
     });
   });
   const accountIds = createMemo(() => {
@@ -115,7 +115,7 @@ function ArrivalLabel(props: { account: string }) {
       </span>
       <span class="min-w-0 truncate">
         {t('agentWork.startedWorking', {
-          name: getDisplayName(tryMacroId(props.account)),
+          name: getDisplayName(tryRoxId(props.account)),
         })}
       </span>
     </button>
@@ -173,7 +173,7 @@ export function DmWorkPanel() {
               title={
                 <WorkIdentity
                   isAgent
-                  name={getDisplayName(tryMacroId(account()))}
+                  name={getDisplayName(tryRoxId(account()))}
                   avatar={
                     <UserIcon
                       id={account()}

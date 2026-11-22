@@ -1,5 +1,5 @@
 import type { NotificationType } from '@core/types';
-import { getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayNameParts, tryRoxId } from '@core/user';
 import type { NotificationStack } from '@notifications';
 import {
   entityDiscussionVerb,
@@ -74,7 +74,7 @@ export function NotificationDescription(props: NotificationDescriptionProps) {
   };
 
   const roxFirstName = (id: string) => {
-    const parts = getDisplayNameParts(tryMacroId(id), {
+    const parts = getDisplayNameParts(tryRoxId(id), {
       emailFallback: 'local-part',
     });
     return parts.firstName || parts.fullName;

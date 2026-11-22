@@ -41,7 +41,7 @@ const documentRow = (
   type: 'document',
   id: 'doc-1',
   name,
-  ownerId: 'rox|owner@rox.one',
+  ownerId: 'macro|owner@rox.one',
   fileType,
 });
 
@@ -86,7 +86,7 @@ describe('download type gating', () => {
         type: 'document',
         id: 'task-1',
         name: 'Ship it',
-        ownerId: 'rox|owner@rox.one',
+        ownerId: 'macro|owner@rox.one',
         fileType: 'md',
         subType: { type: 'task' },
       })
@@ -96,7 +96,7 @@ describe('download type gating', () => {
         type: 'chat',
         id: 'chat-1',
         name: 'Chat',
-        ownerId: 'rox|owner@rox.one',
+        ownerId: 'macro|owner@rox.one',
       })
     ).toBe(false);
   });
@@ -126,7 +126,7 @@ describe('download by id', () => {
             documentName: 'Diagram',
             documentVersionId: 7,
             fileType: 'png',
-            owner: 'rox|owner@rox.one',
+            owner: 'macro|owner@rox.one',
           },
           userAccessLevel: 'view',
         })
@@ -142,7 +142,7 @@ describe('download by id', () => {
             metadata: {
               documentId: 'doc-1',
               documentName: 'Diagram',
-              owner: 'rox|owner@rox.one',
+              owner: 'macro|owner@rox.one',
             },
           },
         })

@@ -1,6 +1,6 @@
 import { EmailAttachmentPill } from '@app/features/email-message/components/attachment-pill';
 import { reloadApp } from '@app/observability/reload';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { FileDropOverlay } from '@core/component/FileDropOverlay';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
@@ -275,7 +275,7 @@ function LoadedReplyInputView(props: ReplyInputViewProps) {
   // File sharing and editor plugin wiring belong to this view. The controller only
   // needs to know when editor content has changed and requires another save.
   const editorConfig = buildConfig('markdown')
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .namespace('email-base-input-markdown')
     .withMentions({
       onUserMention: state.handleUserMention,

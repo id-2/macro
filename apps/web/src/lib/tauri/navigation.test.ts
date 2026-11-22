@@ -26,7 +26,7 @@ vi.mock('@solidjs/router', () => ({ useNavigate: () => mocks.navigate }));
 vi.mock('@tauri-apps/api/core', () => ({ invoke: mocks.invoke }));
 vi.mock('@tauri-apps/api/event', () => ({ listen: mocks.listen }));
 vi.mock('./roxLinkInterceptor', () => ({
-  registerMacroLinkInterceptor: () => () => {},
+  registerRoxLinkInterceptor: () => () => {},
 }));
 
 import { registerPipedreamCallback } from '@core/pipedream/connect-callback';

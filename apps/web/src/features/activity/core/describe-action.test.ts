@@ -18,11 +18,11 @@ const DESCRIBE_CASES: Array<[ActivityAction, string]> = [
     'changed a property',
   ],
   [
-    { kind: 'participant-added', participant: 'rox|sarah@example.com' },
+    { kind: 'participant-added', participant: 'macro|sarah@example.com' },
     'added a participant',
   ],
   [
-    { kind: 'participant-removed', participant: 'rox|sarah@example.com' },
+    { kind: 'participant-removed', participant: 'macro|sarah@example.com' },
     'removed a participant',
   ],
   [{ kind: 'call-started' }, 'started a call'],
@@ -44,7 +44,7 @@ const ENTITY_CASES: Array<
   [{ kind: 'messaged' }, { verb: 'sent a message', connector: 'in' }],
   [{ kind: 'responded' }, { verb: 'responded', connector: 'to' }],
   [
-    { kind: 'participant-added', participant: 'rox|sarah@example.com' },
+    { kind: 'participant-added', participant: 'macro|sarah@example.com' },
     { verb: 'added a participant', connector: 'to' },
   ],
   [
@@ -86,11 +86,11 @@ describe('describeAction', () => {
       'made 5 property changes',
     ],
     [
-      { kind: 'participant-added', participant: 'rox|sarah@example.com' },
+      { kind: 'participant-added', participant: 'macro|sarah@example.com' },
       'added 5 participants',
     ],
     [
-      { kind: 'participant-removed', participant: 'rox|sarah@example.com' },
+      { kind: 'participant-removed', participant: 'macro|sarah@example.com' },
       'removed 5 participants',
     ],
     [{ kind: 'call-started' }, 'started 5 calls'],
@@ -109,7 +109,7 @@ describe('describeAction', () => {
 describe('describeRun', () => {
   const event = (id: string, action: ActivityAction): ActivityEvent => ({
     id,
-    actorId: 'rox|sarah@example.com',
+    actorId: 'macro|sarah@example.com',
     entityId: 'doc-1',
     entityType: 'document',
     occurredAt: '2026-08-21T12:00:00.000Z',

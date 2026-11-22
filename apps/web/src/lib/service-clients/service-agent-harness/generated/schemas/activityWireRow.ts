@@ -17,7 +17,7 @@ export interface ActivityWireRow {
   action: string;
   /** The stored action payload, if any. */
   action_payload?: unknown;
-  /** Who mechanically acted, as a principal string (`rox|…` / `bot|…`). */
+  /** Who mechanically acted, as a principal string (`macro|…` / `bot|…`). */
   actor_id: string;
   /** Originating code-mode invocation, absent on older events. */
   agent_correlation_id?: ActivityWireRowAgentCorrelationId;

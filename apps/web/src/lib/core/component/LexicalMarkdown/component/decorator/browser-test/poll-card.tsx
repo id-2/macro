@@ -67,7 +67,7 @@ function pollDetail(
       id,
       name: question,
       description: '',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -141,7 +141,7 @@ function PollExample(props: {
       type: 'form',
       name: props.question,
       rawName: props.question,
-      owner: 'rox|owner@example.com',
+      owner: 'macro|owner@example.com',
       loading: false,
       access: 'access',
     } satisfies PreviewItem);
@@ -210,7 +210,7 @@ function SuspendedPollExample() {
     type: 'form',
     name: 'Pick your size',
     rawName: 'Pick your size',
-    owner: 'rox|owner@example.com',
+    owner: 'macro|owner@example.com',
     loading: false,
     access: 'access',
   } satisfies PreviewItem);

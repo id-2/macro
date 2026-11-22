@@ -29,7 +29,7 @@ import {
   taskDetailRoute,
 } from '@app/routes/routes';
 import { createAppSplitRouterMiddleware } from '@components/app/split-layout/split-router/app-middleware';
-import { createMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { createRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { describe, expect, it, vi } from 'vitest';
 import { pipelineTab } from './core/navigation';
 import type { CrmViewConfig } from './core/saved-view';
@@ -87,7 +87,7 @@ const routes = createRoutesManifest({
   ],
   defaultRoute: () => paneRoute({ id: companiesRoute.id, params: {} }),
 } satisfies SplitRoutes);
-const resolveMention = createMacroMentionLinkResolver(routes);
+const resolveMention = createRoxMentionLinkResolver(routes);
 
 const appUrl = (path: string) => `${window.location.origin}/app${path}`;
 const crmViewLink = (view: CrmViewConfig) =>

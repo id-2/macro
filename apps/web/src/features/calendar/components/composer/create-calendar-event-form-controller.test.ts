@@ -27,8 +27,8 @@ function timedRange(startHoursFromNow: number) {
 function guest(email: string): SelectedEventEditorGuest {
   return {
     kind: 'custom',
-    id: `rox|${email}`,
-    data: { id: `rox|${email}`, email, invalid: false },
+    id: `macro|${email}`,
+    data: { id: `macro|${email}`, email, invalid: false },
   };
 }
 

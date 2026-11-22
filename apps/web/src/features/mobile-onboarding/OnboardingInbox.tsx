@@ -12,7 +12,7 @@ import CheckIcon from '@icon/system/regular/check.svg';
 import { cn } from '@ui';
 import { createSignal, For, Show } from 'solid-js';
 
-const CURRENT_USER_ID = 'rox|current@example.com';
+const CURRENT_USER_ID = 'macro|current@example.com';
 
 const mockEmail = (
   id: string,

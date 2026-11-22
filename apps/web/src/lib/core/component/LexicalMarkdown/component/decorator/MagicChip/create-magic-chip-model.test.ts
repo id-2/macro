@@ -66,11 +66,11 @@ vi.mock('@service-agent-harness/client', () => ({
   agentHarnessServiceClient: serviceClient,
 }));
 vi.mock('@core/user', () => ({
-  tryMacroId: (id: string) => (id.startsWith('rox|') ? id : undefined),
+  tryRoxId: (id: string) => (id.startsWith('macro|') ? id : undefined),
   getDisplayName: (id: string) =>
-    id === 'rox|alice@rox.one' ? 'Alice Owner' : '',
+    id === 'macro|alice@rox.one' ? 'Alice Owner' : '',
 }));
-let viewer = 'rox|alice@rox.one';
+let viewer = 'macro|alice@rox.one';
 vi.mock('@core/context/user', () => ({ useUserId: () => () => viewer }));
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { failure: vi.fn(), success: vi.fn() },
@@ -106,7 +106,7 @@ const prompt: FoldedMessage = {
   agentSessionId: 'session',
   key: '0:user',
   turn: 0,
-  author: { kind: 'user', userId: 'rox|wolf@rox.one' },
+  author: { kind: 'user', userId: 'macro|wolf@rox.one' },
   parts: [{ kind: 'text', text: 'Say hi' }],
   stop: null,
   pending: false,
@@ -179,7 +179,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'rox|alice@rox.one',
+        ownerId: 'macro|alice@rox.one',
         canEdit: true,
       },
     });
@@ -637,7 +637,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'rox|alice@rox.one',
+        ownerId: 'macro|alice@rox.one',
         canEdit: false,
       },
     });
@@ -678,7 +678,7 @@ describe('createMagicChipModel', () => {
             serverSlug: 'rox',
             serverName: 'Rox',
             toolName: 'GetThread',
-            requestedBy: 'rox|bob@rox.one',
+            requestedBy: 'macro|bob@rox.one',
           },
         ],
       } as unknown as SessionMetadata,
@@ -688,7 +688,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'rox|alice@rox.one',
+        ownerId: 'macro|alice@rox.one',
         canEdit: true,
       },
     });
@@ -707,9 +707,9 @@ describe('createMagicChipModel', () => {
     };
 
     expect(await action()).toBe('Wants to read your email');
-    viewer = 'rox|bob@rox.one';
+    viewer = 'macro|bob@rox.one';
     expect(await action()).toBe("Wants to read the owner's email");
-    viewer = 'rox|alice@rox.one';
+    viewer = 'macro|alice@rox.one';
   });
 
   it("a question from a later turn is not this chip's, and the live metadata moves it", async () => {

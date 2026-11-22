@@ -46,7 +46,7 @@ for (const mode of ['email', 'calendar']) {
       ).toBeDisabled();
     await prompt.fill(`${prefix} Precise`);
     await expect(page.getByTestId('people-reference-result')).toContainText(
-      'rox|precise@example.com'
+      'macro|precise@example.com'
     );
     await expect(submit).toBeEnabled();
     await prompt.fill(`${prefix} Family, Given`);
@@ -54,21 +54,21 @@ for (const mode of ['email', 'calendar']) {
       '["family, given"]'
     );
     await expect(page.getByTestId('people-reference-result')).toContainText(
-      'rox|family-given@example.com'
+      'macro|family-given@example.com'
     );
     await expect(submit).toBeEnabled();
     await submit.click();
     await expect(page.getByTestId('person-targets')).toContainText(
-      'rox|family-given@example.com'
+      'macro|family-given@example.com'
     );
     await expect(page.getByTestId('person-targets')).not.toContainText(
-      'rox|family@example.com'
+      'macro|family@example.com'
     );
     await expect(page.getByTestId('person-targets')).not.toContainText(
-      'rox|given@example.com'
+      'macro|given@example.com'
     );
     await expect(page.getByTestId('person-targets')).not.toContainText(
-      'rox|other@example.com'
+      'macro|other@example.com'
     );
   });
 }
@@ -108,7 +108,7 @@ test('message choices keep their names while independent identity proof loads', 
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect(page.getByTestId('person-targets')).toContainText(
-    'rox|late@example.com'
+    'macro|late@example.com'
   );
 });
 
@@ -188,7 +188,7 @@ test('incomplete offline name evidence blocks sending and resolves the same draf
     page.getByRole('button', { name: 'Send email', exact: true })
   ).toBeEnabled();
   await expect(page.getByTestId('people-reference-result')).toContainText(
-    'rox|late@example.com'
+    'macro|late@example.com'
   );
 });
 
@@ -205,9 +205,9 @@ test('inferred search cannot run with an unresolved person constraint', async ({
   await expect(page.getByTestId('global-search-requests')).toHaveText('[]');
   await prompt.fill('Search Precise');
   await expect(page.getByTestId('people-reference-result')).toContainText(
-    'rox|precise@example.com'
+    'macro|precise@example.com'
   );
   await expect(page.getByTestId('global-search-requests')).toContainText(
-    'rox|precise@example.com'
+    'macro|precise@example.com'
   );
 });

@@ -1,4 +1,4 @@
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { ThrownResultError } from '@core/util/result';
 import {
   buildDiffState,
@@ -160,7 +160,7 @@ export function HistoryProvider(props: {
   const userEntries = mapArray(uniqueUserIds, (userId) => {
     const displayName = useAuthorName(
       () => userId,
-      (id) => getDisplayName(tryMacroId(id), { emailFallback: 'local-part' })
+      (id) => getDisplayName(tryRoxId(id), { emailFallback: 'local-part' })
     );
     return { userId, displayName, color: userColor(userId) };
   });

@@ -33,7 +33,7 @@ vi.mock('@core/component/TopBar/ShareButton', () => ({
 }));
 vi.mock('@core/user', () => ({
   getDisplayName: (id: string) => id,
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 vi.mock('./components/project-collaborators', () => ({
   ProjectCollaborators: () => null,

@@ -21,7 +21,7 @@ let roxApiTokenPromise: Promise<string> | null = null;
 let tokenGeneration = 0;
 
 /** Login/account replacement must not reuse the previous viewer's bearer token. */
-export function resetMacroApiToken() {
+export function resetRoxApiToken() {
   tokenGeneration++;
   roxApiTokenPromise = null;
 }
@@ -29,7 +29,7 @@ function assertTokenGeneration(generation: number) {
   if (generation !== tokenGeneration)
     throw new DOMException('Authentication session changed', 'AbortError');
 }
-async function readMacroApiToken(generation: number) {
+async function readRoxApiToken(generation: number) {
   const result = await authServiceClient.roxApiToken();
   assertTokenGeneration(generation);
   if (result.isErr()) throw result.error;
@@ -42,14 +42,14 @@ async function releaseFailedToken(promise: Promise<string>) {
     if (roxApiTokenPromise === promise) roxApiTokenPromise = null;
   }
 }
-function requestMacroApiToken() {
-  const promise = readMacroApiToken(tokenGeneration);
+function requestRoxApiToken() {
+  const promise = readRoxApiToken(tokenGeneration);
   roxApiTokenPromise = promise;
   fireAndForget(releaseFailedToken(promise), 'auth-token');
   return promise;
 }
 
-export async function getMacroApiToken(): Promise<string> {
+export async function getRoxApiToken(): Promise<string> {
   const parent = Telemetry.captureContext();
   const generation = tokenGeneration;
   if (LOCAL_ONLY) {
@@ -61,7 +61,7 @@ export async function getMacroApiToken(): Promise<string> {
 
   const cachedPromise = roxApiTokenPromise;
   if (!cachedPromise) {
-    return parent.run(requestMacroApiToken);
+    return parent.run(requestRoxApiToken);
   }
 
   const apiToken = await cachedPromise;
@@ -74,10 +74,10 @@ export async function getMacroApiToken(): Promise<string> {
   // caller was suspended awaiting it. Reuse that replacement instead of
   // issuing a duplicate request.
   if (roxApiTokenPromise !== cachedPromise) {
-    return parent.run(getMacroApiToken);
+    return parent.run(getRoxApiToken);
   }
 
-  return parent.run(requestMacroApiToken);
+  return parent.run(requestRoxApiToken);
 }
 
 type TextContentType = `text/${string}`;
@@ -111,7 +111,7 @@ export async function fetchWithAuth<
   const generation = tokenGeneration;
   init?.signal?.throwIfAborted();
   const parentSpan = init?.trace?.parentSpan ?? Telemetry.captureContext();
-  const apiToken = await parentSpan.run(getMacroApiToken);
+  const apiToken = await parentSpan.run(getRoxApiToken);
   init?.signal?.throwIfAborted();
   assertTokenGeneration(generation);
   if (!apiToken) {

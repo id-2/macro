@@ -1,6 +1,6 @@
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, idToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, idToEmail, tryRoxId } from '@core/user';
 import { useSendMessageToPeople } from '@core/util/channels';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { Telemetry } from '@rox-one/observability';
@@ -18,7 +18,7 @@ type PendingDirectMessageProps = {
 };
 
 function recipientName(recipientId: string) {
-  return getDisplayName(tryMacroId(recipientId)) || idToEmail(recipientId);
+  return getDisplayName(tryRoxId(recipientId)) || idToEmail(recipientId);
 }
 
 /** As a created DM's composer names them: "First Last" shortens to "First". */

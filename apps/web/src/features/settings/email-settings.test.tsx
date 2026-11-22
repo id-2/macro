@@ -23,7 +23,7 @@ vi.mock('@core/constant/settingsTabsConfig', () => ({
   useSettingsTabAvailable: () => () => false,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|owner@example.com',
+  useUserId: () => () => 'macro|owner@example.com',
 }));
 vi.mock('@core/email-link', () => ({
   useEmailLinks: () => ({ query: mocks.query }),
@@ -52,7 +52,7 @@ vi.mock('./SignatureSection', () => ({
 
 const link = {
   id: 'link-1',
-  rox_id: 'rox|owner@example.com',
+  rox_id: 'macro|owner@example.com',
   email_address: 'owner@example.com',
   settings: { read_receipts_enabled: true },
 };
@@ -106,7 +106,7 @@ describe('EmailSignatures', () => {
           link,
           {
             id: 'link-2',
-            rox_id: 'rox|helpdesk@example.com',
+            rox_id: 'macro|helpdesk@example.com',
             email_address: 'helpdesk@example.com',
             settings: { read_receipts_enabled: true },
           },

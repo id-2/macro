@@ -5,7 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { contactRecordKey } from './contact-key';
 import { usePinnedContactUsers } from './use-directory';
 
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 const fetchIds = vi.hoisted(() => vi.fn());
 vi.mock('@service-storage/graphql-contacts', () => ({
   fetchContactDirectoryPage: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('@service-storage/graphql-soup', () => ({
 }));
 vi.mock('@queries/auth/use-query-account', () => ({
   useQueryAccount: () => () => ({
-    userId: 'rox|viewer@example.com',
+    userId: 'macro|viewer@example.com',
     session: 0,
   }),
 }));
@@ -31,7 +31,7 @@ beforeEach(() => {
       contactsByUserIds: ids.map((userId) => ({
         id: contactRecordKey(VIEWER, userId).slice('GraphqlContact:'.length),
         userId,
-        email: userId.slice('rox|'.length),
+        email: userId.slice('macro|'.length),
         name: 'Person',
       })),
     },
@@ -47,7 +47,7 @@ it.each([0, 499, 500])(
     });
     const selected = Array.from(
       { length: count },
-      (_, index) => `rox|person${index}@example.com`
+      (_, index) => `macro|person${index}@example.com`
     );
     const loaded = Promise.withResolvers<string[]>();
     function Harness() {

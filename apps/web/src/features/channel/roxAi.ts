@@ -15,14 +15,14 @@ import type { IUser } from '@core/user/types';
 
 // Re-export the shared Rox identity under the names used in this package.
 export {
-  isMacroAgentId as isMacroAiId,
+  isRoxAgentId as isRoxAiId,
   ROX_AGENT_BOT_ID as ROX_AI_BOT_ID,
   ROX_AGENT_HANDLE as ROX_AI_HANDLE,
   ROX_AGENT_NAME as ROX_AI_NAME,
   ROX_AGENT_PRINCIPAL_ID as ROX_AI_PRINCIPAL_ID,
 } from '@core/constant/roxAgent';
-export { isMacroCoderId } from '@core/constant/roxCoder';
-export { isMacroNewId } from '@core/constant/roxNew';
+export { isRoxCoderId } from '@core/constant/roxCoder';
+export { isRoxNewId } from '@core/constant/roxNew';
 
 /**
  * The single synthetic [`IUser`] entry for Rox in the channel `@`-mention

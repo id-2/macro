@@ -23894,7 +23894,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -23972,7 +23972,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24048,7 +24048,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24109,7 +24109,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24258,7 +24258,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24393,7 +24393,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24469,7 +24469,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24528,7 +24528,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24668,7 +24668,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24808,7 +24808,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -24946,7 +24946,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -25017,7 +25017,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -25086,7 +25086,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -25147,7 +25147,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,
@@ -25274,7 +25274,7 @@
             }
           },
           {
-            "name": "X-Macro-Passwords",
+            "name": "X-Rox-Passwords",
             "in": "header",
             "description": "Required CSRF header; send 1",
             "required": true,

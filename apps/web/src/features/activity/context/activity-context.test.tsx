@@ -17,7 +17,7 @@ vi.mock('@queries/bots/bots', () => ({
 }));
 vi.mock('@core/context/user', () => ({ useUserId: () => () => 'me' }));
 vi.mock('@core/user', () => ({
-  tryMacroId: () => undefined,
+  tryRoxId: () => undefined,
   useDisplayName: () => [() => ''],
 }));
 vi.mock('@property/editor/hooks/useAllProperties', () => ({

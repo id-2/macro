@@ -114,9 +114,9 @@ export const formatPropertyValue = (
 
   let formattedValue = value.toString();
 
-  // Filter out "rox|" prefix for system owner properties
+  // Filter out "macro|" prefix for system owner properties
   if (property.displayName === 'Owner') {
-    formattedValue = formattedValue.replace('rox|', '');
+    formattedValue = formattedValue.replace('macro|', '');
   }
 
   return formattedValue;

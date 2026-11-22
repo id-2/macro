@@ -22,14 +22,14 @@ test('pages recipients without retaining earlier options or dropping custom sele
   );
   await expect(input).toBeFocused();
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|outside@example.com"]'
+    '["macro|outside@example.com"]'
   );
   await input.fill('rare');
   await expect(page.getByRole('option', { name: /Rare Person/ })).toBeVisible();
   await expect(page.getByTestId('loaded')).toHaveText('1');
   await input.press('Enter');
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|outside@example.com","rox|person99999@example.com"]'
+    '["macro|outside@example.com","macro|person99999@example.com"]'
   );
   await input.press('Escape');
   await expect(page.getByRole('option')).toHaveCount(0);
@@ -45,7 +45,7 @@ test('selects an initial asynchronous match and keeps the next typed query open'
   await expect(page.getByRole('option', { name: /Rare Person/ })).toBeVisible();
   await input.press('Enter');
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|outside@example.com","rox|person99999@example.com"]'
+    '["macro|outside@example.com","macro|person99999@example.com"]'
   );
   await input.fill('empty');
   await expect(
@@ -70,12 +70,12 @@ test('advances an empty window and preserves chips when closing or changing quer
   await expect(input).toBeFocused();
   await page.getByRole('button', { name: 'Outside picker' }).click();
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|outside@example.com"]'
+    '["macro|outside@example.com"]'
   );
   await expect(page.getByRole('option')).toHaveCount(0);
   await input.fill('rare');
   await expect(page.getByRole('option', { name: /Rare Person/ })).toBeVisible();
   await expect(page.getByTestId('recipients')).toHaveText(
-    '["rox|outside@example.com"]'
+    '["macro|outside@example.com"]'
   );
 });

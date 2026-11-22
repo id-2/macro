@@ -2504,7 +2504,7 @@ export type roxApiTokenResponse =
   | roxApiTokenResponseSuccess
   | roxApiTokenResponseError;
 
-export const getMacroApiTokenUrl = (params: RoxApiTokenParams) => {
+export const getRoxApiTokenUrl = (params: RoxApiTokenParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -2524,7 +2524,7 @@ export const roxApiToken = async (
   params: RoxApiTokenParams,
   options?: RequestInit
 ): Promise<roxApiTokenResponse> => {
-  const res = await fetch(getMacroApiTokenUrl(params), {
+  const res = await fetch(getRoxApiTokenUrl(params), {
     ...options,
     method: 'GET',
   });

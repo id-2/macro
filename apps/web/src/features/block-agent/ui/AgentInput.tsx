@@ -23,7 +23,7 @@ import { createComposerDictation } from '@app/features/dictation/composer-dictat
 import { InputProvider } from '@channel/Input/context';
 import { Input } from '@channel/Input/Input';
 import type { InputAttachmentData, InputCommands } from '@channel/Input/types';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { preloadAgentFold } from '@core/agent-fold/client';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { ComposerEditor } from '@core/component/LexicalMarkdown/component/ComposerEditor';
@@ -201,7 +201,7 @@ export function AgentInput(props: AgentInputProps) {
   };
 
   const editor = buildConfig('chat')
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .namespace('agent-input')
     .withMentions({
       showOpenTabs: true,

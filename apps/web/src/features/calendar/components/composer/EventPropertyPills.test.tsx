@@ -74,7 +74,7 @@ vi.mock('@property/editors/selectors/PropertyEntitySelector', async () => {
 
 function guest(email: string, name: string): EventEditorGuestOption {
   return recipientEntityMapper('user')({
-    id: `rox|${email}`,
+    id: `macro|${email}`,
     email,
     name,
   });

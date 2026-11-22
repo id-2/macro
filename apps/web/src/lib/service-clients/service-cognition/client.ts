@@ -375,7 +375,7 @@ export const cognitionApiServiceClient = {
    * Record an app connected through Rox Connect. Fails with `NOT_FOUND`
    * until Connect lists the connection, so callers poll it.
    */
-  async completeMacroConnect(args: PipedreamConnectCompleteRequest) {
+  async completeRoxConnect(args: PipedreamConnectCompleteRequest) {
     return (
       await dcsFetch<PipedreamConnectionResponse>(
         `/pipedream/mcp/connect/complete`,

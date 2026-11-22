@@ -8,8 +8,8 @@ let server: Miniflare;
 let serverUrl: string;
 // The sync Worker allows localhost origins (ports 3000-3999).
 const BASE = 'http://localhost:3018';
-const ALICE = 'rox|alice@example.com';
-const BOB = 'rox|bob@example.com';
+const ALICE = 'macro|alice@example.com';
+const BOB = 'macro|bob@example.com';
 const SHOTS = process.env.DOCX_E2E_SHOTS;
 
 test.beforeAll(async () => {

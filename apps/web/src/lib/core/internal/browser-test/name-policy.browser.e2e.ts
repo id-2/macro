@@ -26,7 +26,7 @@ test('partial local recipients keep reversed-word matches and reject arbitrary g
   await expect(page.getByRole('option').first()).toContainText('Person 50');
   await input.press('Enter');
   await expect(page.getByTestId('policy-selections')).toHaveText(
-    '["rox|outside@example.com","rox|person50@example.com"]'
+    '["macro|outside@example.com","macro|person50@example.com"]'
   );
   await input.fill('prsn');
   await expect(

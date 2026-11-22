@@ -59,7 +59,7 @@ function signalClause(
       clause.eq('channelDone', false),
       clause.eq('channelIsParticipant', true)
     ),
-    // Participant only accepts `rox|` user ids, so an unknown viewer
+    // Participant only accepts `macro|` user ids, so an unknown viewer
     // matches no threads instead of sending a placeholder id.
     cthf: clause.and(
       clause.eq('channelThreadDone', false),

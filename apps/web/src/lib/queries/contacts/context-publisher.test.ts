@@ -11,7 +11,7 @@ import {
 } from './context-publisher';
 
 const SCOPE = {
-  identity: 'rox|viewer@example.com',
+  identity: 'macro|viewer@example.com',
   storageGeneration: '00000000-0000-4000-8000-000000000001',
 };
 const FIRST = { ...EMPTY_PERSON_FACTS, lastInteractionMs: 1 };
@@ -55,7 +55,7 @@ it('publishes a large snapshot in bounded writes, then only changed and removed 
   const publisher = new ContactContextPublisher(cache, SCOPE, () => true);
   const source = new Map<string, PersonFacts>();
   for (let i = 0; i < 1201; i++)
-    source.set(`rox|peer${i}@example.com`, FIRST);
+    source.set(`macro|peer${i}@example.com`, FIRST);
   publisher.replace(source);
   expect(await publisher.flush()).toBe('ready');
   expect(
@@ -66,8 +66,8 @@ it('publishes a large snapshot in bounded writes, then only changed and removed 
     )
   ).toEqual(['begin', 500, 500, 201, 'commit']);
   const changed = new Map(source);
-  changed.set('rox|peer0@example.com', SECOND);
-  changed.delete('rox|peer1@example.com');
+  changed.set('macro|peer0@example.com', SECOND);
+  changed.delete('macro|peer1@example.com');
   cache.writes.length = 0;
   publisher.replace(changed);
   await publisher.flush();
@@ -75,8 +75,8 @@ it('publishes a large snapshot in bounded writes, then only changed and removed 
     {
       kind: 'patch',
       updates: [
-        { userId: 'rox|peer0@example.com', facts: SECOND },
-        { userId: 'rox|peer1@example.com', facts: EMPTY_PERSON_FACTS },
+        { userId: 'macro|peer0@example.com', facts: SECOND },
+        { userId: 'macro|peer1@example.com', facts: EMPTY_PERSON_FACTS },
       ],
     },
   ]);
@@ -88,7 +88,7 @@ it('publishes a large snapshot in bounded writes, then only changed and removed 
 it('keeps a newer update to an in-flight dirty ID until its own ack', async () => {
   const cache = cachePort();
   const publisher = new ContactContextPublisher(cache, SCOPE, () => true);
-  publisher.replace(new Map([['rox|peer@example.com', FIRST]]));
+  publisher.replace(new Map([['macro|peer@example.com', FIRST]]));
   await publisher.flush();
   const entered = Promise.withResolvers<void>();
   const release = Promise.withResolvers<void>();
@@ -98,16 +98,16 @@ it('keeps a newer update to an in-flight dirty ID until its own ack', async () =
     await release.promise;
     return apply(update);
   });
-  publisher.replace(new Map([['rox|peer@example.com', SECOND]]));
+  publisher.replace(new Map([['macro|peer@example.com', SECOND]]));
   const writing = publisher.flush();
   await entered.promise;
   publisher.replace(
-    new Map([['rox|peer@example.com', { ...SECOND, secondaryInbox: true }]])
+    new Map([['macro|peer@example.com', { ...SECOND, secondaryInbox: true }]])
   );
   expect(publisher.pendingCount).toBe(1);
   release.resolve();
   await writing;
-  expect(cache.rows.get('rox|peer@example.com')?.facts.secondaryInbox).toBe(
+  expect(cache.rows.get('macro|peer@example.com')?.facts.secondaryInbox).toBe(
     true
   );
   expect(publisher.pendingCount).toBe(0);
@@ -124,12 +124,12 @@ it('caps queued dirty IDs and replaces an overflowing in-flight snapshot before 
     await release.promise;
     return apply(update);
   });
-  publisher.replace(new Map([['rox|old@example.com', FIRST]]));
+  publisher.replace(new Map([['macro|old@example.com', FIRST]]));
   const publishing = publisher.flush();
   await entered.promise;
   const replacement = new Map<string, PersonFacts>();
   for (let i = 0; i < 1002; i++)
-    replacement.set(`rox|next${i}@example.com`, SECOND);
+    replacement.set(`macro|next${i}@example.com`, SECOND);
   publisher.replace(replacement);
   expect(publisher.pendingCount).toBeLessThanOrEqual(500);
   release.resolve();
@@ -147,7 +147,7 @@ it('caps queued dirty IDs and replaces an overflowing in-flight snapshot before 
 it('starts a fresh epoch after an uncertain write rather than replaying stale batches', async () => {
   const cache = cachePort();
   const publisher = new ContactContextPublisher(cache, SCOPE, () => true);
-  publisher.replace(new Map([['rox|old@example.com', FIRST]]));
+  publisher.replace(new Map([['macro|old@example.com', FIRST]]));
   await publisher.flush();
   const original = cache.state();
   const apply = cache.update.getMockImplementation()!;
@@ -155,17 +155,17 @@ it('starts a fresh epoch after an uncertain write rather than replaying stale ba
     await apply(update);
     throw new Error('lost ack');
   });
-  publisher.replace(new Map([['rox|old@example.com', SECOND]]));
+  publisher.replace(new Map([['macro|old@example.com', SECOND]]));
   await expect(publisher.flush()).rejects.toThrow('lost ack');
-  publisher.replace(new Map([['rox|new@example.com', FIRST]]));
+  publisher.replace(new Map([['macro|new@example.com', FIRST]]));
   await publisher.flush();
   const published = cache.state();
   expect(published).not.toEqual(original);
   if (published.kind !== 'ready') throw new Error('Expected publication');
-  expect(cache.rows.get('rox|old@example.com')?.epoch).not.toBe(
+  expect(cache.rows.get('macro|old@example.com')?.epoch).not.toBe(
     published.epoch
   );
-  expect(cache.rows.get('rox|new@example.com')?.epoch).toBe(published.epoch);
+  expect(cache.rows.get('macro|new@example.com')?.epoch).toBe(published.epoch);
 });
 
 it('does not commit after disposal or an account fence fails while a write is pending', async () => {
@@ -180,7 +180,7 @@ it('does not commit after disposal or an account fence fails while a write is pe
     await release.promise;
     return apply(update);
   });
-  publisher.replace(new Map([['rox|peer@example.com', FIRST]]));
+  publisher.replace(new Map([['macro|peer@example.com', FIRST]]));
   const writing = publisher.flush();
   const rejected = expect(writing).rejects.toBeInstanceOf(
     ContactContextCanceled
@@ -211,7 +211,7 @@ it('treats missing inputs as waiting, known empty inputs as a snapshot, and unsu
   const old = new ContactContextPublisher(unsupported, SCOPE, () => true);
   old.replace(new Map());
   expect(await old.flush()).toBe('unsupported');
-  old.replace(new Map([['rox|peer@example.com', FIRST]]));
+  old.replace(new Map([['macro|peer@example.com', FIRST]]));
   expect(await old.flush()).toBe('unsupported');
   expect(unsupported.context).toHaveBeenCalledOnce();
   expect(unsupported.update).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import type { PeopleContextUpdate } from '@graphql-cache/people/generated';
 import type { Link } from '@service-email/generated/schemas';
 import type { ApiChannelWithLatest } from '@service-storage/channel-list-types';
@@ -126,7 +126,7 @@ export function buildContactContextFacts(input: {
   }
   for (const link of input.links) {
     if (link.is_primary) continue;
-    const id = emailToMacroId(link.email_address.toLowerCase());
+    const id = emailToRoxId(link.email_address.toLowerCase());
     const peer = id && canonicalContactUserId(id);
     if (peer)
       result.set(peer, {

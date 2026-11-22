@@ -45,7 +45,7 @@ vi.mock('./hooks/use-calendar-sources', () => ({
     },
   }),
 }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|self' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|self' }));
 vi.mock('@app/lib/analytics/posthog', () => ({
   useFeatureFlag: () => () => ({ enabled: true }),
 }));
@@ -64,7 +64,7 @@ it('re-consents the Outlook account whose Connect calendar was clicked', () => {
   mocks.links = [
     {
       id: 'gmail-link',
-      rox_id: 'rox|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: false,
@@ -72,7 +72,7 @@ it('re-consents the Outlook account whose Connect calendar was clicked', () => {
     },
     {
       id: 'outlook-link',
-      rox_id: 'rox|self',
+      rox_id: 'macro|self',
       email_address: 'teo@contoso.onmicrosoft.com',
       provider: 'OUTLOOK',
       needs_calendar_permission: true,
@@ -93,7 +93,7 @@ it('re-consents a lone Gmail account, restoring mail access it lost', () => {
   mocks.links = [
     {
       id: 'gmail-link',
-      rox_id: 'rox|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: true,
@@ -114,7 +114,7 @@ it('asks for a provider when connecting another account', () => {
   mocks.links = [
     {
       id: 'outlook-link',
-      rox_id: 'rox|self',
+      rox_id: 'macro|self',
       email_address: 'teo@contoso.onmicrosoft.com',
       provider: 'OUTLOOK',
       needs_calendar_permission: false,
@@ -132,7 +132,7 @@ it("saves a calendar's Busy switch to the viewer's availability setting", () => 
   mocks.links = [
     {
       id: 'gmail-link',
-      rox_id: 'rox|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: false,
@@ -162,7 +162,7 @@ it("saves a calendar's Busy switch to the viewer's availability setting", () => 
   );
   expect(mocks.setAvailability).toHaveBeenCalledExactlyOnceWith(
     {
-      userId: 'rox|self',
+      userId: 'macro|self',
       calendarIds: ['coworker'],
       contributesToAvailability: false,
     },

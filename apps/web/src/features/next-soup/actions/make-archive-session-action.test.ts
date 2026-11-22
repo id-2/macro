@@ -11,7 +11,7 @@ vi.mock(
 
 import { makeArchiveSessionAction } from './make-archive-session-action';
 
-const ME = 'rox|me@rox.one';
+const ME = 'macro|me@rox.one';
 
 const session = (overrides: Partial<EntityData> = {}) =>
   ({
@@ -27,7 +27,7 @@ const action = makeArchiveSessionAction({ userId: () => ME });
 describe('makeArchiveSessionAction', () => {
   it('offers archiving only to the session owner', () => {
     expect(action.canExecute(session())).toBe(true);
-    expect(action.canExecute(session({ ownerId: 'rox|other' }))).toBe(false);
+    expect(action.canExecute(session({ ownerId: 'macro|other' }))).toBe(false);
     expect(
       action.canExecute({ ...session(), type: 'chat' } as EntityData)
     ).toBe(false);

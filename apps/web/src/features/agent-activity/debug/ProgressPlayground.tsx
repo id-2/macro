@@ -118,7 +118,7 @@ function documentResult(id: string, name: string, snippet?: string) {
     type: 'document',
     id,
     name,
-    owner_id: 'rox|ada@example.com',
+    owner_id: 'macro|ada@example.com',
     document_id: id,
     document_name: name,
     file_type: 'md',
@@ -305,7 +305,7 @@ const THOUGHT: MessagePart = {
 };
 
 const ANSWER =
-  'The <m-document-mention>{"documentId":"4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46","documentName":"Launch checklist","blockName":"md"}</m-document-mention> has two open items: confirming the date and telling support. <m-user-mention>{"userId":"rox|ada@example.com","email":"ada@example.com","displayName":"Ada"}</m-user-mention> owns the date.';
+  'The <m-document-mention>{"documentId":"4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46","documentName":"Launch checklist","blockName":"md"}</m-document-mention> has two open items: confirming the date and telling support. <m-user-mention>{"userId":"macro|ada@example.com","email":"ada@example.com","displayName":"Ada"}</m-user-mention> owns the date.';
 
 const LONG_QUERY =
   'launch checklist for the agent progress line in channels and agent sessions, including the collapsed summary and every expanded row';

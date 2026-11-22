@@ -143,7 +143,7 @@ describe('createTauriCacheHost', () => {
 
   it('uses dedicated person commands and never turns a missing writer into success', async () => {
     const scope = {
-      identity: 'rox|viewer@example.com',
+      identity: 'macro|viewer@example.com',
       storageGeneration: '00000000-0000-4000-8000-000000000001',
     };
     const update = {
@@ -175,7 +175,7 @@ describe('createTauriCacheHost', () => {
 
   it('keeps person scope errors fatal and emits only committed hydration hints', async () => {
     const scope = {
-      identity: 'rox|viewer@example.com',
+      identity: 'macro|viewer@example.com',
       storageGeneration: '00000000-0000-4000-8000-000000000001',
     };
     const update = {
@@ -1301,7 +1301,7 @@ describe('createTauriCacheHost', () => {
         });
         if (!host.people) throw new Error('Missing person transport');
         const scope = {
-          identity: 'rox|viewer@example.com',
+          identity: 'macro|viewer@example.com',
           storageGeneration: '00000000-0000-4000-8000-000000000001',
         };
         invokeMock.mockImplementation((command: string) =>

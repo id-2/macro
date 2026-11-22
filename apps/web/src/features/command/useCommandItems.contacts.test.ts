@@ -13,7 +13,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { CategoryFilter } from './types';
 import { type CommandContactSource, useCommandItems } from './useCommandItems';
 
-const VIEWER = 'rox|viewer@rox.one';
+const VIEWER = 'macro|viewer@rox.one';
 
 const mocks = vi.hoisted(() => ({
   lists: {} as Record<string, () => QuickAccessItem[]>,
@@ -30,7 +30,7 @@ vi.mock('@app/lib/analytics/posthog', () => ({
   useFeatureFlag: () => () => ({ enabled: false, loading: false }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|viewer@rox.one',
+  useUserId: () => () => 'macro|viewer@rox.one',
 }));
 vi.mock('@app/constants/hotkeys', () => ({
   GO_TO_COMMAND_SCOPE: 'go-to',
@@ -98,11 +98,11 @@ const contact = (
 const user = (email: string, name: string): UserItem => ({
   kind: 'user',
   bucket: 'person',
-  id: `rox|${email}`,
+  id: `macro|${email}`,
   searchText: `${name} | ${email}`,
   sortTimestamp: 0,
   timestamps: {},
-  data: { id: `rox|${email}`, email, name },
+  data: { id: `macro|${email}`, email, name },
 });
 
 const directMessage = (
@@ -252,7 +252,7 @@ describe('command menu contact discovery', () => {
     const viewer = user('viewer@rox.one', 'Gabriel Viewer');
     const group = directMessage('group-gabriel', 'Gabriel group', gabriel.id);
     if (group.data.type !== 'channel') throw new Error('Expected channel');
-    group.data.participantIds = [VIEWER, gabriel.id, 'rox|third@rox.one'];
+    group.data.participantIds = [VIEWER, gabriel.id, 'macro|third@rox.one'];
     t.setUsers([gabriel, viewer]);
     t.setDms([group]);
     t.setQuery('Gabriel');
@@ -321,7 +321,7 @@ describe('command menu contact discovery', () => {
       const dm = directMessage(
         'dm-jack',
         'Jackson Kustec',
-        'rox|jack@rox.one'
+        'macro|jack@rox.one'
       );
       t.setDms([dm]);
       t.setQuery('jack');

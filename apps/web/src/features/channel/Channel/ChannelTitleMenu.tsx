@@ -35,7 +35,7 @@ export function ChannelTitleMenu(props: { channelId: string }) {
   const channelType = useChannelType(props.channelId);
 
   // Seed for "Ask Rox": a new chat with this channel @mentioned.
-  const askMacroEntity = () => {
+  const askRoxEntity = () => {
     const type = channelType();
     if (!type) return undefined;
     return {
@@ -55,7 +55,7 @@ export function ChannelTitleMenu(props: { channelId: string }) {
           viewContext={CHANNEL_ACTION_VIEW_CONTEXT}
           triggerProps={{ size: 'icon-sm', 'aria-label': 'Channel actions' }}
           extraItems={
-            <Show when={askMacroEntity()}>
+            <Show when={askRoxEntity()}>
               {(seed) => (
                 <MenuItem
                   text={t('entityActions.askMacro')}

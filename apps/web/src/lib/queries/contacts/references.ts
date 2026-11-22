@@ -1,4 +1,4 @@
-import { emailToMacroId, tryMacroId } from '@core/user/roxId';
+import { emailToRoxId, tryRoxId } from '@core/user/roxId';
 import { normalizeNameText } from '@core/util/name-match-score';
 import type { CacheHost } from '@graphql-cache/host/types';
 import {
@@ -96,11 +96,11 @@ export function assertContactReferenceInput(
 export function contactReferenceIdentity(label: string): string | undefined {
   if (label.length > MAX_CONTACT_ID_BYTES) return;
   const value = label.trim().toLowerCase();
-  const id = tryMacroId(value);
+  const id = tryRoxId(value);
   if (id && !id.includes('$') && UTF8.encode(id).length <= MAX_CONTACT_ID_BYTES)
     return id;
   return validEmail(value)
-    ? canonicalContactUserId(`rox|${value}`)
+    ? canonicalContactUserId(`macro|${value}`)
     : undefined;
 }
 
@@ -156,11 +156,11 @@ async function serverReference(
       if (page.user.contacts.nodes.length > MAX_PEOPLE_BATCH)
         throw new Error('Contact reference page exceeds its bound');
       for (const record of page.user.contacts.nodes) {
-        const id = tryMacroId(record.userId.toLowerCase());
+        const id = tryRoxId(record.userId.toLowerCase());
         if (
           !id ||
           UTF8.encode(id).length > MAX_CONTACT_ID_BYTES ||
-          emailToMacroId(record.email.toLowerCase()) !== id ||
+          emailToRoxId(record.email.toLowerCase()) !== id ||
           contactRecordKey(viewer, id) !== `GraphqlContact:${record.id}`
         )
           throw new ContactDirectoryScopeError();
@@ -230,7 +230,7 @@ export async function resolveContactReferences(
     const identities = request.labels.map(contactReferenceIdentity);
     const literals = request.labels.map(
       (label) =>
-        label.trim().toLowerCase().startsWith('rox|') ||
+        label.trim().toLowerCase().startsWith('macro|') ||
         validEmail(label.trim())
     );
     const nameIndexes = identities.flatMap((id, index) =>

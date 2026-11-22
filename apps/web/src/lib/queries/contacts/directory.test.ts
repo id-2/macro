@@ -20,11 +20,11 @@ vi.mock('./backfill', () => ({ loadContactCheckpoint: checkpoint }));
 vi.mock('@service-storage/graphql-contacts', () => ({
   fetchContactDirectoryPage: remote,
 }));
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const person = {
   recordKey: 'GraphqlContact:scoped-key',
-  userId: 'rox|person@example.com',
+  userId: 'macro|person@example.com',
   name: 'John Smith',
   email: 'person@example.com',
   lastInteractionMs: 1,
@@ -176,7 +176,7 @@ it('binds continuations to query, policy, account and storage; rejects changed c
     ).rejects.toBeInstanceOf(ContactDirectoryScopeError);
   await expect(
     readContactDirectory(
-      'rox|other@example.com',
+      'macro|other@example.com',
       cache,
       { ...request, cursor },
       signal()

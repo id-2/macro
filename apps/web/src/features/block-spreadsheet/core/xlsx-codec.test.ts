@@ -747,7 +747,7 @@ describe('Excel workbook files', () => {
     expect(result.rowCount).toBe(5000);
   });
 
-  it('rejects invalid ZIP, encryption, exported roxs, corrupt data and forged expansion sizes', async () => {
+  it('rejects invalid ZIP, encryption, exported macros, corrupt data and forged expansion sizes', async () => {
     await expect(
       decodeXlsx(new Uint8Array(XLSX_MAX_BYTES + 1))
     ).rejects.toThrow('50 MB');
@@ -757,9 +757,9 @@ describe('Excel workbook files', () => {
     const original = (await encodeXlsx({ sheets: [simpleSheet()] })).bytes;
     const entries = unzipSync(original);
     entries['xl/vbaProject.bin'] = new Uint8Array([1]);
-    // Imports drop roxs (see xlsm-import.test.ts); exports may never carry them.
+    // Imports drop macros (see xlsm-import.test.ts); exports may never carry them.
     expect(() => inspectXlsxArchive(zipSync(entries))).toThrow(
-      'must not contain roxs'
+      'must not contain macros'
     );
     const central = (bytes: Uint8Array) => {
       const view = new DataView(

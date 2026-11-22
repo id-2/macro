@@ -27,7 +27,7 @@ const entity: ForeignEntity = {
   id: '019f0000-0000-7000-8000-000000000001',
   foreignEntityId: 'owner/repo/pull/12',
   foreignEntitySource: 'github_pull_request',
-  storedForId: 'rox|test@example.com',
+  storedForId: 'macro|test@example.com',
   storedForAuthEntity: 'user',
   metadata: { status: 'open' },
   createdAt: '2026-09-14T00:00:00Z',

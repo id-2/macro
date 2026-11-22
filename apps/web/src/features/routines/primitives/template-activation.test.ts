@@ -8,7 +8,7 @@ const DOC =
 
 const TEMPLATE: RoutineTemplate = {
   id: 'template-1',
-  author: 'rox|eric@rox.one',
+  author: 'macro|eric@rox.one',
   name: 'Weekly digest',
   description: '',
   active_count: 0,
@@ -30,7 +30,7 @@ const TEMPLATE: RoutineTemplate = {
 };
 
 const ACTIVATOR = {
-  userId: 'rox|jun@rox.one',
+  userId: 'macro|jun@rox.one',
   email: 'jun@rox.one',
   timezone: 'America/New_York',
 };
@@ -113,7 +113,7 @@ describe('createTemplateActivation', () => {
   it('fills the author in as the activator in the Ask AI step', () => {
     createRoot((dispose) => {
       const author =
-        '<m-user-mention>{"userId":"rox|eric@rox.one","email":"eric@rox.one"}</m-user-mention>';
+        '<m-user-mention>{"userId":"macro|eric@rox.one","email":"eric@rox.one"}</m-user-mention>';
       const activation = createTemplateActivation({
         template: () => ({
           ...TEMPLATE,
@@ -129,7 +129,7 @@ describe('createTemplateActivation', () => {
           variables: [
             {
               kind: 'user',
-              id: 'rox|eric@rox.one',
+              id: 'macro|eric@rox.one',
               label: 'eric@rox.one',
               fill: 'activator',
             },

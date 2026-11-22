@@ -64,7 +64,7 @@ vi.mock('@service-cognition/client', () => ({
     completePipedreamConnection: mocks.complete,
     startMcpAuth: mocks.startAuth,
     recoverPipedreamConnection: mocks.recover,
-    completeMacroConnect: mocks.completeConnect,
+    completeRoxConnect: mocks.completeConnect,
   },
 }));
 

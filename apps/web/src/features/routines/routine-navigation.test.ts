@@ -26,7 +26,7 @@ import {
   splitContentFromLocation,
   upgradeLegacyPath,
 } from '@components/app/split-layout/split-router/legacy-route';
-import { createMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { createRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import type { BlockOrchestrator } from '@core/orchestrator';
 import { createRoot } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -133,7 +133,7 @@ describe('routine navigation', () => {
       }
       const id = '018f18ee-9747-7152-8a5f-4aa2d83d1f62';
       expect(
-        createMacroMentionLinkResolver(routes)(
+        createRoxMentionLinkResolver(routes)(
           `${window.location.origin}/app/${type}/${id}`
         )
       ).toEqual({ id, block: 'routine', params: {} });

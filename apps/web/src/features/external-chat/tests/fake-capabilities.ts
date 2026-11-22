@@ -16,7 +16,7 @@ export const chat: ChatDetail = {
   provider: 'whatsapp',
   kind: 'group',
   name: 'Design Crit',
-  ownerId: 'rox|me@example.test',
+  ownerId: 'macro|me@example.test',
   accessLevel: 'owner',
   canSend: true,
   phone: '+14155550142',
@@ -46,7 +46,7 @@ export const messages: ChatMessage[] = [
       {
         emoji: '👍',
         reactors: [
-          { name: 'Me', userId: 'rox|me@example.test' },
+          { name: 'Me', userId: 'macro|me@example.test' },
           { name: 'Ben' },
         ],
         mine: true,
@@ -57,7 +57,7 @@ export const messages: ChatMessage[] = [
   {
     id: 'message-2',
     kind: 'message',
-    sender: { name: 'Me', userId: 'rox|me@example.test' },
+    sender: { name: 'Me', userId: 'macro|me@example.test' },
     mentions: [],
     forwarded: false,
     body: 'Looking now. Thanks, Ana!',

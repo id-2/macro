@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  alreadyInMacroSummary,
+  alreadyInRoxSummary,
   buildPlanTree,
   EMPTY_IMPORT_DRAFT,
   type ImportPlanEntry,
@@ -247,10 +247,10 @@ describe('already in Rox', () => {
     expect(importCount(withCopies, [])).toBe(1);
     expect(volumeLabel(importVolume(withCopies, []))).toBe('40 tasks');
     expect(planCounts(withCopies).pages).toBe(4);
-    expect(alreadyInMacroSummary(withCopies)).toBe(
+    expect(alreadyInRoxSummary(withCopies)).toBe(
       '2 already in Rox (imported by ana@acme.com, bo@acme.com)'
     );
-    expect(alreadyInMacroSummary(entries)).toBe('');
+    expect(alreadyInRoxSummary(entries)).toBe('');
   });
 });
 

@@ -4,7 +4,7 @@ import { UserIcon, type UserIconProps } from '@core/component/UserIcon';
 import { ScrollIndicators } from '@core/component/VerticalScrollIndicators';
 import { isMobile } from '@core/mobile/isMobile';
 import {
-  emailToMacroId,
+  emailToRoxId,
   getDisplayName,
   getInitialsFromName,
 } from '@core/user';
@@ -43,7 +43,7 @@ import {
 import { Dynamic } from 'solid-js/web';
 import type { CalendarEvent, CalendarTimeFormat } from '../types';
 import {
-  parseMacroAppLink,
+  parseRoxAppLink,
   sanitizeCalendarDescription,
 } from '../utils/calendar-description';
 import { conferenceJoinUrl, safeConferenceUrl } from '../utils/conference-link';
@@ -65,8 +65,8 @@ import {
   parseCalendarDate,
 } from '../utils/event-schedule';
 import {
-  calendarMacroCallUrl,
-  removeCalendarMacroCall,
+  calendarRoxCallUrl,
+  removeCalendarRoxCall,
 } from '../utils/rox-call-link';
 import { eventRecurrenceDescription } from '../utils/recurrence';
 import { CALENDAR_TIME_FORMAT_OPTIONS } from '../utils/time-format';
@@ -109,7 +109,7 @@ const compareAttendeeNames = new Intl.Collator(undefined, {
 function resolveCalendarAttendee(
   attendee: CalendarAttendee
 ): ResolvedCalendarAttendee {
-  const roxId = emailToMacroId(attendee.email);
+  const roxId = emailToRoxId(attendee.email);
   const iconProps: UserIconProps = roxId
     ? { id: roxId }
     : { email: attendee.email };
@@ -385,7 +385,7 @@ function EventRemindersItem(props: {
 
 function calendarPersonDisplayName(person: CalendarPerson) {
   const email = person.email ?? '';
-  const roxId = person.email ? emailToMacroId(person.email) : undefined;
+  const roxId = person.email ? emailToRoxId(person.email) : undefined;
   const roxName = getDisplayName(roxId).trim();
   if (isUsableDisplayName(roxName, email)) return roxName;
 
@@ -425,7 +425,7 @@ function CalendarSourceItem(props: {
 
 function CalendarOrganizerItem(props: { organizer: CalendarPerson }) {
   const roxId = props.organizer.email
-    ? emailToMacroId(props.organizer.email)
+    ? emailToRoxId(props.organizer.email)
     : undefined;
   const displayName = () => calendarPersonDisplayName(props.organizer);
 
@@ -476,7 +476,7 @@ export function EventDetails(props: {
   timeFormat: CalendarTimeFormat;
   defaultReminders?: EventReminderOverride[];
 }) {
-  const roxMeetingUrl = () => calendarMacroCallUrl(props.event);
+  const roxMeetingUrl = () => calendarRoxCallUrl(props.event);
   const conferenceUrl = createMemo(
     () => roxMeetingUrl() ?? safeConferenceUrl(props.event.conferenceUrl)
   );
@@ -493,7 +493,7 @@ export function EventDetails(props: {
     formatOriginalTimeZone(props.event, props.timeFormat)
   );
   const eventContent = createMemo(() =>
-    removeCalendarMacroCall(props.event, roxMeetingUrl())
+    removeCalendarRoxCall(props.event, roxMeetingUrl())
   );
   const descriptionHtml = createMemo(() =>
     sanitizeCalendarDescription(eventContent().description)
@@ -502,7 +502,7 @@ export function EventDetails(props: {
     const anchor = (event.target as Element | null)?.closest('a[href]');
     if (!(anchor instanceof HTMLAnchorElement)) return;
     event.preventDefault();
-    const target = parseMacroAppLink(anchor.href);
+    const target = parseRoxAppLink(anchor.href);
     if (target) {
       openDocument(
         target.blockName,

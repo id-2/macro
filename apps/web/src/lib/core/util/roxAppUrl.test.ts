@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 // jsdom's window.location.hostname is 'localhost', which
-// isValidMacroAppHostname pairs with dev.rox.one outside of Tauri.
+// isValidRoxAppHostname pairs with dev.rox.one outside of Tauri.
 describe('parseInternalAppLink', () => {
   it('parses a rox app link into path and query', () => {
     expect(

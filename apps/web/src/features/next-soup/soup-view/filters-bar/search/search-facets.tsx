@@ -14,7 +14,7 @@ import { EntityIcon } from '@core/component/EntityIcon';
 import { UserIcon } from '@core/component/UserIcon';
 import { useQuickAccess } from '@core/context/quickAccess';
 import { useUserId } from '@core/context/user';
-import { roxIdToEmail, tryMacroId } from '@core/user/roxId';
+import { roxIdToEmail, tryRoxId } from '@core/user/roxId';
 import { useContactFilterOptions } from '@core/user/use-contact-filter-options';
 import { EntityIcon as EntityIconWithAvatar } from '@entity/extractors/entity-icon';
 import { PropertyValueIcon } from '@property/component/propertyValue/PropertyValueIcon';
@@ -196,7 +196,7 @@ function usePersonPicker(
     );
     return selected().map((id) => {
       const user = known.get(id.toLowerCase());
-      const roxId = tryMacroId(id);
+      const roxId = tryRoxId(id);
       const name = user?.name || (roxId ? roxIdToEmail(roxId) : id);
       return {
         id,

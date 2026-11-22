@@ -24,7 +24,7 @@ type SavedReview = {
 const initial: SavedReview = {
   id: '019a0000-0000-7000-8000-000000000005',
   sessionId: '019a0000-0000-7000-8000-000000000001',
-  actingUser: 'rox|owner@rox.local',
+  actingUser: 'macro|owner@rox.local',
   executionId: 'execution',
   title: 'Drafts to review',
   revision: 1,
@@ -65,7 +65,7 @@ async function serveReview(
   await page.route('**/auth/user/legacy_user_permissions', (route) =>
     route.fulfill({
       json: {
-        userId: 'rox|owner@rox.local',
+        userId: 'macro|owner@rox.local',
         email: 'owner@rox.local',
         aiDataConsent: true,
         hasChromeExt: false,

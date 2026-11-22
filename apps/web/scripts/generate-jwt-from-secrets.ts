@@ -25,20 +25,20 @@ Options:
 const ENV_CONFIG = {
   dev: {
     jwtSecretKey: "fusionauth-jwt-secret-dev",
-    macroApiTokenPrivateKey: "macro-api-token-private-key-dev",
+    roxApiTokenPrivateKey: "macro-api-token-private-key-dev",
     fusionauthClientId: "fusionauth-client-id-key-dev",
     issuer: "fusionauth-dev.rox.one",
-    macroApiTokenIssuer: "authentication-service-dev.rox.one",
+    roxApiTokenIssuer: "authentication-service-dev.rox.one",
     accessTokenCookie: "dev-macro-access-token",
     refreshTokenCookie: "dev-macro-refresh-token",
     tid: "tenant-dev",
   },
   prod: {
     jwtSecretKey: "fusionauth-jwt-secret-prod",
-    macroApiTokenPrivateKey: "macro-api-token-private-key-prod",
+    roxApiTokenPrivateKey: "macro-api-token-private-key-prod",
     fusionauthClientId: "fusionauth-client-id-key-prod",
     issuer: "auth.rox.one",
-    macroApiTokenIssuer: "authentication-service.rox.one",
+    roxApiTokenIssuer: "authentication-service.rox.one",
     accessTokenCookie: "macro-access-token",
     refreshTokenCookie: "macro-refresh-token",
     tid: "tenant-prod",
@@ -111,7 +111,7 @@ async function generateAccessToken(params: {
   return token;
 }
 
-async function generateMacroApiToken(params: {
+async function generateRoxApiToken(params: {
   email: string;
   privateKey: string;
   issuer: string;
@@ -218,7 +218,7 @@ async function main() {
   // Fetch secrets from AWS
   const [jwtSecret, privateKey, audience] = await Promise.all([
     getSecret(config.jwtSecretKey),
-    getSecret(config.macroApiTokenPrivateKey),
+    getSecret(config.roxApiTokenPrivateKey),
     getSecret(config.fusionauthClientId),
   ]);
 
@@ -236,10 +236,10 @@ async function main() {
     organizationId,
   });
 
-  const macroApiToken = await generateMacroApiToken({
+  const roxApiToken = await generateRoxApiToken({
     email,
     privateKey,
-    issuer: config.macroApiTokenIssuer,
+    issuer: config.roxApiTokenIssuer,
     expiryMinutes,
     fusionUserId,
     organizationId,
@@ -251,7 +251,7 @@ async function main() {
   if (output === "json") {
     const result = {
       access_token: accessToken,
-      rox_api_token: macroApiToken,
+      rox_api_token: roxApiToken,
       access_token_cookie_name: config.accessTokenCookie,
       email,
       rox_user_id: macroUserId,
@@ -262,7 +262,7 @@ async function main() {
     console.log(JSON.stringify(result, null, 2));
   } else if (output === "env") {
     console.log(`export ROX_ACCESS_TOKEN='${accessToken}'`);
-    console.log(`export ROX_API_TOKEN='${macroApiToken}'`);
+    console.log(`export ROX_API_TOKEN='${roxApiToken}'`);
   } else {
     // Default: simple output with browser command and curl
     const serviceSuffix = env === "prod" ? "" : "-dev";

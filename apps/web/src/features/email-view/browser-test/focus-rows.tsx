@@ -30,7 +30,7 @@ import {
   EmailFocusScore,
 } from '../components/EmailFocusBadges';
 
-const VIEWER_ID = 'rox|focus-rows@example.test';
+const VIEWER_ID = 'macro|focus-rows@example.test';
 
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   id: VIEWER_ID,

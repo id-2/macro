@@ -2,7 +2,7 @@ import { makeGraphqlSoupInput } from '@queries/soup/graphql/ast';
 import { describe, expect, it } from 'vitest';
 import { agentConversationsQuery } from './agent-conversations-query';
 
-const OWNER = 'rox|dana@example.com';
+const OWNER = 'macro|dana@example.com';
 
 describe('agentConversationsQuery', () => {
   it('lists the owner’s chats and sessions without unlisted ones', () => {

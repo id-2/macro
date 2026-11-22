@@ -24,7 +24,7 @@ describe('openGlobalShareModal', () => {
       type: 'form',
       id: 'form-1',
       name: 'RSVP',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       access: 'view',
     } as Extract<EntityData, { type: 'form' }>;
     await openGlobalShareModal({ entity: form });
@@ -37,7 +37,7 @@ describe('openGlobalShareModal', () => {
       type: 'document',
       id: 'document-1',
       name: 'Notes',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       fileType: 'md',
     } as Extract<EntityData, { type: 'document' }>;
     await openGlobalShareModal({ entity: document });
@@ -57,7 +57,7 @@ describe('openGlobalShareModal', () => {
       type: 'database',
       id: 'database-1',
       name: 'Roadmap',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       grant: 'edit',
     } as Extract<EntityData, { type: 'database' }>;
     await openGlobalShareModal({ entity: database });
@@ -68,7 +68,7 @@ describe('openGlobalShareModal', () => {
         itemType: 'database',
         name: 'Roadmap',
         userPermissions: Permissions.CAN_EDIT,
-        owner: 'rox|owner@example.com',
+        owner: 'macro|owner@example.com',
       })
     );
   });

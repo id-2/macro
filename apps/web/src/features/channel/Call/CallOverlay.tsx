@@ -15,7 +15,7 @@ import { useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { isMobile } from '@core/mobile/isMobile';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { virtualKeyboardVisible } from '@core/mobile/virtualKeyboard';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import CaretDown from '@icon/system/regular/caret-down.svg';
 import CaretLeft from '@icon/system/regular/caret-left.svg';
@@ -206,7 +206,7 @@ export function CallOverlay(props: {
 
   const callWork = createCallWork({
     accountIds: () =>
-      participants().map((participant) => tryMacroId(participant.identity)),
+      participants().map((participant) => tryRoxId(participant.identity)),
     selectedTab,
     panelOpen,
     canChat,
@@ -238,9 +238,9 @@ export function CallOverlay(props: {
     callCtx.trackVersion();
 
     const identity = callCtx.room()?.localParticipant.identity?.trim();
-    const roxIdentity = identity ? tryMacroId(identity) : undefined;
+    const roxIdentity = identity ? tryRoxId(identity) : undefined;
     const userId = currentUserId()?.trim();
-    return roxIdentity ?? (userId ? tryMacroId(userId) : undefined);
+    return roxIdentity ?? (userId ? tryRoxId(userId) : undefined);
   };
 
   const localVideoTrack = () => {
@@ -261,7 +261,7 @@ export function CallOverlay(props: {
 
   function isAccountSpeaking(accountId: string) {
     const participant = participants().find(
-      (candidate) => tryMacroId(candidate.identity) === accountId
+      (candidate) => tryRoxId(candidate.identity) === accountId
     );
     return participant ? callCtx.isParticipantSpeaking(participant) : false;
   }
@@ -305,14 +305,14 @@ export function CallOverlay(props: {
     const participant = talking();
     if (participant === 'local') return localUserId();
     if (!participant) return undefined;
-    return tryMacroId(participant.identity);
+    return tryRoxId(participant.identity);
   };
   const talkingName = () => {
     const participant = talking();
     return participant === 'local'
       ? t('calls.you')
       : participant?.name ||
-          (participant ? getDisplayName(tryMacroId(participant.identity)) : '');
+          (participant ? getDisplayName(tryRoxId(participant.identity)) : '');
   };
   const stageClass = () => {
     if (staged()) return 'grid justify-center gap-2';

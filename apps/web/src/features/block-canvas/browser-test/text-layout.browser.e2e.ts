@@ -107,7 +107,7 @@ test('real person chips render and fit text boxes and ellipse labels after edits
   page,
 }) => {
   const person = {
-    userId: 'rox|alice@example.com',
+    userId: 'macro|alice@example.com',
     email: 'alice@example.com',
     displayName: 'Alice',
   };
@@ -157,7 +157,7 @@ test('real person chips render and fit text boxes and ellipse labels after edits
       id: 'person-text',
       at: 0,
       person: {
-        userId: 'rox|bob@example.com',
+        userId: 'macro|bob@example.com',
         email: 'bob@example.com',
         displayName: 'Bob',
       },

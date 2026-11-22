@@ -606,7 +606,7 @@ describe('groupEmailEntitiesByDate', () => {
       id,
       type: 'email',
       name: id,
-      ownerId: 'rox|alice@example.com',
+      ownerId: 'macro|alice@example.com',
       ...stamps,
     }) as unknown as WithNotification<EntityData>;
 

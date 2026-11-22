@@ -45,7 +45,7 @@ import { useConnectionsView } from './view-state';
 
 export type IntegrationItemHosts = {
   onOpenEmailSettings: () => void;
-  onOpenMacroMcp: () => void;
+  onOpenRoxMcp: () => void;
   /** Absent when the Runtimes page is unavailable. */
   onOpenLocalAgents?: () => void;
 };
@@ -408,7 +408,7 @@ export function aiAppItems(hosts: IntegrationItemHosts): IntegrationItem[] {
           label="Set up"
           variant="neutral"
           ariaLabel="Set up Rox in AI apps"
-          onClick={hosts.onOpenMacroMcp}
+          onClick={hosts.onOpenRoxMcp}
         />
       ),
     },

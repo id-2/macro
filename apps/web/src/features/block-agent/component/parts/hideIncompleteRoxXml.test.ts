@@ -1,23 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { hideIncompleteMacroXml } from './hideIncompleteMacroXml';
+import { hideIncompleteRoxXml } from './hideIncompleteRoxXml';
 
-describe('hideIncompleteMacroXml', () => {
+describe('hideIncompleteRoxXml', () => {
   const complete =
     '<m-document-mention>{"documentId":"abc","documentName":"","blockName":"md","blockParams":{}}</m-document-mention>';
 
   it('leaves complete mention tags intact', () => {
-    expect(hideIncompleteMacroXml(`See ${complete}.`)).toBe(`See ${complete}.`);
+    expect(hideIncompleteRoxXml(`See ${complete}.`)).toBe(`See ${complete}.`);
   });
 
   it('strips a trailing unclosed mention tag', () => {
     expect(
-      hideIncompleteMacroXml(`See ${complete.slice(0, complete.indexOf('{'))}`)
+      hideIncompleteRoxXml(`See ${complete.slice(0, complete.indexOf('{'))}`)
     ).toBe('See ');
   });
 
   it('keeps completed chips and surrounding prose before an unfinished chip', () => {
     expect(
-      hideIncompleteMacroXml(
+      hideIncompleteRoxXml(
         `Before ${complete} after. Next <m-document-mention>{"documentId":"partial`
       )
     ).toBe(`Before ${complete} after. Next `);
@@ -31,11 +31,11 @@ describe('hideIncompleteMacroXml', () => {
     '<m-user-mention>{"userId":"partial',
     '<m-agent-session-mention>{"id":"partial',
   ])('hides a response cut off at %s', (partial) => {
-    expect(hideIncompleteMacroXml(`See ${partial}`)).toBe('See ');
+    expect(hideIncompleteRoxXml(`See ${partial}`)).toBe('See ');
   });
 
   it('strips a trailing bare open prefix', () => {
-    expect(hideIncompleteMacroXml('See <m-document-ment')).toBe('See ');
+    expect(hideIncompleteRoxXml('See <m-document-ment')).toBe('See ');
   });
 
   it.each([
@@ -45,28 +45,28 @@ describe('hideIncompleteMacroXml', () => {
     'Example:\n```xml\n<m-document-mention>{"documentId":"unfinished',
     'Example:\n````xml\n```\n<m-document-mention>\n````\nAfter.',
   ])('preserves literal Rox XML in code: %s', (text) => {
-    expect(hideIncompleteMacroXml(text)).toBe(text);
+    expect(hideIncompleteRoxXml(text)).toBe(text);
   });
 
   it('still hides an unfinished chip after a closed code example', () => {
     const before = 'Use `<m-document-mention>` as the tag name. See ';
     expect(
-      hideIncompleteMacroXml(`${before}<m-document-mention>{"documentId":`)
+      hideIncompleteRoxXml(`${before}<m-document-mention>{"documentId":`)
     ).toBe(before);
     const fenced = '```xml\n<m-document-mention>\n```\nSee ';
-    expect(hideIncompleteMacroXml(`${fenced}<m-user-mention>{"userId":`)).toBe(
+    expect(hideIncompleteRoxXml(`${fenced}<m-user-mention>{"userId":`)).toBe(
       fenced
     );
   });
 
   it('does not treat an escaped backtick or an unclosed inline span as code', () => {
-    expect(hideIncompleteMacroXml('Use \\`<m-document-mention>')).toBe(
+    expect(hideIncompleteRoxXml('Use \\`<m-document-mention>')).toBe(
       'Use \\`'
     );
-    expect(hideIncompleteMacroXml('Use `<m-document-mention>')).toBe('Use `');
+    expect(hideIncompleteRoxXml('Use `<m-document-mention>')).toBe('Use `');
   });
 
   it('leaves text with no mention markup alone', () => {
-    expect(hideIncompleteMacroXml('plain reply')).toBe('plain reply');
+    expect(hideIncompleteRoxXml('plain reply')).toBe('plain reply');
   });
 });

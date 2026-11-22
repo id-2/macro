@@ -24,7 +24,7 @@ scan_content() {
     | grep -vE 'macro_rules|macro_use|macro_export|parse_macro_input|proc_macro' \
     | head -20)
   local camel
-  camel=$(grep -rn 'Macro[A-Z]' \
+  camel=$(grep -rnE '\bMacro[A-Z]' \
     --include='*.rs' --include='*.ts' --include='*.tsx' \
     . 2>/dev/null \
     | grep -vE 'node_modules|/target/|/dist/|/vendor/|\.git/|scripts/check-old-brand.sh' \

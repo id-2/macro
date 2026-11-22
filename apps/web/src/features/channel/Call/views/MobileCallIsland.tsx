@@ -2,7 +2,7 @@ import { t } from '@app/lib/i18n';
 import { FloatRegion } from '@components/app/mobile/float-regions/FloatRegion';
 import { isMobile } from '@core/mobile/isMobile';
 import { virtualKeyboardVisible } from '@core/mobile/virtualKeyboard';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { useLiveCallRecordQuery } from '@queries/call/call';
 import { Button, cn } from '@ui';
@@ -36,7 +36,7 @@ export function MobileCallIsland() {
     const participant = speaker();
     return (
       participant?.name?.trim() ||
-      getDisplayName(tryMacroId(participant?.identity ?? '')) ||
+      getDisplayName(tryRoxId(participant?.identity ?? '')) ||
       t('calls.you')
     );
   };

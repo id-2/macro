@@ -17,7 +17,7 @@ const navigation = {
 };
 const payload = {
   notificationId: 'notification-1',
-  recipientId: 'rox|test@example.com',
+  recipientId: 'macro|test@example.com',
   navigation,
 };
 
@@ -37,7 +37,7 @@ it('decodes nested APNs routing metadata and retains known top-level identity', 
   expect(notificationLaunchPath(payload.recipientId)).toBe(
     '/home/~/channel/11111111-1111-4111-8111-111111111111?channel_message_id=22222222-2222-4222-8222-222222222222&channel_thread_id=22222222-2222-4222-8222-222222222222'
   );
-  expect(notificationLaunchPath('rox|another@example.com')).toBeUndefined();
+  expect(notificationLaunchPath('macro|another@example.com')).toBeUndefined();
 });
 
 it.each([

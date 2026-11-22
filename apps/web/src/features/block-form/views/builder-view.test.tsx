@@ -93,7 +93,7 @@ function rsvp(): FormDetail {
       id: 'form-1',
       name: 'Team survey',
       description: '',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -812,20 +812,20 @@ describe('BuilderView', () => {
     shared.setPeers([
       {
         peerId: 'peer-ada',
-        userId: 'rox|ada@example.com',
+        userId: 'macro|ada@example.com',
         color: 'blue',
         selection: { sectionId: 'about', questionId: 'q-team' },
       },
     ]);
     expect(
       within(screen.getByRole('group', { name: 'Question 2: Team' })).getByText(
-        'rox|ada@example.com on this question'
+        'macro|ada@example.com on this question'
       )
     ).toBeTruthy();
     expect(
       within(
         screen.getByRole('group', { name: 'Question 1: Name' })
-      ).queryByText(/rox\|ada/)
+      ).queryByText(/macro\|ada/)
     ).toBeNull();
     fireEvent.click(screen.getByRole('group', { name: 'Question 1: Name' }));
     fireEvent.blur(window);

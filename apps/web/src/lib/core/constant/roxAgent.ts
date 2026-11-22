@@ -30,7 +30,7 @@ export const ROX_AGENT_HANDLE = 'rox';
  * Whether an id refers to the Rox bot. Accepts both the bare UUID and
  * the `bot|<uuid>` participant/sender form.
  */
-export function isMacroAgentId(id: string | undefined): boolean {
+export function isRoxAgentId(id: string | undefined): boolean {
   if (!id) return false;
   const bare = id.startsWith('bot|') ? id.slice('bot|'.length) : id;
   return bare === ROX_AGENT_BOT_ID;
@@ -42,5 +42,5 @@ export function isMacroAgentId(id: string | undefined): boolean {
  * (accepted for historical content only).
  */
 export function isBotPrincipalId(id: string | undefined): boolean {
-  return id?.startsWith('bot|') === true || isMacroAgentId(id);
+  return id?.startsWith('bot|') === true || isRoxAgentId(id);
 }

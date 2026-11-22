@@ -323,7 +323,7 @@ export function registerToggleAppendedThread(editor: LexicalEditor) {
   );
 }
 
-async function _appendItemsAsMacroMentions(
+async function _appendItemsAsRoxMentions(
   editor: LexicalEditor | undefined,
   items: DocumentMentionInfo[]
 ) {
@@ -542,7 +542,7 @@ export function hasDraftContent(
   );
 }
 
-export function prepareMacroBody(bodyMacro: string): string {
+export function prepareRoxBody(bodyMacro: string): string {
   // Remove appended-quote blocks from the markdown string
   // We want these in the HTML, but not in body_rox
   // TODO (seamus + peter) Add logic for binding a markdown signal that skips certain transforms

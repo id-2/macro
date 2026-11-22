@@ -157,7 +157,7 @@ vi.mock('@core/user', () => ({
     lastName: '',
     fullName: '',
   }),
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 
 vi.mock('@queries/team/teams', () => ({

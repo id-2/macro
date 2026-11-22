@@ -50,7 +50,7 @@ vi.mock('@core/auth/push-registration-lifecycle', () => ({
   syncPushRegistrations: async () => {},
 }));
 vi.mock('@queries/notification/device-registration', () => ({
-  fetchPushRecipient: async () => 'rox|test@example.com',
+  fetchPushRecipient: async () => 'macro|test@example.com',
   registerPushDevice: registration.register,
   unregisterPushDevice: async () => ({ isErr: () => false }),
 }));
@@ -231,7 +231,7 @@ describe('iOS notification launch integration', () => {
     receivedAtMs: 123,
     payload: {
       notificationId: 'notification-1',
-      recipientId: 'rox|test@example.com',
+      recipientId: 'macro|test@example.com',
       navigation: JSON.stringify({
         type: 'channel',
         channelId: '11111111-1111-4111-8111-111111111111',
@@ -249,7 +249,7 @@ describe('iOS notification launch integration', () => {
     mountRegistration();
     await registration.sync!();
     expect(registration.configureRecipient).toHaveBeenCalledExactlyOnceWith(
-      'rox|test@example.com'
+      'macro|test@example.com'
     );
   });
 

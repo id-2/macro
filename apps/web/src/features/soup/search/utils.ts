@@ -1,6 +1,6 @@
 import { createFreshSearch } from '@core/util/freshSort';
 import { fuzzyMatch } from '@core/util/fuzzy';
-import { mergeAdjacentMacroEmTags } from '@core/util/searchHighlight';
+import { mergeAdjacentRoxEmTags } from '@core/util/searchHighlight';
 import type { EntityData, WithSearch } from '@entity';
 import type { SoupSearchPoolEntry } from './context';
 
@@ -52,7 +52,7 @@ export function nameFuzzySearchFilter<TEntity extends EntityData>(
     ({ item, nameHighlight }) => ({
       ...item,
       search: {
-        nameHighlight: mergeAdjacentMacroEmTags(nameHighlight),
+        nameHighlight: mergeAdjacentRoxEmTags(nameHighlight),
         senderHighlightTerms: null,
         contentHitData: null,
         source: 'local',

@@ -1,5 +1,5 @@
 import { useSplitPanel } from '@components/app/split-layout/layoutUtils';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
 import type { EditorControls } from '@core/component/LexicalMarkdown/builder/types';
@@ -17,7 +17,7 @@ export function ProjectDescriptionComposer(props: {
 }) {
   const panel = useSplitPanel();
   const config = buildConfig('markdown')
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .withMentions()
     .withEmojis()
     .withCode()

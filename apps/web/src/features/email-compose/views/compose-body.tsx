@@ -1,5 +1,5 @@
 import { EmailAttachmentPill } from '@app/features/email-message/components/attachment-pill';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { FileDropOverlay } from '@core/component/FileDropOverlay';
 import { MarkdownTextarea } from '@core/component/LexicalMarkdown/component/core/MarkdownTextarea';
 import { keyboardShortcutsPlugin } from '@core/component/LexicalMarkdown/plugins/keyboard-shortcuts';
@@ -36,7 +36,7 @@ export function ComposeBody(props: {
 }) {
   const ctx = useCompose();
   const attachmentViewer = createAttachmentViewer();
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
 
   const [editor, setEditor] = createSignal<LexicalEditor>();
   const [isDragging, setIsDragging] = createSignal<boolean>();

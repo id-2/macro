@@ -17,7 +17,7 @@ function routine(name: string, status: RoutineStatus): RoutineEntity {
     id: name,
     type: 'routine',
     name,
-    ownerId: 'rox|owner@example.com',
+    ownerId: 'macro|owner@example.com',
     cron: '0 0 9 * * 2',
     status,
   };

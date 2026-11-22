@@ -50,7 +50,7 @@ vi.mock('@components/app/side-panel', () => ({
   },
 }));
 vi.mock('@app/features/chat/ChatWithAgentButton', () => ({
-  AskMacroButton: () => <button>Ask Rox</button>,
+  AskRoxButton: () => <button>Ask Rox</button>,
 }));
 vi.mock(
   '@app/features/email-thread/context/email-thread-state-context',

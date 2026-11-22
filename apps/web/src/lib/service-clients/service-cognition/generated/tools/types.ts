@@ -5221,7 +5221,7 @@ export interface ToolFieldValue {
    */
   field: string;
   /**
-   * The value as text: a stage or other option label ("Negotiation"), a person as "me", an email or a rox| user id, a number ("48000"), true/false, or a date ("2026-10-12"). Omit both value and values to empty the field (or, in a filter, to match empty fields).
+   * The value as text: a stage or other option label ("Negotiation"), a person as "me", an email or a macro| user id, a number ("48000"), true/false, or a date ("2026-10-12"). Omit both value and values to empty the field (or, in a filter, to match empty fields).
    */
   value?: string | null;
   /**
@@ -5264,7 +5264,7 @@ export interface ToolEntry {
   record?: ToolRecord | null;
   /**
    * Its filled-in fields by name: text, a number, true/false, a date, or a
-   * list when a field holds several values. People are rox| user ids.
+   * list when a field holds several values. People are macro| user ids.
    */
   fields: {
     [k: string]: unknown;
@@ -7399,9 +7399,9 @@ export interface BotWebhook {
  *
  * The event lands on the user's primary calendar unless `calendarId` (from ListCalendars) targets another one. For recurring events pass RFC 5545 lines in `recurrenceLines`, e.g. ["RRULE:FREQ=WEEKLY;BYDAY=MO"]. Returns the created event with its `eventId` for later updates or deletion. Fails if the user has no writable calendar connected.
  *
- * For video conferencing pick at most one of `addMacroCall` (a Rox meeting link, the default choice for a Rox user's meeting) or `addConference` (Google Meet or Microsoft Teams, per calendar capabilities). A Rox call is created for the user, scheduled to the event's times, and its join link is appended to the event's description so every attendee's invitation carries it; it also becomes the event's `location` unless a physical `location` was supplied. The returned event's `roxCallUrl` holds the link.
+ * For video conferencing pick at most one of `addRoxCall` (a Rox meeting link, the default choice for a Rox user's meeting) or `addConference` (Google Meet or Microsoft Teams, per calendar capabilities). A Rox call is created for the user, scheduled to the event's times, and its join link is appended to the event's description so every attendee's invitation carries it; it also becomes the event's `location` unless a physical `location` was supplied. The returned event's `roxCallUrl` holds the link.
  *
- * Set `eventType` to "out_of_office" to mark the user as out of office (e.g. "mark me out of office Thursday"). Out-of-office events must land on the user's primary calendar (omit `calendarId`), must be timed rather than all-day, and take no attendees or video conferencing (leave `addMacroCall` and `addConference` false); use `outOfOffice` to control whether conflicting meetings are auto-declined. The type cannot be changed afterward.
+ * Set `eventType` to "out_of_office" to mark the user as out of office (e.g. "mark me out of office Thursday"). Out-of-office events must land on the user's primary calendar (omit `calendarId`), must be timed rather than all-day, and take no attendees or video conferencing (leave `addRoxCall` and `addConference` false); use `outOfOffice` to control whether conflicting meetings are auto-declined. The type cannot be changed afterward.
  */
 export interface CreateCalendarEvent {
   /**
@@ -7436,7 +7436,7 @@ export interface CreateCalendarEvent {
   /**
    * Attach a freshly created Rox call to the event: a Rox meeting link scheduled to the event's times, written into the event's location and description. Mutually exclusive with `addConference`.
    */
-  addMacroCall?: boolean;
+  addRoxCall?: boolean;
   /**
    * Attach a conference supported by this calendar: Google Meet or Microsoft Teams. Check ListCalendars capabilities first.
    */
@@ -7520,7 +7520,7 @@ export interface GuestPolicy {
   canSeeOtherGuests: boolean;
 }
 /**
- * Create a private or team channel and add its first members. Use `private` for an invite-only channel and `team` for a channel owned by the current user's team. Do not use this for a direct message — those are created separately. Team id is resolved from the current user; do not invent one. Participants accept `rox|<email>` ids from ListTeamMembers or bare emails. Creating a team channel when the user has no team fails; create a private channel instead. Creating a team channel with no participants adds the current user so the channel is valid. Use only when the user asks to create a channel.
+ * Create a private or team channel and add its first members. Use `private` for an invite-only channel and `team` for a channel owned by the current user's team. Do not use this for a direct message — those are created separately. Team id is resolved from the current user; do not invent one. Participants accept `macro|<email>` ids from ListTeamMembers or bare emails. Creating a team channel when the user has no team fails; create a private channel instead. Creating a team channel with no participants adds the current user so the channel is valid. Use only when the user asks to create a channel.
  */
 export interface CreateChannel {
   /**
@@ -7529,7 +7529,7 @@ export interface CreateChannel {
   name: string;
   channelType: NewChannelType;
   /**
-   * People to add, as `rox|<email>` ids or bare emails. Defaults to none. A team channel with an empty list adds the current user.
+   * People to add, as `macro|<email>` ids or bare emails. Defaults to none. A team channel with an empty list adds the current user.
    */
   participants?: string[];
 }
@@ -7622,7 +7622,7 @@ export interface CreateConfirmedCalendarEvent {
   /**
    * Attach a freshly created Rox call to the event: a Rox meeting link scheduled to the event's times, written into the event's location and description. Mutually exclusive with `addConference`.
    */
-  addMacroCall?: boolean;
+  addRoxCall?: boolean;
   /**
    * Attach a conference supported by this calendar: Google Meet or Microsoft Teams. Check ListCalendars capabilities first.
    */
@@ -11004,7 +11004,7 @@ export interface ToolContact {
  */
 export interface GetUserActivity {
   /**
-   * A rox| user id, or omit for yourself.
+   * A macro| user id, or omit for yourself.
    */
   userId?: string | null;
   /**
@@ -12099,7 +12099,7 @@ export interface ListCompanies {
    */
   stage?: string | null;
   /**
-   * Filter to companies whose Owner property is this Rox user id (e.g. "rox|user@example.com"). Use ListTeamMembers to find user ids.
+   * Filter to companies whose Owner property is this Rox user id (e.g. "macro|user@example.com"). Use ListTeamMembers to find user ids.
    */
   owner_user_id?: string | null;
   /**
@@ -12221,7 +12221,7 @@ export interface ToolTableSummary {
   sqlName: string;
 }
 /**
- * Browse the user's Rox workspace to see recent items they have access to. Returns Rox documents, agent sessions, projects, emails, chat channels, call records, and foreign entities. Use this to get an overview of what the user has been working on or to find items by type. Start here for activity-summary questions such as "what happened today", "what's going on", "catch me up", or "what happened in standup today"; apply precise time, type, channel, or mailbox filters when the user gives that scope. For Rox task requests such as "list my tasks", "tasks assigned to me", or "tasks I completed yesterday", prefer this tool over external task trackers such as Linear unless the user explicitly asks for Linear. Rox tasks are document items with df subtype {"l":{"dst":"task"}} and includeTypes ["document"]. Filter task Status and Assignees through propf using entity_type TASK: Status property 00000001-0000-0000-0000-000000000002, Completed option 00000001-0000-0000-0002-000000000004, Assignees property 00000001-0000-0000-0000-000000000001. The current user's assignee entity id is their Rox user id, usually rox|<their email address from context>. For "completed yesterday", combine status Completed, assigned-to-me, and a df updatedAt yesterday window with ua gte/lt ISO timestamps. Returned documents, projects, emails, and call records include the tags visible to the user as {label, scope} pairs. To filter by tag (e.g. "my items tagged bug-report"), pass the tag labels in the tags argument — ListTags shows which tags exist. For finding specific items by name or content, use the search tool instead.
+ * Browse the user's Rox workspace to see recent items they have access to. Returns Rox documents, agent sessions, projects, emails, chat channels, call records, and foreign entities. Use this to get an overview of what the user has been working on or to find items by type. Start here for activity-summary questions such as "what happened today", "what's going on", "catch me up", or "what happened in standup today"; apply precise time, type, channel, or mailbox filters when the user gives that scope. For Rox task requests such as "list my tasks", "tasks assigned to me", or "tasks I completed yesterday", prefer this tool over external task trackers such as Linear unless the user explicitly asks for Linear. Rox tasks are document items with df subtype {"l":{"dst":"task"}} and includeTypes ["document"]. Filter task Status and Assignees through propf using entity_type TASK: Status property 00000001-0000-0000-0000-000000000002, Completed option 00000001-0000-0000-0002-000000000004, Assignees property 00000001-0000-0000-0000-000000000001. The current user's assignee entity id is their Rox user id, usually macro|<their email address from context>. For "completed yesterday", combine status Completed, assigned-to-me, and a df updatedAt yesterday window with ua gte/lt ISO timestamps. Returned documents, projects, emails, and call records include the tags visible to the user as {label, scope} pairs. To filter by tag (e.g. "my items tagged bug-report"), pass the tag labels in the tags argument — ListTags shows which tags exist. For finding specific items by name or content, use the search tool instead.
  */
 export interface ListEntities {
   /**
@@ -12246,7 +12246,7 @@ export interface ListEntities {
     [k: string]: unknown;
   };
   /**
-   * Agent-session filter (asf): use {"l":{"id":"<session UUID>"}} for a session, or {"l":{"o":"rox|email@example.com"}} for an owner.
+   * Agent-session filter (asf): use {"l":{"id":"<session UUID>"}} for a session, or {"l":{"o":"macro|email@example.com"}} for an owner.
    */
   asf?: {
     [k: string]: unknown;
@@ -12286,7 +12286,7 @@ export interface ListEntities {
     [k: string]: unknown;
   };
   /**
-   * Full soup AST property filter (propf). Use this for Rox task Status, Assignees, Priority, and other entity properties. For task Status Completed: {"l":{"pd":"00000001-0000-0000-0000-000000000002","et":"TASK","v":{"so":"00000001-0000-0000-0002-000000000004"}}}. For tasks assigned to the current user: {"l":{"pd":"00000001-0000-0000-0000-000000000001","et":"TASK","v":{"er":"rox|user@example.com"}}}. Combine both with &: {"&":[statusCompleted, assignedToMe]}. Prefer this over Linear tools for unqualified task requests.
+   * Full soup AST property filter (propf). Use this for Rox task Status, Assignees, Priority, and other entity properties. For task Status Completed: {"l":{"pd":"00000001-0000-0000-0000-000000000002","et":"TASK","v":{"so":"00000001-0000-0000-0002-000000000004"}}}. For tasks assigned to the current user: {"l":{"pd":"00000001-0000-0000-0000-000000000001","et":"TASK","v":{"er":"macro|user@example.com"}}}. Combine both with &: {"&":[statusCompleted, assignedToMe]}. Prefer this over Linear tools for unqualified task requests.
    */
   propf?: {
     [k: string]: unknown;
@@ -12957,7 +12957,7 @@ export interface ManageBotChannelAccessResponse {
   summary: string;
 }
 /**
- * Add or remove members of an existing channel. Requires the current user to be a channel member. Direct-message channels cannot change membership. The channel owner cannot be removed. Participants accept `rox|<email>` ids from ListTeamMembers or bare emails. Use `add` to invite people and `remove` to take them out. Use only when the user asks to change who is in a channel.
+ * Add or remove members of an existing channel. Requires the current user to be a channel member. Direct-message channels cannot change membership. The channel owner cannot be removed. Participants accept `macro|<email>` ids from ListTeamMembers or bare emails. Use `add` to invite people and `remove` to take them out. Use only when the user asks to change who is in a channel.
  */
 export interface ManageChannelParticipants {
   /**
@@ -12966,7 +12966,7 @@ export interface ManageChannelParticipants {
   channelId: string;
   action: ParticipantAction;
   /**
-   * People to add or remove, as `rox|<email>` ids or bare emails. Must not be empty.
+   * People to add or remove, as `macro|<email>` ids or bare emails. Must not be empty.
    */
   participants: string[];
 }
@@ -13131,7 +13131,7 @@ export interface NameSearch {
  */
 export interface OpenDirectMessage {
   /**
-   * The other people in the conversation, as Rox user ids (`rox|<email>`) or emails. Do not include the user.
+   * The other people in the conversation, as Rox user ids (`macro|<email>`) or emails. Do not include the user.
    */
   participants: string[];
 }
@@ -13182,8 +13182,8 @@ export interface OpenDirectMessageResponse {
  * - **Names are display names.** Double-quote a table or column name with spaces or punctuation (`FROM "Guest List" WHERE "Due Date" < '2026-09-01'`); names match case-insensitively, and a miss suggests the closest name. A table may be qualified by its database's name (`FROM "Offsite"."Guests"`).
  * - **Select and tag columns take option labels** (`"Status" = 'Going'`), never option ids. Only labels the column carries are accepted; add new ones with `ALTER TABLE table ALTER COLUMN col ADD OPTIONS ('New label')`.
  * - **Relations hold the row ids of another table.** Write a list of row ids (`"Guests" = ['<row id>']`), test with `HAS '<row id>'`, and join with `ON i."Guest" = g.row_id`: `SELECT p."Name" AS party, COUNT(*) AS invites FROM "Invites" i JOIN "Parties" p ON i."Party" = p.row_id GROUP BY p."Name"`. Never compare a relation to a name.
- * - **Person and other entity columns hold Rox ids,** never names: `'rox|sam@example.com'` for a person, a list for a multi-valued column. Respect each column's `specificEntityType`.
- * - **People:** `rox.people` is everyone the user knows (contacts and teammates) with `id`, `name` and `email`, the viewer included: “me” is the row whose email is the signed-in user's. It is read-only. Find people there, then write their ids: `SELECT id, name, email FROM rox.people WHERE name LIKE '%julia%' OR email LIKE '%julia%'`, then `UPDATE "Parties" SET "Host" = 'rox|julia@example.com' WHERE row_id = '<id>'`. Join to read names or emails: `JOIN rox.people p ON t."Owner" = p.id`. Use it, not ListTeamMembers, to find people for a database. Never invent a person or an id; when a name matches several people or none, ask.
+ * - **Person and other entity columns hold Rox ids,** never names: `'macro|sam@example.com'` for a person, a list for a multi-valued column. Respect each column's `specificEntityType`.
+ * - **People:** `rox.people` is everyone the user knows (contacts and teammates) with `id`, `name` and `email`, the viewer included: “me” is the row whose email is the signed-in user's. It is read-only. Find people there, then write their ids: `SELECT id, name, email FROM rox.people WHERE name LIKE '%julia%' OR email LIKE '%julia%'`, then `UPDATE "Parties" SET "Host" = 'macro|julia@example.com' WHERE row_id = '<id>'`. Join to read names or emails: `JOIN rox.people p ON t."Owner" = p.id`. Use it, not ListTeamMembers, to find people for a database. Never invent a person or an id; when a name matches several people or none, ask.
  * - **Changing a column's type:** `ALTER TABLE table ALTER COLUMN col TYPE type`,  where type is text, number, boolean, date, date_range, link, select, select_number, tag, or entity(USER), entity(DOCUMENT), entity(TASK)…, with `[]` for several values (`select[]`). Call DescribeDatabase with `includeEditingMetadata: true` for the column's `safeTypes` and `checkedTypes`. A value that does not fit, or a multi-valued cell a single-valued type would truncate, refuses the statement with counts and examples: fix those values with UPDATE, or add a new column.
  * - **Schema commands** (one statement per call; edit access required):
  *   - `CREATE DATABASE "Sales CRM"` creates its starter table with a Name column. Call DescribeDatabase using the returned database ID before editing it; reuse that starter table.
@@ -13954,7 +13954,7 @@ export interface ToolChannelMessage {
    */
   channelId: string;
   /**
-   * Sender id: `rox|<email>` for a person, `bot|<id>` for a bot.
+   * Sender id: `macro|<email>` for a person, `bot|<id>` for a bot.
    */
   senderId: string;
   /**
@@ -14034,7 +14034,7 @@ export interface ToolThreadReply {
    */
   threadId: string;
   /**
-   * Sender id: `rox|<email>` for a person, `bot|<id>` for a bot.
+   * Sender id: `macro|<email>` for a person, `bot|<id>` for a bot.
    */
   senderId: string;
   /**
@@ -15661,7 +15661,7 @@ export interface SendEmail {
  * For multi-select properties — including tags — prefer add_option_ids / remove_option_ids over option_ids: they add or remove just those options atomically, composing with concurrent edits. option_ids replaces the entire value, so a stale read can silently drop options someone else just added; only use it when the user asks to set the value to exactly a given list. To apply a tag, pass the tag set's property_definition_id and the tag's option id (both from ListTags) in add_option_ids; to remove a tag, use remove_option_ids.
  *
  * Tasks always have these system properties (use these property_definition_id values directly):
- * - Assignees (00000001-0000-0000-0000-000000000001): entity type, multi-select. Use entity_refs with entity_type='user' and entity_id='rox|email@domain.com' for people or 'bot|<agent UUID>' for agents. Adding an agent starts its session and replies in the task discussion.
+ * - Assignees (00000001-0000-0000-0000-000000000001): entity type, multi-select. Use entity_refs with entity_type='user' and entity_id='macro|email@domain.com' for people or 'bot|<agent UUID>' for agents. Adding an agent starts its session and replies in the task discussion.
  * - Status (00000001-0000-0000-0000-000000000002): select_string, single. Options: Not Started (00000001-0000-0000-0002-000000000001), In Progress (...0002), In Review (...0003), Completed (...0004), Canceled (...0005).
  * - Priority (00000001-0000-0000-0000-000000000003): select_string, single. Options: Low (...0001), Medium (...0002), High (...0003), Urgent (...0004). Option IDs: 00000001-0000-0000-0003-0000000000XX.
  * - Due Date (00000001-0000-0000-0000-000000000004): date, single. Use date_value with ISO 8601.
@@ -15674,7 +15674,7 @@ export interface SendEmail {
  *
  * CRM companies (entity_type='company', entity_id=the company UUID) always have these system properties:
  * - Stage (00000001-0000-0000-0000-000000000010): select_string, single. Use option_id. Default options: Lead (00000001-0000-0000-0010-000000000001), Qualified (...0002), Demo (...0003), Trial (...0004), Negotiation (...0005), Customer (...0006), Churned (...0007). Teams can customize their stages, so prefer calling GetCompany or GetEntityProperties first to get the valid stage option ids. This is the company's own Stage, not a deal's stage in a CRM pipeline: move pipeline deals with UpdatePipelineEntries.
- * - Owner (00000001-0000-0000-0000-000000000011): entity, single. Use entity_ref with entity_type='user' and entity_id='rox|email@domain.com'.
+ * - Owner (00000001-0000-0000-0000-000000000011): entity, single. Use entity_ref with entity_type='user' and entity_id='macro|email@domain.com'.
  * - Revenue (00000001-0000-0000-0000-000000000012): number, single. Use number_value (dollars).
  * Any member of the owning team can edit visible company properties; hidden records remain admin/owner-only.
  *
@@ -16046,7 +16046,7 @@ export interface UpdateBookingSettings {
  *
  * A guest without modify rights (`viewerCan.editDetails` false while `viewerCan.rsvp` is true) may only change their own `reminders`, add guests where `viewerCan.inviteGuests` allows it, and answer with `rsvp`; changing the title, time, description, location, recurrence or conference fails because the organizer doesn't let guests change the event.
  *
- * `addMacroCall` switches the event to a Rox call in place, so never delete and recreate an event to change its meeting link. It creates the call, adds its join link to the description (and to `location` when no physical location is set), and removes any Google Meet or other conference, in the one update attendees are notified of. The returned event's `roxCallUrl` holds the link. An Outlook event's Teams meeting cannot be removed this way, and the call then fails.
+ * `addRoxCall` switches the event to a Rox call in place, so never delete and recreate an event to change its meeting link. It creates the call, adds its join link to the description (and to `location` when no physical location is set), and removes any Google Meet or other conference, in the one update attendees are notified of. The returned event's `roxCallUrl` holds the link. An Outlook event's Teams meeting cannot be removed this way, and the call then fails.
  *
  * `rsvp` sets the user's own response to an invitation and is independent of the field edits — it can be the only thing this call changes. It applies at the same `scope` as the rest of the call and answers as the connected inbox the event's copy belongs to, so it only works when that inbox is an attendee.
  */
@@ -16093,13 +16093,13 @@ export interface UpdateCalendarEvent {
    */
   recurrenceLines?: string[] | null;
   /**
-   * Change the event's video conference: "provider_default" uses the calendar's supported provider; "google_meet" or "microsoft_teams" selects one explicitly. "remove" detaches the conference only where supported. Check ListCalendars capabilities first. Omit to preserve the current conference. To switch to a Rox call use `addMacroCall` instead.
+   * Change the event's video conference: "provider_default" uses the calendar's supported provider; "google_meet" or "microsoft_teams" selects one explicitly. "remove" detaches the conference only where supported. Check ListCalendars capabilities first. Omit to preserve the current conference. To switch to a Rox call use `addRoxCall` instead.
    */
   conference?: ConferenceChangeInput | null;
   /**
    * Switch the event to a Rox call, replacing any Google Meet or other conference. An event already holding a Rox call keeps it. Mutually exclusive with `conference`.
    */
-  addMacroCall?: boolean;
+  addRoxCall?: boolean;
   /**
    * Replacement notification reminders. `useDefault: true` follows the calendar's own defaults; otherwise `overrides` replaces the whole list with entries of `method` "popup" (a Rox notification) or "email" and `minutes` before the start — an empty list silences the event. Omit to keep the current reminders.
    */
@@ -16210,7 +16210,7 @@ export interface UpdateMemory {
   edit: MemoryEdit;
 }
 /**
- * Move deals to another stage or change their fields in a CRM pipeline: "move Acme to Negotiation", "set the revenue on the Globex deal", "assign these deals to Sam". Address each entry by entryId (from FindPipelineEntries) or by the company or contact id it tracks, and set fields by name with text values: stages and other options by label, people as "me", an email or a rox| user id, numbers, true/false, or dates. Several entries change in one call, all or nothing. If a stage the user names does not exist, say so and offer to add it with EditPipeline; never pick a similar one. Returns each field before and after: check them before saying a change is saved. This changes the entry in the pipeline, not the company's own properties.
+ * Move deals to another stage or change their fields in a CRM pipeline: "move Acme to Negotiation", "set the revenue on the Globex deal", "assign these deals to Sam". Address each entry by entryId (from FindPipelineEntries) or by the company or contact id it tracks, and set fields by name with text values: stages and other options by label, people as "me", an email or a macro| user id, numbers, true/false, or dates. Several entries change in one call, all or nothing. If a stage the user names does not exist, say so and offer to add it with EditPipeline; never pick a similar one. Returns each field before and after: check them before saying a change is saved. This changes the entry in the pipeline, not the company's own properties.
  */
 export interface UpdatePipelineEntries {
   /**

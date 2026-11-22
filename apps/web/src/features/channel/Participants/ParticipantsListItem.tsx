@@ -1,5 +1,5 @@
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayName, idToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, idToEmail, tryRoxId } from '@core/user';
 import { useSplitNavigationHandler } from '@core/util/useSplitNavigationHandler';
 import IconX from '@icon/system/regular/x.svg';
 import type { ChannelParticipant } from '@queries/channel/types';
@@ -19,7 +19,7 @@ export function ParticipantsListItem(props: {
     props.participant.role !== 'owner';
 
   const displayName = () =>
-    getDisplayName(tryMacroId(props.participant.user_id), {
+    getDisplayName(tryRoxId(props.participant.user_id), {
       emailFallback: 'local-part',
     }) || idToEmail(props.participant.user_id);
 

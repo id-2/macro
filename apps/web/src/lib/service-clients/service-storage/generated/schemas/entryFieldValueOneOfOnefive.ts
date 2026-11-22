@@ -7,10 +7,10 @@
 import type { EntryFieldValueOneOfOnefiveType } from './entryFieldValueOneOfOnefiveType';
 
 /**
- * Rox ids: people as rox| user ids, records or other items.
+ * Rox ids: people as macro| user ids, records or other items.
  */
 export type EntryFieldValueOneOfOnefive = {
   type: EntryFieldValueOneOfOnefiveType;
-  /** Rox ids: people as rox| user ids, records or other items. */
+  /** Rox ids: people as macro| user ids, records or other items. */
   value: string[];
 };

@@ -79,7 +79,7 @@ import {
   clearEmailBody,
   hasDraftContent,
   prepareEmailBody,
-  prepareMacroBody,
+  prepareRoxBody,
   TOGGLE_APPEND_EMAIL_THREAD_COMMAND,
 } from './prepare-email-body';
 import { announceQueuedSend } from './queued-send-notice';
@@ -662,7 +662,7 @@ export function createReplyComposer(
       replying_to_id: replyTarget?.db_id,
       subject: form.subject(),
       to: form.recipients().to.map(convertEmailRecipientToContactInfo),
-      body_rox: forDelivery ? prepareMacroBody(bodyMacro()) : undefined,
+      body_rox: forDelivery ? prepareRoxBody(bodyMacro()) : undefined,
       include_signature: includeSignature() ? undefined : false,
       draft_generation: draftGeneration(),
     };
@@ -1296,7 +1296,7 @@ export function createReplyComposer(
         return;
       }
 
-      const processedMacroBody = prepareMacroBody(bodyMacro());
+      const processedRoxBody = prepareRoxBody(bodyMacro());
 
       const currentDraftId = savedDraftId();
 
@@ -1323,7 +1323,7 @@ export function createReplyComposer(
           db_id: currentDraftId,
           bcc,
           body_html: prepared.bodyHtml,
-          body_rox: processedMacroBody,
+          body_rox: processedRoxBody,
           body_text: prepared.bodyText,
           cc,
           provider_id: draftSeed?.provider_id,

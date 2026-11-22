@@ -45,7 +45,7 @@ class MemorySnapshots implements SnapshotStore<Uint8Array> {
 
 const shortName = (id: string | undefined) =>
   (id ?? '')
-    .replace(/^rox\|/, '')
+    .replace(/^macro\|/, '')
     .split('@')[0]
     .replace(/^./, (c) => c.toUpperCase()) || 'Someone';
 
@@ -57,7 +57,7 @@ export function CollabFixture(props: {
   const worker = props.params.get('worker') ?? '';
   const socketUrl = props.params.get('socket') ?? '';
   const token = props.params.get('token') ?? '';
-  const user = props.params.get('user') ?? 'rox|alice@example.com';
+  const user = props.params.get('user') ?? 'macro|alice@example.com';
   const readonly = props.params.has('readonly');
   const [engine, setEngine] = createSignal<PresentationEngine>();
   const [errors, setErrors] = createSignal<string[]>([]);

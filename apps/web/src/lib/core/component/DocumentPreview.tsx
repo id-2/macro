@@ -1,10 +1,10 @@
 import {
-  parseMacroAppLink,
+  parseRoxAppLink,
   sanitizeCalendarDescription,
 } from '@app/features/calendar/utils/calendar-description';
 import {
-  calendarMacroCallUrl,
-  removeCalendarMacroCall,
+  calendarRoxCallUrl,
+  removeCalendarRoxCall,
 } from '@app/features/calendar/utils/rox-call-link';
 import { SharedEventActions } from '@app/features/calendar-view/components/SharedEventActions';
 import {
@@ -40,7 +40,7 @@ import {
   itemToBlockName,
   resolveBlockAlias,
 } from '@core/constant/allBlocks';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { copyBranchNameToClipboard } from '@core/util/branchName';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { parseLocalDate } from '@core/util/local-date';
@@ -383,12 +383,12 @@ function CalendarEventPreviewDetails(props: {
 }) {
   const organizer = () =>
     props.event.organizerName ?? props.event.organizerEmail;
-  const roxMeetingUrl = () => calendarMacroCallUrl(props.event);
+  const roxMeetingUrl = () => calendarRoxCallUrl(props.event);
   // A channel share exposes the meeting, not a way into its call.
   const joinableMeetingUrl = () =>
     props.event.viewerEventId ? roxMeetingUrl() : undefined;
   const eventContent = createMemo(() =>
-    removeCalendarMacroCall(props.event, roxMeetingUrl())
+    removeCalendarRoxCall(props.event, roxMeetingUrl())
   );
   const descriptionHtml = () =>
     sanitizeCalendarDescription(eventContent().description);
@@ -399,7 +399,7 @@ function CalendarEventPreviewDetails(props: {
     if (!(anchor instanceof HTMLAnchorElement)) return;
     event.preventDefault();
     event.stopPropagation();
-    const target = parseMacroAppLink(anchor.href);
+    const target = parseRoxAppLink(anchor.href);
     if (target) {
       openBlockDocument(
         target.blockName,
@@ -1023,8 +1023,8 @@ export function DocumentPreviewContent(props: DocumentPreviewContentProps) {
                             }
                           >
                             {(owner) =>
-                              getDisplayName(tryMacroId(owner())) ||
-                              owner().replace('rox|', '')
+                              getDisplayName(tryRoxId(owner())) ||
+                              owner().replace('macro|', '')
                             }
                           </Show>
                           <Show

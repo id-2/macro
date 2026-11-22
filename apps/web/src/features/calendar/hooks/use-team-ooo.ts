@@ -1,5 +1,5 @@
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import {
   type CalendarOccurrenceQueryRange,
   createCalendarOccurrenceQueryRange,
@@ -61,7 +61,7 @@ function mapTeamOooItem(item: TeamOutOfOfficeItem): CalendarEvent {
     time.kind === 'timed'
       ? { allDay: false, start: time.startsAt, end: time.endsAt }
       : { allDay: true, start: time.startDate, end: time.endDate };
-  const name = getDisplayName(tryMacroId(item.ownerId));
+  const name = getDisplayName(tryRoxId(item.ownerId));
   const title = item.title ?? TEAM_OOO_FALLBACK_TITLE;
   const calendar = {
     id: teamOooSourceId(item.ownerId),
@@ -318,7 +318,7 @@ export function useUpcomingTeamOoo(): UpcomingTeamOoo {
         ownerId: item.ownerId,
         eventId: item.eventId,
         occurrenceKey: item.occurrenceKey,
-        name: getDisplayName(tryMacroId(item.ownerId)),
+        name: getDisplayName(tryRoxId(item.ownerId)),
         event: mapTeamOooItem(item),
         title: item.title ?? undefined,
         start,

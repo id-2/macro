@@ -861,7 +861,7 @@ function uniqueParticipantIds(ids: string[]): string[] {
   for (const id of ids) {
     const trimmedId = id.trim();
     const normalizedId = normalizeParticipantIdentity(trimmedId);
-    if (!isMacroParticipantIdentity(trimmedId) || seen.has(normalizedId)) {
+    if (!isRoxParticipantIdentity(trimmedId) || seen.has(normalizedId)) {
       continue;
     }
     seen.add(normalizedId);
@@ -870,10 +870,10 @@ function uniqueParticipantIds(ids: string[]): string[] {
   return participantIds;
 }
 
-function isMacroParticipantIdentity(identity: string): boolean {
+function isRoxParticipantIdentity(identity: string): boolean {
   const trimmedIdentity = identity.trim();
   return (
-    normalizeParticipantIdentity(trimmedIdentity).startsWith('rox|') &&
+    normalizeParticipantIdentity(trimmedIdentity).startsWith('macro|') &&
     trimmedIdentity.includes('@')
   );
 }

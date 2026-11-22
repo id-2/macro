@@ -13,7 +13,7 @@ it('edits mention tokens atomically and maps selection offsets to the canonical 
   document.body.append(root);
   const token = encodeCellMention({
     type: 'user',
-    userId: 'rox|a@b.com',
+    userId: 'macro|a@b.com',
     email: 'a@b.com',
     displayName: 'Alice',
   });

@@ -1,5 +1,5 @@
 import { getDisplayName } from './displayName';
-import { tryMacroId } from './roxId';
+import { tryRoxId } from './roxId';
 import type { IUser } from './types';
 
 // TODO: consolidate idToEmail, see idToEmail in email.ts
@@ -8,19 +8,19 @@ import type { IUser } from './types';
  * @deprecated Use `roxIdToEmail` with a validated `RoxId` instead.
  */
 export function idToEmail(id: string): string {
-  return id.replace('rox|', '');
+  return id.replace('macro|', '');
 }
 
 /**
  * Converts an email address to a user id.
- * @deprecated Use `emailToMacroId` instead for type-safe RoxId creation.
+ * @deprecated Use `emailToRoxId` instead for type-safe RoxId creation.
  */
 export function emailToId(email: string): string {
-  return `rox|${email}`;
+  return `macro|${email}`;
 }
 
 export function idToDisplayName(id: string): string {
-  return getDisplayName(tryMacroId(id), {
+  return getDisplayName(tryRoxId(id), {
     emailFallback: 'local-part',
   });
 }

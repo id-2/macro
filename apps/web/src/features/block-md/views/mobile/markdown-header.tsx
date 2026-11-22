@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import type { BlockTool } from '@components/app/block-tool';
 import {
   CollaborationStatusIndicator,
@@ -73,7 +73,7 @@ export function MobileMarkdownHeader(props: {
                   <Show when={kind() === 'task' && !isMobile()}>
                     <DispatchAgentButton showPrimaryLabel />
                   </Show>
-                  <AskMacroButton
+                  <AskRoxButton
                     grouped
                     entity={{
                       type: 'document',

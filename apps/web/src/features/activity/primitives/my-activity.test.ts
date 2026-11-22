@@ -241,8 +241,8 @@ describe('createMyActivityState', () => {
     const teammateEdit = {
       ...editedEvent,
       id: 'evt-team',
-      actorId: 'rox|priya@example.com',
-      subjectId: 'rox|priya@example.com',
+      actorId: 'macro|priya@example.com',
+      subjectId: 'macro|priya@example.com',
     };
 
     function setupScoped(initial: ActivityScope) {

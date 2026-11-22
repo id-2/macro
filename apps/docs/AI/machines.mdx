@@ -9,13 +9,17 @@ description: "Connect your computer, share it with your team, and choose which m
 
 An **agent** is the name, instructions, and model you @mention. A **machine** is where that agent runs: on Rox's built-in machines, in Cursor, or on a computer of your own.
 
-Manage both in the same place: agents in **Settings → Agents**, machines in **Settings → Machines**. The Machines page is also at [that address](/settings/runtimes).
+Manage both in the same place: agents in **Settings → Agents**, machines in **Settings → Machines**. On the web the Machines page is [settings/runtimes](/settings/runtimes).
 
 ## What a machine holds
 
 A machine is not the agent. It holds the folder your agent works in, the coding agent installed there, and the credentials that agent uses. Two agents pointed at the same machine share its files and its sign-ins.
 
-<RoxComputer />
+The Machines page has three kinds of entry:
+
+- **Your machines** are computers you paired with `roxd`. You rename them, share them, and remove them here.
+- **Teammates' machines** are computers someone else paired. You can ask for access to one, but you cannot change it.
+- **Built-in machines** are Rox's own and Cursor. Rox is always there; Cursor is listed too and works once you paste an API key.
 
 ## Connect your own computer
 
@@ -27,11 +31,7 @@ Your own computer runs **roxd**, the Rox daemon. It connects out to Rox, so you 
 
 ### On the Rox desktop app
 
-The desktop app bundles `roxd`. Open **Settings → Machines** and use the **Run agents on this computer** card:
-
-- **Set up** looks for a coding agent already installed on this computer.
-- **Set up** that agent configures, pairs, and starts `roxd`, then creates the agent for you. No terminal and no pairing code.
-- **Options** chooses a different agent, sets the **Workspace folder**, and turns on **Full access**.
+The desktop app bundles `roxd`. Open **Settings → Machines** and use the **This computer** card, whose row is **Run agents on this computer**. **Set up** looks for a coding agent already installed on this computer; then **Set up Claude Code**, **Set up Codex**, or whichever agent it found, configures and pairs `roxd` and creates the agent for you. No terminal and no pairing code. **Options** chooses a different agent, sets the **Workspace folder**, and turns on **Full access**.
 
 Keep the app open while the machine runs.
 
@@ -66,7 +66,7 @@ Use this for servers, a second computer, or any computer without the desktop app
   </Step>
 
   <Step title="Let roxd connect">
-    After approval, `roxd` connects by itself. Its row in **Your machines** shows a green dot and **Connected**. Keep `roxd` running and the computer awake while you use the machine.
+    After approval, `roxd` connects by itself. Its row in **Your machines** turns connected: the status dot fills in and **Last connected** updates. Keep `roxd` running and the computer awake while you use the machine.
   </Step>
 </Steps>
 
@@ -107,7 +107,7 @@ A request can also come on behalf of an agent. The menu marks those as **Asked b
   </Step>
 
   <Step title="Pick where it runs">
-    Under **Where it runs**, choose **On your machine**, then pick the computer in the **Machine** list and a model. **In Rox** and **In Cursor** are the other places an agent can run; **Rox computer** runs it on a hosted machine your team bought.
+    Under **Where it runs**, choose **On your machine**, then pick the computer in the **Machine** list and a model. **In Rox**, **In Cursor**, and **On a Rox computer** are the other places an agent can run.
   </Step>
 
   <Step title="Choose who can use the agent">
@@ -121,10 +121,10 @@ An offline machine stays selectable, and its row in the list says **Offline**. A
 
 ## Keep a machine connected
 
-Each row in **Your machines** shows its status and when it last connected. **Rename** and **Remove** sit next to **Share** and **Options**.
+Each row in **Your machines** shows its status and when it last connected. **Share** opens access for the machine, **Options** opens the permission switch, and **Rename** and **Remove** change the machine itself.
 
 - **Options** opens the **Don't ask before acting** switch. Only the machine's owner can change it, and turning it on asks you to confirm first.
-- **Remove** unpairs the machine. Its agents stop, and you have to pair the computer again before using it. Removing does not touch the files on your computer.
+- **Remove** unpairs the machine. Its agents stop, and you have to pair the computer again before using it. Files on the computer stay where they are.
 - **Offline** on the row means `roxd` is not running, the computer is asleep, or it cannot reach Rox. Start `roxd` again; it reloads its saved configuration from any folder.
 
 For a second machine on the same computer, run `roxd --profile work`. Each profile pairs as its own machine, shows up as a separate row, and can be shared with a different set of people.
@@ -134,6 +134,6 @@ For a second machine on the same computer, run `roxd --profile work`. Each profi
 - **A teammate cannot see my machine:** check the **Share** menu. The machine is **Private** until you add them or turn on **Team machine**.
 - **My agent says it stopped for lack of access:** an owner of the machine removed the access it runs on. Ask them to add it back; the agent resumes when they do.
 - **Pairing code is rejected:** codes expire. Run `roxd` again, press <kbd>p</kbd> to print a new one, and enter that.
-- **A machine shows as offline after I moved computers:** a machine belongs to the computer it was paired on. Pair the new computer as a new machine.
+- **I removed a machine by mistake:** pair that computer again. It comes back as a new row, and you point its agents at it under **Where it runs**.
 
 To connect a hosted Cursor machine instead, see [Cursor](/AI/cursor). To learn more about using agents, see [Agents](/product/agents).

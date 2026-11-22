@@ -4,12 +4,12 @@ import type { CalendarEventEntity } from '../../types/entity';
 import { CalendarEventWhen } from './calendar';
 
 vi.mock('@core/user', () => ({
-  emailToMacroId: (email: string) =>
-    email.includes('@') ? `rox|${email}` : undefined,
+  emailToRoxId: (email: string) =>
+    email.includes('@') ? `macro|${email}` : undefined,
   getDisplayName: (id: string) =>
-    id === 'rox|jacob@rox.one'
+    id === 'macro|jacob@rox.one'
       ? 'Jacob Beckerman'
-      : id.replace(/^rox\|/, ''),
+      : id.replace(/^macro\|/, ''),
 }));
 vi.mock('@core/component/UserIcon', () => ({ UserIcon: () => null }));
 vi.mock('../../entity', () => ({ Entity: {} }));
@@ -20,7 +20,7 @@ function event(
   return {
     id: 'event',
     name: 'Out of office',
-    ownerId: 'rox|gab@rox.one',
+    ownerId: 'macro|gab@rox.one',
     type: 'calendar_event',
     status: 'confirmed',
     isReadOnly: false,

@@ -1,4 +1,4 @@
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { buildChatEditor } from '@core/component/AI/component/input/buildChatEditor';
 import type { ChatSendInput } from '@core/component/AI/component/input/buildRequest';
 import { ChatInput } from '@core/component/AI/component/input/ChatInput';
@@ -26,7 +26,7 @@ function EditableChatMessageInner(props: {
     getAttachmentFromMention
   );
   const editor = buildChatEditor()
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .withMentions({
       ...attachmentMentionCallbacks,
       block: 'chat',

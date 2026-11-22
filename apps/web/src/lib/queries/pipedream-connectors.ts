@@ -511,7 +511,7 @@ async function connectPipedreamAccount(
   }
   span.setAttr('connector.provider', token.value.provider);
   if (token.value.provider === 'connect' && token.value.connect_url) {
-    return connectThroughMacroConnect(
+    return connectThroughRoxConnect(
       args,
       token.value.connect_url,
       popup,
@@ -585,7 +585,7 @@ const ROX_CONNECT_TIMEOUT_MS = 10 * 60 * 1000;
  * tab is closed, or the session expires. Connect's redirect page cannot
  * message this tab, so completion is polled, as for overlaid apps.
  */
-async function connectThroughMacroConnect(
+async function connectThroughRoxConnect(
   args: Parameters<typeof connectPipedreamApp>[0],
   connectUrl: string,
   popup: Window | null,
@@ -597,7 +597,7 @@ async function connectThroughMacroConnect(
     const deadline = Date.now() + ROX_CONNECT_TIMEOUT_MS;
     while (Date.now() < deadline && currentUserId() === userId) {
       const closed = popup?.closed ?? false;
-      const result = await cognitionApiServiceClient.completeMacroConnect({
+      const result = await cognitionApiServiceClient.completeRoxConnect({
         app_slug: args.appSlug,
         server_name: args.serverName,
       });

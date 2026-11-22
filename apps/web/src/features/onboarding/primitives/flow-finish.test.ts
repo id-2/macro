@@ -12,7 +12,7 @@ import {
   saveStep,
 } from './flow-storage';
 
-const VIEWER = 'rox|ada@acme.com';
+const VIEWER = 'macro|ada@acme.com';
 
 let dispose: (() => void) | undefined;
 afterEach(() => dispose?.());

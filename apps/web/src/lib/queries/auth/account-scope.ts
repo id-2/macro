@@ -1,6 +1,6 @@
 import { scheduledActionKeys } from '@app/features/routines/queries/keys';
 import { thrownResultErrorHasCode } from '@core/util/result';
-import { resetMacroApiToken } from '@service-auth/fetch';
+import { resetRoxApiToken } from '@service-auth/fetch';
 import {
   hashKey,
   type MutationFunctionContext,
@@ -108,7 +108,7 @@ export function mutationQueryAccount(
  * cannot reopen this gate. An old auth request is canceled before invalidation. */
 export async function resetQueryAccountSession(): Promise<void> {
   stopWaitingForIdentity?.();
-  resetMacroApiToken();
+  resetRoxApiToken();
   const epoch = session().epoch + 1;
   setSession({ epoch, pending: true });
   const cache = queryClient.getQueryCache();

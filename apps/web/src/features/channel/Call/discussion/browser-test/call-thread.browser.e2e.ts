@@ -3,7 +3,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 const CHANNEL_ID = '00000000-0000-7000-8000-00000000c0c0';
 const CALL_ID = '00000000-0000-7000-8000-0000000ca110';
-const CALLER = 'rox|caller@example.com';
+const CALLER = 'macro|caller@example.com';
 const STARTED_AT = new Date(Date.now() - 5 * 60_000).toISOString();
 const PATH =
   '/src/features/channel/Call/discussion/browser-test/call-thread.html';
@@ -14,7 +14,7 @@ function message(id: string, content: string, overrides: object = {}) {
     parent: { type: 'channel', id: CHANNEL_ID },
     thread_id: null,
     kind: 'message',
-    sender_id: 'rox|member@example.com',
+    sender_id: 'macro|member@example.com',
     mentions: [],
     content,
     created_at: STARTED_AT,
@@ -134,7 +134,7 @@ async function open(
                   ? [
                       {
                         id: 'registration-1',
-                        accountId: 'rox|member@example.com',
+                        accountId: 'macro|member@example.com',
                         registeredAt: STARTED_AT,
                         session: {
                           id: '00000000-0000-7000-8000-00000000a001',

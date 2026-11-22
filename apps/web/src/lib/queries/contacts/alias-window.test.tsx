@@ -19,7 +19,7 @@ it('resolves the listed alias pages up to one batch and discards old private-use
   vi.useFakeTimers();
   resolve.mockImplementation(async (_viewer, _host, lookup) => ({
     users: lookup.values.map((email) => ({
-      id: `rox|${email}`,
+      id: `macro|${email}`,
       email,
       name: email,
     })),
@@ -142,7 +142,7 @@ it('keeps the users found for emails still listed while a changed list resolves 
   vi.useFakeTimers();
   resolve.mockImplementation(async (_viewer, _host, lookup) => ({
     users: lookup.values.map((email) => ({
-      id: `rox|${email}`,
+      id: `macro|${email}`,
       email,
       name: email,
     })),

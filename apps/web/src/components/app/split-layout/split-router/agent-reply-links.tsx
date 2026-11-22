@@ -22,7 +22,7 @@ import { transformShortIdInUrlPathname } from '@core/util/url';
 import { createCallback } from '@solid-primitives/rootless';
 import { type ParentProps, useContext } from 'solid-js';
 import { upgradeLegacyPath } from './legacy-route';
-import { createMacroMentionLinkResolver } from './mention-links';
+import { createRoxMentionLinkResolver } from './mention-links';
 
 /**
  * The location a Rox app link shows in its last pane, as the router would
@@ -65,7 +65,7 @@ function useAgentReplyLinkOpener(): AppLinkOpener | undefined {
   const router = useOptionalSplitRouter();
   if (!router) return;
 
-  const resolveMention = createMacroMentionLinkResolver(router.routes);
+  const resolveMention = createRoxMentionLinkResolver(router.routes);
   const pane = useContext(PaneContext);
 
   return createCallback((url: string) => {

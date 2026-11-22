@@ -1,10 +1,10 @@
 import { PROPERTY_OPTION_IDS, SYSTEM_PROPERTY_IDS } from '@property/constants';
 import { describe, expect, test } from 'vitest';
-import { linearCsvRecordToMacroTaskDraft } from './linearImport';
+import { linearCsvRecordToRoxTaskDraft } from './linearImport';
 
-describe('linearCsvRecordToMacroTaskDraft', () => {
+describe('linearCsvRecordToRoxTaskDraft', () => {
   test('maps Completed timestamp to completed status', () => {
-    const draft = linearCsvRecordToMacroTaskDraft({
+    const draft = linearCsvRecordToRoxTaskDraft({
       record: {
         Title: 'A',
         Completed: '2025-01-01',
@@ -24,7 +24,7 @@ describe('linearCsvRecordToMacroTaskDraft', () => {
   });
 
   test('maps Archived timestamp to canceled status (best available option)', () => {
-    const draft = linearCsvRecordToMacroTaskDraft({
+    const draft = linearCsvRecordToRoxTaskDraft({
       record: {
         Title: 'A',
         Archived: '2025-01-02',
@@ -45,7 +45,7 @@ describe('linearCsvRecordToMacroTaskDraft', () => {
   });
 
   test('maps priority strings', () => {
-    const draft = linearCsvRecordToMacroTaskDraft({
+    const draft = linearCsvRecordToRoxTaskDraft({
       record: {
         Title: 'A',
         Priority: 'Urgent',
@@ -62,7 +62,7 @@ describe('linearCsvRecordToMacroTaskDraft', () => {
   });
 
   test('maps priority numeric values', () => {
-    const draft = linearCsvRecordToMacroTaskDraft({
+    const draft = linearCsvRecordToRoxTaskDraft({
       record: {
         Title: 'A',
         Priority: '2',

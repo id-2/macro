@@ -3,7 +3,7 @@ import { UserIcon } from '@core/component/UserIcon';
 import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { isMobile } from '@core/mobile/isMobile';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { getPropertyOptionLabel } from '@entity';
 import { SOUP_ROW_CLASS } from '@entity/composed/list-entity/row-geometry';
 import { useListLayout } from '@entity/composed/list-entity/shared';
@@ -77,7 +77,7 @@ export function TaskGroupHeader(props: {
 
     if (props.groupBy === 'assignee') {
       if (isBotPrincipalId(props.row.groupId)) return agent.name();
-      const assigneeId = tryMacroId(props.row.groupId);
+      const assigneeId = tryRoxId(props.row.groupId);
       if (!assigneeId) return props.row.label;
       return (
         getDisplayName(assigneeId, { emailFallback: 'local-part' }) ||

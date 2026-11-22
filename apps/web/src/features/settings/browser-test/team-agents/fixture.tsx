@@ -39,20 +39,20 @@ const team: Team = {
   id: 'team-1',
   name: 'Northwind',
   slug: 'northwind',
-  owner_id: 'rox|maya@example.com',
+  owner_id: 'macro|maya@example.com',
   allow_non_admin_invites: true,
   crm_enabled: false,
   enterprise: false,
 };
 
-// The viewer comes from the page's URL (`?viewer=rox|sam@example.com`), an
+// The viewer comes from the page's URL (`?viewer=macro|sam@example.com`), an
 // owner by default. The roster, invites and agents come from the spec's
 // scripted auth service, so a refetch after an invite reads its new state.
 const viewer =
   new URLSearchParams(window.location.search).get('viewer') ?? team.owner_id;
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   id: viewer,
-  email: viewer.replace('rox|', ''),
+  email: viewer.replace('macro|', ''),
   authenticated: true,
 });
 queryClient.setQueryData(teamKeys.invites(team.id).queryKey, { invites: [] });

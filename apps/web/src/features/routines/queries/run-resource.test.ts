@@ -262,7 +262,7 @@ describe('step outputs and run starts in run history', () => {
     });
 
   it('keeps what each step returned', () => {
-    const steps = run({ kind: 'manual', by: 'rox|owner@example.com' }).steps;
+    const steps = run({ kind: 'manual', by: 'macro|owner@example.com' }).steps;
     expect(
       steps?.map((step) => (step.kind === 'code' ? step.output : null))
     ).toEqual([{ count: 2, ids: ['a', 'b'] }, { documentId: 'doc-1' }, null]);
@@ -308,7 +308,7 @@ describe('step outputs and run starts in run history', () => {
   });
 
   it('decodes whom code steps acted as, ignoring values it does not know', () => {
-    const manual = { kind: 'manual', by: 'rox|owner@example.com' };
+    const manual = { kind: 'manual', by: 'macro|owner@example.com' };
     expect(run(manual, { code_acts_as: 'owner' }).run?.codeActsAs).toBe(
       'owner'
     );

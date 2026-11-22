@@ -8,7 +8,7 @@ import {
 import { createRoot } from 'solid-js';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createOpenSections } from '../../whatsapp-linked/primitives/open-sections';
-import { InMacroChats } from './in-rox-section';
+import { InRoxChats } from './in-rox-section';
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -28,7 +28,7 @@ afterEach(() => {
 it('lists readable chats with unread counts and marks read-only ones', () => {
   const onOpenChat = vi.fn();
   render(() => (
-    <InMacroChats
+    <InRoxChats
       label="WhatsApp"
       chats={[
         {
@@ -36,7 +36,7 @@ it('lists readable chats with unread counts and marks read-only ones', () => {
           provider: 'whatsapp',
           kind: 'group',
           name: 'Design Crit',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 3,
           canSend: true,
         },
@@ -45,7 +45,7 @@ it('lists readable chats with unread counts and marks read-only ones', () => {
           provider: 'whatsapp',
           kind: 'group',
           name: 'Ana, Ben, +2',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 0,
           canSend: false,
         },
@@ -54,7 +54,7 @@ it('lists readable chats with unread counts and marks read-only ones', () => {
           provider: 'whatsapp',
           kind: 'direct',
           name: 'Ana Ruiz',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 1,
           canSend: false,
         },
@@ -95,7 +95,7 @@ it('sorts chats into direct messages, groups and one section per community, like
   );
   const launch = { id: '120363000000000010@g.us', name: 'Launch' };
   render(() => (
-    <InMacroChats
+    <InRoxChats
       label="WhatsApp"
       chats={[
         {
@@ -103,7 +103,7 @@ it('sorts chats into direct messages, groups and one section per community, like
           provider: 'whatsapp',
           kind: 'direct',
           name: 'Ana Ruiz',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 0,
           canSend: true,
         },
@@ -112,7 +112,7 @@ it('sorts chats into direct messages, groups and one section per community, like
           provider: 'whatsapp',
           kind: 'group',
           name: 'Launch',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 4,
           canSend: false,
           community: { ...launch, announcements: true },
@@ -122,7 +122,7 @@ it('sorts chats into direct messages, groups and one section per community, like
           provider: 'whatsapp',
           kind: 'group',
           name: 'Design Crit',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 2,
           canSend: true,
         },
@@ -131,7 +131,7 @@ it('sorts chats into direct messages, groups and one section per community, like
           provider: 'whatsapp',
           kind: 'group',
           name: 'Design',
-          ownerId: 'rox|me@example.test',
+          ownerId: 'macro|me@example.test',
           unreadCount: 1,
           canSend: true,
           community: { ...launch, announcements: false },

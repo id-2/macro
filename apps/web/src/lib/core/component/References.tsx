@@ -11,7 +11,7 @@ import type { BlockAlias, BlockName } from '@core/block';
 import { toast } from '@core/component/Toast/Toast';
 import { itemToBlockName } from '@core/constant/allBlocks';
 import { COMMENT_LINK_PARAM } from '@core/messages/comment-link';
-import { getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayNameParts, tryRoxId } from '@core/user';
 import { compareDateDesc, type DateValue } from '@core/util/date';
 import { useSplitNavigationHandler } from '@core/util/useSplitNavigationHandler';
 import { formatRelativeTimestamp } from '@entity';
@@ -167,7 +167,7 @@ function MessageReferenceRow(props: {
   onOpen: (e: KeyboardEvent | MouseEvent) => void;
 }) {
   const senderName = () => {
-    const parts = getDisplayNameParts(tryMacroId(props.senderId), {
+    const parts = getDisplayNameParts(tryRoxId(props.senderId), {
       emailFallback: 'local-part',
     });
     return parts.firstName || parts.fullName;
@@ -254,7 +254,7 @@ function GenericReferenceRow(props: {
 }) {
   const userId = props.reference.user_id!;
   const senderName = () => {
-    const parts = getDisplayNameParts(tryMacroId(userId), {
+    const parts = getDisplayNameParts(tryRoxId(userId), {
       emailFallback: 'local-part',
     });
     return parts.firstName || parts.fullName;

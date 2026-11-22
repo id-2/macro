@@ -1,4 +1,4 @@
-import { emailToMacroId, tryMacroId } from '@core/user/roxId';
+import { emailToRoxId, tryRoxId } from '@core/user/roxId';
 import type { IUser } from '@core/user/types';
 import {
   readRecordsByKeys,
@@ -58,7 +58,7 @@ export function contactLookupIds(lookup: ContactLookup): string[] {
     if (value.length > 1024) throw new Error('Invalid contact lookup');
     const canonical = value.trim().toLowerCase();
     const id =
-      lookup.kind === 'ids' ? tryMacroId(canonical) : emailToMacroId(canonical);
+      lookup.kind === 'ids' ? tryRoxId(canonical) : emailToRoxId(canonical);
     if (!id || id.includes('\0') || id.length > 1024)
       throw new Error('Invalid contact lookup');
     return id;

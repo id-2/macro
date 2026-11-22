@@ -24,7 +24,7 @@ import {
 
 function legacyMessage(
   senderId: string,
-  replySenderId = 'rox|reply@example.com'
+  replySenderId = 'macro|reply@example.com'
 ): ChannelMessageWithMaybeSender {
   return {
     id: 'message-1',
@@ -66,18 +66,18 @@ function legacyMessage(
 describe('message sender normalization', () => {
   it('derives user senders for old channel message payloads', () => {
     const message = normalizeChannelMessageSender(
-      legacyMessage('rox|alice@example.com')
+      legacyMessage('macro|alice@example.com')
     );
 
     expect(message.sender).toEqual({
       type: 'user',
-      id: 'rox|alice@example.com',
+      id: 'macro|alice@example.com',
     });
     expect(
       normalizeThreadReplySender(message.thread.preview[0]).sender
     ).toEqual({
       type: 'user',
-      id: 'rox|reply@example.com',
+      id: 'macro|reply@example.com',
     });
   });
 
@@ -143,7 +143,7 @@ describe('message sender normalization', () => {
       mentions: [],
       sender_id: ROX_AGENT_PRINCIPAL_ID,
       bot_profile: { name: ROX_AGENT_NAME },
-      triggered_by: 'rox|alice@example.com',
+      triggered_by: 'macro|alice@example.com',
       triggered_via: 'Claude Code',
       content: 'posted from Claude Code',
       created_at: '2026-11-02T10:00:00.000Z',
@@ -173,7 +173,7 @@ describe('message sender normalization', () => {
     const bot = {
       ...root,
       bot_profile: { name: 'Bingus', avatar_url: 'https://example.com/b.png' },
-      triggered_by: 'rox|eric@example.com',
+      triggered_by: 'macro|eric@example.com',
     };
     const reply = {
       ...root,
@@ -191,7 +191,7 @@ describe('message sender normalization', () => {
         {
           ...root,
           id: 'reply-2',
-          sender_id: 'rox|reply@example.com',
+          sender_id: 'macro|reply@example.com',
           bot_profile: null,
         },
       ],
@@ -202,14 +202,14 @@ describe('message sender normalization', () => {
       id: '00000000-0000-0000-0000-000000000001',
       name: 'Bingus',
       avatar_url: 'https://example.com/b.png',
-      triggered_by: 'rox|eric@example.com',
+      triggered_by: 'macro|eric@example.com',
     });
     expect(getBotDisplayName(thread.root.sender_id, thread.root.sender)).toBe(
       'Bingus'
     );
     expect(thread.replies.map((message) => message.sender)).toEqual([
       expect.objectContaining({ type: 'bot', name: 'Deploy Bot' }),
-      expect.objectContaining({ type: 'user', id: 'rox|reply@example.com' }),
+      expect.objectContaining({ type: 'user', id: 'macro|reply@example.com' }),
     ]);
   });
 });

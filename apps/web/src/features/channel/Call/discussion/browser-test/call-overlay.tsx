@@ -59,7 +59,7 @@ applyTheme(
 document.documentElement.dataset.touchDevice = String(isTouchDevice());
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   authenticated: true,
-  id: 'rox|me@example.com',
+  id: 'macro|me@example.com',
   permissions: [],
 } as unknown as UserInfoData);
 const notifications = {

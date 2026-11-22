@@ -194,7 +194,7 @@ const client = new QueryClient({
 if (PARAMS.has('discussion')) {
   queryClient.setQueryData(authKeys.userInfo.queryKey, {
     authenticated: true,
-    id: 'rox|reader@example.com',
+    id: 'macro|reader@example.com',
     permissions: [],
   } as unknown as UserInfoData);
 }

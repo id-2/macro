@@ -25,11 +25,11 @@ vi.mock('@core/auth', () => ({ useHasPaidAccess: () => () => false }));
 vi.mock('@core/constant/featureFlags', () => ({
   LOCAL_ONLY: false,
   enableAiUsageBilling: {},
-  enableMacroComputers: {},
+  enableRoxComputers: {},
 }));
 vi.mock('@core/context/user', () => ({
   usePermissions: () => () => ['write:stripe_subscription'],
-  useUserId: () => () => 'rox|returning@example.com',
+  useUserId: () => () => 'macro|returning@example.com',
   useLicenseStatus: () => () => 'inactive',
 }));
 vi.mock('@queries/team/teams', () => ({

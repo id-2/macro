@@ -30,7 +30,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 vi.mock('@core/user', () => ({
   getDisplayNameParts: () => ({ firstName: 'Ada', fullName: 'Ada Lovelace' }),
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 vi.mock('@entity', () => ({ formatRelativeTimestamp: () => 'now' }));
 vi.mock('./ItemPreview', () => ({
@@ -67,7 +67,7 @@ function genericReference(sourceId: string) {
     entity_id: 'referenced-doc',
     source_entity_type: 'document',
     source_entity_id: sourceId,
-    user_id: 'rox|ada@example.com',
+    user_id: 'macro|ada@example.com',
     created_at: '2026-11-03T20:00:00Z',
   };
 }

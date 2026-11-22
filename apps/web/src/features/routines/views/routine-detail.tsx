@@ -1,6 +1,6 @@
 import { t } from '@app/lib/i18n';
 import { getDisplayName } from '@core/user/displayName';
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { formatRelativeDate } from '@core/util/time';
 import { formatDateAndTime } from '@entity';
@@ -208,7 +208,7 @@ export function RoutineDetailView(props: {
             runsAs: () =>
               routine().ownerId === props.userId()
                 ? 'You'
-                : getDisplayName(tryMacroId(routine().ownerId)) || 'Owner',
+                : getDisplayName(tryRoxId(routine().ownerId)) || 'Owner',
             runsAsDescription: 'Steps and AI act with the owner’s access.',
             unsupported: (
               <p class="text-sm text-ink-muted">
@@ -348,7 +348,7 @@ export function RoutineDetailView(props: {
                 <span class="font-medium text-ink">
                   {routine().ownerId === props.userId()
                     ? 'You'
-                    : getDisplayName(tryMacroId(routine().ownerId)) ||
+                    : getDisplayName(tryRoxId(routine().ownerId)) ||
                       'Someone'}
                 </span>
               </span>
@@ -503,7 +503,7 @@ export function RoutineDetailView(props: {
                     (id) =>
                       id === props.userId()
                         ? 'you'
-                        : getDisplayName(tryMacroId(id)) || 'someone',
+                        : getDisplayName(tryRoxId(id)) || 'someone',
                     formatDateAndTime
                   )
                 }

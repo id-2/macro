@@ -23,7 +23,7 @@ test('inline task filters resolve only referenced names in bounded batches and r
   await expect(option).toBeVisible();
   await option.locator('[data-multiselect-checkbox]').click();
   await expect(page.getByTestId('inline-settings')).toContainText(
-    'rox|person500@example.com'
+    'macro|person500@example.com'
   );
   await search.press('Escape');
   await page.keyboard.press('Escape');
@@ -33,9 +33,9 @@ test('inline task filters resolve only referenced names in bounded batches and r
   );
   // Scoped roster changes never erase the saved filter identity.
   await expect(page.getByTestId('inline-settings')).toContainText(
-    'rox|person500@example.com'
+    'macro|person500@example.com'
   );
   await expect(page.getByTestId('inline-lookup-ids')).toHaveText(
-    '["rox|person999@example.com"]'
+    '["macro|person999@example.com"]'
   );
 });

@@ -1,5 +1,5 @@
 import type { MessageData } from '@core/messages/types';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { getBotDisplayName } from '@queries/messages/message-sender';
 import { cn } from '@ui';
 import { Show } from 'solid-js';
@@ -23,7 +23,7 @@ export function MessageSenderName(props: SenderNameProps) {
 }
 
 export function SenderName(props: { message: MessageData }) {
-  const roxId = () => tryMacroId(props.message.sender_id);
+  const roxId = () => tryRoxId(props.message.sender_id);
   const displayName = () => getDisplayName(roxId());
   const agentName = () =>
     getBotDisplayName(props.message.sender_id, props.message.sender);

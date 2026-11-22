@@ -125,7 +125,7 @@ function SearchbarFixture() {
                 .append(
                   $createParagraphNode().append(
                     $createUserMentionNode({
-                      userId: 'rox|julia@rox.one',
+                      userId: 'macro|julia@rox.one',
                       email: 'julia@rox.one',
                       displayName: 'Julia',
                     }),
@@ -283,12 +283,12 @@ export function UniversalInputFixture(
 
   for (const person of [
     {
-      id: 'rox|john@example.com',
+      id: 'macro|john@example.com',
       name: 'John Adams',
       email: 'john@example.com',
     },
     {
-      id: 'rox|julia@rox.one',
+      id: 'macro|julia@rox.one',
       name: 'Julia Jones',
       email: 'julia@rox.one',
     },
@@ -361,7 +361,7 @@ export function UniversalInputFixture(
     });
     const people = createPersonList({
       scope: () => ({
-        userId: 'rox|viewer@example.com',
+        userId: 'macro|viewer@example.com',
         host: getGraphqlSoupCacheHost(),
       }),
       search: () => options?.searchTerm?.() ?? '',
@@ -454,13 +454,13 @@ export function UniversalInputFixture(
   const [connections, setConnections] = createSignal(0);
   const people = [
     {
-      id: 'rox|john@example.com',
+      id: 'macro|john@example.com',
       kind: 'user' as const,
       label: 'John Adams',
       email: 'john@example.com',
     },
     {
-      id: 'rox|julia@rox.one',
+      id: 'macro|julia@rox.one',
       kind: 'user' as const,
       label: 'Julia Jones',
       email: 'julia@rox.one',

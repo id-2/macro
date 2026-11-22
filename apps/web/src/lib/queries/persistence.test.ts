@@ -480,13 +480,13 @@ describe('setupQueryPersistence', () => {
     const scopes = createQueryPersistenceScopes('test');
     const keys = [
       authKeys.userName(
-        'rox|viewer@example.com',
+        'macro|viewer@example.com',
         1,
         2,
-        'rox|person@example.com'
+        'macro|person@example.com'
       ).queryKey,
-      authKeys.userNameSelf('rox|viewer@example.com', 1).queryKey,
-      ['auth', 'userName', 'rox|person@example.com'],
+      authKeys.userNameSelf('macro|viewer@example.com', 1).queryKey,
+      ['auth', 'userName', 'macro|person@example.com'],
       ['auth', 'userNameSelf'],
     ];
     for (const key of keys)

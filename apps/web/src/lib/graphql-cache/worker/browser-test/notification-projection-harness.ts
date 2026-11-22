@@ -107,7 +107,7 @@ const snapshot = (
             cacheProjection: null,
             properties: [],
             isFavorited: false,
-            ownerId: 'rox|viewer@example.com',
+            ownerId: 'macro|viewer@example.com',
             parentId: null,
             createdAt: '2025-01-01T00:00:00Z',
             updatedAt: '2025-01-02T00:00:00Z',

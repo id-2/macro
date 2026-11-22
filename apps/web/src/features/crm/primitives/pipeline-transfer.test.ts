@@ -17,7 +17,7 @@ const pipeline: TrackedPipeline = {
   id: 'pipeline',
   teamId: 'team',
   name: 'Q4 Deals',
-  userId: 'rox|owner@rox.one',
+  userId: 'macro|owner@rox.one',
   recordType: 'company',
   databaseId: 'database',
   tableId: 'table',

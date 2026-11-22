@@ -28,7 +28,7 @@ also opts in. */
   name?: InitiativeFiltersName;
   /** Filter by initiative notification state. */
   notification_filters?: NotificationFilters;
-  /** Filter by initiative owner principal — a user ('rox|user@example.com'), a
+  /** Filter by initiative owner principal — a user ('macro|user@example.com'), a
 bot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include
 every owner. */
   owners?: string[];

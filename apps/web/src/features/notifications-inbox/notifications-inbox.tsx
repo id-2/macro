@@ -1,7 +1,7 @@
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserId } from '@core/context/user';
-import { getDisplayNameParts, tryMacroId } from '@core/user';
+import { getDisplayNameParts, tryRoxId } from '@core/user';
 import { openExternalUrl } from '@core/util/url';
 import { createUserScopedStorage } from '@core/util/userScopedStorage';
 import {
@@ -37,7 +37,7 @@ import { NotificationsView } from './views/notifications-view';
 const filterStorage = createUserScopedStorage('rox:notifications:filters:v1');
 
 function userName(userId: string): string | undefined {
-  const parts = getDisplayNameParts(tryMacroId(userId), {
+  const parts = getDisplayNameParts(tryRoxId(userId), {
     emailFallback: 'local-part',
   });
   return parts.firstName || parts.fullName || undefined;

@@ -1,6 +1,6 @@
 import { HoverCard } from '@core/component/HoverCard';
 import { UserTooltip } from '@core/component/UserTooltip';
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import { createSignal, type JSX } from 'solid-js';
 
 interface Recipient {
@@ -36,7 +36,7 @@ export function EmailUserTooltip(props: EmailUserTooltipProps) {
           email={props.recipient?.email ?? undefined}
           id={
             props.recipient?.email
-              ? emailToMacroId(props.recipient.email)
+              ? emailToRoxId(props.recipient.email)
               : undefined
           }
           photoUrl={props.photoUrl}

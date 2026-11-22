@@ -12,7 +12,7 @@ import { RecipientSelector } from '@core/component/RecipientSelector';
 import { ENABLE_AGENT_DMS } from '@core/constant/featureFlags';
 import {
   getDisplayName,
-  tryMacroId,
+  tryRoxId,
   type WithCustomUserInput,
 } from '@core/user';
 import { useSendMessageToPeople } from '@core/util/channels';
@@ -60,7 +60,7 @@ export function ChannelCompose() {
     const recipient = selectedRecipients()[0];
     if (recipient?.kind === 'agent') return recipient.data.name;
     const id = dmUserId();
-    return id ? getDisplayName(tryMacroId(id)) : undefined;
+    return id ? getDisplayName(tryRoxId(id)) : undefined;
   });
 
   const [triedToSubmit, _setTriedToSubmit] = createSignal(false);
@@ -78,7 +78,7 @@ export function ChannelCompose() {
         .map((r) => {
           if (r.kind === 'agent') return r.data.name;
           if (r.kind === 'user') {
-            return getDisplayName(tryMacroId(r.data.id));
+            return getDisplayName(tryRoxId(r.data.id));
           }
           return r.data.email || 'Unknown';
         })

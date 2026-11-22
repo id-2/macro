@@ -1,4 +1,4 @@
-import { isMacroId } from '@core/user/roxId';
+import { isRoxId } from '@core/user/roxId';
 import { Show } from 'solid-js';
 import { DisplayName } from '../components/DisplayName';
 import type { ContentHitData } from '../types/search';
@@ -18,7 +18,7 @@ export function SearchSender(props: SearchSenderProps) {
   return (
     <Show when={senderId()}>
       {(id) => (
-        <Show when={isMacroId(id())} fallback="Guest">
+        <Show when={isRoxId(id())} fallback="Guest">
           <DisplayName id={id()} format="firstName" />
         </Show>
       )}

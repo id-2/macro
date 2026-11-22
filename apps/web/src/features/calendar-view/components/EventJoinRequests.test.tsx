@@ -18,7 +18,7 @@ import { EventJoinRequests } from './EventJoinRequests';
 const request = {
   id: 'request-1',
   eventId: 'shared-event',
-  requesterId: 'rox|member@example.com',
+  requesterId: 'macro|member@example.com',
   requesterEmail: 'member@work.example.com',
   status: 'pending' as const,
   createdAt: '2026-10-22T18:00:00Z',
@@ -27,7 +27,7 @@ const request = {
 const otherRequest = {
   ...request,
   id: 'request-2',
-  requesterId: 'rox|other@example.com',
+  requesterId: 'macro|other@example.com',
   requesterEmail: 'other@work.example.com',
 };
 

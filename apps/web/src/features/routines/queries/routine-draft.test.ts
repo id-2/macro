@@ -27,7 +27,7 @@ vi.mock('@core/constant/allBlocks', () => ({
 
 const cron: ScheduledAction = {
   id: 'cron-id',
-  owner: 'rox|owner@example.com',
+  owner: 'macro|owner@example.com',
   name: 'Weekly summary',
   kind: 'Agent',
   trigger: {

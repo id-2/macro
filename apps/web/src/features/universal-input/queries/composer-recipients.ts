@@ -1,4 +1,4 @@
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import type { EmailRecipient } from '../../email-compose/core/email-recipient';
 import {
   formatRecipientTerms,
@@ -33,7 +33,7 @@ export function composerRecipients(
     ...recipients.flatMap((recipient): EmailRecipient[] => {
       if (!recipient.external) return composerRecipientOptions([recipient]);
       const email = recipient.email ?? recipient.id;
-      const id = emailToMacroId(email) ?? recipient.id;
+      const id = emailToRoxId(email) ?? recipient.id;
       return [{ kind: 'custom', id, data: { id, email, invalid: false } }];
     }),
     ...unresolved.map(

@@ -101,7 +101,7 @@ function engine(names: () => string[]) {
         if (operation.kind === 'teardown') return empty;
         const data: SoupQuery = {
           user: {
-            id: 'rox|viewer@databases.test',
+            id: 'macro|viewer@databases.test',
             emailLinks: [],
             soup: { items: [], nextCursor: null },
           },
@@ -116,7 +116,7 @@ function engine(names: () => string[]) {
   const read: DatabaseSqlQueryCapabilities = {
     client: () => client,
     cacheHost: () => undefined,
-    account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+    account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
     describe: async (catalog) => ({
       readTables: catalog.tables.map((table) => table.id),
       columns: [],

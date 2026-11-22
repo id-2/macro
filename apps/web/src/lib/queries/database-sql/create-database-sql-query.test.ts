@@ -69,7 +69,7 @@ function deal(id: string, name: string, createdAt: string): SoupItem {
     tableId: DEALS,
     databaseId: 'db000000-0000-0000-0000-000000000001',
     position: 'a',
-    ownerId: 'rox|owner@databases.test',
+    ownerId: 'macro|owner@databases.test',
     creatorId: null,
     createdAt,
     updatedAt: createdAt,
@@ -132,7 +132,7 @@ const localExecution: Pick<
   DatabaseSqlQueryCapabilities,
   'account' | 'describe'
 > = {
-  account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+  account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
   describe: async (catalog) => ({
     readTables: catalog.tables.map((table) => table.id),
     columns: [],
@@ -163,7 +163,7 @@ describe('createDatabaseSqlQuery', () => {
           client: () =>
             createClient({ url: 'http://test.invalid', exchanges: [] }),
           cacheHost: () => undefined,
-          account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+          account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
           describe: async (catalog) => ({
             readTables: catalog.tables.map((table) => table.id),
             columns: [],
@@ -200,7 +200,7 @@ describe('createDatabaseSqlQuery', () => {
               operation,
               data: {
                 user: {
-                  id: 'rox|viewer@databases.test',
+                  id: 'macro|viewer@databases.test',
                   emailLinks: [],
                   soup: {
                     items: policy === 'cache-only' ? [acme] : [globex],
@@ -239,7 +239,7 @@ describe('createDatabaseSqlQuery', () => {
                       kind: 'hit',
                       data: {
                         user: {
-                          id: 'rox|viewer@databases.test',
+                          id: 'macro|viewer@databases.test',
                           soup: { items: [acme], nextCursor: null },
                         },
                       },
@@ -291,7 +291,7 @@ describe('createDatabaseSqlQuery', () => {
             operation,
             data: {
               user: {
-                id: 'rox|viewer@databases.test',
+                id: 'macro|viewer@databases.test',
                 soup: { items: [globex], nextCursor: null },
               },
             },
@@ -320,7 +320,7 @@ describe('createDatabaseSqlQuery', () => {
               kind: 'hit',
               data: {
                 user: {
-                  id: 'rox|viewer@databases.test',
+                  id: 'macro|viewer@databases.test',
                   soup: { items: [acme], nextCursor: null },
                 },
               },
@@ -365,7 +365,7 @@ describe('createDatabaseSqlQuery', () => {
               Response.json({
                 data: {
                   user: {
-                    id: 'rox|viewer@databases.test',
+                    id: 'macro|viewer@databases.test',
                     soup: { items: [item], nextCursor: null },
                   },
                 },
@@ -417,7 +417,7 @@ describe('createDatabaseSqlQuery', () => {
             operation,
             data: {
               user: {
-                id: 'rox|viewer@databases.test',
+                id: 'macro|viewer@databases.test',
                 soup: { items: [globex], nextCursor: null },
               },
             },
@@ -471,7 +471,7 @@ describe('createDatabaseSqlQuery', () => {
           requests.push(operation);
           const data: SoupQuery = {
             user: {
-              id: 'rox|viewer@databases.test',
+              id: 'macro|viewer@databases.test',
               emailLinks: [],
               soup: { items: [acme], nextCursor: null },
             },
@@ -503,7 +503,7 @@ describe('createDatabaseSqlQuery', () => {
         kind: 'hit' as const,
         data: {
           user: {
-            id: 'rox|viewer@databases.test',
+            id: 'macro|viewer@databases.test',
             soup: { items: [acme], nextCursor: null },
           },
         },
@@ -649,7 +649,7 @@ describe('createDatabaseSqlQuery', () => {
             });
           const data: SoupQuery = {
             user: {
-              id: 'rox|viewer@databases.test',
+              id: 'macro|viewer@databases.test',
               emailLinks: [],
               soup: { items: [acme], nextCursor: null },
             },
@@ -713,7 +713,7 @@ describe('createDatabaseSqlQuery', () => {
           const respond = (items: SoupItem[]) => {
             const data: SoupQuery = {
               user: {
-                id: 'rox|viewer@databases.test',
+                id: 'macro|viewer@databases.test',
                 emailLinks: [],
                 soup: { items, nextCursor: null },
               },
@@ -740,7 +740,7 @@ describe('createDatabaseSqlQuery', () => {
         kind: 'hit' as const,
         data: {
           user: {
-            id: 'rox|viewer@databases.test',
+            id: 'macro|viewer@databases.test',
             soup: { items: [acme], nextCursor: null },
           },
         },
@@ -809,7 +809,7 @@ describe('a refresh another run replaced', () => {
             operation,
             data: {
               user: {
-                id: 'rox|viewer@databases.test',
+                id: 'macro|viewer@databases.test',
                 emailLinks: [],
                 soup: { items: [acme], nextCursor: null },
               },

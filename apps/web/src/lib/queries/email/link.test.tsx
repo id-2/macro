@@ -38,7 +38,7 @@ vi.mock('@queries/soup/normalized-cache', () => ({
   invalidateAllSoup: vi.fn(),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|self',
+  useUserId: () => () => 'macro|self',
   useIsAuthenticated: () => authenticated,
 }));
 
@@ -53,7 +53,7 @@ vi.mock('../client', () => ({
 const link = (id: string): EmailLink =>
   ({
     id,
-    rox_id: 'rox|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: false,
     calendar_disabled: false,
@@ -62,7 +62,7 @@ const link = (id: string): EmailLink =>
 
 const cachedLinks = () =>
   testQueryClient.getQueryData<{ links: EmailLink[] }>(
-    emailKeys.links('rox|self').queryKey
+    emailKeys.links('macro|self').queryKey
   )?.links ?? [];
 
 const cachedLink = (id: string) => cachedLinks().find((it) => it.id === id);
@@ -74,7 +74,7 @@ afterEach(() => {
 
 it('does not suspend an offline composer when its primary-inbox lookup resumes', async () => {
   testQueryClient.removeQueries({
-    queryKey: emailKeys.links('rox|self').queryKey,
+    queryKey: emailKeys.links('macro|self').queryKey,
   });
   onlineManager.setOnline(false);
   const { promise, resolve } =
@@ -109,10 +109,10 @@ beforeEach(() => {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   testQueryClient.setQueryData(authKeys.userInfo.queryKey, {
-    id: 'rox|self',
+    id: 'macro|self',
     authenticated: true,
   });
-  testQueryClient.setQueryData(emailKeys.links('rox|self').queryKey, {
+  testQueryClient.setQueryData(emailKeys.links('macro|self').queryKey, {
     links: [link('inbox-a'), link('inbox-b')],
   });
 });
@@ -130,7 +130,7 @@ it('starts account lookups and health probes only after sign-in and stops on log
         <button
           onClick={() => {
             testQueryClient.setQueryData(authKeys.userInfo.queryKey, {
-              id: 'rox|self',
+              id: 'macro|self',
               authenticated: true,
             });
             setAuthenticated(true);

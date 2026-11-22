@@ -74,7 +74,7 @@ export function SqlPeopleFixture() {
                     : index === 1000
                       ? 'late@example.com'
                       : `person${index}@example.com`;
-                const userId = `rox|${email}`;
+                const userId = `macro|${email}`;
                 return {
                   __typename: 'GraphqlContact',
                   id: contactRecordKey(viewer, userId).slice(

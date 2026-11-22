@@ -26,7 +26,7 @@ const context = {
     notifiedSort: true,
     snippets: true,
   },
-  userId: 'rox|alice@example.com',
+  userId: 'macro|alice@example.com',
 };
 
 const search = { query: 'roadmap', matchType: 'partial' as const };
@@ -35,7 +35,7 @@ describe('Home search channel threads', () => {
   it("searches the viewer's channel threads", () => {
     const { filters } = buildHomeSearchRequest(context, search).body;
     expect(filters?.channel_thread_filters).toEqual({
-      participant_ids: ['rox|alice@example.com'],
+      participant_ids: ['macro|alice@example.com'],
     });
   });
 

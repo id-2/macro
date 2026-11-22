@@ -2,7 +2,7 @@ import { NotificationSoundSettingsView } from '@app/features/notification-sounds
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { toast } from '@core/component/Toast/Toast';
-import { enableMacroComputers } from '@core/constant/featureFlags';
+import { enableRoxComputers } from '@core/constant/featureFlags';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { fireAndForget } from '@core/util/fireAndForget';
 import {
@@ -34,7 +34,7 @@ import {
 export function Notifications() {
   const dialogOwner = getOwner();
   const analytics = useAnalytics();
-  const roxComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableRoxComputers);
   const platformSettings = useNotificationSettings();
   const [pushPending, setPushPending] = createSignal(false);
   const preferencesQuery = useNotificationTypePreferencesQuery();

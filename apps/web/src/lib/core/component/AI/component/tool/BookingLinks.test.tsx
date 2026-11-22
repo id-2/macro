@@ -16,7 +16,7 @@ afterEach(cleanup);
 const schedule = newSchedule('UTC');
 const draft = {
   event: {
-    ...newEventType(schedule.id, ['rox|host@example.test'], false),
+    ...newEventType(schedule.id, ['macro|host@example.test'], false),
     title: 'Intro',
     slug: 'intro',
   },

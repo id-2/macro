@@ -197,7 +197,7 @@ it('returns to Home from a channel opened by a cold push launch', async () => {
     messageId: '22222222-2222-4222-8222-222222222222',
     threadId: null,
   };
-  const recipientId = 'rox|test@example.com';
+  const recipientId = 'macro|test@example.com';
   receiveNotificationTap(
     {
       type: 'BACKGROUND_TAP',
@@ -252,7 +252,7 @@ it('acknowledges a failed lookup and opens the next native tap', async () => {
     onTestFinished(dispose);
     usePendingNotificationNavigationEffect(
       source,
-      () => 'rox|test@example.com'
+      () => 'macro|test@example.com'
     );
   });
   setGlobalSplitManager(layout);
@@ -287,7 +287,7 @@ it('acknowledges a failed lookup and opens the next native tap', async () => {
     notification_event_type: 'channel_invite',
     notification_metadata: {
       tag: 'channel_invite',
-      content: { invitedBy: 'rox|sender@example.com' },
+      content: { invitedBy: 'macro|sender@example.com' },
     },
     state: 'unseen',
     sent: true,
@@ -324,7 +324,7 @@ it.each(['direct', 'cached'] as const)(
       notification_event_type: 'channel_invite',
       notification_metadata: {
         tag: 'channel_invite',
-        content: { invitedBy: 'rox|sender@example.com' },
+        content: { invitedBy: 'macro|sender@example.com' },
       },
       state: 'unseen',
       sent: true,

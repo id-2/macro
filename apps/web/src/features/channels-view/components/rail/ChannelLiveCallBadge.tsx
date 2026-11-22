@@ -1,7 +1,7 @@
 import { useCallContextOptional } from '@channel/Call/CallContext';
 import { UserGroup } from '@core/component/UserGroup';
 import { useUserId } from '@core/context/user';
-import { tryMacroId } from '@core/user';
+import { tryRoxId } from '@core/user';
 import { useActiveCallsQuery } from '@queries/call/call';
 import { Show } from 'solid-js';
 import { CallLiveChip } from '../../../channel/Call/components/CallLiveChip';
@@ -27,7 +27,7 @@ export function ChannelLiveCallBadge(props: { channelId: string }) {
     const remote = Array.from(call.remoteParticipants().values())
       .filter((participant) => !participant.isAgent)
       .flatMap((participant) => {
-        const id = tryMacroId(participant.identity);
+        const id = tryRoxId(participant.identity);
         return id ? [id] : [];
       });
     return local ? [local, ...remote] : remote;

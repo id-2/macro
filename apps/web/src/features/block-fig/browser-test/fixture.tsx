@@ -106,7 +106,7 @@ function Fixture() {
   if (params.has('collab')) {
     const users = (params.get('people') ?? 'alice,bob')
       .split(',')
-      .map((n) => `rox|${n}@example.com`);
+      .map((n) => `macro|${n}@example.com`);
     return (
       <div class="flex h-screen flex-col bg-page text-ink">
         <CollabFixture

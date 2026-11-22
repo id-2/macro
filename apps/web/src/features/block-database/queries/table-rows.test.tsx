@@ -234,7 +234,7 @@ function engine(
           });
         const data: SoupQuery = {
           user: {
-            id: 'rox|viewer@databases.test',
+            id: 'macro|viewer@databases.test',
             emailLinks: [],
             soup: { items: [], nextCursor: null },
           },
@@ -257,7 +257,7 @@ function engine(
   const read: DatabaseSqlQueryCapabilities = {
     client: () => client,
     cacheHost: () => undefined,
-    account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+    account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
     describe: async (catalog) => ({
       readTables: catalog.tables.map((table) => table.id),
       columns: [],
@@ -794,7 +794,7 @@ describe('a column type change', () => {
               if (operation.kind === 'teardown') return empty;
               const data: SoupQuery = {
                 user: {
-                  id: 'rox|viewer@databases.test',
+                  id: 'macro|viewer@databases.test',
                   emailLinks: [],
                   soup: { items: [], nextCursor: null },
                 },
@@ -821,13 +821,13 @@ describe('a column type change', () => {
         read: {
           client: () => client,
           cacheHost: () => undefined,
-          account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+          account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
         },
         viewQuery: (statement) =>
           createDatabaseSqlQuery(statement, {
             client: () => client,
             cacheHost: () => undefined,
-            account: () => ({ userId: 'rox|viewer@example.com', session: 0 }),
+            account: () => ({ userId: 'macro|viewer@example.com', session: 0 }),
             describe: async (catalog) => ({
               readTables: catalog.tables.map((table) => table.id),
               columns: [],
@@ -1811,7 +1811,7 @@ describe('first-entry column types', () => {
         kind: 'cell',
         rowId: 'record',
         columnId: 'name',
-        value: 'rox|ada@example.com',
+        value: 'macro|ada@example.com',
         columnTypes: { name: { dataType: 'ENTITY', entityType: 'USER' } },
       },
       5,
@@ -1825,7 +1825,7 @@ describe('first-entry column types', () => {
     expect(applyOps).toHaveBeenLastCalledWith(
       nameEdit({
         type: 'entities',
-        value: [{ entityType: 'USER', entityId: 'rox|ada@example.com' }],
+        value: [{ entityType: 'USER', entityId: 'macro|ada@example.com' }],
       })
     );
   });

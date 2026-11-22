@@ -124,13 +124,13 @@ it('lists every thread of a discussion with its comments', () => {
           comments: [
             {
               id: threadId,
-              author: 'rox|author@example.com',
+              author: 'macro|author@example.com',
               content: 'First comment',
               createdAt: '2026-10-21T12:00:00Z',
             },
             {
               id: commentId,
-              author: 'rox|author@example.com',
+              author: 'macro|author@example.com',
               createdAt: '2026-10-21T12:05:00Z',
             },
           ],

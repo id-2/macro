@@ -22,7 +22,7 @@ const computer: ComputerStatus = {
   agentCount: 0,
   canUndoCancel: false,
   canRestore: false,
-  purchasedBy: 'rox|maya@example.com',
+  purchasedBy: 'macro|maya@example.com',
   createdAt: '2026-11-13T09:00:00Z',
 };
 

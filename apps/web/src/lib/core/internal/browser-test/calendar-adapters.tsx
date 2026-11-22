@@ -14,12 +14,12 @@ export const getGraphqlSoupCacheHost = () =>
     ? onboardingCacheHost
     : undefined;
 export { useQueryAccount } from './test-account';
-export const emailToId = (email: string) => `rox|${email}`;
-export const idToEmail = (id: string) => id.replace(/^rox\|/, '');
-export const useUserId = () => () => 'rox|viewer@example.com';
+export const emailToId = (email: string) => `macro|${email}`;
+export const idToEmail = (id: string) => id.replace(/^macro\|/, '');
+export const useUserId = () => () => 'macro|viewer@example.com';
 export const useIsAuthenticated = () => () => true;
 export const useUserInfo = () => () => ({
-  id: 'rox|viewer@example.com',
+  id: 'macro|viewer@example.com',
   email: 'viewer@example.com',
   authenticated: true,
   permissions: [],

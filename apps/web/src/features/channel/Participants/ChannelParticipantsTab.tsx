@@ -1,7 +1,7 @@
 import { useChannel, useChannelType } from '@core/context/channels';
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, idToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, idToEmail, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { useOpenDirectMessage } from '@core/util/open-direct-message';
 
@@ -85,7 +85,7 @@ export function ChannelParticipantsTab(props: {
       const email = idToEmail(participant.user_id).toLowerCase();
       return (
         participant.user_id.toLowerCase().includes(query) ||
-        getDisplayName(tryMacroId(participant.user_id))
+        getDisplayName(tryRoxId(participant.user_id))
           .toLowerCase()
           .includes(query) ||
         email.includes(query) ||

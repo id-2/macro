@@ -2,7 +2,7 @@ import type { GroupHeaderProps } from '@app/features/next-soup/create-soup-state
 import { SoupSectionHeader } from '@app/features/next-soup/soup-view/section-header';
 import { useSoupView } from '@app/features/next-soup/soup-view/soup-view-context';
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayName, type RoxId, tryMacroId } from '@core/user';
+import { getDisplayName, type RoxId, tryRoxId } from '@core/user';
 import ChevronRightIcon from '@icon/system/regular/caret-right.svg';
 import CircleDashed from '@icon/system/regular/circle-dashed.svg';
 import { PROPERTY_OPTION_IDS, SYSTEM_PROPERTY_IDS } from '@property';
@@ -58,7 +58,7 @@ export const TaskGroupHeader = (
     ) {
       return;
     }
-    return tryMacroId(props.group.key);
+    return tryRoxId(props.group.key);
   });
 
   const statusTint = createMemo(() => {

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { EntityData } from '../types/entity';
 import { isSharedWithViewer } from './shared';
 
-const VIEWER = 'rox|me@example.com';
-const PETER = 'rox|peter@example.com';
+const VIEWER = 'macro|me@example.com';
+const PETER = 'macro|peter@example.com';
 const ENGINEERING = '01234567-89ab-cdef-0123-456789abcdef';
 
 function row(

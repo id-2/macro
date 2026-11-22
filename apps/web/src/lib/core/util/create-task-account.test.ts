@@ -56,7 +56,7 @@ it('guards task dispatch and refuses to seed a previous account response', async
     entered.resolve();
     return await reply.promise;
   });
-  const owner = { userId: 'rox|viewer@example.com', session: 0 };
+  const owner = { userId: 'macro|viewer@example.com', session: 0 };
   const pending = createTaskForAccount(owner, { title: 'Task' });
   await entered.promise;
   mocks.current = false;
@@ -80,7 +80,7 @@ it('uses the normal task lifecycle when the captured account remains current', a
   );
   expect(
     await createTaskForAccount(
-      { userId: 'rox|viewer@example.com', session: 0 },
+      { userId: 'macro|viewer@example.com', session: 0 },
       { title: 'Task' }
     )
   ).toBe('task');

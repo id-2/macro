@@ -4,7 +4,7 @@ import { ChannelMutedIndicator } from '@channel/components/ChannelMutedIndicator
 import { groupChatName, isNamedForPeople } from '@channel/group-chat-name';
 import { useGlobalNotificationSource } from '@components/app/GlobalAppState';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { Entity, MaybeEntityRow } from '@entity';
 import type { BaseListEntityProps } from '@entity/composed/list-entity/shared';
 import { unreadFilterFn } from '@entity/utils/filter';
@@ -186,7 +186,7 @@ function HomeThreadTitle(
     if (value.id === currentUserId()) return 'You';
     return (
       getBotDisplayName(value.id, value.details) ||
-      getDisplayName(tryMacroId(value.id), { emailFallback: 'local-part' }) ||
+      getDisplayName(tryRoxId(value.id), { emailFallback: 'local-part' }) ||
       value.details?.name ||
       'Someone'
     );
@@ -220,7 +220,7 @@ function HomeNotificationTitle(props: {
     const senderId = props.notification.sender_id;
     if (senderId) {
       return (
-        getDisplayName(tryMacroId(senderId), { emailFallback: 'local-part' }) ||
+        getDisplayName(tryRoxId(senderId), { emailFallback: 'local-part' }) ||
         'Someone'
       );
     }

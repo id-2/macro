@@ -414,7 +414,7 @@ it('places the chip when an activity row is the first visible row', () => {
       'activity:joined',
       {
         id: 'joined',
-        actor_id: 'rox|user@example.com',
+        actor_id: 'macro|user@example.com',
         occurred_at: '2026-08-02T00:00:00Z',
         action: 'participant_added',
         payload: null,

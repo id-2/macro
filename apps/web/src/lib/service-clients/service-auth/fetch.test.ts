@@ -38,7 +38,7 @@ function jwt(exp: unknown) {
   return `header.${payload}.signature`;
 }
 
-describe('getMacroApiToken', () => {
+describe('getRoxApiToken', () => {
   beforeEach(() => {
     vi.resetModules();
     roxApiToken.mockReset();
@@ -47,10 +47,10 @@ describe('getMacroApiToken', () => {
   test('reuses an unexpired cached token', async () => {
     const token = jwt(Math.floor(Date.now() / 1000) + 3600);
     roxApiToken.mockResolvedValue(ok({ rox_api_token: token }));
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    await expect(getMacroApiToken()).resolves.toBe(token);
-    await expect(getMacroApiToken()).resolves.toBe(token);
+    await expect(getRoxApiToken()).resolves.toBe(token);
+    await expect(getRoxApiToken()).resolves.toBe(token);
 
     expect(roxApiToken).toHaveBeenCalledTimes(1);
   });
@@ -61,10 +61,10 @@ describe('getMacroApiToken', () => {
     roxApiToken
       .mockResolvedValueOnce(ok({ rox_api_token: expired }))
       .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    await expect(getMacroApiToken()).resolves.toBe(expired);
-    await expect(getMacroApiToken()).resolves.toBe(fresh);
+    await expect(getRoxApiToken()).resolves.toBe(expired);
+    await expect(getRoxApiToken()).resolves.toBe(fresh);
 
     expect(roxApiToken).toHaveBeenCalledTimes(2);
   });
@@ -75,10 +75,10 @@ describe('getMacroApiToken', () => {
     roxApiToken
       .mockResolvedValueOnce(ok({ rox_api_token: malformed }))
       .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    await expect(getMacroApiToken()).resolves.toBe(malformed);
-    await expect(getMacroApiToken()).resolves.toBe(fresh);
+    await expect(getRoxApiToken()).resolves.toBe(malformed);
+    await expect(getRoxApiToken()).resolves.toBe(fresh);
 
     expect(roxApiToken).toHaveBeenCalledTimes(2);
   });
@@ -93,10 +93,10 @@ describe('getMacroApiToken', () => {
       await gate;
       return ok({ rox_api_token: token });
     });
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    const first = getMacroApiToken();
-    const second = getMacroApiToken();
+    const first = getRoxApiToken();
+    const second = getRoxApiToken();
 
     expect(roxApiToken).toHaveBeenCalledTimes(1);
     release();
@@ -107,9 +107,9 @@ describe('getMacroApiToken', () => {
     const expired = jwt(Math.floor(Date.now() / 1000) - 60);
     const fresh = jwt(Math.floor(Date.now() / 1000) + 3600);
     roxApiToken.mockResolvedValueOnce(ok({ rox_api_token: expired }));
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    await expect(getMacroApiToken()).resolves.toBe(expired);
+    await expect(getRoxApiToken()).resolves.toBe(expired);
 
     let release!: () => void;
     const gate = new Promise<void>((resolve) => {
@@ -120,8 +120,8 @@ describe('getMacroApiToken', () => {
       return ok({ rox_api_token: fresh });
     });
 
-    const first = getMacroApiToken();
-    const second = getMacroApiToken();
+    const first = getRoxApiToken();
+    const second = getRoxApiToken();
 
     await Promise.resolve();
     expect(roxApiToken).toHaveBeenCalledTimes(2);
@@ -137,20 +137,20 @@ describe('getMacroApiToken', () => {
     roxApiToken
       .mockReturnValueOnce(held.promise)
       .mockResolvedValueOnce(ok({ rox_api_token: next }));
-    const { getMacroApiToken, resetMacroApiToken } = await import('./fetch');
-    const obsolete = getMacroApiToken();
+    const { getRoxApiToken, resetRoxApiToken } = await import('./fetch');
+    const obsolete = getRoxApiToken();
     const rejected = expect(obsolete).rejects.toThrow(
       'Authentication session changed'
     );
-    resetMacroApiToken();
-    await expect(getMacroApiToken()).resolves.toBe(next);
+    resetRoxApiToken();
+    await expect(getRoxApiToken()).resolves.toBe(next);
     held.resolve(ok({ rox_api_token: old }));
     await rejected;
-    await expect(getMacroApiToken()).resolves.toBe(next);
+    await expect(getRoxApiToken()).resolves.toBe(next);
     expect(roxApiToken).toHaveBeenCalledTimes(2);
-    resetMacroApiToken();
+    resetRoxApiToken();
     roxApiToken.mockResolvedValueOnce(ok({ rox_api_token: old }));
-    await expect(getMacroApiToken()).resolves.toBe(old);
+    await expect(getRoxApiToken()).resolves.toBe(old);
     expect(roxApiToken).toHaveBeenCalledTimes(3);
   });
 
@@ -159,14 +159,14 @@ describe('getMacroApiToken', () => {
       Promise.withResolvers<Ok<{ rox_api_token: string }, unknown>>();
     roxApiToken.mockReturnValueOnce(held.promise);
     const nativeFetch = vi.spyOn(globalThis, 'fetch');
-    const { fetchWithAuth, resetMacroApiToken } = await import('./fetch');
+    const { fetchWithAuth, resetRoxApiToken } = await import('./fetch');
     const pending = fetchWithAuth('/user/get_names_with_email', {
       method: 'POST',
     });
     const rejected = expect(pending).rejects.toThrow(
       'Authentication session changed'
     );
-    resetMacroApiToken();
+    resetRoxApiToken();
     held.resolve(
       ok({ rox_api_token: jwt(Math.floor(Date.now() / 1000) + 3600) })
     );
@@ -188,13 +188,13 @@ describe('getMacroApiToken', () => {
         return response.promise;
       });
     try {
-      const { fetchWithAuth, resetMacroApiToken } = await import('./fetch');
+      const { fetchWithAuth, resetRoxApiToken } = await import('./fetch');
       const pending = fetchWithAuth('/user/name');
       const rejected = expect(pending).rejects.toThrow(
         'Authentication session changed'
       );
       await entered.promise;
-      resetMacroApiToken();
+      resetRoxApiToken();
       response.resolve(
         new Response(JSON.stringify({ first_name: 'Old private name' }), {
           status: 200,
@@ -214,10 +214,10 @@ describe('getMacroApiToken', () => {
         err([{ code: 'UNAUTHORIZED' as const, message: 'Unauthorized access' }])
       )
       .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
-    const { getMacroApiToken } = await import('./fetch');
+    const { getRoxApiToken } = await import('./fetch');
 
-    await expect(getMacroApiToken()).rejects.toBeDefined();
-    await expect(getMacroApiToken()).resolves.toBe(fresh);
+    await expect(getRoxApiToken()).rejects.toBeDefined();
+    await expect(getRoxApiToken()).resolves.toBe(fresh);
 
     expect(roxApiToken).toHaveBeenCalledTimes(2);
   });

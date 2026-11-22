@@ -16,7 +16,7 @@ const factory = vi.hoisted(
 
 vi.mock('@core/constant/isMac', () => ({ IS_MAC: false }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|owner@example.com',
+  useUserId: () => () => 'macro|owner@example.com',
 }));
 vi.mock('@core/util/upload', () => ({ handleFileFolderDrop: vi.fn() }));
 vi.mock('@rox-one/lexical-core', () => ({

@@ -98,7 +98,7 @@ describe('usePendingNotificationNavigationEffect', () => {
     dispose = createRoot((rootDispose) => {
       usePendingNotificationNavigationEffect(
         source,
-        () => 'rox|test@example.com'
+        () => 'macro|test@example.com'
       );
       return rootDispose;
     });
@@ -150,7 +150,7 @@ describe('usePendingNotificationNavigationEffect', () => {
         deliveryId: 'native-tap',
         payload: {
           notificationId: 'notification-1',
-          recipientId: 'rox|test@example.com',
+          recipientId: 'macro|test@example.com',
           navigation,
         },
       },
@@ -185,7 +185,7 @@ describe('usePendingNotificationNavigationEffect', () => {
         deliveryId: 'wrong-account',
         payload: {
           notificationId: 'private-notification',
-          recipientId: 'rox|another@example.com',
+          recipientId: 'macro|another@example.com',
         },
       },
       acknowledge

@@ -32,7 +32,7 @@ function makeEditor() {
   return editor;
 }
 
-function $collectMacroQuotes() {
+function $collectRoxQuotes() {
   return $nodesOfType(ClassedBlockNode).filter((node) =>
     node.exportJSON().classes.includes('rox_quote')
   );
@@ -58,9 +58,9 @@ describe('appended reply draft round trip', () => {
   it('keeps one removable quote before and after saving and reloading a draft', () => {
     const editorA = makeEditor();
     appendQuote(editorA);
-    editorA.read(() => expect($collectMacroQuotes()).toHaveLength(1));
+    editorA.read(() => expect($collectRoxQuotes()).toHaveLength(1));
     hideQuote(editorA);
-    editorA.read(() => expect($collectMacroQuotes()).toHaveLength(0));
+    editorA.read(() => expect($collectRoxQuotes()).toHaveLength(0));
     appendQuote(editorA);
     const prepared = prepareEmailBody(editorA);
     const html = decodeBase64Utf8(prepared!.bodyHtml);
@@ -76,7 +76,7 @@ describe('appended reply draft round trip', () => {
     });
 
     editorB.read(() => {
-      expect($collectMacroQuotes()).toHaveLength(1);
+      expect($collectRoxQuotes()).toHaveLength(1);
       expect($getRoot().getTextContent()).toContain('original message text');
     });
     editorB.dispatchCommand(TOGGLE_APPEND_EMAIL_THREAD_COMMAND, {
@@ -85,11 +85,11 @@ describe('appended reply draft round trip', () => {
       visible: true,
     });
     editorB.read(() => {
-      expect($collectMacroQuotes()).toHaveLength(1);
+      expect($collectRoxQuotes()).toHaveLength(1);
     });
     hideQuote(editorB);
     editorB.read(() => {
-      expect($collectMacroQuotes()).toHaveLength(0);
+      expect($collectRoxQuotes()).toHaveLength(0);
       expect($getRoot().getTextContent().trim()).toBe('my reply');
     });
   });

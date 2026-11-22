@@ -12,7 +12,7 @@ vi.mock('@core/component/UserIcon', () => ({
 vi.mock('@core/user', () => ({
   getDisplayName: () => 'Alex Smith',
   idToEmail: () => 'alex@example.com',
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 
 vi.mock('@ui', async () => ({
@@ -23,7 +23,7 @@ vi.mock('@ui', async () => ({
 
 const participant: ChannelParticipant = {
   channel_id: 'channel',
-  user_id: 'rox|alex@example.com',
+  user_id: 'macro|alex@example.com',
   joined_at: '2026-10-05T00:00:00Z',
   role: 'member',
 };
@@ -34,7 +34,7 @@ function setup(overrides: Partial<ChannelParticipant> = {}) {
   render(() => (
     <ParticipantsListItem
       participant={{ ...participant, ...overrides }}
-      currentUserId="rox|me@example.com"
+      currentUserId="macro|me@example.com"
       editable
       onClick={onClick}
       onRemove={onRemove}

@@ -12,11 +12,11 @@ import type { Notification, WithNotification } from '../types/notification';
 import type { WithSearch } from '../types/search';
 
 const MOCK_USER_IDS = {
-  owner: 'rox|alex@example.com',
-  sharedUser: 'rox|sam@example.com',
-  teamMember1: 'rox|jordan@example.com',
-  teamMember2: 'rox|casey@example.com',
-  currentUser: 'rox|current@example.com',
+  owner: 'macro|alex@example.com',
+  sharedUser: 'macro|sam@example.com',
+  teamMember1: 'macro|jordan@example.com',
+  teamMember2: 'macro|casey@example.com',
+  currentUser: 'macro|current@example.com',
 } as const;
 
 export const MOCK_USERS = [

@@ -65,7 +65,7 @@ vi.mock('@app/features/home/components/HomeEntityIcon', () => ({
 vi.mock('@core/context/user', () => ({ useUserId: () => () => 'me' }));
 vi.mock('@core/user', () => ({
   getDisplayName: () => '',
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 
 let motionStyles: HTMLStyleElement;

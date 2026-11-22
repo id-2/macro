@@ -53,7 +53,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|current@example.com',
+  useUserId: () => () => 'macro|current@example.com',
 }));
 
 vi.mock('@core/user', () => ({
@@ -179,7 +179,7 @@ describe('UserTooltip direct message action', () => {
       <UserTooltip
         displayName="Jane Doe"
         email="jane.doe@example.com"
-        id="rox|jane.doe@example.com"
+        id="macro|jane.doe@example.com"
       />
     ));
 
@@ -209,7 +209,7 @@ describe('UserTooltip CRM contact action', () => {
       <UserTooltip
         displayName="Jane Doe"
         email="jane.doe@example.com"
-        id="rox|jane.doe@example.com"
+        id="macro|jane.doe@example.com"
         onClose={mocks.onClose}
       />
     ));
@@ -272,7 +272,7 @@ describe('UserTooltip CRM contact action', () => {
       <UserTooltip
         displayName="Jane Doe"
         email="jane.doe@example.com"
-        id="rox|jane.doe@example.com"
+        id="macro|jane.doe@example.com"
       />
     ));
 
@@ -340,7 +340,7 @@ describe('UserTooltip settings action', () => {
       {
         bot: {
           id: agentId,
-          owner: { type: 'user', user_id: 'rox|someone@example.com' },
+          owner: { type: 'user', user_id: 'macro|someone@example.com' },
         },
       },
     ];
@@ -355,7 +355,7 @@ describe('UserTooltip settings action', () => {
       <UserTooltip
         displayName="Jane Doe"
         email="jane.doe@example.com"
-        id="rox|jane.doe@example.com"
+        id="macro|jane.doe@example.com"
       />
     ));
 

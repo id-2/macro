@@ -8,7 +8,7 @@ import { createMemo, createSignal } from 'solid-js';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 vi.mock('@components/app/split-layout/split-router/mention-links', () => ({
-  useMacroMentionLinkResolver: () => () => undefined,
+  useRoxMentionLinkResolver: () => () => undefined,
 }));
 // The description's typeahead menus need app providers this test is not
 // about; the editor itself is real.

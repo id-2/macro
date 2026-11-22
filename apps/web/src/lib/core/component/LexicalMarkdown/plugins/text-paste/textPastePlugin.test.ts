@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  parseMacroAppUrl,
+  parseRoxAppUrl,
   parsePastedGithubPrUrl,
-  resolvePastedMacroAppUrl,
+  resolvePastedRoxAppUrl,
 } from './textPastePlugin';
 
 // Keep the parser tests independent of application boot and editor UI wiring.
@@ -13,12 +13,12 @@ vi.mock('@queries/storage/pr-mention', () => ({}));
 
 const sessionId = '019507e8-14a3-7bc1-8610-419f16bd03a8';
 
-describe('parseMacroAppUrl', () => {
+describe('parseRoxAppUrl', () => {
   it.each(['agents', 'agent'])(
     'recognizes %s session links as agent mentions',
     (route) => {
       expect(
-        parseMacroAppUrl(
+        parseRoxAppUrl(
           `https://dev.rox.one/app/${route}/${sessionId}?message=target&referral_code=ignored`
         )
       ).toEqual({
@@ -34,14 +34,14 @@ describe('parseMacroAppUrl', () => {
     'preserves existing %s links',
     (block) => {
       expect(
-        parseMacroAppUrl(`https://dev.rox.one/app/${block}/${sessionId}`)
+        parseRoxAppUrl(`https://dev.rox.one/app/${block}/${sessionId}`)
       ).toEqual({ isValid: true, id: sessionId, block, params: {} });
     }
   );
 
   it('does not treat a legacy first pane as a complete legacy link', () => {
     expect(
-      parseMacroAppUrl(
+      parseRoxAppUrl(
         `https://dev.rox.one/app/md/${sessionId}/~/drive/pdf/${sessionId}`
       ).isValid
     ).toBe(false);
@@ -53,7 +53,7 @@ describe('parseMacroAppUrl', () => {
     `https://example.com/app/agents/${sessionId}`,
     `https://dev.rox.one/app/unknown-route/${sessionId}`,
   ])('does not convert invalid or foreign links: %s', (url) => {
-    expect(parseMacroAppUrl(url).isValid).toBe(false);
+    expect(parseRoxAppUrl(url).isValid).toBe(false);
   });
 });
 
@@ -66,7 +66,7 @@ describe('route-aware paste resolver', () => {
 
   it('uses the app resolver for routed links', () => {
     const url = `https://dev.rox.one/app/drive/md/${sessionId}`;
-    expect(resolvePastedMacroAppUrl(url, resolveAppLink)).toEqual({
+    expect(resolvePastedRoxAppUrl(url, resolveAppLink)).toEqual({
       id: sessionId,
       block: 'md',
       params: {},
@@ -77,7 +77,7 @@ describe('route-aware paste resolver', () => {
   it('preserves legacy query parameters without consulting the app resolver', () => {
     resolveAppLink.mockClear();
     expect(
-      resolvePastedMacroAppUrl(
+      resolvePastedRoxAppUrl(
         `https://dev.rox.one/app/md/${sessionId}?comment_id=target`,
         resolveAppLink
       )
@@ -99,7 +99,7 @@ describe('route-aware paste resolver', () => {
     (route, block) => {
       resolveAppLink.mockClear();
       expect(
-        resolvePastedMacroAppUrl(
+        resolvePastedRoxAppUrl(
           `https://dev.rox.one/app/${route}/${sessionId}`,
           resolveAppLink
         )
@@ -115,7 +115,7 @@ describe('route-aware paste resolver', () => {
       block: 'pdf' as const,
       params: {},
     }));
-    expect(resolvePastedMacroAppUrl(url, resolveLayout)).toEqual({
+    expect(resolvePastedRoxAppUrl(url, resolveLayout)).toEqual({
       id: sessionId,
       block: 'pdf',
       params: {},
@@ -125,7 +125,7 @@ describe('route-aware paste resolver', () => {
 
   it('leaves unknown links unconverted without an app resolver', () => {
     expect(
-      resolvePastedMacroAppUrl(
+      resolvePastedRoxAppUrl(
         `https://dev.rox.one/app/drive/md/${sessionId}`
       )
     ).toBeUndefined();

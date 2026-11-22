@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
 import { useAuthor, useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import Microphone from '@icon/system/regular/microphone.svg';
 import MicrophoneSlash from '@icon/system/regular/microphone-slash.svg';
 import VideoCamera from '@icon/system/regular/video-camera.svg';
@@ -139,7 +139,7 @@ function RemoteParticipantRow(props: {
 }) {
   const call = useCallContext();
   const volumes = useCallVolumeOptional();
-  const userId = () => tryMacroId(props.participant.identity);
+  const userId = () => tryRoxId(props.participant.identity);
   const name = () =>
     props.participant.name?.trim() ||
     (userId() ? getDisplayName(userId()) : t('calls.guest'));
@@ -188,8 +188,8 @@ export function CallParticipantsList(props: {
     call.connectionState();
     call.trackVersion();
     return (
-      tryMacroId(call.room()?.localParticipant.identity ?? '') ??
-      tryMacroId(currentUserId() ?? '')
+      tryRoxId(call.room()?.localParticipant.identity ?? '') ??
+      tryRoxId(currentUserId() ?? '')
     );
   };
   return (

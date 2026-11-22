@@ -17,7 +17,7 @@ import { useEmail, useUserContext, useUserId } from '@core/context/user';
 import { isMobile } from '@core/mobile/isMobile';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { trackMention } from '@core/signal/mention';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { deviceLooksOffline } from '@core/util/connectivity';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { interceptMailtoLinks } from '@core/util/interceptMailtoLinks';
@@ -168,7 +168,7 @@ export function createEmailComposeContext(
   const headerId = (id: string | null | undefined) =>
     nonPrimaryEmailLinkIdHeader(id, primaryId());
   const inboxSource = createEmailInboxSource(viewerEmail, accounts, (email) =>
-    getDisplayName(tryMacroId(`rox|${email}`))
+    getDisplayName(tryRoxId(`macro|${email}`))
   );
   const signatures = useFeatureFlag(enableEmailSignatures);
   const calendarEvents = useCreateEmailEvent();
@@ -252,7 +252,7 @@ export function createEmailComposeContext(
     calendarEvents,
     draftLifecycle: emailDraftLifecycleSource,
     operations: createMessageOperationSource,
-    recipientName: (id) => getDisplayName(tryMacroId(id)),
+    recipientName: (id) => getDisplayName(tryRoxId(id)),
     recordMention: (sourceId, targetId) => {
       void trackMention(sourceId, 'document', targetId).catch(reportError);
     },

@@ -33,7 +33,7 @@ vi.mock('@app/features/agents-view/primitives/open-page', () => ({
   openAgentsPage: mocks.openAgentsPage,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|owner@example.com',
+  useUserId: () => () => 'macro|owner@example.com',
 }));
 // The row menu has its own coverage; here, only where it opens a routine.
 vi.mock('./routine-row-menu-actions', () => ({
@@ -49,7 +49,7 @@ vi.mock('./queries/routine-sources', () => ({
       {
         id: 'briefing',
         name: 'Morning briefing',
-        ownerId: 'rox|owner@example.com',
+        ownerId: 'macro|owner@example.com',
         createdAt: '2026-10-01T09:00:00Z',
         enabled: true,
         revision: 1,

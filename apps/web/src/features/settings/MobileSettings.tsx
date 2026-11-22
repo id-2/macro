@@ -4,7 +4,7 @@ import { useLogout } from '@core/auth/logout';
 import { UserIcon } from '@core/component/UserIcon';
 import {
   enableEmailSignatures,
-  enableMacroComputers,
+  enableRoxComputers,
 } from '@core/constant/featureFlags';
 import { useSettingsTabs } from '@core/constant/settingsTabsConfig';
 import { useEmail, useUserId } from '@core/context/user';
@@ -20,7 +20,7 @@ import { useTeamSettingsGroups } from './teamSettingsGroups';
 export function MobileSettings() {
   const settings = useMobileSettings();
   const signatures = useFeatureFlag(enableEmailSignatures);
-  const roxComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableRoxComputers);
   // Always mounted on phones; read the providers only once settings open.
   const outlook = useOutlookAvailable(settings.open);
   const { groups, searchGroups } = useSettingsTabs();

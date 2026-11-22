@@ -6,7 +6,7 @@ import { useHasPaidAccess } from '@core/auth';
 import { toast } from '@core/component/Toast/Toast';
 import {
   enableAiUsageBilling,
-  enableMacroComputers,
+  enableRoxComputers,
   LOCAL_ONLY,
 } from '@core/constant/featureFlags';
 import { PERMISSION_IDS } from '@core/constant/permissions';
@@ -68,7 +68,7 @@ function LiveBilling(props: { controls?: JSX.Element }) {
   const team = useCurrentTeamQuery();
   const summary = useAiBillingSummaryQuery();
   const aiUsageBilling = useFeatureFlag(enableAiUsageBilling);
-  const roxComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableRoxComputers);
   const changePlan = useChangePlanMutation();
   const checkout = useCreateCheckoutSessionMutation();
   const portal = useCreateBillingPortalMutation();

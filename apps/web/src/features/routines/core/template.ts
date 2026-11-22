@@ -48,11 +48,11 @@ function parseMention(kind: string, json: string): Mention | undefined {
   }
 }
 
-/** `rox|<email>` principals and bare emails name the same person. */
+/** `macro|<email>` principals and bare emails name the same person. */
 function isSameUser(mention: { id: string; email?: string }, userId: string) {
   return (
     mention.id === userId ||
-    (mention.email !== undefined && `rox|${mention.email}` === userId)
+    (mention.email !== undefined && `macro|${mention.email}` === userId)
   );
 }
 

@@ -16,7 +16,7 @@ for (const surface of ['modal', 'panel']) {
       page.getByRole('option', { name: /person0@example\.com/ })
     ).toHaveCount(0);
     await expect(page.getByTestId('excluded')).toContainText(
-      'rox|person0@example.com'
+      'macro|person0@example.com'
     );
     if (info.project.name === 'phone')
       await page.getByRole('button', { name: 'Next options' }).click();
@@ -37,7 +37,7 @@ for (const surface of ['modal', 'panel']) {
       })
       .click();
     await expect(page.getByTestId('added')).toHaveText(
-      '["rox|person51@example.com","rox|person99999@example.com"]'
+      '["macro|person51@example.com","macro|person99999@example.com"]'
     );
   });
 
@@ -83,7 +83,7 @@ test('touch selection and paging keep the invitation drawer open', async ({
   await expect(input).toBeVisible();
   await page.getByRole('button', { name: 'Add', exact: true }).tap();
   await expect(page.getByTestId('added')).toHaveText(
-    '["rox|person51@example.com"]'
+    '["macro|person51@example.com"]'
   );
 });
 
@@ -100,7 +100,7 @@ test('explicit external invitation addresses remain independent of directory res
   await input.press('Enter');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   await expect(page.getByTestId('added')).toHaveText(
-    '["rox|outside@example.org"]'
+    '["macro|outside@example.org"]'
   );
 });
 
@@ -114,6 +114,6 @@ test('whole-team invitations do not depend on the personal suggestion window', a
     .click();
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   await expect(page.getByTestId('added')).toHaveText(
-    '["rox|teammate@example.com"]'
+    '["macro|teammate@example.com"]'
   );
 });

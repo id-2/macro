@@ -14,7 +14,7 @@ import {
   conferenceJoinUrl,
   safeConferenceUrl,
 } from '../../calendar/utils/conference-link';
-import { calendarMacroCallUrl } from '../../calendar/utils/rox-call-link';
+import { calendarRoxCallUrl } from '../../calendar/utils/rox-call-link';
 import {
   isMeetingEvent,
   selectUpcomingCalendarEvents,
@@ -92,7 +92,7 @@ export function useUpcomingCalendarEventsSource(options: SourceOptions) {
     const events = createMemo(() =>
       calendarEvents().map((event): UpcomingCalendarEvent => {
         const url =
-          calendarMacroCallUrl(event) ?? safeConferenceUrl(event.conferenceUrl);
+          calendarRoxCallUrl(event) ?? safeConferenceUrl(event.conferenceUrl);
         return {
           id: event.id,
           title: event.title,

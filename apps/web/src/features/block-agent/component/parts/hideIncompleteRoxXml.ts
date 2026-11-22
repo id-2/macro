@@ -2,7 +2,7 @@
  * Hide a trailing unclosed Rox mention tag so agent text does not
  * flash raw `<m-document-mention>` XML. Complete tags and code stay intact.
  */
-export function hideIncompleteMacroXml(text: string): string {
+export function hideIncompleteRoxXml(text: string): string {
   const open = text.lastIndexOf('<m-');
   if (open === -1) return text;
   if (isInCode(text, open)) return text;

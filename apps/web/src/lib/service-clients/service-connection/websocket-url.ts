@@ -1,13 +1,13 @@
 import { ENABLE_BEARER_TOKEN_AUTH } from '@core/constant/featureFlags';
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { ensureFreshSession } from '@core/util/fetchWithToken';
-import { getMacroApiToken } from '@service-auth/fetch';
+import { getRoxApiToken } from '@service-auth/fetch';
 
 /** Resolve gateway credentials without initializing a connection. */
 export async function resolveWsUrl() {
   const wsHost = SERVER_HOSTS['connection-gateway'];
   if (ENABLE_BEARER_TOKEN_AUTH) {
-    const apiToken = await getMacroApiToken();
+    const apiToken = await getRoxApiToken();
     if (!apiToken) throw new Error('No Rox API token');
 
     return `${wsHost}?rox-api-token=${apiToken}`;

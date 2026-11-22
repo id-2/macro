@@ -3,7 +3,7 @@ import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { t } from '@app/lib/i18n';
 import { enableAgentTeammates } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
 import PlusIcon from '@icon/system/regular/plus.svg';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
@@ -207,7 +207,7 @@ function InviteEmailsInput(props: {
 }
 
 function InviterName(props: { inviterId: string }) {
-  const displayName = () => getDisplayName(tryMacroId(props.inviterId));
+  const displayName = () => getDisplayName(tryRoxId(props.inviterId));
   return <span class="font-medium">{displayName()}</span>;
 }
 

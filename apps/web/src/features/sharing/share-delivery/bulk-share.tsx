@@ -3,7 +3,7 @@ import { isShareableEntity } from '@app/features/sharing/global-share-modal/shar
 import { createConfiguredChannelMarkdownEditor } from '@channel/Input';
 import { createMentionsTracker } from '@channel/Input/mentions-tracker';
 import { authoredMentions } from '@channel/Input/message-payload';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
 import type { ItemMention } from '@core/component/LexicalMarkdown/plugins';
 import { ShareRecipientField } from '@core/component/ShareRecipientField';
@@ -49,7 +49,7 @@ export function BulkShare(props: {
     };
   const editor = createConfiguredChannelMarkdownEditor({
     namespace: 'bulk-share-markdown',
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     enableMentions: true,
     onChange: form.setText,
     onMentionCreate: trackMentions(mentions.onMentionCreate),

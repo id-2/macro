@@ -14,9 +14,9 @@ type Agent = {
 
 type SetupStep = 'billing' | 'creating' | 'booting' | 'connecting';
 
-const OWNER = 'rox|maya@example.com';
-const MEMBER = 'rox|sam@example.com';
-const ADA = 'rox|ada@agents.rox.invalid';
+const OWNER = 'macro|maya@example.com';
+const MEMBER = 'macro|sam@example.com';
+const ADA = 'macro|ada@agents.rox.invalid';
 
 /** Where to also copy every screenshot, for a PR; unset keeps them in test-results. */
 const screenshotDirectory = process.env.TEAM_AGENTS_SCREENSHOT_DIR;
@@ -228,7 +228,7 @@ async function scriptAuthService(
       }
       backend.reads = 0;
       const agent: Agent = {
-        userId: `rox|${body.name.toLowerCase()}@agents.rox.invalid`,
+        userId: `macro|${body.name.toLowerCase()}@agents.rox.invalid`,
         teamId: 'team-1',
         name: body.name,
         jobDescription: body.jobDescription,
@@ -409,7 +409,7 @@ async function notify(page: Page, outcome: 'ready' | 'failed') {
         computerId: 'computer-ada',
         harnessId: kind === 'ready' ? 'harness-ada' : null,
         computerName: 'Ada',
-        agent: { userId: 'rox|ada@agents.rox.invalid', name: 'Ada' },
+        agent: { userId: 'macro|ada@agents.rox.invalid', name: 'Ada' },
         outcome:
           kind === 'ready'
             ? { kind: 'ready' }

@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import {
   PdfDocument,
   PdfDocumentContent,
@@ -164,7 +164,7 @@ export function PdfDetailDocument(props: {
     >
       <SidePanel.HeaderActions>
         <HeaderActionGroup label="Actions">
-          <AskMacroButton
+          <AskRoxButton
             grouped
             entity={{
               type: 'document',

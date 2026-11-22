@@ -4,10 +4,10 @@ import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/S
 import { unifiedListMarkdownTheme } from '@core/component/LexicalMarkdown/theme';
 import { toast } from '@core/component/Toast/Toast';
 import { UserTooltip } from '@core/component/UserTooltip';
-import { emailToMacroId, getDisplayName } from '@core/user';
+import { emailToRoxId, getDisplayName } from '@core/user';
 import {
   highlightTermsInText,
-  mergeAdjacentMacroEmTags,
+  mergeAdjacentRoxEmTags,
 } from '@core/util/searchHighlight';
 import CopyIcon from '@icon/system/regular/copy.svg';
 import { Telemetry } from '@rox-one/observability';
@@ -60,7 +60,7 @@ function ParticipantWithTooltip(props: {
   displayName: string;
   highlighted?: string;
 }) {
-  const roxId = () => emailToMacroId(props.participant.email);
+  const roxId = () => emailToRoxId(props.participant.email);
   const roxDisplayName = () => getDisplayName(roxId());
   const tooltipName = () =>
     resolveParticipantName(props.participant, roxDisplayName());
@@ -194,7 +194,7 @@ function HiddenParticipantsTooltip(props: { hidden: ResolvedParticipant[] }) {
 export function EntityEmailParticipants(props: { entity: EmailEntity }) {
   const viewerEmail = useInboxEmail(() => props.entity.linkId);
   const fetchDisplayName = (email: string) =>
-    getDisplayName(emailToMacroId(email));
+    getDisplayName(emailToRoxId(email));
 
   const participants = () =>
     abbreviateParticipants(
@@ -225,7 +225,7 @@ export function EntityEmailParticipants(props: { entity: EmailEntity }) {
   const highlightName = (name: string) => {
     const terms = searchTerms();
     if (!terms?.length) return undefined;
-    const result = mergeAdjacentMacroEmTags(highlightTermsInText(name, terms));
+    const result = mergeAdjacentRoxEmTags(highlightTermsInText(name, terms));
     return result !== name ? result : undefined;
   };
 

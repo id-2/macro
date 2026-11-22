@@ -6,7 +6,7 @@ import { createAssertedContextProvider } from './createContext';
 export const ROX_TEAM_SLUG = 'MACRO';
 
 type TeamContextValue = {
-  isMacroTeam: Accessor<boolean>;
+  isRoxTeam: Accessor<boolean>;
 };
 
 export const [TeamContextProvider, useTeamContext] =
@@ -15,7 +15,7 @@ export const [TeamContextProvider, useTeamContext] =
     const currentTeam = useCurrentTeamQuery();
     // Guarded: `data` suspends while the team query waits on sign-in, and this
     // provider wraps the whole app.
-    const isMacroTeam = createMemo(
+    const isRoxTeam = createMemo(
       () =>
         currentTeam.isSuccess && currentTeam.data?.team.slug === ROX_TEAM_SLUG
     );
@@ -30,10 +30,10 @@ export const [TeamContextProvider, useTeamContext] =
     });
 
     return {
-      isMacroTeam,
+      isRoxTeam,
     };
   });
 
-export function useIsMacroTeam() {
-  return useTeamContext().isMacroTeam;
+export function useIsRoxTeam() {
+  return useTeamContext().isRoxTeam;
 }

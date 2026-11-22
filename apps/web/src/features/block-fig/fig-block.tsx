@@ -36,7 +36,7 @@ import {
   useGetPermissions,
   useIsDocumentOwner,
 } from '@core/signal/permissions';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import {
   useBlockDocumentDownloadName,
   useBlockDocumentName,
@@ -78,7 +78,7 @@ import {
 import { createFontSource } from './queries/font-source';
 import { openFigEngine, prepareFigEngine } from './queries/prepare-engine';
 import { FigViewer } from './views/fig-viewer';
-import { useMacroComments } from './views/rox-comments';
+import { useRoxComments } from './views/rox-comments';
 
 /**
  * ⌘K on a design opens the command menu, which then offers the design
@@ -225,7 +225,7 @@ function FigHost(props: {
 }
 
 const displayName = (userId: string | undefined) =>
-  getDisplayName(tryMacroId(userId ?? ''), { emailFallback: 'local-part' }) ||
+  getDisplayName(tryRoxId(userId ?? ''), { emailFallback: 'local-part' }) ||
   'Someone';
 
 /**
@@ -347,7 +347,7 @@ export default function FigBlock(props: { share?: string; present?: string }) {
   const canComment = useCanComment();
   const isOwner = useIsDocumentOwner();
   const userId = useUserId();
-  const comments = useMacroComments({
+  const comments = useRoxComments({
     documentId,
     userId,
     canComment,

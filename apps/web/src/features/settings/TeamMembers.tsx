@@ -14,7 +14,7 @@ import {
   getDisplayName,
   isAgentAccount,
   roxIdToEmail,
-  tryMacroId,
+  tryRoxId,
 } from '@core/user';
 import { debouncedDependent } from '@core/util/debounce';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -169,10 +169,10 @@ function MemberRow(props: {
   onPlanChange: (plan: PaidPlan) => void;
 }) {
   const aiUsageBilling = useFeatureFlag(enableAiUsageBilling);
-  const displayName = () => getDisplayName(tryMacroId(props.member.user_id));
+  const displayName = () => getDisplayName(tryRoxId(props.member.user_id));
   const isMemberOwner = () => props.member.role === TeamRole.owner;
   const email = () => {
-    const id = tryMacroId(props.member.user_id);
+    const id = tryRoxId(props.member.user_id);
     return id ? roxIdToEmail(id) : undefined;
   };
   const showEmail = () => {
@@ -194,7 +194,7 @@ function MemberRow(props: {
                 <span class="text-ink-muted font-normal"> (you)</span>
               )}
             </div>
-            <Show when={isAgentAccount(tryMacroId(props.member.user_id))}>
+            <Show when={isAgentAccount(tryRoxId(props.member.user_id))}>
               <AgentTag />
             </Show>
           </div>
@@ -267,7 +267,7 @@ function MemberRow(props: {
 }
 
 function MemberName(props: { memberId: string }) {
-  const displayName = () => getDisplayName(tryMacroId(props.memberId));
+  const displayName = () => getDisplayName(tryRoxId(props.memberId));
   return <span class="font-medium">{displayName()}</span>;
 }
 
@@ -352,7 +352,7 @@ export function TeamMembers(props: { team: TeamSummary }) {
   // name lookup per member (not recreated on every keystroke / re-render), and
   // disposes it when the member leaves the list.
   const memberSearchIndex = mapArray(members, (member) => {
-    const roxId = tryMacroId(member.user_id);
+    const roxId = tryRoxId(member.user_id);
     const displayName = () => getDisplayName(roxId);
     const email = roxId ? roxIdToEmail(roxId) : '';
     // Memoized so the lowercased search string is built once (and only rebuilt

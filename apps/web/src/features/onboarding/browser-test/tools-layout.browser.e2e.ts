@@ -23,7 +23,7 @@ for (const viewport of [
       await page.evaluate(() =>
         localStorage.setItem(
           'onboarding-flow-step',
-          JSON.stringify({ user: 'rox|ada@acme.com', step: 'tools' })
+          JSON.stringify({ user: 'macro|ada@acme.com', step: 'tools' })
         )
       );
       await page.reload();

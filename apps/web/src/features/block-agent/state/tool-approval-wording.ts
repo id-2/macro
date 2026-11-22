@@ -199,7 +199,7 @@ const ROX_TOOLS: Record<RoxToolName, Wording | null> = {
   WebSearch: null,
 };
 
-function isMacroTool(tool: string): tool is RoxToolName {
+function isRoxTool(tool: string): tool is RoxToolName {
   return Object.hasOwn(ROX_TOOLS, tool);
 }
 
@@ -222,7 +222,7 @@ export function describeToolCall(
     return `use ${whose} ${server.name} account (${toolWords(tool)})`;
   }
   // A tool newer than this build, or one never held, reads by its name.
-  const wording = isMacroTool(tool) ? ROX_TOOLS[tool] : null;
+  const wording = isRoxTool(tool) ? ROX_TOOLS[tool] : null;
   return wording
     ? wording(whose)
     : `use ${whose} Rox workspace (${toolWords(tool)})`;

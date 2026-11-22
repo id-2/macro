@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { canDeleteBot, canManageAgent } from '../botPermissions';
 
-const CURRENT_USER = 'rox|current@example.com';
-const CREATOR = 'rox|creator@example.com';
+const CURRENT_USER = 'macro|current@example.com';
+const CREATOR = 'macro|creator@example.com';
 const TEAM_ID = 'team-1';
 
 describe('canDeleteBot', () => {

@@ -1,7 +1,7 @@
 import { ViewShell } from '@app/components/view-shell';
 import { ChangesSplit, ChangesToggle } from '@app/features/changes/changes';
 import { useOptionalChanges } from '@app/features/changes/context/changes-controller';
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import { useGlobalNotificationSource } from '@components/app/GlobalAppState';
 import { HeaderActionButton } from '@components/app/HeaderActionButton';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
@@ -221,7 +221,7 @@ export function PrDetailActions(props: {
         {(detail) => (
           <>
             <HeaderActionGroup label="Actions">
-              <AskMacroButton
+              <AskRoxButton
                 grouped
                 entity={{
                   type: 'pr',

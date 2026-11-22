@@ -390,7 +390,7 @@ const createAnalytics = () => {
 
   /**
    * Mobile capture identifies PostHog as the normalized email. This app and
-   * the create-user webhook use `rox|{email}`. `identify` only merges an
+   * the create-user webhook use `macro|{email}`. `identify` only merges an
    * anonymous id into an identified one, and `alias` refuses an id that was
    * already passed to `identify`, so those two persons stay split.
    * `$merge_dangerously` is the merge PostHog applies; the event's distinct

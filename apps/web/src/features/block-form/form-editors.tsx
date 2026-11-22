@@ -3,13 +3,13 @@
  * elsewhere: their avatars, ringed in the color their cursor has.
  */
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { AvatarGroup } from '@ui';
 import { For } from 'solid-js';
 import type { EditorsProps } from './context/form-context';
 
 const nameOf = (userId: string | undefined) =>
-  getDisplayName(tryMacroId(userId ?? ''), { emailFallback: 'local-part' }) ||
+  getDisplayName(tryRoxId(userId ?? ''), { emailFallback: 'local-part' }) ||
   'Someone';
 
 export function FormEditors(props: EditorsProps) {

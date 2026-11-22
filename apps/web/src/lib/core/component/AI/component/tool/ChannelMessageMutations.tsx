@@ -92,7 +92,7 @@ export const openDirectMessageHandler = createToolRenderer({
   render: (ctx) => {
     const participants = () =>
       (ctx.response?.data.participants ?? ctx.tool.data.participants)
-        .map((id) => (id.startsWith('rox|') ? id.slice('rox|'.length) : id))
+        .map((id) => (id.startsWith('macro|') ? id.slice('macro|'.length) : id))
         .join(', ');
 
     return (

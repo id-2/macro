@@ -1,5 +1,5 @@
 import { AgentTag } from '@core/component/AgentTag';
-import { isAgentAccount, tryMacroId } from '@core/user';
+import { isAgentAccount, tryRoxId } from '@core/user';
 import { isBotSenderId } from '@queries/messages/message-sender';
 import { Show } from 'solid-js';
 import { useMessage } from './context';
@@ -16,7 +16,7 @@ export function AgentBadge(props: AgentBadgeProps) {
   const message = useMessage();
   const isAgent = () => {
     const senderId = message().sender_id;
-    return isBotSenderId(senderId) || isAgentAccount(tryMacroId(senderId));
+    return isBotSenderId(senderId) || isAgentAccount(tryRoxId(senderId));
   };
 
   return (

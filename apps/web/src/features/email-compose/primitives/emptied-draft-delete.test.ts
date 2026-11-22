@@ -102,8 +102,8 @@ const providers: [string, EmailInbox][] = [
 
 const recipient = (email: string): EmailRecipient => ({
   kind: 'custom',
-  id: `rox|${email}`,
-  data: { id: `rox|${email}`, email, invalid: false },
+  id: `macro|${email}`,
+  data: { id: `macro|${email}`, email, invalid: false },
 });
 
 const operationName = (operation: Operation) =>

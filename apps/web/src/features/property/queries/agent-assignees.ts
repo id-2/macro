@@ -1,5 +1,5 @@
 import { useAgentMentionUsers } from '@channel/use-agent-mention-users';
-import { isMacroAgentId } from '@core/constant/roxAgent';
+import { isRoxAgentId } from '@core/constant/roxAgent';
 import type { IUser } from '@core/user';
 import { useAgentsQuery } from '@queries/agents/agents';
 import { useBotsQuery } from '@queries/bots/bots';
@@ -34,5 +34,5 @@ export function useAgentAssignees(
   // Reuse the message composer's system-agent roster and rollout policy.
   // Classic Rox replies inline without a session, so it cannot be assigned.
   const available = useAgentMentionUsers(savedAgents, enabled);
-  return () => available().filter((agent) => !isMacroAgentId(agent.id));
+  return () => available().filter((agent) => !isRoxAgentId(agent.id));
 }

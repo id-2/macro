@@ -22,7 +22,7 @@ vi.mock('@service-storage/graphql-contacts', () => ({
 
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const REPLACEMENT = '00000000-0000-4000-8000-000000000002';
-const viewer = 'rox|viewer@example.com';
+const viewer = 'macro|viewer@example.com';
 const [account, setAccount] = createSignal({ userId: viewer, session: 0 });
 vi.mock('../auth/use-query-account', () => ({
   useQueryAccount: () => account,
@@ -107,7 +107,7 @@ it('publishes completion only after acknowledgement and persisted checkpoint, wi
   const foreign = vi.fn();
   const stop = subscribeContactCheckpoint(viewer, notified);
   const stopForeign = subscribeContactCheckpoint(
-    'rox|other@example.com',
+    'macro|other@example.com',
     foreign
   );
   const stopThrowing = subscribeContactCheckpoint(viewer, () => {

@@ -43,7 +43,7 @@ import {
   getDisplayNameParts,
   getInitials,
   roxIdToEmail,
-  tryMacroId,
+  tryRoxId,
 } from '../../../lib/core/user/index';
 import type {
   DatabaseColumnCastsSource,
@@ -1436,7 +1436,7 @@ function presenceOutline(
 
 /** First name when known, else the email name before its first separator. */
 function presenceName(userId: string) {
-  const roxId = tryMacroId(userId);
+  const roxId = tryRoxId(userId);
   const { firstName, lastName } = getDisplayNameParts(roxId);
   if (firstName) return firstName;
   const email = roxId ? roxIdToEmail(roxId) : userId;

@@ -15,7 +15,7 @@ function token(documentId: string, user: string) {
   const payload = Buffer.from(
     JSON.stringify({
       document_id: documentId,
-      user_id: `rox|${user}@example.com`,
+      user_id: `macro|${user}@example.com`,
       access_level: 'edit',
       exp: Math.floor(Date.now() / 1000) + 600,
     })
@@ -98,7 +98,7 @@ async function seedDocument() {
 async function openConnected(page: Page, id: string, user: string) {
   const socket = `${serverUrl.replace('http:', 'ws:')}document/${id}/connect?token=${token(id, user)}`;
   await page.goto(
-    `http://localhost:3017/?${new URLSearchParams({ document: id, socket, user: `rox|${user}@example.com` })}`
+    `http://localhost:3017/?${new URLSearchParams({ document: id, socket, user: `macro|${user}@example.com` })}`
   );
   await expect(page.locator('[data-address="A1"]')).toBeVisible();
   await expect
@@ -228,7 +228,7 @@ test('live edits, named colored ranges, offline recovery and departing cursors',
         const user = ['alice', 'bob', 'carol'][index];
         const socket = `${serverUrl.replace('http:', 'ws:')}document/${id}/connect?token=${token(id, user)}`;
         await page.goto(
-          `http://localhost:3017/?${new URLSearchParams({ document: id, socket, user: `rox|${user}@example.com` })}`
+          `http://localhost:3017/?${new URLSearchParams({ document: id, socket, user: `macro|${user}@example.com` })}`
         );
         await expect(page.locator('[data-address="A1"]')).toBeVisible();
       })

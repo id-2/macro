@@ -216,7 +216,7 @@ export function ChatWithAgentButton(props: {
   );
 }
 
-export function AskMacroButton(props: {
+export function AskRoxButton(props: {
   entity: ChatWithAgentEntity;
   grouped?: boolean;
   size?: ButtonSize;

@@ -3,7 +3,7 @@ import { appRoutesManifest } from '../tests/app-routes';
 import { decideUiCommand, type UiCommandRecipient } from './ui-command';
 
 const ME: UiCommandRecipient = {
-  userId: 'rox|owner@example.com',
+  userId: 'macro|owner@example.com',
   clientId: '0198a4cc-e138-7670-a308-a6b7666027c1',
 };
 const DOC = '0198a4cc-e138-7670-a308-a6b766602799';
@@ -74,7 +74,7 @@ describe('decideUiCommand', () => {
   it('ignores a frame for another tab or another person', () => {
     for (const other of [
       frame({ clientId: '0198a4cc-e138-7670-a308-a6b7666027c2' }),
-      frame({ userId: 'rox|someone@example.com' }),
+      frame({ userId: 'macro|someone@example.com' }),
       frame({ clientId: undefined }),
       { ...frame(), kind: 'navigate' },
       'not a frame',

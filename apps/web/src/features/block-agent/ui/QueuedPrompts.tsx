@@ -21,7 +21,7 @@
  * steer the server refused stays queued and says it was not sent.
  */
 
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
 import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
@@ -420,7 +420,7 @@ function PromptBody(
 
   // The composer's features, so a queued prompt edits the way it was written.
   const editor = buildConfig('chat')
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .namespace('agent-queued-prompt')
     .withMentions({ showOpenTabs: true, block: 'agent' })
     .withEmojis()

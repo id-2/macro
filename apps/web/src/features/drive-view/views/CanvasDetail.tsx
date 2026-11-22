@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { CanvasDocument } from '@block-canvas/component/CanvasDocument';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
@@ -86,7 +86,7 @@ export function CanvasDetailDocument(props: {
     >
       <SidePanel.HeaderActions>
         <HeaderActionGroup label="Actions">
-          <AskMacroButton
+          <AskRoxButton
             grouped
             entity={{
               type: 'document',

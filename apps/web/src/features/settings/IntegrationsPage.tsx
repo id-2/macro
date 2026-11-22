@@ -41,7 +41,7 @@ export function IntegrationsPage() {
         fallback={
           <IntegrationsView
             onOpenEmailSettings={() => openSettings('Email')}
-            onOpenMacroMcp={() => openSettings('Agent')}
+            onOpenRoxMcp={() => openSettings('Agent')}
             onOpenLocalAgents={
               isTabAvailable('Harness')
                 ? () => setShowLocalAgents(true)

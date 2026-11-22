@@ -9,7 +9,7 @@ import { resolveSearchFilters } from '../core/search';
 import { extractedSearchFields } from './extracted-search';
 
 const julia = {
-  id: 'rox|julia@rox.one',
+  id: 'macro|julia@rox.one',
   label: 'Julia Jones',
   email: 'julia@rox.one',
   kind: 'user' as const,

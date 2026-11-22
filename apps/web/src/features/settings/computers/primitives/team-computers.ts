@@ -1,5 +1,5 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
-import { enableMacroComputers } from '@core/constant/featureFlags';
+import { enableRoxComputers } from '@core/constant/featureFlags';
 import { useComputersQuery } from '@queries/computers/computers';
 import { queryReadyGate } from '@queries/gate';
 import { useCurrentTeamQuery } from '@queries/team/teams';
@@ -11,7 +11,7 @@ import type { ComputerStatus } from '@service-auth/computers';
  * fetched or shown, so Settings and Billing look as they do without them.
  */
 export function useTeamComputers() {
-  const flag = useFeatureFlag(enableMacroComputers);
+  const flag = useFeatureFlag(enableRoxComputers);
   const team = useCurrentTeamQuery();
   const enabled = () =>
     flag().enabled && queryReadyGate(team) && team.data !== null;

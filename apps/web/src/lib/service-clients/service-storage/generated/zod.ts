@@ -65,7 +65,7 @@ export const requestAccountManagerBody = zod
     callerRole: zod
       .enum(['managed', 'manager'])
       .describe('One side of a grant.'),
-    counterpartyId: zod.string().describe('The other account (`rox|...`).'),
+    counterpartyId: zod.string().describe('The other account (`macro|...`).'),
   })
   .describe('Request body for asking for a grant.');
 
@@ -4684,7 +4684,7 @@ export const getCallRecordResponse = zod
             id: zod
               .uuid()
               .describe(
-                "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Macro user\nids. Only the server mints them; Macro users keep `rox|…` identities,\nso an RTC identity classifies as exactly one of the two."
+                "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Macro user\nids. Only the server mints them; Macro users keep `macro|…` identities,\nso an RTC identity classifies as exactly one of the two."
               ),
             joinedAt: zod.iso
               .datetime({})
@@ -5175,7 +5175,7 @@ export const editCallTranscriptBody = zod
               ),
           })
           .describe(
-            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
+            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
           )
       )
       .describe('The set of per-diarized-speaker overrides to apply.'),
@@ -6412,7 +6412,7 @@ export const getOrCreateDmBody = zod
     recipient_id: zod
       .string()
       .describe(
-        'Recipient user id (`rox|...`) or agent persona id (`bot|...`).'
+        'Recipient user id (`macro|...`) or agent persona id (`bot|...`).'
       ),
   })
   .describe('Request to get or create a direct message channel.');
@@ -9817,11 +9817,11 @@ export const searchCrmPipelineEntriesResponseItem = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10023,11 +10023,11 @@ export const listCrmRecordPipelineEntriesResponseItem = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10551,7 +10551,7 @@ export const addCrmPipelineEntriesBody = zod
                       .string()
                       .nullish()
                       .describe(
-                        'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
+                        'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
                       ),
                     values: zod
                       .array(zod.string())
@@ -10645,11 +10645,11 @@ export const addCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10747,11 +10747,11 @@ export const addCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10829,7 +10829,7 @@ export const updateCrmPipelineEntriesBody = zod
                       .string()
                       .nullish()
                       .describe(
-                        'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
+                        'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
                       ),
                     values: zod
                       .array(zod.string())
@@ -10929,11 +10929,11 @@ export const updateCrmPipelineEntriesResponse = zod
                                 value: zod
                                   .array(zod.string())
                                   .describe(
-                                    'Macro ids: people as rox| user ids, records or other items.'
+                                    'Macro ids: people as macro| user ids, records or other items.'
                                   ),
                               })
                               .describe(
-                                'Macro ids: people as rox| user ids, records or other items.'
+                                'Macro ids: people as macro| user ids, records or other items.'
                               ),
                           ])
                           .describe("A stored value in its field's own terms."),
@@ -11012,11 +11012,11 @@ export const updateCrmPipelineEntriesResponse = zod
                                 value: zod
                                   .array(zod.string())
                                   .describe(
-                                    'Macro ids: people as rox| user ids, records or other items.'
+                                    'Macro ids: people as macro| user ids, records or other items.'
                                   ),
                               })
                               .describe(
-                                'Macro ids: people as rox| user ids, records or other items.'
+                                'Macro ids: people as macro| user ids, records or other items.'
                               ),
                           ])
                           .describe("A stored value in its field's own terms."),
@@ -11089,7 +11089,7 @@ export const findCrmPipelineEntriesBody = zod
               .string()
               .nullish()
               .describe(
-                'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
+                'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
               ),
             values: zod
               .array(zod.string())
@@ -11239,11 +11239,11 @@ export const findCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -11527,11 +11527,11 @@ export const removeCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as rox| user ids, records or other items.'
+                            'Macro ids: people as macro| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as rox| user ids, records or other items.'
+                        'Macro ids: people as macro| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -36317,7 +36317,7 @@ export const calculateSpreadsheetBody = zod
                         zod
                           .string()
                           .describe(
-                            'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
+                            'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
                           ),
                         zod
                           .null()
@@ -37118,7 +37118,7 @@ export const editSpreadsheetBody = zod
                             zod
                               .string()
                               .describe(
-                                'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
+                                'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
                               ),
                             zod
                               .null()
@@ -54229,7 +54229,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by session owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
+            "Filter by session owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
           ),
       })
       .optional()
@@ -54446,7 +54446,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by chat owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by chat owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -54531,7 +54531,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by document owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by document owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -54774,7 +54774,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by initiative owner principal — a user ('rox|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
+            "Filter by initiative owner principal — a user ('macro|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
           ),
       })
       .optional()
@@ -54814,7 +54814,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by project owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by project owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -77935,7 +77935,7 @@ export const passwordsCreateFolderParams = zod.object({
 });
 
 export const passwordsCreateFolderHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsCreateFolderBody = zod
@@ -77975,7 +77975,7 @@ export const passwordsRenameFolderParams = zod.object({
 });
 
 export const passwordsRenameFolderHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsRenameFolderBody = zod
@@ -78009,7 +78009,7 @@ export const passwordsRemoveFolderParams = zod.object({
 });
 
 export const passwordsRemoveFolderHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 /**
@@ -78021,7 +78021,7 @@ export const passwordsMoveFolderParams = zod.object({
 });
 
 export const passwordsMoveFolderHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsMoveFolderBody = zod
@@ -78149,7 +78149,7 @@ export const passwordsCreateParams = zod.object({
 });
 
 export const passwordsCreateHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsCreateBody = zod
@@ -78407,7 +78407,7 @@ export const passwordsUpdateParams = zod.object({
 });
 
 export const passwordsUpdateHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsUpdateBody = zod
@@ -78580,7 +78580,7 @@ export const passwordsRemoveParams = zod.object({
 });
 
 export const passwordsRemoveHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 /**
@@ -78592,7 +78592,7 @@ export const passwordsPatchParams = zod.object({
 });
 
 export const passwordsPatchHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsPatchBody = zod
@@ -78753,7 +78753,7 @@ export const passwordsCopyParams = zod.object({
 });
 
 export const passwordsCopyHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsCopyBody = zod
@@ -78837,7 +78837,7 @@ export const passwordsRevealParams = zod.object({
 });
 
 export const passwordsRevealHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsRevealBody = zod
@@ -78926,7 +78926,7 @@ export const passwordsShareParams = zod.object({
 });
 
 export const passwordsShareHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsShareBody = zod
@@ -78964,7 +78964,7 @@ export const passwordsSetTotpParams = zod.object({
 });
 
 export const passwordsSetTotpHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsSetTotpBody = zod
@@ -78986,7 +78986,7 @@ export const passwordsRemoveTotpParams = zod.object({
 });
 
 export const passwordsRemoveTotpHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 /**
@@ -78998,7 +78998,7 @@ export const passwordsTotpParams = zod.object({
 });
 
 export const passwordsTotpHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsTotpResponsePeriodMin = 0;
@@ -79049,7 +79049,7 @@ export const passwordsCopyUsernameParams = zod.object({
 });
 
 export const passwordsCopyUsernameHeader = zod.object({
-  'X-Macro-Passwords': zod.string().describe('Required CSRF header; send 1'),
+  'X-Rox-Passwords': zod.string().describe('Required CSRF header; send 1'),
 });
 
 export const passwordsCopyUsernameResponse = zod

@@ -2,30 +2,30 @@ import { contactRecordKey } from '@queries/contacts/contact-key';
 import type { ContactReferencePageQueryVariables } from '@service-storage/graphql/generated/graphql';
 import { createSignal } from 'solid-js';
 
-const viewer = 'rox|viewer@example.com';
+const viewer = 'macro|viewer@example.com';
 const people = [
   {
-    userId: 'rox|person99999@example.com',
+    userId: 'macro|person99999@example.com',
     email: 'person99999@example.com',
     name: 'Private late name',
   },
   {
-    userId: 'rox|comma@example.com',
+    userId: 'macro|comma@example.com',
     email: 'comma@example.com',
     name: 'Family, Given',
   },
   {
-    userId: 'rox|shared1@example.com',
+    userId: 'macro|shared1@example.com',
     email: 'shared1@example.com',
     name: 'Shared Name',
   },
   {
-    userId: 'rox|shared2@example.com',
+    userId: 'macro|shared2@example.com',
     email: 'shared2@example.com',
     name: 'Shared Name',
   },
   {
-    userId: 'rox|alias@example.com',
+    userId: 'macro|alias@example.com',
     email: 'alias@example.com',
     name: 'target@example.com',
   },
@@ -79,7 +79,7 @@ export async function fetchImportIds(ids: string[], signal: AbortSignal) {
   const records = ids.flatMap((id) => {
     const known = people.find((person) => person.userId === id);
     if (known) return [row(known)];
-    if (id === viewer || /^rox\|person\d+@example\.com$/.test(id))
+    if (id === viewer || /^macro\|person\d+@example\.com$/.test(id))
       return [
         row({
           userId: id,

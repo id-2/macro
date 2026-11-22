@@ -1,4 +1,4 @@
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { EditorConfigBuilder } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
 import { useRoutinePromptMentionUsers } from './routine-prompt-mention-users';
@@ -9,7 +9,7 @@ export function RoutinePromptEditor(props: {
   onChange: (markdown: string) => void;
 }) {
   const editor = new EditorConfigBuilder()
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .namespace('routine-prompt')
     .withHistory()
     .withLinks()

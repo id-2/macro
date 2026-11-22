@@ -1,5 +1,5 @@
 import { UserIcon } from '@core/component/UserIcon';
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import type { IUser } from '@core/user/types';
 import CaretRightIcon from '@icon/system/regular/caret-right.svg';
 import SearchIcon from '@icon/system/regular/magnifying-glass.svg';
@@ -74,7 +74,7 @@ export function CalendarPeopleFilterSubmenu(props: {
     const selected: IUser[] = [...selectedEmails].map(
       (email) =>
         resolved.get(email) ?? {
-          id: emailToMacroId(email) ?? email,
+          id: emailToRoxId(email) ?? email,
           email,
           name: email,
         }

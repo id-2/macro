@@ -1,5 +1,5 @@
 import { t } from '@app/lib/i18n';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { EntityIcon } from '@core/component/EntityIcon';
 import { ComposerEditor } from '@core/component/LexicalMarkdown/component/ComposerEditor';
 import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
@@ -19,8 +19,8 @@ import {
   updateDragInsertPreviewFromCoordinates,
 } from '@core/component/LexicalMarkdown/utils/dragInsertUtils';
 import { handleUserMention } from '@core/component/LexicalMarkdown/utils/mentionsUtils';
-import { isMacroAgentId } from '@core/constant/roxAgent';
-import { isMacroNewId } from '@core/constant/roxNew';
+import { isRoxAgentId } from '@core/constant/roxAgent';
+import { isRoxNewId } from '@core/constant/roxNew';
 import { registerHotkey, useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { createMessageComposer } from '@core/messages/create-message-composer';
 import { isMobile } from '@core/mobile/isMobile';
@@ -401,7 +401,7 @@ export function ChannelInput(props: ChannelInputProps) {
   const markdownEditor = createConfiguredChannelMarkdownEditor({
     groupMentions,
     namespace: props.markdownNamespace ?? 'channel-input-markdown',
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     enableMentions: initialFeatures.mentions !== false,
     mentionSources: participantsOnly ? ['users'] : undefined,
     disableMentionTracking: participantsOnly || undefined,
@@ -497,7 +497,7 @@ export function ChannelInput(props: ChannelInputProps) {
   // the agent-session bot, depending on rollout.
   const roxUser = () =>
     (transformUsers ? transformUsers([]) : (mentionUsers() ?? [])).find(
-      (user) => isMacroAgentId(user.id) || isMacroNewId(user.id)
+      (user) => isRoxAgentId(user.id) || isRoxNewId(user.id)
     );
   const addMenuGroups = (): ComposerAddMenuGroup[] => {
     const create = (

@@ -22,7 +22,7 @@ const CSRF_HEADER: &str = "x-rox-passwords";
 
 /// CSRF marker header earlier clients sent. Still accepted so a page loaded
 /// from a build before the rename can save a password.
-const LEGACY_CSRF_HEADER: &str = "x-rox-passwords";
+const LEGACY_CSRF_HEADER: &str = "x-macro-passwords";
 
 /// Composition-owned domain service and authenticated transport state.
 pub struct PasswordRouterState<A> {

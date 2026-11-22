@@ -13,8 +13,8 @@ import type { ContactDirectoryByUserIdsQuery } from '@service-storage/graphql/ge
 import * as Effect from 'effect/Effect';
 import { createSignal, onCleanup, onMount } from 'solid-js';
 
-const viewer = 'rox|viewer@example.com';
-const removedId = 'rox|late@example.com';
+const viewer = 'macro|viewer@example.com';
+const removedId = 'macro|late@example.com';
 const document =
   '{ user { id contacts(limit: 500) { nodes { id userId name email } nextCursor } } }';
 function person(
@@ -89,7 +89,7 @@ export function ContactRemovalFixture() {
                   ? viewer
                   : start + offset === 600
                     ? removedId
-                    : `rox|p${start + offset}@example.com`
+                    : `macro|p${start + offset}@example.com`
               )
             ).filter((node) => !removed || node.userId !== removedId);
             const nextCursor = end === 601 ? null : String(end);

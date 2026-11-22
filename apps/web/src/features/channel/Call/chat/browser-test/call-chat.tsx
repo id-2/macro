@@ -24,7 +24,7 @@ const direct = params.get('surface') === 'direct';
 if (access === 'member') {
   queryClient.setQueryData(authKeys.userInfo.queryKey, {
     authenticated: true,
-    id: 'rox|me@example.com',
+    id: 'macro|me@example.com',
     permissions: [],
   } as unknown as UserInfoData);
 }

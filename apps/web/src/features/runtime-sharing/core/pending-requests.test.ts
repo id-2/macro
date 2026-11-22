@@ -9,7 +9,7 @@ const machine = { id: 'm-1', name: 'Mac mini' } as Harness;
 const theirs = { id: 'm-2', name: 'Build box' } as Harness;
 const request = (id: string, status: 'pending' | 'denied') => ({
   id,
-  requesterId: `rox|${id}@x.test`,
+  requesterId: `macro|${id}@x.test`,
   requestedLevel: 'edit' as const,
   status,
   revision: 1,

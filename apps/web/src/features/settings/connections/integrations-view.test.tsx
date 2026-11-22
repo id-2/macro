@@ -217,7 +217,7 @@ function startImport() {
   render(() => (
     <IntegrationsView
       onOpenEmailSettings={() => {}}
-      onOpenMacroMcp={() => {}}
+      onOpenRoxMcp={() => {}}
       onOpenLocalAgents={() => {}}
     />
   ));
@@ -300,7 +300,7 @@ describe('Slack channel import handoff', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
         onOpenLocalAgents={() => {}}
       />
     ));
@@ -316,7 +316,7 @@ describe('unified Integrations page', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
       />
     ));
     expect(
@@ -328,19 +328,19 @@ describe('unified Integrations page', () => {
   });
 
   it('opens the matching setup flow for each callout', () => {
-    const onOpenMacroMcp = vi.fn();
+    const onOpenRoxMcp = vi.fn();
     const onOpenLocalAgents = vi.fn();
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={onOpenMacroMcp}
+        onOpenRoxMcp={onOpenRoxMcp}
         onOpenLocalAgents={onOpenLocalAgents}
       />
     ));
     fireEvent.click(
       screen.getByRole('button', { name: 'Set up Rox in AI apps' })
     );
-    expect(onOpenMacroMcp).toHaveBeenCalledOnce();
+    expect(onOpenRoxMcp).toHaveBeenCalledOnce();
     expect(onOpenLocalAgents).not.toHaveBeenCalled();
     fireEvent.click(
       screen.getByRole('button', { name: 'Set up local agents' })
@@ -353,7 +353,7 @@ describe('unified Integrations page', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
       />
     ));
     const names = screen
@@ -371,7 +371,7 @@ describe('unified Integrations page', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
       />
     ));
     expect(screen.queryByText('Team tools')).toBeNull();
@@ -382,7 +382,7 @@ describe('unified Integrations page', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
       />
     ));
     fireEvent.input(
@@ -400,7 +400,7 @@ describe('unified Integrations page', () => {
     render(() => (
       <IntegrationsView
         onOpenEmailSettings={() => {}}
-        onOpenMacroMcp={() => {}}
+        onOpenRoxMcp={() => {}}
       />
     ));
     fireEvent.click(screen.getByRole('button', { name: 'Manage slack' }));

@@ -87,7 +87,7 @@ export function createMentionBufferPlugin(
     return [toTextPart(template, text)];
   }
 
-  function canBecomeMacroXml(text: string): boolean {
+  function canBecomeRoxXml(text: string): boolean {
     if (ROX_XML_PREFIX.startsWith(text)) return true;
     return /^<m-[a-zA-Z0-9_-]*$/.test(text);
   }
@@ -113,8 +113,8 @@ export function createMentionBufferPlugin(
         continue;
       }
       const openTag = text.match(ROX_XML_OPEN_TAG);
-      const viableMacroXml = !!openTag || canBecomeMacroXml(text);
-      if (viableMacroXml && !isCodeContext()) {
+      const viableRoxXml = !!openTag || canBecomeRoxXml(text);
+      if (viableRoxXml && !isCodeContext()) {
         if (text.length > MAX_ROX_XML_LENGTH) {
           out.push(...release(text.length));
           break;

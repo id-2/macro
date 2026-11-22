@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import { SidePanel } from '@components/app/side-panel';
 import { Show } from 'solid-js';
@@ -21,7 +21,7 @@ export function MarkdownHeaderActions() {
           <DispatchAgentButton showPrimaryLabel />
         </Show>
         <HeaderActionGroup label="Actions">
-          <AskMacroButton
+          <AskRoxButton
             grouped
             entity={{
               type: 'document',

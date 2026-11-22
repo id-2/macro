@@ -8,7 +8,7 @@ const definition = {
   is_multi_select: false,
   is_metadata: false,
   is_system: false,
-  owner: { scope: 'user', user_id: 'rox|ada@example.com' },
+  owner: { scope: 'user', user_id: 'macro|ada@example.com' },
   specific_entity_type: null,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',

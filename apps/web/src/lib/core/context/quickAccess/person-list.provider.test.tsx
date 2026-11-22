@@ -16,7 +16,7 @@ import { createPersonList } from './person-list';
 import { QuickAccessProvider } from './QuickAccessProvider';
 import type { QuickAccessListOptions } from './types';
 
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 const state = vi.hoisted(() => ({
   built: 0,
   host: undefined as unknown,
@@ -30,7 +30,7 @@ vi.mock('@service-storage/graphql-contacts', () => ({
 }));
 vi.mock('@core/context/user', () => ({
   useIsAuthenticated: () => () => true,
-  useUserId: () => () => 'rox|viewer@example.com',
+  useUserId: () => () => 'macro|viewer@example.com',
 }));
 vi.mock('@channel/DebugSuspense', () => ({
   DebugSuspense: (props: ParentProps) => props.children,
@@ -41,7 +41,7 @@ vi.mock('./QuickAccessSource', () => ({
       state.built++;
       return createPersonList({
         scope: () => ({
-          userId: 'rox|viewer@example.com',
+          userId: 'macro|viewer@example.com',
           host: state.host as never,
         }),
         search: () => options.searchTerm?.() ?? '',
@@ -77,7 +77,7 @@ it('keeps one list through typing and lists the next page of people below the fi
         people: [
           {
             recordKey: `GraphqlContact:${id}`,
-            userId: `rox|${id}@example.com`,
+            userId: `macro|${id}@example.com`,
             email: `${id}@example.com`,
             name: id,
             lastInteractionMs: 0,
@@ -145,18 +145,18 @@ it('keeps one list through typing and lists the next page of people below the fi
     </QueryClientProvider>
   ));
   await vi.advanceTimersByTimeAsync(1000);
-  expect(ids()).toEqual(['rox|first@example.com']);
+  expect(ids()).toEqual(['macro|first@example.com']);
 
   setQuery('a');
   await vi.advanceTimersByTimeAsync(1000);
   setQuery('al');
   await vi.advanceTimersByTimeAsync(1000);
-  expect(ids()).toEqual(['rox|first@example.com']);
+  expect(ids()).toEqual(['macro|first@example.com']);
   expect(state.built).toBe(1);
 
   setPaging(true);
   await vi.advanceTimersByTimeAsync(5000);
-  expect(ids()).toEqual(['rox|first@example.com', 'rox|next@example.com']);
+  expect(ids()).toEqual(['macro|first@example.com', 'macro|next@example.com']);
   expect(pageRequests).toBe(1);
   expect(state.built).toBe(1);
 

@@ -53,7 +53,7 @@ export function DraftOwnerFixture() {
           senderLinkId: 'inbox',
           senderEmail: 'sender@example.com',
           senderAccount: accountReady()
-            ? { rox_id: 'rox|inbox-owner@example.com' }
+            ? { rox_id: 'macro|inbox-owner@example.com' }
             : undefined,
         })
       );

@@ -14,7 +14,7 @@ import {
 } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
 import { useProfilePictureUrl } from '@core/signal/profilePicture';
-import { emailToMacroId, getInitialsFromName } from '@core/user';
+import { emailToRoxId, getInitialsFromName } from '@core/user';
 import { idToEmail } from '@core/user/util';
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { EntityData } from '@entity';
@@ -240,7 +240,7 @@ export function createAppCrmContext(): CrmContext {
     feedback: toast,
     downloadCsv: downloadCrmCsv,
     createContactPhoto: (email) =>
-      useProfilePictureUrl(emailToMacroId(email))[0],
+      useProfilePictureUrl(emailToRoxId(email))[0],
     contactInitials: getInitialsFromName,
     userEmail: idToEmail,
     createNavigation: createAppCrmNavigation,

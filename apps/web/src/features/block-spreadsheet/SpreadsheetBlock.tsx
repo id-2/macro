@@ -34,7 +34,7 @@ import { createMethodRegistration } from '@core/orchestrator';
 import { blockElementSignal } from '@core/signal/blockElement';
 import { blockHandleSignal, blockMetadataSignal } from '@core/signal/load';
 import { useCanEdit, useGetPermissions } from '@core/signal/permissions';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { useBlockDocumentName } from '@core/util/currentBlockDocumentName';
 import { downloadFile } from '@filesystem/download';
 import IconShared from '@icon/share.svg';
@@ -188,7 +188,7 @@ function SpreadsheetBlockContent(props: { share?: string }) {
                 peers: () =>
                   source.peers().map((peer) => ({
                     ...peer,
-                    name: getDisplayName(tryMacroId(peer.userId ?? ''), {
+                    name: getDisplayName(tryRoxId(peer.userId ?? ''), {
                       emailFallback: 'local-part',
                     }),
                   })),

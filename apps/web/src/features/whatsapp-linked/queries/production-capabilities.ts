@@ -1,7 +1,7 @@
 import { useUserId } from '@core/context/user';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { getDisplayName } from '@core/user/displayName';
-import { isMacroId } from '@core/user/roxId';
+import { isRoxId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { queryReadyGate } from '@queries/gate';
 import {
@@ -137,7 +137,7 @@ export function createWhatsAppLinkedCapabilities(host: {
         useWhatsappLinkedChatsQuery(currentUser, enabled),
         (chats) =>
           decodeChats(chats, (ownerId) =>
-            isMacroId(ownerId)
+            isRoxId(ownerId)
               ? getDisplayName(ownerId) || 'a teammate'
               : 'a teammate'
           )

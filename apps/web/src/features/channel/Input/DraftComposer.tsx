@@ -1,5 +1,5 @@
 import { FloatRegionOrInline } from '@components/app/mobile/float-regions/FloatRegion';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { ComposerEditor } from '@core/component/LexicalMarkdown/component/ComposerEditor';
 import { createComposerLayout } from '@core/component/LexicalMarkdown/utils/create-composer-layout';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
@@ -88,7 +88,7 @@ export function DraftComposer(props: {
 
   const markdownEditor = createConfiguredChannelMarkdownEditor({
     namespace: 'compose-input-markdown',
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     enableMentions: true,
     scrollContainer,
     onMentionCreate: (mention) => mentionsTracker.onMentionCreate(mention),

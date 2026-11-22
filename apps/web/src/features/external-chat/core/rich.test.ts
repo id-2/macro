@@ -123,7 +123,7 @@ describe('mentions', () => {
       `<m-user-mention>${JSON.stringify({ userId, email: 'x', displayName })}</m-user-mention>`;
     expect(
       composerMentions(
-        `${chip('1555@s.whatsapp.net', 'Ben')} ${chip('42@lid', 'Cy')} ${chip('rox|z@x.test', 'Zed')} ${chip('1555@s.whatsapp.net', 'Ben')}`,
+        `${chip('1555@s.whatsapp.net', 'Ben')} ${chip('42@lid', 'Cy')} ${chip('macro|z@x.test', 'Zed')} ${chip('1555@s.whatsapp.net', 'Ben')}`,
         ['1555@s.whatsapp.net', '42@lid']
       )
     ).toEqual({

@@ -28,7 +28,7 @@ vi.mock('@core/user', () => ({
   getInitials: () => '?',
   getInitialsFromName: nameReads.initials,
   roxIdToEmail: (id: string) => id,
-  tryMacroId: () => undefined,
+  tryRoxId: () => undefined,
   useIsConnectedSecondaryInbox: () => () => false,
 }));
 vi.mock('@core/signal/profilePicture', () => ({
@@ -61,7 +61,7 @@ describe('firstPartyBotMark', () => {
     expect(
       firstPartyBotMark('bot|11111111-2222-3333-4444-555555555555')
     ).toBeUndefined();
-    expect(firstPartyBotMark('rox|peter@rox.one')).toBeUndefined();
+    expect(firstPartyBotMark('macro|peter@rox.one')).toBeUndefined();
     expect(firstPartyBotMark(undefined)).toBeUndefined();
   });
 });
@@ -71,7 +71,7 @@ it('uses supplied contact names without populating the global name store', () =>
   nameReads.full.mockClear();
   const { container } = render(() => (
     <UserIcon
-      id="rox|person@example.com"
+      id="macro|person@example.com"
       name="Person Name"
       suppressClick
       showTooltip={false}

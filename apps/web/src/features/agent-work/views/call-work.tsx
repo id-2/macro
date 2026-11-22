@@ -4,7 +4,7 @@ import { t } from '@app/lib/i18n';
 import { UserGroup } from '@core/component/UserGroup';
 import { UserIcon } from '@core/component/UserIcon';
 import { enableAgentWork } from '@core/constant/featureFlags';
-import { getDisplayName, isAgentAccount, tryMacroId } from '@core/user';
+import { getDisplayName, isAgentAccount, tryRoxId } from '@core/user';
 import XIcon from '@icon/system/regular/x.svg';
 import { subscribeGraphqlSoupReconnected } from '@service-storage/graphql-soup';
 import { Button } from '@ui';
@@ -77,8 +77,8 @@ function CallWorkSection(props: {
       <CollapsibleSection.Header>
         <CollapsibleSection.Trigger class="flex-1">
           <WorkIdentity
-            name={getDisplayName(tryMacroId(props.accountId))}
-            isAgent={isAgentAccount(tryMacroId(props.accountId))}
+            name={getDisplayName(tryRoxId(props.accountId))}
+            isAgent={isAgentAccount(tryRoxId(props.accountId))}
             avatar={
               <span
                 class="rounded-full"

@@ -19,10 +19,10 @@ export {
 export { useAugmentUserWithDmActivity } from './dmActivity';
 export { useIsConnectedSecondaryInbox } from './inboxOnly';
 export {
-  emailToMacroId,
+  emailToRoxId,
   type RoxId,
   roxIdToEmail,
-  tryMacroId,
+  tryRoxId,
 } from './roxId';
 export type * from './types';
 export { emailToId, idToDisplayName, idToEmail } from './util';

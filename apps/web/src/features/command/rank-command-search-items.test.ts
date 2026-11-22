@@ -368,14 +368,14 @@ describe('command menu search ranking', () => {
 
   it('keeps server-matched people the fuzzy matcher misses, without the cache projection', () => {
     const person: CommandMenuItem = {
-      id: 'rox|asher@rox.one',
+      id: 'macro|asher@rox.one',
       kind: 'user',
       bucket: 'person',
       searchText: 'Asher Smith | asher@rox.one',
       sortTimestamp: NOW,
       timestamps: {},
       data: {
-        id: 'rox|asher@rox.one',
+        id: 'macro|asher@rox.one',
         email: 'asher@rox.one',
         name: 'Asher Smith',
       },

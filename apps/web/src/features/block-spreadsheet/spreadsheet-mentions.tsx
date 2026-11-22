@@ -2,13 +2,13 @@ import { CellMentionEditor } from '@app/components/cell-text-editor/CellMentionE
 import type { CellTextEditorProps } from '@app/components/cell-text-editor/types';
 import {
   type RoxMentionLinkResolver,
-  useMacroMentionLinkResolver,
+  useRoxMentionLinkResolver,
 } from '@components/app/split-layout/split-router/mention-links';
 import { DocumentMention } from '@core/component/LexicalMarkdown/component/decorator/DocumentMention';
 import { UserMention } from '@core/component/LexicalMarkdown/component/decorator/UserMention';
 import { MentionsMenu } from '@core/component/LexicalMarkdown/component/menu/MentionsMenu/MentionsMenu';
 import { getBlockNameFromEntity } from '@core/component/LexicalMarkdown/component/menu/MentionsMenu/utils/entityUtils';
-import { parseMacroAppUrl } from '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin';
+import { parseRoxAppUrl } from '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin';
 import type { MentionItem } from '@core/component/LexicalMarkdown/utils/mentionsUtils';
 import {
   formatRelativeDay,
@@ -36,7 +36,7 @@ export function linkMentions(
       part.mention
         ? part.text
         : part.text.replace(/https?:\/\/[^\s<>]+/g, (url) => {
-            const legacy = parseMacroAppUrl(url);
+            const legacy = parseRoxAppUrl(url);
             const parsed = legacy.isValid ? legacy : resolveAppLink?.(url);
             return parsed?.id && parsed.block
               ? encodeCellMention({
@@ -89,7 +89,7 @@ function CellDateChip(props: CellDateMention) {
   );
 }
 function CellMentions(props: { value: string }) {
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
   return (
     <For each={cellTextParts(linkMentions(props.value, resolveAppLink))}>
       {(part) => {
@@ -124,7 +124,7 @@ function CellMentions(props: { value: string }) {
   );
 }
 function SpreadsheetMentionEditor(props: CellTextEditorProps) {
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
   return (
     <CellMentionEditor
       {...props}

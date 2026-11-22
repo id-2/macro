@@ -19,7 +19,7 @@ test('account-scoped lists ignore old in-flight channel and inbox responses', as
   await expect(channels).toHaveText('Second channel');
   await expect(page.getByTestId('contact-context-state')).toHaveText('ready');
   await expect(page.getByTestId('contact-context-rows')).toContainText(
-    'rox|other@example.com'
+    'macro|other@example.com'
   );
   await expect(page.getByTestId('contact-context-rows')).toContainText(
     'Second channel'

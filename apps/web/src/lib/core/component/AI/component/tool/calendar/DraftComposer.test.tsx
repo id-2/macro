@@ -40,7 +40,7 @@ vi.mock('@queries/email/link', () => ({
     refetch: mocks.refetchLinks,
   }),
 }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|self' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|self' }));
 vi.mock('@core/email-link', () => ({
   useAddInboxFlow: () => mocks.startAddInbox,
 }));
@@ -104,7 +104,7 @@ import {
 const link = (id: string, overrides: Partial<Link> = {}): Link =>
   ({
     id,
-    rox_id: 'rox|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     is_primary: id === 'work',
     needs_reauth: false,
@@ -297,11 +297,11 @@ describe('AI calendar draft Rox calls', () => {
   });
 
   it('opens on the conferencing the agent drafted', () => {
-    showDraft(undefined, { addMacroCall: true });
+    showDraft(undefined, { addRoxCall: true });
     expect(screen.getByLabelText('Conference').textContent).toBe('rox');
   });
 
-  it('executes the tool with addMacroCall when the user picks a Rox call', async () => {
+  it('executes the tool with addRoxCall when the user picks a Rox call', async () => {
     showDraft(undefined, {
       attendees: [{ email: 'guest@example.com' }],
       addConference: false,
@@ -314,7 +314,7 @@ describe('AI calendar draft Rox calls', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Create event' }));
     expect(mocks.execute).toHaveBeenCalledWith(
       expect.objectContaining({
-        addMacroCall: true,
+        addRoxCall: true,
         addConference: false,
         attendees: [{ email: 'guest@example.com' }],
       })

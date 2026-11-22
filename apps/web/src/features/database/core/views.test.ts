@@ -389,15 +389,15 @@ describe('a board grouped by people', () => {
   });
 
   it('names a person lane by their email and the empty lane by the column', () => {
-    expect(laneLabel(owner, { kind: 'user', id: 'rox|sam@rox.one' })).toBe(
+    expect(laneLabel(owner, { kind: 'user', id: 'macro|sam@rox.one' })).toBe(
       'sam@rox.one'
     );
     expect(laneLabel(owner, { kind: 'none' })).toBe('No owner');
   });
 
   it('starts a card created in a person lane with that person', () => {
-    expect(laneValue(owner, { kind: 'user', id: 'rox|sam@rox.one' })).toBe(
-      'rox|sam@rox.one'
+    expect(laneValue(owner, { kind: 'user', id: 'macro|sam@rox.one' })).toBe(
+      'macro|sam@rox.one'
     );
     expect(laneValue(owner, { kind: 'none' })).toBeUndefined();
   });

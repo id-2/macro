@@ -1,11 +1,11 @@
 import { UserIcon } from '@core/component/UserIcon';
 import type { EmailMessage } from './core/email-message';
-import { getSenderMacroId } from './core/email-user';
+import { getSenderRoxId } from './core/email-user';
 
 /** Profile lookup and the interactive user card belong to application composition. */
 export function EmailSenderIcon(props: { message: EmailMessage }) {
   const sender = () => {
-    const id = getSenderMacroId(props.message);
+    const id = getSenderRoxId(props.message);
     const photoUrl = props.message.from?.photo_url ?? undefined;
     return id
       ? { id, photoUrl }

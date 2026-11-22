@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
-  attachCalendarMacroCall,
-  calendarMacroCallUrl,
+  attachCalendarRoxCall,
+  calendarRoxCallUrl,
   roxCallUrl,
-  removeCalendarMacroCall,
+  removeCalendarRoxCall,
 } from './rox-call-link';
 
 const URL = 'https://rox.one/app/meet/8m8mGwzHqxzYjeIN5-nJRquRbzyTEhGF';
@@ -12,7 +12,7 @@ const SETUP_URL = URL.replace('/meet/', '/meet/join/');
 describe('Rox calendar call links', () => {
   it('recognizes shared links in invitations and drops autojoin parameters', () => {
     expect(
-      calendarMacroCallUrl({
+      calendarRoxCallUrl({
         description: `<p>Join <a href="${URL}?join=true&amp;source=calendar">the call</a></p>`,
       })
     ).toBe(URL);
@@ -31,7 +31,7 @@ describe('Rox calendar call links', () => {
       URL,
     ]) {
       expect(
-        calendarMacroCallUrl({ location: `${url}/?source=calendar` })
+        calendarRoxCallUrl({ location: `${url}/?source=calendar` })
       ).toBe(url);
     }
   });
@@ -54,7 +54,7 @@ describe('Rox calendar call links', () => {
   });
 
   it('keeps notes and a physical room while adding a portable invitation link', () => {
-    const content = attachCalendarMacroCall(
+    const content = attachCalendarRoxCall(
       {
         description: '<p>Bring the roadmap.</p>',
         location: 'Room 2',
@@ -64,30 +64,30 @@ describe('Rox calendar call links', () => {
     expect(content.location).toBe('Room 2');
     expect(content.description).toContain('<p>Bring the roadmap.</p>');
     expect(content.description).toContain(`<a href="${URL}">${URL}</a>`);
-    expect(calendarMacroCallUrl(content)).toBe(URL);
+    expect(calendarRoxCallUrl(content)).toBe(URL);
   });
 
   it('does not duplicate the generated link when saving an existing or recurring call', () => {
-    const initial = attachCalendarMacroCall(
+    const initial = attachCalendarRoxCall(
       { description: '<p>Notes</p>' },
       URL
     );
-    expect(attachCalendarMacroCall(initial, URL)).toEqual(initial);
-    expect(removeCalendarMacroCall(initial, URL)).toEqual({
+    expect(attachCalendarRoxCall(initial, URL)).toEqual(initial);
+    expect(removeCalendarRoxCall(initial, URL)).toEqual({
       description: '<p>Notes</p>',
       location: '',
     });
   });
 
   it('replaces a generated legacy invitation with the setup link without losing notes', () => {
-    const legacy = attachCalendarMacroCall(
+    const legacy = attachCalendarRoxCall(
       { description: '<p>Notes</p>' },
       URL
     );
-    const updated = attachCalendarMacroCall(legacy, SETUP_URL, URL);
+    const updated = attachCalendarRoxCall(legacy, SETUP_URL, URL);
     expect(updated.location).toBe(SETUP_URL);
-    expect(calendarMacroCallUrl(updated)).toBe(SETUP_URL);
-    expect(removeCalendarMacroCall(updated, SETUP_URL)).toEqual({
+    expect(calendarRoxCallUrl(updated)).toBe(SETUP_URL);
+    expect(removeCalendarRoxCall(updated, SETUP_URL)).toEqual({
       description: '<p>Notes</p>',
       location: '',
     });
@@ -96,7 +96,7 @@ describe('Rox calendar call links', () => {
   it('hides a generated invitation with tracking parameters in its displayed URL', () => {
     const trackedUrl = `${URL}?join=true&amp;source=calendar`;
     expect(
-      removeCalendarMacroCall(
+      removeCalendarRoxCall(
         {
           description: `<p>Agenda</p><p>Join Rox call: <a href="${trackedUrl}">${trackedUrl}</a></p>`,
           location: 'Room 2',
@@ -107,11 +107,11 @@ describe('Rox calendar call links', () => {
   });
 
   it('writes the Rox wording into the invitation', () => {
-    const content = attachCalendarMacroCall({ description: '' }, URL);
+    const content = attachCalendarRoxCall({ description: '' }, URL);
     expect(content.description).toBe(
       `<p>Join Rox call: <a href="${URL}">${URL}</a></p>`
     );
-    expect(removeCalendarMacroCall(content, URL)).toEqual({
+    expect(removeCalendarRoxCall(content, URL)).toEqual({
       description: '',
       location: '',
     });
@@ -119,7 +119,7 @@ describe('Rox calendar call links', () => {
 
   it('hides legacy invitations that say "Join Macro call"', () => {
     expect(
-      removeCalendarMacroCall(
+      removeCalendarRoxCall(
         {
           description: `<p>Join Macro call: <a href="${URL}">${URL}</a></p>`,
           location: 'Room 2',
@@ -131,7 +131,7 @@ describe('Rox calendar call links', () => {
 
   it('hides generated legacy invitations even when the series URL differs', () => {
     expect(
-      removeCalendarMacroCall(
+      removeCalendarRoxCall(
         {
           description: `<p>Join Macro call: <a href="${SETUP_URL}">${SETUP_URL}</a></p>`,
           location: 'Room 2',
@@ -146,6 +146,6 @@ describe('Rox calendar call links', () => {
       description: `<p>Related call: <a href="${URL}">prior discussion</a></p>`,
       location: 'Room 2',
     };
-    expect(removeCalendarMacroCall(content, URL)).toEqual(content);
+    expect(removeCalendarRoxCall(content, URL)).toEqual(content);
   });
 });

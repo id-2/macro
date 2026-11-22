@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
   } as DetailRead,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|me@example.test',
+  useUserId: () => () => 'macro|me@example.test',
 }));
 vi.mock('@app/features/external-chat/queries/production-api', () => ({
   externalChatApi: {},

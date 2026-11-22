@@ -2361,7 +2361,7 @@ export const CreateCalendarEvent = z.object({
       z.null(),
     ])
     .optional(),
-  addMacroCall: z.boolean().optional(),
+  addRoxCall: z.boolean().optional(),
   addConference: z.boolean().optional(),
   eventType: z
     .intersection(
@@ -2626,7 +2626,7 @@ export const CreateConfirmedCalendarEvent = z.object({
       z.null(),
     ])
     .optional(),
-  addMacroCall: z.boolean().optional(),
+  addRoxCall: z.boolean().optional(),
   addConference: z.boolean().optional(),
   eventType: z
     .intersection(
@@ -20089,7 +20089,7 @@ export const UpdateCalendarEvent = z.object({
       z.null(),
     ])
     .optional(),
-  addMacroCall: z.boolean().optional(),
+  addRoxCall: z.boolean().optional(),
   reminders: z
     .union([
       z.object({

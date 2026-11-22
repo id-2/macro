@@ -157,7 +157,7 @@ it('recovers a failed post-login identity refresh and reopens the account gate',
     defaultOptions: { queries: { retry: false } },
   });
   client.current = queryClient;
-  const identity = { id: 'rox|viewer@example.com', authenticated: true };
+  const identity = { id: 'macro|viewer@example.com', authenticated: true };
   queryClient.setQueryData(authKeys.userInfo.queryKey, identity);
   auth.getLegacyUserPermissions
     .mockRejectedValueOnce(new Error('offline'))

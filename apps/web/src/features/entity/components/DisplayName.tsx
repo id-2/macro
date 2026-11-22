@@ -1,4 +1,4 @@
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { truncateLabel } from '@core/util/string';
 
 export function DisplayName(props: {
@@ -7,7 +7,7 @@ export function DisplayName(props: {
   maxChars?: number;
 }) {
   const name = () => {
-    const fullName = getDisplayName(tryMacroId(props.id));
+    const fullName = getDisplayName(tryRoxId(props.id));
     const format = props.format ?? 'fullName';
 
     const nameParts = fullName.trim().split(/\s+/).filter(Boolean);

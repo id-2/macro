@@ -29,7 +29,7 @@ vi.mock('@core/context/channels', () => ({
   }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|ada@acme.test',
+  useUserId: () => () => 'macro|ada@acme.test',
 }));
 const openWithSplit = vi.hoisted(() => vi.fn());
 vi.mock('@components/app/split-layout/layout', () => ({
@@ -241,16 +241,16 @@ describe('shelf after a video ends', () => {
 describe('support link under the video', () => {
   it("opens the person's support channel and closes the dialog", async () => {
     channelList.channels = [
-      { id: 'general', name: 'general', owner_id: 'rox|ada@acme.test' },
+      { id: 'general', name: 'general', owner_id: 'macro|ada@acme.test' },
       {
         id: 'someone-elses-support',
         name: 'Macro Support x grace',
-        owner_id: 'rox|grace@acme.test',
+        owner_id: 'macro|grace@acme.test',
       },
       {
         id: 'support-ada',
         name: 'Rox Support x ada',
-        owner_id: 'rox|ada@acme.test',
+        owner_id: 'macro|ada@acme.test',
       },
     ];
     render(() => <TutorialPill tutorial="crm" />);
@@ -283,13 +283,13 @@ describe('support link under the video', () => {
       {
         id: 'older-support',
         name: 'Macro Support x grace',
-        owner_id: 'rox|grace@acme.test',
+        owner_id: 'macro|grace@acme.test',
         updated_at: '2026-11-01T10:00:00Z',
       },
       {
         id: 'recent-support',
         name: 'Macro Support x lin',
-        owner_id: 'rox|lin@acme.test',
+        owner_id: 'macro|lin@acme.test',
         updated_at: '2026-11-04T10:00:00Z',
       },
     ];
@@ -310,7 +310,7 @@ describe('support link under the video', () => {
 
   it('leaves the lip out when the person is in no support channel', async () => {
     channelList.channels = [
-      { id: 'general', name: 'general', owner_id: 'rox|ada@acme.test' },
+      { id: 'general', name: 'general', owner_id: 'macro|ada@acme.test' },
     ];
     render(() => <TutorialRow tutorial="mail" />);
     fireEvent.click(row()!);

@@ -11,7 +11,7 @@ import {
   getDisplayNameParts,
   useDisplayName,
 } from './displayName';
-import { emailToMacroId } from './roxId';
+import { emailToRoxId } from './roxId';
 
 const mocks = vi.hoisted(() => ({ getUserNamesWithEmail: vi.fn() }));
 let client: QueryClient;
@@ -24,10 +24,10 @@ vi.mock('@service-auth/client', () => ({
   authServiceClient: { getUserNamesWithEmail: mocks.getUserNamesWithEmail },
 }));
 const unavailable = err([{ code: 'NETWORK_ERROR', message: 'Unavailable' }]);
-const IDENTITY = { id: 'rox|viewer@example.com', authenticated: true };
+const IDENTITY = { id: 'macro|viewer@example.com', authenticated: true };
 const cleanups: (() => void)[] = [];
 function renderLabel(email: string) {
-  const id = emailToMacroId(email);
+  const id = emailToRoxId(email);
   const labels: string[] = [];
   const dispose = createRoot((dispose) => {
     createRenderEffect(() => labels.push(getDisplayName(id)));
@@ -63,7 +63,7 @@ describe('display name compatibility over the scoped query cache', () => {
     expect(label.labels.at(-1)).toBe('offline@example.com');
   });
   it('retries on a later access after cooldown', async () => {
-    const id = 'rox|person@example.com';
+    const id = 'macro|person@example.com';
     mocks.getUserNamesWithEmail
       .mockResolvedValueOnce(unavailable)
       .mockResolvedValueOnce(
@@ -98,7 +98,7 @@ describe('display name compatibility over the scoped query cache', () => {
     createRoot((dispose) => {
       cleanups.push(dispose);
       createRenderEffect(() => {
-        const parts = getDisplayNameParts(emailToMacroId(email()), {
+        const parts = getDisplayNameParts(emailToRoxId(email()), {
           emailFallback: 'local-part',
         });
         values.push(JSON.stringify(parts));
@@ -118,7 +118,7 @@ describe('display name compatibility over the scoped query cache', () => {
   });
   it('wakes mounted labels after an unauthorized auth query is replaced by a confirmed login', async () => {
     mocks.getUserNamesWithEmail.mockResolvedValue(
-      ok({ names: [{ id: 'rox|person@example.com', first_name: 'Private' }] })
+      ok({ names: [{ id: 'macro|person@example.com', first_name: 'Private' }] })
     );
     const label = renderLabel('person@example.com');
     await vi.advanceTimersByTimeAsync(10);
@@ -144,7 +144,7 @@ describe('display name compatibility over the scoped query cache', () => {
     expect(mocks.getUserNamesWithEmail).toHaveBeenCalledTimes(2);
   });
   it('clears mounted private names on replacement login and prevents old controls publishing into the new session', async () => {
-    const id = emailToMacroId('person@example.com');
+    const id = emailToRoxId('person@example.com');
     mocks.getUserNamesWithEmail.mockResolvedValue(
       ok({ names: [{ id, first_name: 'Private first' }] })
     );

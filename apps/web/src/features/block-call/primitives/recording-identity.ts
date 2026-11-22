@@ -1,6 +1,6 @@
 import { formatLocale, t } from '@app/lib/i18n';
 import { guestDisplayName } from '@channel/Call/call-identity';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import type { CallRecord } from '@service-call/client';
 import { isSameDay } from 'date-fns';
 import type { Accessor } from 'solid-js';
@@ -52,7 +52,7 @@ export function createRecordingIdentity(
     if (!segment) return title();
     return (
       guestDisplayName(record(), segment.speakerId) ||
-      getDisplayName(tryMacroId(segment.speakerId))
+      getDisplayName(tryRoxId(segment.speakerId))
     );
   };
   return { title, dateRange, currentSpeaker };

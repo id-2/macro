@@ -3,7 +3,7 @@ import type {
   ReferredFrom,
   SplitContent,
 } from '@components/app/split-layout/layoutManager';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { buildChatEditor } from '@core/component/AI/component/input/buildChatEditor';
 import {
   ChatInputProvider,
@@ -43,7 +43,7 @@ function InputContent(props: {
   onCleanup(telemetry.dispose);
   const [state, setState] = createSignal<UniversalInputController>();
   const { getAttachmentFromMention } = useGetChatAttachmentInfo();
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
   const editor = buildChatEditor()
     .withAppLinkResolver(resolveAppLink)
     .withMentions({

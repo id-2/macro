@@ -11,10 +11,10 @@ import { Property } from '../property';
 import type { PropertyApiValues, Property as PropertyT } from '../types';
 
 const MOCK_NAMES = [
-  { id: 'rox|alex@example.com', firstName: 'Alex', lastName: 'Owner' },
-  { id: 'rox|sam@example.com', firstName: 'Sam', lastName: 'Shared' },
-  { id: 'rox|jordan@example.com', firstName: 'Jordan', lastName: 'Team' },
-  { id: 'rox|current@example.com', firstName: 'Current', lastName: 'User' },
+  { id: 'macro|alex@example.com', firstName: 'Alex', lastName: 'Owner' },
+  { id: 'macro|sam@example.com', firstName: 'Sam', lastName: 'Shared' },
+  { id: 'macro|jordan@example.com', firstName: 'Jordan', lastName: 'Team' },
+  { id: 'macro|current@example.com', firstName: 'Current', lastName: 'User' },
 ];
 
 const Section: Component<{ title: string; children: JSX.Element }> = (

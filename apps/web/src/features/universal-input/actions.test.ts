@@ -133,11 +133,11 @@ vi.mock('@queries/contacts/use-references', () => ({
               'john',
               'john adams',
               'john@example.com',
-              'rox|john@example.com',
+              'macro|john@example.com',
             ].includes(label)
           ? [
               {
-                userId: 'rox|john@example.com',
+                userId: 'macro|john@example.com',
                 name: 'John Adams',
                 email: 'john@example.com',
               },
@@ -243,7 +243,7 @@ async function execute(snapshot: Submission) {
     try {
       return await createInputActions(
         () => snapshot.fields,
-        'rox|me@example.com',
+        'macro|me@example.com',
         {
           navigate: (next) => mocks.replace({ next }),
           intent: () => snapshot.intent,
@@ -283,7 +283,7 @@ describe('destination adapters', () => {
       try {
         await createInputActions(
           () => input('email').fields,
-          'rox|me@example.com',
+          'macro|me@example.com',
           { navigate: (next) => mocks.replace({ next }), intent: () => 'email' }
         ).connectGoogle();
         expect(mocks.connectGoogle).toHaveBeenCalledWith({
@@ -371,7 +371,7 @@ describe('destination adapters', () => {
           initialQuery: 'budget',
           initialFilters: expect.objectContaining({
             include: expect.objectContaining({
-              channelSenderId: ['rox|john@example.com'],
+              channelSenderId: ['macro|john@example.com'],
               channelId: ['julia-dm'],
             }),
           }),
@@ -505,7 +505,7 @@ describe('destination adapters', () => {
         });
         const actions = createInputActions(
           () => submission.fields,
-          'rox|me@example.com',
+          'macro|me@example.com',
           {
             navigate: (next) => mocks.replace({ next }),
             intent: () => submission.intent,
@@ -566,7 +566,7 @@ describe('destination adapters', () => {
         const submission = input('email', { body: '**Hello José**' });
         const actions = createInputActions(
           () => submission.fields,
-          'rox|me@example.com',
+          'macro|me@example.com',
           {
             navigate: (next) => mocks.replace({ next }),
             intent: () => submission.intent,
@@ -606,7 +606,7 @@ describe('destination adapters', () => {
   it('resolves a DM only at submission and keeps the message retry ID', async () => {
     await execute(input('message'));
     expect(mocks.dm).toHaveBeenCalledWith({
-      recipient_id: 'rox|john@example.com',
+      recipient_id: 'macro|john@example.com',
     });
     expect(mocks.message).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -622,14 +622,14 @@ describe('destination adapters', () => {
       try {
         const actions = createInputActions(
           () => snapshot.fields,
-          'rox|me@example.com',
+          'macro|me@example.com',
           {
             navigate: (next) => mocks.replace({ next }),
             intent: () => snapshot.intent,
           }
         );
         actions.captureMessageMentions(() => [
-          { itemType: 'user', itemId: 'rox|john@example.com' },
+          { itemType: 'user', itemId: 'macro|john@example.com' },
         ]);
         await actions.submit(snapshot);
       } finally {
@@ -641,7 +641,7 @@ describe('destination adapters', () => {
         message: {
           content: 'Hello John',
           mentions: [
-            { entity_type: 'user', entity_id: 'rox|john@example.com' },
+            { entity_type: 'user', entity_id: 'macro|john@example.com' },
           ],
         },
       })
@@ -681,7 +681,7 @@ describe('destination adapters', () => {
     mocks.taskValues = {
       [SYSTEM_PROPERTY_IDS.ASSIGNEES]: {
         valueType: 'ENTITY',
-        refs: [{ entity_id: 'rox|chosen@example.com', entity_type: 'USER' }],
+        refs: [{ entity_id: 'macro|chosen@example.com', entity_type: 'USER' }],
       },
     };
     const submitting = execute(input('task'));
@@ -693,7 +693,7 @@ describe('destination adapters', () => {
       SYSTEM_PROPERTY_IDS.ASSIGNEES,
       {
         valueType: 'ENTITY',
-        refs: [{ entity_id: 'rox|chosen@example.com', entity_type: 'USER' }],
+        refs: [{ entity_id: 'macro|chosen@example.com', entity_type: 'USER' }],
       },
     ]);
   });

@@ -1,4 +1,4 @@
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import { validate as isEmail } from 'email-validator';
 import type { Accessor } from 'solid-js';
 import { readContactDirectory } from './directory';
@@ -45,7 +45,7 @@ export function createContactIdFilterSource(
     selection: createContactResolution(
       scope,
       () => {
-        const ids = selectedIds().filter((id) => tryMacroId(id.toLowerCase()));
+        const ids = selectedIds().filter((id) => tryRoxId(id.toLowerCase()));
         const viewer = scope().userId;
         if (
           viewer &&

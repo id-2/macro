@@ -1,5 +1,5 @@
 import { UserCardTrigger } from '@core/component/UserCardTrigger';
-import { getDisplayName, roxIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, roxIdToEmail, tryRoxId } from '@core/user';
 import { cn } from '@ui';
 import { Show } from 'solid-js';
 import { useMessage } from './context';
@@ -18,7 +18,7 @@ export function FromPill(props: FromPillProps) {
   const triggeredBy = () => message().sender?.triggered_by ?? undefined;
   const roxId = () => {
     const id = triggeredBy();
-    return id ? tryMacroId(id) : undefined;
+    return id ? tryRoxId(id) : undefined;
   };
   const displayName = () => getDisplayName(roxId());
   const email = () => {

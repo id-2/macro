@@ -1,8 +1,8 @@
-import { type RoxId, tryMacroId } from '@core/user/roxId';
+import { type RoxId, tryRoxId } from '@core/user/roxId';
 
 /**
  * Who performed an activity event, parsed once from the wire `actorId`.
- * The backend emits `rox|<email>` for users and `bot|<uuid>` for bots
+ * The backend emits `macro|<email>` for users and `bot|<uuid>` for bots
  * (first-party agents, team bots, and the system principal). Anything else
  * is preserved raw so the row can still say something honest.
  */
@@ -14,7 +14,7 @@ export type Actor =
 const BOT_PREFIX = 'bot|';
 
 export function parseActor(actorId: string): Actor {
-  const user = tryMacroId(actorId);
+  const user = tryRoxId(actorId);
   if (user) return { kind: 'user', id: user };
   if (actorId.startsWith(BOT_PREFIX)) {
     const botId = actorId.slice(BOT_PREFIX.length);

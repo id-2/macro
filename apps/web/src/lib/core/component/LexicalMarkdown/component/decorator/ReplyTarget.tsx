@@ -13,7 +13,7 @@ import {
   useMessageQuoteName,
   useMessageViewerOverride,
 } from '@core/messages/message-transport';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { openInNewSplitForMention } from '@core/util/openInNewSplit';
 import type { ReplyTargetDecoratorProps } from '@rox-one/lexical-core';
 import { useBotsQuery } from '@queries/bots/bots';
@@ -53,7 +53,7 @@ export function ReplyTarget(props: ReplyTargetDecoratorProps) {
           ? bots.data
           : []
     ) ||
-    getDisplayName(tryMacroId(props.senderId), {}) ||
+    getDisplayName(tryRoxId(props.senderId), {}) ||
     props.senderId;
 
   const target = ():

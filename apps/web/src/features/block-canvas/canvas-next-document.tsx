@@ -1,7 +1,7 @@
 import { useFlow, usePending } from '@app/observability/flow';
 import { ENABLE_MENTION_TRACKING } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { GraphicsEditor } from '@rox-one/graphics';
 import { debounce } from '@solid-primitives/scheduled';
@@ -139,7 +139,7 @@ function CanvasDocumentSession(
             doc={doc}
             session={doc ? session : undefined}
             displayName={(userId) =>
-              getDisplayName(tryMacroId(userId ?? ''), {
+              getDisplayName(tryRoxId(userId ?? ''), {
                 emailFallback: 'local-part',
               }) || 'Someone'
             }

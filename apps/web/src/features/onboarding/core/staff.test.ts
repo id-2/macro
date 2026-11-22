@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canBypassOnboarding, isMacroStaffEmail } from './staff';
+import { canBypassOnboarding, isRoxStaffEmail } from './staff';
 
 describe('canBypassOnboarding', () => {
   it('shows Bypass for @rox.one accounts', () => {
@@ -16,11 +16,11 @@ describe('canBypassOnboarding', () => {
   });
 });
 
-describe('isMacroStaffEmail', () => {
+describe('isRoxStaffEmail', () => {
   it('matches only the rox.one domain', () => {
-    expect(isMacroStaffEmail('ada@rox.one')).toBe(true);
-    expect(isMacroStaffEmail('ada@MACRO.com')).toBe(true);
-    expect(isMacroStaffEmail('ada@sub.rox.one')).toBe(false);
-    expect(isMacroStaffEmail('ada@gmail.com')).toBe(false);
+    expect(isRoxStaffEmail('ada@rox.one')).toBe(true);
+    expect(isRoxStaffEmail('ada@MACRO.com')).toBe(true);
+    expect(isRoxStaffEmail('ada@sub.rox.one')).toBe(false);
+    expect(isRoxStaffEmail('ada@gmail.com')).toBe(false);
   });
 });

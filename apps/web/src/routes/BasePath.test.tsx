@@ -193,7 +193,7 @@ describe('BasePathComponent', () => {
   it('chooses the tapped message before Home or a saved destination after authentication', async () => {
     mocks.nativeMobile = true;
     setPostLoginRedirect('/channels/previous');
-    const recipientId = 'rox|test@example.com';
+    const recipientId = 'macro|test@example.com';
     receiveNotificationTap(
       {
         type: 'BACKGROUND_TAP',

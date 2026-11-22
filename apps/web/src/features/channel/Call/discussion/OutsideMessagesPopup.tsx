@@ -1,6 +1,6 @@
 import { t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import ArrowUpRightIcon from '@icon/system/regular/arrow-up-right.svg';
 import type { Message } from '@service-storage/messages';
 import { Layer } from '@ui';
@@ -12,7 +12,7 @@ export function OutsideMessagesPopup(props: {
 }) {
   const latest = () => props.messages[props.messages.length - 1];
   const senderName = () =>
-    getDisplayName(tryMacroId(latest().sender_id)).split(/\s+/)[0] ||
+    getDisplayName(tryRoxId(latest().sender_id)).split(/\s+/)[0] ||
     t('calls.someone');
 
   return (

@@ -208,7 +208,7 @@ export const enableSlackArchiveImport = defineFlag({
  * Agents). Off hides it; existing computers keep running and billing.
  * No dev default: dev follows PostHog like the backend, which fails closed.
  */
-export const enableMacroComputers = defineFlag({
+export const enableRoxComputers = defineFlag({
   key: 'enable-rox-computers',
   env: 'ENABLE_ROX_COMPUTERS',
 });

@@ -579,10 +579,10 @@ describe('Home work feed', () => {
     expect(source.isLoading()).toBe(true);
     expect(ids(source)).toEqual([]);
 
-    setUserId('rox|alice@example.com');
+    setUserId('macro|alice@example.com');
     expect(options?.().enabled).toBe(true);
     expect(JSON.stringify(args().body.cthf)).toContain(
-      '{"Participant":"rox|alice@example.com"}'
+      '{"Participant":"macro|alice@example.com"}'
     );
     expect(source.isLoading()).toBe(false);
     expect(ids(source)).toEqual(['from-soup']);
@@ -600,7 +600,7 @@ describe('Home work feed', () => {
     expect(source.isLoading()).toBe(true);
     expect(ids(source)).toEqual([]);
 
-    setUserId('rox|alice@example.com');
+    setUserId('macro|alice@example.com');
     expect(source.isLoading()).toBe(false);
     expect(ids(source)).toEqual(['recent', 'notified']);
   });

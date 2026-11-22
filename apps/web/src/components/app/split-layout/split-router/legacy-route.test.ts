@@ -23,7 +23,7 @@ import { createRoot } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createAppSplitRouterMiddleware } from './app-middleware';
 import { resolveContentLocation, upgradeLegacyPath } from './legacy-route';
-import { createMacroMentionLinkResolver } from './mention-links';
+import { createRoxMentionLinkResolver } from './mention-links';
 
 vi.mock('@components/app/split-layout/componentRegistry', () => ({
   resolveComponent: vi.fn(() => ({ type: 'mock-component' })),
@@ -98,7 +98,7 @@ describe('upgradeLegacyPath', () => {
 });
 
 describe('legacy link mentions', () => {
-  const resolveMention = createMacroMentionLinkResolver(routes);
+  const resolveMention = createRoxMentionLinkResolver(routes);
   const projectId = '01a15f1b-5b91-7aa3-885d-7d31fcc5a776';
   const appUrl = (path: string) => `${window.location.origin}/app${path}`;
 

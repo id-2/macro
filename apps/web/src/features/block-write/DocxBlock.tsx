@@ -29,7 +29,7 @@ import {
   useGetPermissions,
   useIsDocumentOwner,
 } from '@core/signal/permissions';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { useBlockDocumentName } from '@core/util/currentBlockDocumentName';
 import { fireAndForget } from '@core/util/fireAndForget';
 import IconShared from '@icon/share.svg';
@@ -51,7 +51,7 @@ import { DocxCommentMargin, DocxDetachedComments } from './views/DocxComments';
 import { DocxEditorView } from './views/DocxEditorView';
 
 function displayName(userId: string | undefined) {
-  return getDisplayName(tryMacroId(userId ?? ''), {
+  return getDisplayName(tryRoxId(userId ?? ''), {
     emailFallback: 'local-part',
   });
 }

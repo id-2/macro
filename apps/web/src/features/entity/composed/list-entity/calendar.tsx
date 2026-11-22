@@ -1,5 +1,5 @@
 import { UserIcon, type UserIconProps } from '@core/component/UserIcon';
-import { emailToMacroId, getDisplayName } from '@core/user';
+import { emailToRoxId, getDisplayName } from '@core/user';
 import RepeatIcon from '@icon/system/regular/repeat.svg';
 import { Show } from 'solid-js';
 import { Entity } from '../../entity';
@@ -90,7 +90,7 @@ function organizerIconProps(
 ): UserIconProps | undefined {
   const email = entity.organizer?.email;
   if (!email) return undefined;
-  const roxId = emailToMacroId(email);
+  const roxId = emailToRoxId(email);
   return roxId ? { id: roxId } : { email };
 }
 
@@ -101,7 +101,7 @@ function organizerIconProps(
  * must not win over the name the source supplied. */
 function organizerName(entity: CalendarEventEntity): string {
   const email = entity.organizer?.email;
-  const roxId = email ? emailToMacroId(email) : undefined;
+  const roxId = email ? emailToRoxId(email) : undefined;
   const resolved = roxId ? getDisplayName(roxId).trim() : '';
   const profileName = resolved && resolved !== email ? resolved : '';
   return profileName || entity.organizer?.name || email || '';

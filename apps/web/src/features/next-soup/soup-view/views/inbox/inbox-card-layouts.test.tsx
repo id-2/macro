@@ -61,7 +61,7 @@ const taskItem = (value: string) =>
       type: 'document',
       fileType: 'md',
       subType: { type: 'task' },
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       properties: [priority(value)],
     },
     unread: false,

@@ -105,14 +105,14 @@ vi.mock('@queries/external-chats', () => ({
       {
         id: 'group-1',
         name: 'Design Crit',
-        ownerId: 'rox|gab@rox.one',
+        ownerId: 'macro|gab@rox.one',
         unreadCount: 0,
         canSend: true,
       },
       {
         id: 'group-2',
         name: 'Launch Room',
-        ownerId: 'rox|gab@rox.one',
+        ownerId: 'macro|gab@rox.one',
         unreadCount: 0,
         canSend: true,
       },
@@ -120,7 +120,7 @@ vi.mock('@queries/external-chats', () => ({
       {
         id: 'group-3',
         name: 'Design Review',
-        ownerId: 'rox|ana@rox.one',
+        ownerId: 'macro|ana@rox.one',
         unreadCount: 0,
         canSend: false,
       },
@@ -155,7 +155,7 @@ vi.mock('@core/context/quickAccess', () => ({
 }));
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'gab@rox.one',
-  useUserId: () => () => 'rox|gab@rox.one',
+  useUserId: () => () => 'macro|gab@rox.one',
 }));
 vi.mock('@core/constant/allBlocks', () => ({
   fileTypeToBlockName: () => 'md',
@@ -212,7 +212,7 @@ const mockNoEmails = () =>
     loadMore: async () => {},
   });
 const manyUsers: IUser[] = Array.from({ length: 20 }, (_, i) => ({
-  id: `rox|person${i}@rox.one`,
+  id: `macro|person${i}@rox.one`,
   name: `Person ${i}`,
   email: `person${i}@rox.one`,
 }));
@@ -241,7 +241,7 @@ it('keeps matching category and row nodes mounted across typing and updated peop
   vi.useFakeTimers();
   Element.prototype.scrollIntoView = vi.fn();
   const seamus: IUser = {
-    id: 'rox|seamus@rox.one',
+    id: 'macro|seamus@rox.one',
     name: 'Seamus Edson',
     email: 'seamus@rox.one',
   };
@@ -287,7 +287,7 @@ it.each([false, true])(
     Element.prototype.scrollIntoView = vi.fn();
     const sort = vi.spyOn(mobileSort, 'sortMobileMentions');
     const seamus: IUser = {
-      id: 'rox|seamus@rox.one',
+      id: 'macro|seamus@rox.one',
       name: 'Seamus Edson',
       email: 'seamus@rox.one',
     };
@@ -779,12 +779,12 @@ it('picks the highlighted mention on Enter at once, even while typing continues'
   mockNoEmails();
   Element.prototype.scrollIntoView = vi.fn();
   const ana: IUser = {
-    id: 'rox|ana@rox.one',
+    id: 'macro|ana@rox.one',
     name: 'Ana Lima',
     email: 'ana@rox.one',
   };
   const bo: IUser = {
-    id: 'rox|bo@rox.one',
+    id: 'macro|bo@rox.one',
     name: 'Bo Chen',
     email: 'bo@rox.one',
   };

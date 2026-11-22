@@ -1,7 +1,7 @@
 import { type Accessor, createMemo, createSignal } from 'solid-js';
 import {
   alreadyInMacro,
-  alreadyInMacroSummary,
+  alreadyInRoxSummary,
   buildPlanTree,
   EMPTY_IMPORT_DRAFT,
   type ImportDraft,
@@ -165,7 +165,7 @@ export function createImportReview(sources: ImportReviewSources) {
     totals: () => planTotals(sources.entries(), draft().excluded),
     planningStatus: () =>
       planningStatus(progress(), sources.entries(), draft().source),
-    alreadyInMacroSummary: () => alreadyInMacroSummary(sources.entries()),
+    alreadyInRoxSummary: () => alreadyInRoxSummary(sources.entries()),
     alreadyInMacro: () => alreadyInMacro(sources.entries()),
     nodes: () => visiblePlanNodes(nodes(), collapsedIds()),
     hasPlan: () => nodes().length > 0,

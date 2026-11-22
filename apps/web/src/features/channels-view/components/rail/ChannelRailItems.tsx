@@ -10,7 +10,7 @@ import { inlineWrappingMarkdownTheme } from '@core/component/LexicalMarkdown/the
 import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import type { RoxId } from '@core/user/roxId';
 import { type ChannelEntity, Entity } from '@entity';
 import PhoneIncomingIcon from '@icon/system/fill/phone-incoming-fill.svg';
@@ -271,7 +271,7 @@ function UserDisplayName(props: { id: RoxId }) {
 
 function MessageSenderName(props: { id?: string }) {
   const currentUserId = useUserId();
-  const roxId = () => (props.id ? tryMacroId(props.id) : undefined);
+  const roxId = () => (props.id ? tryRoxId(props.id) : undefined);
   const botName = () => (props.id ? getBotDisplayName(props.id) : undefined);
   const isCurrentUser = () =>
     props.id?.toLocaleLowerCase() === currentUserId()?.toLocaleLowerCase();

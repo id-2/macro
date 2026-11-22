@@ -179,7 +179,7 @@ export function sameLane(left: LaneKey, right: LaneKey): boolean {
   return laneId(left) === laneId(right);
 }
 
-/** A person's lane is named by their email, the part of their user id after `rox|`. */
+/** A person's lane is named by their email, the part of their user id after `macro|`. */
 function personLabel(userId: string): string {
   const separator = userId.indexOf('|');
   return separator < 0 ? userId : userId.slice(separator + 1);

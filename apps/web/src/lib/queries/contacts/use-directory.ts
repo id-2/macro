@@ -1,6 +1,6 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { enableGraphqlSoup } from '@core/constant/featureFlags';
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import { getGraphqlSoupCacheHost } from '@service-storage/graphql-soup';
 import { type Accessor, createMemo } from 'solid-js';
 import { useQueryAccount } from '../auth/use-query-account';
@@ -51,7 +51,7 @@ export function usePinnedContactUsers(
   const input = createMemo(() => {
     const values: string[] = [];
     for (const id of selected()) {
-      if (!tryMacroId(id)) continue;
+      if (!tryRoxId(id)) continue;
       values.push(id);
       if (values.length > MAX_CONTACT_LOOKUP) break;
     }

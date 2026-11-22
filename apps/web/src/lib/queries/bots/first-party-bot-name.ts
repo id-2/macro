@@ -1,9 +1,9 @@
 import { CODEX_BOT_NAME, isCodexBotId } from '@core/constant/codexAgent';
 import { CURSOR_BOT_NAME, isCursorBotId } from '@core/constant/cursorAgent';
-import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/roxAgent';
-import { isMacroCoderId, ROX_CODER_NAME } from '@core/constant/roxCoder';
-import { isMacroNewId } from '@core/constant/roxNew';
-import { isMacroSystemId, ROX_SYSTEM_NAME } from '@core/constant/roxSystem';
+import { isRoxAgentId, ROX_AGENT_NAME } from '@core/constant/roxAgent';
+import { isRoxCoderId, ROX_CODER_NAME } from '@core/constant/roxCoder';
+import { isRoxNewId } from '@core/constant/roxNew';
+import { isRoxSystemId, ROX_SYSTEM_NAME } from '@core/constant/roxSystem';
 
 /**
  * Display name for a first-party bot (bare UUID or `bot|<uuid>`), resolved
@@ -12,10 +12,10 @@ import { isMacroSystemId, ROX_SYSTEM_NAME } from '@core/constant/roxSystem';
 export function firstPartyBotName(id: string): string | undefined {
   // Both Rox bots present as "Rox": the chat reply and the agent session
   // are the same persona to a reader, only a different id on the wire.
-  if (isMacroAgentId(id) || isMacroNewId(id)) return ROX_AGENT_NAME;
-  if (isMacroCoderId(id)) return ROX_CODER_NAME;
+  if (isRoxAgentId(id) || isRoxNewId(id)) return ROX_AGENT_NAME;
+  if (isRoxCoderId(id)) return ROX_CODER_NAME;
   if (isCodexBotId(id)) return CODEX_BOT_NAME;
   if (isCursorBotId(id)) return CURSOR_BOT_NAME;
-  if (isMacroSystemId(id)) return ROX_SYSTEM_NAME;
+  if (isRoxSystemId(id)) return ROX_SYSTEM_NAME;
   return undefined;
 }

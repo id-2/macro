@@ -17,7 +17,7 @@ test('a pasted routine link shows and sends the routine name', async ({
         body: JSON.stringify({
           id: routineId,
           name: 'Daily CRM sweep',
-          owner: 'rox|me@example.test',
+          owner: 'macro|me@example.test',
           updated_at: '2026-11-13T18:00:00Z',
         }),
       });

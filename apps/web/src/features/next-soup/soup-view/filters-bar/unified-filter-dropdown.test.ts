@@ -8,19 +8,19 @@ import {
 } from './filter-categories';
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|alice@example.com',
+  useUserId: () => () => 'macro|alice@example.com',
 }));
 vi.mock('@core/component/UserIcon', () => ({ UserIcon: () => null }));
 vi.mock('@queries/team/members', () => ({
   useTeamMembers: () => ({
     users: () => [
       {
-        id: 'rox|alice@example.com',
+        id: 'macro|alice@example.com',
         email: 'alice@example.com',
         name: 'Alice',
       },
       {
-        id: 'rox|teammate@example.com',
+        id: 'macro|teammate@example.com',
         email: 'teammate@example.com',
         name: 'Teammate',
       },
@@ -77,7 +77,7 @@ describe('filterInboxGithubPrOption', () => {
 describe('Assignee filter ordering', () => {
   it('keeps team rows stable during selection and reorders on reopening', () => {
     createRoot((dispose) => {
-      const [ids, setIds] = createSignal(['rox|alice@example.com']);
+      const [ids, setIds] = createSignal(['macro|alice@example.com']);
       const picker = useAssigneePicker(ids, () => true);
       const ordered = useSelectedFirst({
         items: picker.options,
@@ -88,13 +88,13 @@ describe('Assignee filter ordering', () => {
       });
       picker.onOpenChange(true);
       const initial = ordered().map((option) => option.id);
-      setIds(['rox|alice@example.com', 'rox|teammate@example.com']);
+      setIds(['macro|alice@example.com', 'macro|teammate@example.com']);
       expect(ordered().map((option) => option.id)).toEqual(initial);
-      setIds(['rox|teammate@example.com']);
+      setIds(['macro|teammate@example.com']);
       expect(ordered().map((option) => option.id)).toEqual(initial);
       picker.onOpenChange(false);
       picker.onOpenChange(true);
-      expect(ordered()[0].id).toBe('rox|teammate@example.com');
+      expect(ordered()[0].id).toBe('macro|teammate@example.com');
       expect(ordered()[1].id).toBe('bot|00000000-0000-0000-0000-000000000123');
       dispose();
     });
@@ -102,25 +102,25 @@ describe('Assignee filter ordering', () => {
 
   it('allows re-adding a selected outsider only during the same opening', () => {
     createRoot((dispose) => {
-      const [ids, setIds] = createSignal(['rox|outside@example.com']);
+      const [ids, setIds] = createSignal(['macro|outside@example.com']);
       const picker = useAssigneePicker(ids, () => true);
       picker.onOpenChange(true);
       expect(picker.selectedIdsAtViewEntry()).toEqual([
-        'rox|outside@example.com',
+        'macro|outside@example.com',
       ]);
-      expect(picker.options().at(-1)?.id).toBe('rox|outside@example.com');
+      expect(picker.options().at(-1)?.id).toBe('macro|outside@example.com');
       setIds([]);
       expect(
         picker
           .options()
-          .some((option) => option.id === 'rox|outside@example.com')
+          .some((option) => option.id === 'macro|outside@example.com')
       ).toBe(true);
       picker.onOpenChange(false);
       picker.onOpenChange(true);
       expect(
         picker
           .options()
-          .some((option) => option.id === 'rox|outside@example.com')
+          .some((option) => option.id === 'macro|outside@example.com')
       ).toBe(false);
       dispose();
     });

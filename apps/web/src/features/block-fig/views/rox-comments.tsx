@@ -24,7 +24,7 @@ import type {
 } from '../context/fig-comments';
 import { figAnchor, useFigCommentSource } from '../queries/fig-comments';
 
-export function useMacroComments(options: {
+export function useRoxComments(options: {
   documentId: string;
   userId: Accessor<string | undefined>;
   canComment: Accessor<boolean>;

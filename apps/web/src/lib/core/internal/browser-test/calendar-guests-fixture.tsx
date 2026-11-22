@@ -20,7 +20,7 @@ import { hashKey } from '@tanstack/solid-query';
 import { createSignal, Show } from 'solid-js';
 import { changeViewer } from './network';
 
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 export const [reads, setReads] = createSignal(0);
 const [lastRead, setLastRead] = createSignal('');
 let factoryCount = 0;
@@ -71,7 +71,7 @@ function useList(
           request.query === 'broader')
       ) {
         const i = start++;
-        const id = `rox|person${i}@example.com`;
+        const id = `macro|person${i}@example.com`;
         if (!excluded.has(id))
           users.push({
             id,
@@ -86,7 +86,7 @@ function useList(
       }
       if (request.query === 'custom$@example.org')
         users.push({
-          id: 'rox|alias@example.com',
+          id: 'macro|alias@example.com',
           email: 'alias@example.com',
           name: 'custom$@example.org',
         });
@@ -151,9 +151,9 @@ export function CalendarGuestsFixture() {
   const [selected, setSelected] = createSignal<SelectedEventEditorGuest[]>([
     {
       kind: 'custom',
-      id: 'rox|OUTSIDE@example.org',
+      id: 'macro|OUTSIDE@example.org',
       data: {
-        id: 'rox|OUTSIDE@example.org',
+        id: 'macro|OUTSIDE@example.org',
         email: 'OUTSIDE@example.org',
         invalid: false,
       },

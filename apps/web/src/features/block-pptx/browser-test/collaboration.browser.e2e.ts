@@ -27,7 +27,7 @@ async function join(page: Page, documentId: string, user: string) {
       origin,
       sync.url,
       documentId,
-      `rox|${user}@example.com`,
+      `macro|${user}@example.com`,
       DECK
     )
   );

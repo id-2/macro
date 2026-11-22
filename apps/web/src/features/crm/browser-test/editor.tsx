@@ -52,7 +52,7 @@ const pipeline: Pipeline = {
     money: [{ amount: id(10), currency: id(11) }],
   },
   teamId: id(5),
-  userId: 'rox|owner@example.com',
+  userId: 'macro|owner@example.com',
   name: 'Renewals',
   recordType: 'company',
   sharing: 'private',

@@ -48,7 +48,7 @@ vi.mock('@core/component/LexicalMarkdown/builder/MarkdownShell', () => ({
   },
 }));
 vi.mock('@components/app/split-layout/split-router/mention-links', () => ({
-  useMacroMentionLinkResolver: () => undefined,
+  useRoxMentionLinkResolver: () => undefined,
 }));
 vi.mock('@ui', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

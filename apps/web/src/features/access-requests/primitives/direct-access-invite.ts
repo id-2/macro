@@ -1,4 +1,4 @@
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import { createSignal, onCleanup } from 'solid-js';
 import type { SharingSource } from '../context/contracts';
 
@@ -12,7 +12,7 @@ export function createDirectAccessInvite(source: SharingSource) {
     alive = false;
   });
   const invite = async () => {
-    const userId = emailToMacroId(email().trim().toLowerCase());
+    const userId = emailToRoxId(email().trim().toLowerCase());
     if (!userId || !source.state()?.canReview || source.busy()) return;
     setNotice(undefined);
     setError(undefined);

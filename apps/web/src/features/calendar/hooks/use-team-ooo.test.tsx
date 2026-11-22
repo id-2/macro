@@ -34,7 +34,7 @@ vi.mock('@core/context/user', () => ({
 }));
 vi.mock('@core/user', () => ({
   getDisplayName: () => 'Ada',
-  tryMacroId: (id: string) => id,
+  tryRoxId: (id: string) => id,
 }));
 vi.mock('@queries/team/teams', () => ({
   useCurrentTeamQuery: () => ({ isSuccess: false }),

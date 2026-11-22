@@ -18,7 +18,7 @@ function cleanHostname(hostname: string): string {
   return hostname.toLowerCase().replace(/^www\./, '');
 }
 
-export function isValidMacroAppHostname(hostname: string): boolean {
+export function isValidRoxAppHostname(hostname: string): boolean {
   const current = cleanHostname(window.location.hostname);
   const target = cleanHostname(hostname);
   if (current === target) {
@@ -72,7 +72,7 @@ export function parseInternalAppLink(url: string): InternalAppLink | null {
   if (pathname !== '/app' && !pathname.startsWith('/app/')) {
     return null;
   }
-  if (!isValidMacroAppHostname(parsed.hostname)) {
+  if (!isValidRoxAppHostname(parsed.hostname)) {
     return null;
   }
   return {

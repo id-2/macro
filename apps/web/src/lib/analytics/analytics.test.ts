@@ -376,27 +376,27 @@ describe('PostHog team group', () => {
 describe('mobile capture linked to the account', () => {
   it('merges the normalized email into the account after identify', async () => {
     const { analytics } = await import('./analytics');
-    analytics.identify('rox|person@example.com', {
+    analytics.identify('macro|person@example.com', {
       email: 'Person@Example.com',
     });
 
-    expect(mocks.identify).toHaveBeenCalledWith('rox|person@example.com', {
+    expect(mocks.identify).toHaveBeenCalledWith('macro|person@example.com', {
       email: 'person@example.com',
     });
     expect(mocks.gtag).toHaveBeenCalledWith(
       'config',
       expect.any(String),
       expect.objectContaining({
-        user_id: 'rox|person@example.com',
+        user_id: 'macro|person@example.com',
         email: 'person@example.com',
       })
     );
     expect(mocks.capture).toHaveBeenCalledWith('$merge_dangerously', {
       alias: 'person@example.com',
     });
-    expect(mocks.distinctId).toBe('rox|person@example.com');
+    expect(mocks.distinctId).toBe('macro|person@example.com');
 
-    analytics.identify('rox|person@example.com', {
+    analytics.identify('macro|person@example.com', {
       email: 'Person@Example.com',
     });
     expect(mocks.capture).toHaveBeenCalledTimes(1);
@@ -407,23 +407,23 @@ describe('mobile capture linked to the account', () => {
     mocks.identified = true;
     const { analytics } = await import('./analytics');
 
-    analytics.identify('rox|person@example.com', {
+    analytics.identify('macro|person@example.com', {
       email: 'Person@Example.com',
     });
 
     expect(mocks.distinctId).toBe('person@example.com');
     expect(mocks.capture).toHaveBeenCalledWith('$merge_dangerously', {
-      alias: 'rox|person@example.com',
+      alias: 'macro|person@example.com',
     });
   });
 
   it('does not merge a browser identified as a different account', async () => {
-    mocks.distinctId = 'rox|other@example.com';
+    mocks.distinctId = 'macro|other@example.com';
     mocks.identified = true;
     const { analytics } = await import('./analytics');
 
     analytics.linkMobileCapturePerson(
-      'rox|person@example.com',
+      'macro|person@example.com',
       'person@example.com'
     );
 

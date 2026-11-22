@@ -1,10 +1,10 @@
 import { SystemActivityLine } from '@channel/components/SystemActivityRow';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import PhoneFillIcon from '@icon/system/fill/phone-fill.svg';
 import type { Message } from '@service-storage/messages';
 
 export function callerName(message: Message): string {
-  return getDisplayName(tryMacroId(message.sender_id)) || 'Someone';
+  return getDisplayName(tryRoxId(message.sender_id)) || 'Someone';
 }
 
 /** The system line for a call that is over, or whose record is gone. */

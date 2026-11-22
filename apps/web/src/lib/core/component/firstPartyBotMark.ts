@@ -1,9 +1,9 @@
 import { isCodexBotId } from '@core/constant/codexAgent';
 import { isCursorBotId } from '@core/constant/cursorAgent';
-import { isMacroAgentId } from '@core/constant/roxAgent';
-import { isMacroCoderId } from '@core/constant/roxCoder';
-import { isMacroNewId } from '@core/constant/roxNew';
-import { isMacroSystemId } from '@core/constant/roxSystem';
+import { isRoxAgentId } from '@core/constant/roxAgent';
+import { isRoxCoderId } from '@core/constant/roxCoder';
+import { isRoxNewId } from '@core/constant/roxNew';
+import { isRoxSystemId } from '@core/constant/roxSystem';
 import { RoxMark } from '@core/component/RoxMark';
 import ClaudeIcon from '@icon/wide-claude.svg';
 import CodexIcon from '@icon/wide-codex-ide.svg';
@@ -41,10 +41,10 @@ export function firstPartyBotMark(
 ): FirstPartyBotMark | undefined {
   if (!id) return undefined;
   if (
-    isMacroAgentId(id) ||
-    isMacroNewId(id) ||
-    isMacroCoderId(id) ||
-    isMacroSystemId(id)
+    isRoxAgentId(id) ||
+    isRoxNewId(id) ||
+    isRoxCoderId(id) ||
+    isRoxSystemId(id)
   ) {
     return ROX_MARK;
   }

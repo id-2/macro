@@ -21,7 +21,7 @@ function lunchPoll(access: FormDetail['access']): FormDetail {
       id: 'poll-1',
       name: 'Where should we get lunch?',
       description: '',
-      ownerId: 'rox|owner@example.com',
+      ownerId: 'macro|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -90,8 +90,8 @@ function tallyOf(voters?: {
 }
 
 const namedVoters = {
-  tacos: ['rox|ada@example.com', MOCK_VIEWER_ID, 'rox|lin@example.com'],
-  pho: ['rox|sam@example.com'],
+  tacos: ['macro|ada@example.com', MOCK_VIEWER_ID, 'macro|lin@example.com'],
+  pho: ['macro|sam@example.com'],
 };
 
 function mount(
@@ -154,10 +154,10 @@ describe('FormCardView poll', () => {
     const region = screen.getByRole('region', { name: 'Poll results' });
     const tacos = within(region).getByText('3 votes').closest('div')
       ?.parentElement as HTMLElement;
-    expect(within(tacos).getByText('rox|ada@example.com')).toBeTruthy();
+    expect(within(tacos).getByText('macro|ada@example.com')).toBeTruthy();
     expect(within(tacos).getByText(MOCK_VIEWER_ID)).toBeTruthy();
     expect(within(tacos).getByText('(you)')).toBeTruthy();
-    expect(within(region).getByText('rox|sam@example.com')).toBeTruthy();
+    expect(within(region).getByText('macro|sam@example.com')).toBeTruthy();
     expect(within(region).getAllByText('(you)')).toHaveLength(1);
     fireEvent.click(
       within(region).getByRole('button', { name: 'Responses table' })
@@ -202,7 +202,7 @@ describe('FormCardView poll', () => {
     mount('edit', () => {}, tallyOf(namedVoters));
     expect(screen.queryByText('can edit')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Results' }));
-    expect(screen.getByText('rox|lin@example.com')).toBeTruthy();
+    expect(screen.getByText('macro|lin@example.com')).toBeTruthy();
   });
 
   it('sends editors of an anonymous poll to the Responses tab', () => {

@@ -7,7 +7,7 @@ import {
   resolveContactPeople,
   toCrmContactItem,
 } from '@core/context/quickAccess/crm-contacts';
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import type { CrmContactEntity } from '@entity';
 import { crmContactEmailKey } from '@entity/types/entity';
 import type { CommandMenuItem } from './useCommandItems';
@@ -112,7 +112,7 @@ export function contactCommandItems(options: {
   ).map(({ contact, user }) => {
     const email = contact.data.email;
     const searchKey =
-      (email ? emailToMacroId(crmContactEmailKey(email)) : undefined) ??
+      (email ? emailToRoxId(crmContactEmailKey(email)) : undefined) ??
       contact.id;
     if (!user) return { ...contact, searchKey };
     return {

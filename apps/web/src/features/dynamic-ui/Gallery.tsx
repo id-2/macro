@@ -19,7 +19,7 @@ import { Widget as WidgetNS } from './widget';
  */
 
 // --- real entity refs from dev-assets (rox-db-dev RDS), owned by
-// rox|eric.hayes@rox.one — the account logged into the running app — so they
+// macro|eric.hayes@rox.one — the account logged into the running app — so they
 // resolve to real previews via ItemPreview.
 const DOC_SHOWCASE = '019e943b-ffbd-7a2b-b81d-7fe694f493b2'; // "Mentions and Citations Showcase"
 const DOC_STABILIZE = '019e8f7d-2105-7d37-b4fd-8a5e35caff90'; // "Stabilize the tool render component during chat streaming"

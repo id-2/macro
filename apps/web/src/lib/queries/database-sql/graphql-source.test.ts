@@ -79,7 +79,7 @@ function row(
     id,
     tableId: table,
     position,
-    ownerId: 'rox|owner@databases.test',
+    ownerId: 'macro|owner@databases.test',
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z',
     cacheProjection: null,
@@ -148,7 +148,7 @@ function soupPage(
   nextCursor: string | null
 ): DatabaseRowsQuery {
   return {
-    user: { id: 'rox|viewer@databases.test', soup: { items, nextCursor } },
+    user: { id: 'macro|viewer@databases.test', soup: { items, nextCursor } },
   };
 }
 
@@ -218,7 +218,7 @@ describe('the GraphQL row source', () => {
     });
     const people = vi.fn((ids: string[]) =>
       okAsync<Row[], DatabaseSqlSourceFailure>(
-        ids.includes('rox|c@example.com') ? [{ id: SAM, cells: {} }] : []
+        ids.includes('macro|c@example.com') ? [{ id: SAM, cells: {} }] : []
       )
     );
     const source = createGraphqlRowSource({
@@ -233,9 +233,9 @@ describe('the GraphQL row source', () => {
       headers: () => ({}),
     };
     const ids = [
-      'rox|a@example.com',
-      'rox|b@example.com',
-      'rox|c@example.com',
+      'macro|a@example.com',
+      'macro|b@example.com',
+      'macro|c@example.com',
     ];
     const first = await source.page({ type: 'people', ids }, [], null, 2, step);
     expect(first._unsafeUnwrap()).toEqual({ rows: [], next: '2' });
@@ -329,7 +329,7 @@ describe('the GraphQL row source', () => {
     const transcript = readTranscript('count-per-option');
     const server = fakeClient(() => ({
       user: {
-        id: 'rox|viewer@databases.test',
+        id: 'macro|viewer@databases.test',
         groupSoup: {
           bins: [
             {

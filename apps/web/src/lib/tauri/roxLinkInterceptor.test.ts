@@ -3,7 +3,7 @@
 import { isTauri } from '@core/util/platform';
 import { emit } from '@tauri-apps/api/event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { openMacroLinkInApp } from './roxLinkInterceptor';
+import { openRoxLinkInApp } from './roxLinkInterceptor';
 
 vi.mock('@core/util/platform', () => ({
   isTauri: vi.fn(() => false),
@@ -18,9 +18,9 @@ afterEach(() => {
   vi.mocked(emit).mockClear();
 });
 
-describe('openMacroLinkInApp', () => {
+describe('openRoxLinkInApp', () => {
   it('does nothing outside of Tauri', () => {
-    expect(openMacroLinkInApp('https://dev.rox.one/app/component/abc')).toBe(
+    expect(openRoxLinkInApp('https://dev.rox.one/app/component/abc')).toBe(
       false
     );
     expect(emit).not.toHaveBeenCalled();
@@ -29,7 +29,7 @@ describe('openMacroLinkInApp', () => {
   it('emits a navigate event for app links under Tauri', () => {
     vi.mocked(isTauri).mockReturnValue(true);
     expect(
-      openMacroLinkInApp('https://rox.one/app/channel/123?message=456')
+      openRoxLinkInApp('https://rox.one/app/channel/123?message=456')
     ).toBe(true);
     expect(emit).toHaveBeenCalledWith('navigate', {
       path: '/channel/123',
@@ -39,7 +39,7 @@ describe('openMacroLinkInApp', () => {
 
   it('keeps the private token of a booking receipt link', () => {
     vi.mocked(isTauri).mockReturnValue(true);
-    expect(openMacroLinkInApp('https://rox.one/app/booking/123#token')).toBe(
+    expect(openRoxLinkInApp('https://rox.one/app/booking/123#token')).toBe(
       true
     );
     expect(emit).toHaveBeenCalledWith('navigate', {
@@ -51,7 +51,7 @@ describe('openMacroLinkInApp', () => {
 
   it('leaves external links alone under Tauri', () => {
     vi.mocked(isTauri).mockReturnValue(true);
-    expect(openMacroLinkInApp('https://github.com/rox-inc')).toBe(false);
+    expect(openRoxLinkInApp('https://github.com/rox-inc')).toBe(false);
     expect(emit).not.toHaveBeenCalled();
   });
 
@@ -60,7 +60,7 @@ describe('openMacroLinkInApp', () => {
     vi.mocked(emit).mockRejectedValueOnce(new Error('ipc down'));
     const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
 
-    expect(openMacroLinkInApp('https://rox.one/app/channel/123')).toBe(true);
+    expect(openRoxLinkInApp('https://rox.one/app/channel/123')).toBe(true);
     // The window.open fallback runs in the emit-rejection microtask.
     await vi.waitFor(() =>
       expect(openSpy).toHaveBeenCalledWith(

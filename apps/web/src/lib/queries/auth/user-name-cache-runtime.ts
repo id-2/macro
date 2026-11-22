@@ -1,6 +1,6 @@
 import { Telemetry } from '@rox-one/observability';
 import { authServiceClient } from '@service-auth/client';
-import { resetMacroApiToken } from '@service-auth/fetch';
+import { resetRoxApiToken } from '@service-auth/fetch';
 import type { QueryClient } from '@tanstack/solid-query';
 import { untrack } from 'solid-js';
 import { queryClient } from '../client';
@@ -69,7 +69,7 @@ export function userNameCache(): UserNameCache {
       client: queryClient,
       account: currentQueryAccount,
       fetch: fetchNames,
-      onScopeChange: resetMacroApiToken,
+      onScopeChange: resetRoxApiToken,
     });
     runtimes.set(queryClient, cache);
     return cache;

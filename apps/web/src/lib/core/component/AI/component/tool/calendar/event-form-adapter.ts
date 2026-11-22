@@ -70,7 +70,7 @@ export function createCalendarEventToEditorInitialValues(
       .join(', '),
     location: event.location ?? '',
     description: event.description ?? '',
-    conference: event.addMacroCall
+    conference: event.addRoxCall
       ? ('rox' as const)
       : (event.addConference ?? event.addGoogleMeet)
         ? ('google_meet' as const)
@@ -174,7 +174,7 @@ export function editorSubmitValuesToCreateCalendarEvent(
     // `conferenceChoice` is the user's current pick, including the
     // client-recognized Rox call the provider-level `conference` never
     // carries; an out-of-office event takes no conferencing at all.
-    addMacroCall: !outOfOffice && values.conferenceChoice === 'rox',
+    addRoxCall: !outOfOffice && values.conferenceChoice === 'rox',
     addConference:
       !outOfOffice &&
       (values.conferenceChoice === 'google_meet' ||

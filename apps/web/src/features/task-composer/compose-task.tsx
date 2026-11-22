@@ -1,6 +1,6 @@
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { Show } from 'solid-js';
@@ -29,7 +29,7 @@ function createSplitTaskComposerHost(): TaskComposerHost {
   };
   return {
     userId: useUserId(),
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     isPopover: () => splitPanel.handle.isPopover(),
     fillSheet: () => splitPanel.fillDrawer?.(),
     setDisplayName: (name) => splitPanel.handle.setDisplayName(name),

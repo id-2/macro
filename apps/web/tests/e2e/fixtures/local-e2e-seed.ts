@@ -158,7 +158,7 @@ const channelMessages = readJson<SeedChannelMessage[]>(
 
 const usersById = indexBy(users, (row) => row.user_id);
 const usersByEmail = indexBy(users, (row) => row.email);
-const usersByMacroUserId = indexBy(users, (row) => row.rox_user_id);
+const usersByRoxUserId = indexBy(users, (row) => row.rox_user_id);
 const documentsById = indexBy(documents, (row) => row.document_id);
 const documentsByName = indexBy(documents, (row) => row.document_name);
 const channelsById = indexBy(channels, (row) => row.channel_id);
@@ -177,7 +177,7 @@ export const localE2ESeed = {
   users,
   usersById,
   usersByEmail,
-  usersByMacroUserId,
+  usersByRoxUserId,
   documents,
   documentsById,
   documentsByName,

@@ -55,7 +55,7 @@ describe('database board', () => {
         rows={[
           {
             rowId: 'launch',
-            cells: { title: 'Launch project', owner: 'rox|sam@rox.one' },
+            cells: { title: 'Launch project', owner: 'macro|sam@rox.one' },
           },
           { rowId: 'loose', cells: { title: 'Loose end', owner: null } },
         ]}
@@ -74,12 +74,12 @@ describe('database board', () => {
           lanes: [
             { key: { kind: 'none' }, hidden: false, cards: ['loose'] },
             {
-              key: { kind: 'user', id: 'rox|ana@rox.one' },
+              key: { kind: 'user', id: 'macro|ana@rox.one' },
               hidden: false,
               cards: [],
             },
             {
-              key: { kind: 'user', id: 'rox|sam@rox.one' },
+              key: { kind: 'user', id: 'macro|sam@rox.one' },
               hidden: false,
               cards: ['launch'],
             },
@@ -119,7 +119,7 @@ describe('database board', () => {
     await waitFor(() =>
       expect(onMove).toHaveBeenCalledWith(
         'launch',
-        { kind: 'user', id: 'rox|ana@rox.one' },
+        { kind: 'user', id: 'macro|ana@rox.one' },
         undefined
       )
     );
@@ -567,7 +567,7 @@ describe('database board', () => {
             cells: {
               title: 'Launch project',
               status: 'To do',
-              owner: 'rox|ada@example.com',
+              owner: 'macro|ada@example.com',
             },
           },
           {
@@ -625,7 +625,7 @@ describe('database board', () => {
     ));
     const owned = screen.getByRole('button', { name: 'Open Linked record' });
     expect(within(owned).getByRole('heading', { level: 3 }).textContent).toBe(
-      'USER rox|ada@example.com'
+      'USER macro|ada@example.com'
     );
     expect(within(owned).getByTestId('mention')).toBeTruthy();
     expect(

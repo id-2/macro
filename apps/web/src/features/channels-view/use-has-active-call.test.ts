@@ -40,7 +40,7 @@ afterEach(() => {
 
 function setup() {
   const [userId, setUserId] = createSignal<string | undefined>(
-    'rox|viewer@example.com'
+    'macro|viewer@example.com'
   );
   const [channelCalls, setChannelCalls] = createSignal<string[]>([]);
   const [quickCalls, setQuickCalls] = createSignal<string[]>([]);

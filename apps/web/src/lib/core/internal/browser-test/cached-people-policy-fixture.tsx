@@ -23,9 +23,9 @@ export function CachedPeoplePolicyFixture(props: { host: CacheHost }) {
   const [selected, setSelected] = createSignal<WithCustomUserInput<'user'>[]>([
     {
       kind: 'custom',
-      id: 'rox|outside@example.com',
+      id: 'macro|outside@example.com',
       data: {
-        id: 'rox|outside@example.com',
+        id: 'macro|outside@example.com',
         email: 'outside@example.com',
         invalid: false,
       },
@@ -37,7 +37,7 @@ export function CachedPeoplePolicyFixture(props: { host: CacheHost }) {
   const day = 86_400_000;
   const facts = new Map<string, PersonFacts>([
     [
-      'rox|person1@example.com',
+      'macro|person1@example.com',
       {
         ...EMPTY_PERSON_FACTS,
         lastInteractionMs: now - 10 * day,
@@ -49,7 +49,7 @@ export function CachedPeoplePolicyFixture(props: { host: CacheHost }) {
       },
     ],
     [
-      'rox|person2@example.com',
+      'macro|person2@example.com',
       {
         ...EMPTY_PERSON_FACTS,
         lastInteractionMs: now - 10 * day,
@@ -61,15 +61,15 @@ export function CachedPeoplePolicyFixture(props: { host: CacheHost }) {
       },
     ],
     [
-      'rox|person3@example.com',
+      'macro|person3@example.com',
       { ...EMPTY_PERSON_FACTS, secondaryInbox: true },
     ],
     [
-      'rox|person4@example.com',
+      'macro|person4@example.com',
       { ...EMPTY_PERSON_FACTS, lastInteractionMs: now - day },
     ],
     [
-      'rox|not-member@example.com',
+      'macro|not-member@example.com',
       {
         ...EMPTY_PERSON_FACTS,
         directMessage: {
@@ -126,7 +126,7 @@ export function CachedPeoplePolicyFixture(props: { host: CacheHost }) {
       new Map([
         ...facts,
         [
-          'rox|person50@example.com',
+          'macro|person50@example.com',
           { ...EMPTY_PERSON_FACTS, lastInteractionMs: now },
         ],
       ])

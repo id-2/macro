@@ -3,19 +3,19 @@ import { createControlledOpenSignal } from '@core/util/createControlledOpenSigna
 import { Dialog, Surface } from '@ui';
 import { Show } from 'solid-js';
 
-const [roxMcpSetupOpen, setMacroMcpSetupOpen] = createControlledOpenSignal(
+const [roxMcpSetupOpen, setRoxMcpSetupOpen] = createControlledOpenSignal(
   false,
   {
     id: 'rox-mcp-setup',
   }
 );
 
-export const openMacroMcpSetupModal = () => {
-  setMacroMcpSetupOpen(true);
+export const openRoxMcpSetupModal = () => {
+  setRoxMcpSetupOpen(true);
 };
 
-const _closeMacroMcpSetupModal = () => {
-  setMacroMcpSetupOpen(false);
+const _closeRoxMcpSetupModal = () => {
+  setRoxMcpSetupOpen(false);
 };
 
 export function RoxMcpSetupModal() {
@@ -23,7 +23,7 @@ export function RoxMcpSetupModal() {
     <Show when={roxMcpSetupOpen()}>
       <Dialog
         open={roxMcpSetupOpen()}
-        onOpenChange={setMacroMcpSetupOpen}
+        onOpenChange={setRoxMcpSetupOpen}
         class="w-190"
       >
         <Surface depth={2} class="rounded-xl">

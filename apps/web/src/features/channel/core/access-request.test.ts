@@ -7,7 +7,7 @@ const request = (
 ): ChannelAccessRequest => ({
   id: 'request-1',
   channel_id: 'channel-1',
-  requester_id: 'rox|outsider@example.com',
+  requester_id: 'macro|outsider@example.com',
   status,
   created_at: '2026-10-21T12:00:00Z',
 });

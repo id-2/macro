@@ -11,7 +11,7 @@ it('titles a task from the message text and assigns the Rox users it mentions', 
           {
             token: '14155550100',
             name: 'Ana Ruiz',
-            userId: 'rox|ana@example.test',
+            userId: 'macro|ana@example.test',
           },
           { token: '14155550111', name: 'Bo Chen' },
         ],
@@ -24,7 +24,7 @@ it('titles a task from the message text and assigns the Rox users it mentions', 
       'please send @Bo Chen the *updated* designs before the review on Friday...',
     content:
       '<m-document-mention>{"documentId":"019a061e-0000-7000-8000-000000000001","documentName":"Design Crit","blockName":"external_chat"}</m-document-mention>',
-    assigneeIds: ['rox|ana@example.test'],
+    assigneeIds: ['macro|ana@example.test'],
   });
 });
 

@@ -66,7 +66,7 @@ const mocks = vi.hoisted(() => ({
   duplicate: (): void => {},
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'rox|owner@example.com',
+  useUserId: () => () => 'macro|owner@example.com',
 }));
 vi.mock('./queries/routines', () => ({
   useRoutineQuery: () => ({
@@ -268,7 +268,7 @@ vi.mock('@queries/agent-session/session', () => ({
         return metadata
           ? {
               ...metadata,
-              ownerId: 'rox|owner@example.com',
+              ownerId: 'macro|owner@example.com',
               botId: 'test-bot',
               status: { kind: 'event', event: 'session/end' },
             }
@@ -326,7 +326,7 @@ vi.mock('./queries/schedules', () => ({
 
 const cron: ScheduledAction = {
   id: 'routine-id',
-  owner: 'rox|owner@example.com',
+  owner: 'macro|owner@example.com',
   name: 'Summary',
   kind: 'Agent',
   trigger: {
@@ -438,7 +438,7 @@ function deferredSave(): {
 
 describe('routine execution target autosave', () => {
   it('shows another owner’s routine as its template, without its controls', () => {
-    setSchedules([{ ...cron, owner: 'rox|someone-else@example.com' }]);
+    setSchedules([{ ...cron, owner: 'macro|someone-else@example.com' }]);
     render(() => <Routine />);
     expect(screen.getByText('Template for routine-id')).toBeTruthy();
     expect(screen.queryByLabelText('Instructions')).toBeNull();

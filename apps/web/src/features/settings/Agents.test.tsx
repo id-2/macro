@@ -112,7 +112,7 @@ const agentMocks = vi.hoisted(() => ({
   update: vi.fn(),
   toastSuccess: vi.fn(),
   toastFailure: vi.fn(),
-  currentUserId: 'rox|user@example.com',
+  currentUserId: 'macro|user@example.com',
   currentTeam: { team: { id: 'team-1' } } as { team: { id: string } } | null,
   isTeamOwner: false,
   isTeamAdmin: false,
@@ -348,7 +348,7 @@ beforeEach(() => {
   agentMocks.create.mockResolvedValue({ bot: { id: 'created-agent' } });
   agentMocks.delete.mockResolvedValue(undefined);
   agentMocks.update.mockResolvedValue(undefined);
-  agentMocks.currentUserId = 'rox|user@example.com';
+  agentMocks.currentUserId = 'macro|user@example.com';
   agentMocks.currentTeam = { team: { id: 'team-1' } };
   agentMocks.isTeamOwner = false;
   agentMocks.isTeamAdmin = false;
@@ -375,8 +375,8 @@ const ROXD_HARNESS = {
   id: '3f1c9d2e-8a4b-4c5d-9e6f-1a2b3c4d5e6f',
   kind: 'roxd',
   name: 'Dev box',
-  owner: { type: 'user', user_id: 'rox|user@example.com' },
-  created_by: 'rox|user@example.com',
+  owner: { type: 'user', user_id: 'macro|user@example.com' },
+  created_by: 'macro|user@example.com',
   created_at: '2026-08-27T12:00:00Z',
   updated_at: '2026-08-27T12:00:00Z',
   connected: true,
@@ -569,7 +569,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
@@ -638,7 +638,7 @@ describe('Agents', () => {
   it('says where each listed agent runs', () => {
     cursorMocks.status.data.registered = true;
     harnessMocks.query.data = [ROXD_HARNESS];
-    const owner = { type: 'user', user_id: 'rox|user@example.com' };
+    const owner = { type: 'user', user_id: 'macro|user@example.com' };
     agentMocks.query.data = [
       {
         bot: {
@@ -709,7 +709,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-shared',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|coworker@example.com' },
+          owner: { type: 'user', user_id: 'macro|coworker@example.com' },
           name: 'Shared Reviewer',
           handle: 'shared-reviewer',
           has_agent: true,
@@ -871,7 +871,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
@@ -941,7 +941,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           has_agent: true,
@@ -973,7 +973,7 @@ describe('Agents', () => {
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
-          created_by: 'rox|creator@example.com',
+          created_by: 'macro|creator@example.com',
           has_agent: true,
           created_at: '2026-08-27T12:00:00Z',
           updated_at: '2026-08-27T12:00:00Z',
@@ -1021,7 +1021,7 @@ describe('Agents', () => {
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
-          created_by: 'rox|user@example.com',
+          created_by: 'macro|user@example.com',
           has_agent: true,
           created_at: '2026-08-27T12:00:00Z',
           updated_at: '2026-08-27T12:00:00Z',
@@ -1043,7 +1043,7 @@ describe('Agents', () => {
     ).toHaveProperty('disabled', false);
     view.unmount();
 
-    agentMocks.currentUserId = 'rox|team-owner@example.com';
+    agentMocks.currentUserId = 'macro|team-owner@example.com';
     agentMocks.isTeamOwner = true;
     const ownerView = render(() => <Agents {...agentsPageProps} />);
     expect(
@@ -1091,7 +1091,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
@@ -1372,7 +1372,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           has_agent: true,
@@ -1415,7 +1415,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           has_agent: true,
@@ -1829,7 +1829,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           has_agent: true,
@@ -1875,7 +1875,7 @@ describe('Agents', () => {
         bot: {
           id: 'agent-1',
           kind: 'owned',
-          owner: { type: 'user', user_id: 'rox|user@example.com' },
+          owner: { type: 'user', user_id: 'macro|user@example.com' },
           name: 'Bug fixer',
           handle: 'bug-fixer',
           description: 'Finds and fixes bugs.',
@@ -1916,7 +1916,7 @@ describe('Agents', () => {
       name: 'Triage bot',
       handle: 'triage-bot',
       has_agent: true,
-      created_by: 'rox|user@example.com',
+      created_by: 'macro|user@example.com',
       created_at: '2026-08-27T12:00:00Z',
       updated_at: '2026-08-27T12:00:00Z',
     },

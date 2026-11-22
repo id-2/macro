@@ -8,9 +8,9 @@ import { createSignal } from 'solid-js';
 const OPTIONS: CombinedRecipientItem<'user'>[] = [
   {
     kind: 'user',
-    id: 'rox|notifications@example.com',
+    id: 'macro|notifications@example.com',
     data: {
-      id: 'rox|notifications@example.com',
+      id: 'macro|notifications@example.com',
       email: 'notifications@example.com',
       name: 'Notifications mailbox',
       lastInteraction: new Date(),
@@ -18,9 +18,9 @@ const OPTIONS: CombinedRecipientItem<'user'>[] = [
   },
   {
     kind: 'user',
-    id: 'rox|recent@example.com',
+    id: 'macro|recent@example.com',
     data: {
-      id: 'rox|recent@example.com',
+      id: 'macro|recent@example.com',
       email: 'recent@example.com',
       name: 'Person Example Com',
       lastInteraction: new Date(),
@@ -28,9 +28,9 @@ const OPTIONS: CombinedRecipientItem<'user'>[] = [
   },
   {
     kind: 'user',
-    id: 'rox|person@example.com',
+    id: 'macro|person@example.com',
     data: {
-      id: 'rox|person@example.com',
+      id: 'macro|person@example.com',
       email: 'person@example.com',
       name: 'Older Person',
     },

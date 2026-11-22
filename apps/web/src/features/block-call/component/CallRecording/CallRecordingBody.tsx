@@ -1,5 +1,5 @@
 import './recording-layout.css';
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import { t } from '@app/lib/i18n';
 import { usePending } from '@app/observability/flow';
 import { useCallContextOptional } from '@channel/Call/CallContext';
@@ -194,7 +194,7 @@ export function CallRecordingBody(props: {
                           icon={<PhoneCallIcon class="size-4" />}
                         />
                       </Show>
-                      <AskMacroButton
+                      <AskRoxButton
                         grouped
                         entity={{
                           type: 'document',

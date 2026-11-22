@@ -1,8 +1,8 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-const OWNER = 'rox|owner@example.com';
-const ALICE = 'rox|alice@example.com';
-const BOB = 'rox|bob@example.com';
+const OWNER = 'macro|owner@example.com';
+const ALICE = 'macro|alice@example.com';
+const BOB = 'macro|bob@example.com';
 const TEAM = '0198a4cc-e138-7670-a308-a6b7666027aa';
 const MINE = '0198a4cc-e138-7670-a308-a6b766602701';
 const ALICES = '0198a4cc-e138-7670-a308-a6b766602702';

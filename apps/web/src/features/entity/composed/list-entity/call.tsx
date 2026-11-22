@@ -1,6 +1,6 @@
 import { formatCallDuration } from '@block-call/utils';
 import { UserIcon } from '@core/component/UserIcon';
-import { isMacroId } from '@core/user/roxId';
+import { isRoxId } from '@core/user/roxId';
 import { matches } from '@core/util/match';
 import UserCircleIcon from '@icon/system/regular/user-circle.svg';
 import { UserGroup } from '@property/component/propertyValue/UserGroup';
@@ -123,7 +123,7 @@ export function CallNarrowBody(props: {
                 <Show when={callHit().senderId}>
                   {(id) => (
                     <Show
-                      when={isMacroId(id())}
+                      when={isRoxId(id())}
                       fallback={
                         <UserCircleIcon class="size-4 text-ink-muted" />
                       }
@@ -203,7 +203,7 @@ export function CallWideContent(props: {
                   <Show when={callHit().senderId}>
                     {(id) => (
                       <Show
-                        when={isMacroId(id())}
+                        when={isRoxId(id())}
                         fallback={
                           <UserCircleIcon class="size-4 text-ink-muted" />
                         }

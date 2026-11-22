@@ -4,7 +4,7 @@ import {
   CURSOR_BOT_NAME,
 } from '@core/constant/cursorAgent';
 import {
-  isMacroAgentId,
+  isRoxAgentId,
   ROX_AGENT_HANDLE,
   ROX_AGENT_NAME,
   ROX_HARNESS_NAME,
@@ -272,7 +272,7 @@ export function rosterForAgentPicker(
 ): RosterAgent[] {
   return roster.filter(
     (agent) =>
-      agent.id !== ROX_PERSONA_ID && !isMacroAgentId(agent.botId ?? agent.id)
+      agent.id !== ROX_PERSONA_ID && !isRoxAgentId(agent.botId ?? agent.id)
   );
 }
 

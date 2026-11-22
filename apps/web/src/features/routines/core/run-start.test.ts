@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { HistoryRun } from './history';
 import { describeRunStart, runItem, runStartLine } from './run-start';
 
-const person = (id: string) => (id === 'rox|me' ? 'you' : 'Dana');
+const person = (id: string) => (id === 'macro|me' ? 'you' : 'Dana');
 const time = (iso: string) => iso.slice(11, 16);
 
 describe('what started a run', () => {
@@ -29,7 +29,7 @@ describe('what started a run', () => {
         person
       )
     ).toBe('New email received');
-    expect(describeRunStart({ kind: 'manual', by: 'rox|me' }, person)).toBe(
+    expect(describeRunStart({ kind: 'manual', by: 'macro|me' }, person)).toBe(
       'Run by you'
     );
   });
@@ -66,6 +66,6 @@ describe('what started a run', () => {
     expect(runItem({ kind: 'event', event: 'channel.mentioned' })).toBe(
       undefined
     );
-    expect(runItem({ kind: 'manual', by: 'rox|me' })).toBeUndefined();
+    expect(runItem({ kind: 'manual', by: 'macro|me' })).toBeUndefined();
   });
 });

@@ -6,7 +6,7 @@ import { toUsageSummary } from './usage-summary';
 const snapshot: AiUsageSnapshot = {
   tier: 'free',
   unlimited: false,
-  payer: 'rox|free@example.com',
+  payer: 'macro|free@example.com',
   can_manage_billing: true,
   seats: 1,
   period_start: '2026-10-01T00:00:00Z',

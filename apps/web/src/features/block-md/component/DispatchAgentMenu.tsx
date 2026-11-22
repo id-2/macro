@@ -1,9 +1,9 @@
-import { openMacroMcpSetupModal } from '@app/features/integrations/mcp-setup/RoxMcpSetupModal';
+import { openRoxMcpSetupModal } from '@app/features/integrations/mcp-setup/RoxMcpSetupModal';
 import type { CustomFileOperation } from '@components/app/split-layout/components/SplitFileMenu';
 import type { SplitFileMenuAction } from '@components/app/split-layout/context';
 import { editorStateAsMarkdown } from '@core/component/LexicalMarkdown/utils';
 import { toast } from '@core/component/Toast/Toast';
-import { roxIdToEmail, tryMacroId } from '@core/user';
+import { roxIdToEmail, tryRoxId } from '@core/user';
 import { copyBranchNameToClipboard } from '@core/util/branchName';
 import { fireAndForget } from '@core/util/fireAndForget';
 import CaretDown from '@icon/system/regular/caret-down.svg';
@@ -65,7 +65,7 @@ function promptThreadLines(threads: PromptThread[]): string[] {
   for (const thread of threads) {
     lines.push(`<comment-thread thread-id="${thread.threadId}">`);
     for (const comment of thread.comments) {
-      const roxId = tryMacroId(comment.author);
+      const roxId = tryRoxId(comment.author);
       const author = roxId ? roxIdToEmail(roxId) : comment.author;
       const createdAt = comment.createdAt
         ? ` created-at="${comment.createdAt}"`
@@ -316,7 +316,7 @@ export function useDispatchAgentSplitFileActions(): {
       {
         label: 'MCP setup instructions',
         icon: PlugIcon,
-        action: openMacroMcpSetupModal,
+        action: openRoxMcpSetupModal,
       },
     ],
   };
@@ -394,7 +394,7 @@ export function DispatchAgentButton(
           </Show>
           <Dropdown.Item
             onSelect={() => {
-              openMacroMcpSetupModal();
+              openRoxMcpSetupModal();
               setOpen(false);
             }}
           >

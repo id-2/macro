@@ -8,7 +8,7 @@ import { type ComponentProps, createMemo } from 'solid-js';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 vi.mock('@components/app/split-layout/split-router/mention-links', () => ({
-  useMacroMentionLinkResolver: () => () => undefined,
+  useRoxMentionLinkResolver: () => () => undefined,
 }));
 vi.mock(
   '@core/component/LexicalMarkdown/component/core/MarkdownTextarea',

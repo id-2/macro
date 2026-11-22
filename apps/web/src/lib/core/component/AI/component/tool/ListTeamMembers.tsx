@@ -1,5 +1,5 @@
 import { UserIcon } from '@core/component/UserIcon';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import Envelope from '@icon/system/regular/envelope.svg';
 import Users from '@icon/system/regular/users.svg';
 import type { NamedTool } from '@service-cognition/generated/tools/tool';
@@ -16,7 +16,7 @@ type TeamInvite = ListTeamMembersResponse['invited'][number];
 const formatRole = (role: string) => role.split('_').join(' ');
 
 function TeamMemberRow(props: { member: TeamMember }) {
-  const displayName = () => getDisplayName(tryMacroId(props.member.userId));
+  const displayName = () => getDisplayName(tryRoxId(props.member.userId));
   const name = () => displayName() || props.member.userId;
 
   return (

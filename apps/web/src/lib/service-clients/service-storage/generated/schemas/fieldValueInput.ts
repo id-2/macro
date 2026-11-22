@@ -15,7 +15,7 @@ field.
 export interface FieldValueInput {
   /** The field's name, ignoring case. */
   field: string;
-  /** One value: an option label, a person as "me", an email or a rox|
+  /** One value: an option label, a person as "me", an email or a macro|
 user id, a number, true/false, or a date. */
   value?: FieldValueInputValue;
   /** Several values, for a field holding several. A filter matches an entry

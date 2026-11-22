@@ -1,4 +1,4 @@
-import { mergeAdjacentMacroEmTags } from '@core/util/searchHighlight';
+import { mergeAdjacentRoxEmTags } from '@core/util/searchHighlight';
 import type { AgentSessionEntity } from '@entity/types/entity';
 import type { WithSearch } from '@entity/types/search';
 import type { AgentSessionSearchResponseItem } from '@service-search/generated/models';
@@ -15,7 +15,7 @@ export function mapAgentSessionSearchResult(
     if (!target) return [];
     return (hit.highlight.content ?? []).map((content) => ({
       type: 'agent' as const,
-      content: mergeAdjacentMacroEmTags(content),
+      content: mergeAdjacentRoxEmTags(content),
       location: {
         type: 'agent' as const,
         messageTurn: target.message_turn,
@@ -35,7 +35,7 @@ export function mapAgentSessionSearchResult(
     updatedAt: result.updated_at,
     search: {
       nameHighlight: nameHighlight
-        ? mergeAdjacentMacroEmTags(nameHighlight)
+        ? mergeAdjacentRoxEmTags(nameHighlight)
         : null,
       contentHitData: contentHitData.length ? contentHitData : null,
       senderHighlightTerms: null,

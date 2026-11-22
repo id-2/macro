@@ -2,7 +2,7 @@ import { t } from '@app/lib/i18n';
 import { useChannelParticipants } from '@channel/use-channel-participants';
 import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
-import { getDisplayName, isAgentAccount, tryMacroId } from '@core/user';
+import { getDisplayName, isAgentAccount, tryRoxId } from '@core/user';
 import UserGearIcon from '@icon/system/regular/user-gear.svg';
 import XIcon from '@icon/system/regular/x.svg';
 import { useRequestAccountManagerMutation } from '@queries/account-managers/account-managers';
@@ -21,15 +21,15 @@ export function AccountManagerRequestButton(props: { channelId: string }) {
   const [open, setOpen] = createSignal(false);
 
   const counterparty = () => participants.ids().find((id) => id !== userId());
-  const counterpartyMacroId = () => {
+  const counterpartyRoxId = () => {
     const id = counterparty();
-    return id ? tryMacroId(id) : undefined;
+    return id ? tryRoxId(id) : undefined;
   };
-  const counterpartyName = () => getDisplayName(counterpartyMacroId());
-  const counterpartyIsAgent = () => isAgentAccount(counterpartyMacroId());
+  const counterpartyName = () => getDisplayName(counterpartyRoxId());
+  const counterpartyIsAgent = () => isAgentAccount(counterpartyRoxId());
   const viewerIsAgent = () => {
     const id = userId();
-    return id ? isAgentAccount(tryMacroId(id)) : false;
+    return id ? isAgentAccount(tryRoxId(id)) : false;
   };
 
   const ask = async (callerRole: AccountManagerRole) => {

@@ -1,6 +1,6 @@
 import { InlineItemPreview } from '@core/component/ItemPreview';
 import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
-import { getDisplayName, roxIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, roxIdToEmail, tryRoxId } from '@core/user';
 import { formatDate } from '@core/util/date';
 import {
   getNotificationAction,
@@ -19,7 +19,7 @@ type NotificationRendererProps = {
 export function NotificationRenderer(props: NotificationRendererProps) {
   const time = () => formatDate(props.notification.created_at);
   const actorId = () => props.notification.sender_id ?? '';
-  const roxId = () => tryMacroId(actorId());
+  const roxId = () => tryRoxId(actorId());
   const actorName = () =>
     getDisplayName(roxId(), { emailFallback: 'local-part' });
   const emailFallback = () => {

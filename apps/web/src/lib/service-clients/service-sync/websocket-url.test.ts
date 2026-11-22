@@ -18,7 +18,7 @@ vi.mock('@core/constant/servers', async (importOriginal) => ({
 vi.mock('@core/util/fetchWithToken', () => ({
   ensureFreshSession: auth.cookie,
 }));
-vi.mock('@service-auth/fetch', () => ({ getMacroApiToken: auth.token }));
+vi.mock('@service-auth/fetch', () => ({ getRoxApiToken: auth.token }));
 
 import { resolveSyncRouterWsUrl } from './websocket-url';
 

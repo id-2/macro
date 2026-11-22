@@ -1,9 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/solid-query';
-import { getMacroGithubStars } from '../service-clients/service-github-public/client';
+import { getRoxGithubStars } from '../service-clients/service-github-public/client';
 
 const githubStarsQueryOptions = queryOptions({
   queryKey: ['public', 'github', 'rox-inc/rox', 'stars'],
-  queryFn: ({ signal }) => getMacroGithubStars(signal),
+  queryFn: ({ signal }) => getRoxGithubStars(signal),
   staleTime: 60 * 60 * 1000,
   gcTime: 24 * 60 * 60 * 1000,
   retry: 1,

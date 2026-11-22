@@ -2,7 +2,7 @@ import { ENABLE_BEARER_TOKEN_AUTH } from '@core/constant/featureFlags';
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { ensureFreshSession } from '@core/util/fetchWithToken';
 import { Telemetry } from '@rox-one/observability';
-import { getMacroApiToken } from '@service-auth/fetch';
+import { getRoxApiToken } from '@service-auth/fetch';
 
 /** Resolve fresh account credentials for the dedicated DSS sync socket. */
 export async function resolveSyncRouterWsUrl(): Promise<string> {
@@ -12,7 +12,7 @@ export async function resolveSyncRouterWsUrl(): Promise<string> {
     );
     url.protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
     if (ENABLE_BEARER_TOKEN_AUTH) {
-      const token = await getMacroApiToken();
+      const token = await getRoxApiToken();
       if (!token) throw new Error('No Rox API token');
       url.searchParams.set('rox-api-token', token);
     } else {

@@ -143,7 +143,7 @@ function Menu(props: (typeof MENUS)[number]) {
   );
 }
 
-const OWNER = 'rox|owner@acme.test';
+const OWNER = 'macro|owner@acme.test';
 
 function Fixture() {
   const queryClient = new QueryClient({

@@ -12,7 +12,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { appRoutesManifest } from '../tests/app-routes';
 import { AgentNavigationProvider } from './agent-navigation';
 
-const USER = 'rox|owner@example.com';
+const USER = 'macro|owner@example.com';
 const TAB = '0198a4cc-e138-7670-a308-a6b7666027c1';
 const DOC = '0198a4cc-e138-7670-a308-a6b766602799';
 

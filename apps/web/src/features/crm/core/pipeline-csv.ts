@@ -1,5 +1,5 @@
 import type { CellWrite } from '@core/database-sql/generated/types';
-import { emailToMacroId, isMacroId, roxIdToEmail } from '@core/user/roxId';
+import { emailToRoxId, isRoxId, roxIdToEmail } from '@core/user/roxId';
 import { err, ok, type Result } from 'neverthrow';
 import { match } from 'ts-pattern';
 import { cellValue } from '../../database/core/cell-ops';
@@ -88,7 +88,7 @@ function entries(
 function exportedCell(column: DatabaseViewColumn, value: DatabaseCellValue) {
   return isPersonColumn(column)
     ? entries(column, value)
-        .map((id) => (isMacroId(id) ? roxIdToEmail(id) : id))
+        .map((id) => (isRoxId(id) ? roxIdToEmail(id) : id))
         .join(', ')
     : exportedValue(column, value);
 }
@@ -166,8 +166,8 @@ function gridValue(
     .map((value) => value.trim())
     .filter(Boolean)
     .map((value) =>
-      isPersonColumn(column) && !isMacroId(value)
-        ? emailToMacroId(value.toLowerCase())
+      isPersonColumn(column) && !isRoxId(value)
+        ? emailToRoxId(value.toLowerCase())
         : value
     );
   if (values.some((value) => value === undefined)) return undefined;

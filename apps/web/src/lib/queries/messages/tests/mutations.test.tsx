@@ -71,7 +71,7 @@ function message(
     id,
     parent,
     thread_id: threadId,
-    sender_id: 'rox|a@example.com',
+    sender_id: 'macro|a@example.com',
     content: id,
     mentions: [],
     attachments: [],
@@ -101,7 +101,7 @@ it('reopens a resolved project discussion through the real mutation and shared t
   const parent: MessageParent = { type: 'initiative', id: 'project' };
   const state = {
     root_id: 'root',
-    user_id: 'rox|a@example.com',
+    user_id: 'macro|a@example.com',
     resolved: true,
     anchor: null,
     created_at: time,
@@ -199,7 +199,7 @@ describe.each(['channel', 'document', 'call'] as const)(
         ];
         const state = {
           root_id: 'root',
-          user_id: 'rox|a@example.com',
+          user_id: 'macro|a@example.com',
           resolved: false,
           created_at: time,
           updated_at: time,
@@ -285,7 +285,7 @@ describe.each(['channel', 'document', 'call'] as const)(
 describe('root deletion', () => {
   const threadState = (rootId: string) => ({
     root_id: rootId,
-    user_id: 'rox|a@example.com',
+    user_id: 'macro|a@example.com',
     resolved: false,
     created_at: time,
     updated_at: time,
@@ -295,7 +295,7 @@ describe('root deletion', () => {
   /** A discussion whose replies were written by somebody else. */
   function seed(parent: MessageParent, withThreadCache = true) {
     const replies = [
-      { ...message(parent, 'reply', 'root'), sender_id: 'rox|b@example.com' },
+      { ...message(parent, 'reply', 'root'), sender_id: 'macro|b@example.com' },
     ];
     const state = threadState('root');
     const root: MessageListItem = {
@@ -491,7 +491,7 @@ describe('thread resolution', () => {
   const parent: MessageParent = { type: 'document', id: 'doc' };
   const state = {
     root_id: 'root',
-    user_id: 'rox|a@example.com',
+    user_id: 'macro|a@example.com',
     resolved: false,
     created_at: time,
     updated_at: time,
@@ -608,7 +608,7 @@ describe('sending', () => {
       await mountSend().mutateAsync({
         parent,
         message: { content: 'Hello', thread_id: threadId },
-        senderId: 'rox|a@example.com',
+        senderId: 'macro|a@example.com',
         optimisticId: newMessageId(),
       });
 
@@ -666,7 +666,7 @@ describe('sending', () => {
     await mountSend().mutateAsync({
       parent,
       message: { content: 'Hello from another participant' },
-      senderId: 'rox|a@example.com',
+      senderId: 'macro|a@example.com',
       optimisticId: replyId,
     });
 
@@ -725,7 +725,7 @@ describe('sending', () => {
     const pending = mutation.mutateAsync({
       parent,
       message: { content: '2+2=?', anchor },
-      senderId: 'rox|a@example.com',
+      senderId: 'macro|a@example.com',
       optimisticId: id,
     });
     await vi.waitFor(() => expect(rootIds()).toEqual([[id, id]]));
@@ -775,7 +775,7 @@ describe('sending', () => {
       await mountSend().mutateAsync({
         parent,
         message: { content: 'Hello', ...references },
-        senderId: 'rox|a@example.com',
+        senderId: 'macro|a@example.com',
         optimisticId: newMessageId(),
       });
 
@@ -805,7 +805,7 @@ describe('sending', () => {
     await mutation.mutateAsync({
       parent,
       message: { content: '2+2=?' },
-      senderId: 'rox|a@example.com',
+      senderId: 'macro|a@example.com',
       optimisticId: newMessageId(),
     });
     // The row keeps its thread state, so a document discussion (which shows
@@ -841,7 +841,7 @@ describe('sending', () => {
     const sent = await mountSend().mutateAsync({
       parent,
       message: { content: id },
-      senderId: 'rox|a@example.com',
+      senderId: 'macro|a@example.com',
       optimisticId: id,
     });
 
@@ -892,7 +892,7 @@ describe('sending', () => {
     await mountSend().mutateAsync({
       parent,
       message: { content: id },
-      senderId: 'rox|a@example.com',
+      senderId: 'macro|a@example.com',
       optimisticId: id,
       parentSpan,
     });
@@ -930,7 +930,7 @@ describe('sending', () => {
       mountSend().mutateAsync({
         parent: { type: 'document', id: 'doc' },
         message: { content: 'Hello' },
-        senderId: 'rox|a@example.com',
+        senderId: 'macro|a@example.com',
         optimisticId: newMessageId(),
       })
     ).rejects.toThrow();

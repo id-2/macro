@@ -474,7 +474,7 @@ export interface EventComposerConferencePillProps {
 export function EventComposerConferencePill(
   props: EventComposerConferencePillProps
 ) {
-  const includesMacroCall = createMemo(
+  const includesRoxCall = createMemo(
     () => props.roxCallsEnabled || props.value === 'rox'
   );
   // The list must keep its identity while its contents do. A fresh array makes
@@ -485,7 +485,7 @@ export function EventComposerConferencePill(
   const provider = createMemo(() => props.provider);
   const canKeepExisting = createMemo(() => props.canKeepExisting);
   const options = createMemo(() => [
-    ...(includesMacroCall() ? [ROX_CALL_OPTION] : []),
+    ...(includesRoxCall() ? [ROX_CALL_OPTION] : []),
     ...(provider() === 'microsoft_teams'
       ? [MICROSOFT_TEAMS_OPTION]
       : provider() === null || provider() === 'other'

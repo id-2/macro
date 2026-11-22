@@ -10,7 +10,7 @@ import { SplitHeaderLeft } from '@components/app/split-layout/components/SplitHe
 import { SplitPanel } from '@components/app/split-panel';
 import {
   enableEmailSignatures,
-  enableMacroComputers,
+  enableRoxComputers,
 } from '@core/constant/featureFlags';
 import {
   type SettingsTab,
@@ -110,7 +110,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
   const navTabs = createMemo(() => navGroups().flatMap((group) => group.items));
   const signatures = useFeatureFlag(enableEmailSignatures);
   const outlook = useOutlookAvailable();
-  const roxComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableRoxComputers);
 
   const activeNavigationTab = activeTabId;
 

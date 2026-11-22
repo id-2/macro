@@ -12,7 +12,7 @@ import { emit } from '@tauri-apps/api/event';
  * Returns false for non-Tauri and non-Rox-`/app` URLs so `openExternalUrl`
  * keeps handling them.
  */
-export function openMacroLinkInApp(url: string): boolean {
+export function openRoxLinkInApp(url: string): boolean {
   if (!isTauri()) return false;
   const parsed = parseInternalAppLink(url);
   if (!parsed) return false;
@@ -27,9 +27,9 @@ export function openMacroLinkInApp(url: string): boolean {
 }
 
 /**
- * Wires {@link openMacroLinkInApp} into `openExternalUrl`. Called from the Tauri
+ * Wires {@link openRoxLinkInApp} into `openExternalUrl`. Called from the Tauri
  * navigation setup; returns the unregister disposer.
  */
-export function registerMacroLinkInterceptor(): () => void {
-  return registerExternalUrlInterceptor(openMacroLinkInApp);
+export function registerRoxLinkInterceptor(): () => void {
+  return registerExternalUrlInterceptor(openRoxLinkInApp);
 }

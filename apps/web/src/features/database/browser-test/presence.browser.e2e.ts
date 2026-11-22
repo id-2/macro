@@ -9,8 +9,8 @@ type Presence = {
   editing: boolean;
 };
 
-const ALEX = 'rox|alex@example.com';
-const SAM = 'rox|sam@example.com';
+const ALEX = 'macro|alex@example.com';
+const SAM = 'macro|sam@example.com';
 
 async function open(page: Page) {
   await page.goto('/src/features/database/browser-test/grid.html');

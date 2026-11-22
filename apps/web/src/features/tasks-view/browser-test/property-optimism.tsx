@@ -61,7 +61,7 @@ function groupedData(): GroupSoupMembershipQuery {
     });
   return {
     user: {
-      id: 'rox|task-optimism@example.test',
+      id: 'macro|task-optimism@example.test',
       groupSoup: {
         bins: [NOT_SET_GROUP_KEY, urgent].map((key) => {
           const ids = idsFor(key);
@@ -160,7 +160,7 @@ window.fetch = async (input, init) => {
     id,
     properties: saved.has(id) ? [saved.get(id)] : [],
   });
-  const user = { id: 'rox|task-optimism@example.test' };
+  const user = { id: 'macro|task-optimism@example.test' };
   if (body.query.includes('query EntityProperties')) {
     return Response.json({
       data: {

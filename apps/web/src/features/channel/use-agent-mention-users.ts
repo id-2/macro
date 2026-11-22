@@ -8,9 +8,9 @@ import type { Accessor } from 'solid-js';
 import {
   codexMentionUser,
   cursorMentionUser,
-  isMacroAiId,
-  isMacroCoderId,
-  isMacroNewId,
+  isRoxAiId,
+  isRoxCoderId,
+  isRoxNewId,
   roxMentionUser,
 } from './roxAi';
 import { useChatV3AgentsFlag } from './use-chat-v3-agents-flag';
@@ -46,14 +46,14 @@ export function useAgentMentionUserTransform(
 
   return (users) => {
     // Old participants and saved bot rows must not restore the retired coder.
-    const mentionable = users.filter((user) => !isMacroCoderId(user.id));
+    const mentionable = users.filter((user) => !isRoxCoderId(user.id));
     if (!enabled()) return mentionable;
     const base = mentionable.filter(
       (user) =>
         (canUseCursor() || !isCursorBotId(user.id)) &&
         (canUseCodex() || !isCodexBotId(user.id)) &&
-        !isMacroAiId(user.id) &&
-        !isMacroNewId(user.id)
+        !isRoxAiId(user.id) &&
+        !isRoxNewId(user.id)
     );
     if (canUseCursor() && !base.some((user) => isCursorBotId(user.id))) {
       base.unshift(cursorMentionUser());

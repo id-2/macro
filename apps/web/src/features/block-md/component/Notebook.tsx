@@ -5,7 +5,7 @@ import { t } from '@app/lib/i18n';
 import { createSizeBreakpoints } from '@app/util/create-size-breakpoints';
 import { CommentMargin } from '@block-md/comments/CommentMargin';
 import { useSplitPanel } from '@components/app/split-layout/layoutUtils';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { editorFocusSignal } from '@core/component/LexicalMarkdown/utils';
 import { ParamsProvider } from '@core/component/ParamsProvider';
 import {
@@ -14,7 +14,7 @@ import {
   enableEntityAppearance,
   LOCAL_ONLY,
 } from '@core/constant/featureFlags';
-import { useIsMacroTeam } from '@core/context/team';
+import { useIsRoxTeam } from '@core/context/team';
 import { useUserId } from '@core/context/user';
 import { registerHotkey } from '@core/hotkey/hotkeys';
 import { TOKENS } from '@core/hotkey/tokens';
@@ -97,10 +97,10 @@ const CommentBreakpoints = {
 } as const;
 
 function useCanUseLexicalStateDebugger() {
-  const isMacroTeam = useIsMacroTeam();
+  const isRoxTeam = useIsRoxTeam();
   return createMemo(() => {
     if (LOCAL_ONLY || DEV_MODE_ENV) return true;
-    return isMacroTeam();
+    return isRoxTeam();
   });
 }
 
@@ -137,7 +137,7 @@ export function Notebook(props: {
   };
   const scopeId = () => props.hotkeyScope;
   const ownsEnter = createEnterOwningControl();
-  const resolveAppLink = useMacroMentionLinkResolver();
+  const resolveAppLink = useRoxMentionLinkResolver();
 
   let notebookRef!: HTMLDivElement;
   let commentMarginRef: HTMLDivElement | undefined;

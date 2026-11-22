@@ -3,7 +3,7 @@
 import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
 import { channelTheme } from '@core/component/LexicalMarkdown/theme';
 import { createMemo, onCleanup, onMount } from 'solid-js';
-import { hideIncompleteMacroXml } from './hideIncompleteMacroXml';
+import { hideIncompleteRoxXml } from './hideIncompleteRoxXml';
 
 export function TextPart(props: {
   text: string;
@@ -22,7 +22,7 @@ export function TextPart(props: {
   // rebuild the markdown DOM and reload its images.
   const markdown = createMemo(() =>
     props.inFlight || props.hideIncompleteXml
-      ? hideIncompleteMacroXml(props.text)
+      ? hideIncompleteRoxXml(props.text)
       : props.text
   );
   let content!: HTMLDivElement;

@@ -9,7 +9,7 @@ import { createLocalSqlReader, type LocalSqlInput } from './local-read';
 
 const checkpoint = vi.hoisted(() => vi.fn());
 vi.mock('../contacts/backfill', () => ({ loadContactCheckpoint: checkpoint }));
-const VIEWER = 'rox|viewer@example.com';
+const VIEWER = 'macro|viewer@example.com';
 const GENERATION = '00000000-0000-4000-8000-000000000001';
 const TABLE = '6d616372-6f00-0000-0000-000070656f70';
 const DESCRIPTION: ReadDescription = {

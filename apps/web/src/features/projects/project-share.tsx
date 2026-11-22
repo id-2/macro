@@ -1,7 +1,7 @@
 import { getPermissions } from '@core/component/SharePermissions';
 import { toast } from '@core/component/Toast/Toast';
 import { useShareModal } from '@core/component/TopBar/shareModal';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { type Accessor, createEffect, on, onMount, Show } from 'solid-js';
 import { ProjectCollaborators } from './components/project-collaborators';
 import {
@@ -10,7 +10,7 @@ import {
 } from './context/projects-context';
 import type { ProjectDetail } from './core/project';
 
-const userName = (id: string) => getDisplayName(tryMacroId(id));
+const userName = (id: string) => getDisplayName(tryRoxId(id));
 
 /** The standard Share menu; collaborators are the project's direct grants. */
 export function useProjectShareModal(

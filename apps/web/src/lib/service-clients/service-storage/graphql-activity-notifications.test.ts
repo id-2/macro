@@ -97,7 +97,7 @@ describe('channel activity and notification GraphQL cache separation', () => {
               recordChannelActivity: {
                 __typename: 'GraphqlChannelActivity',
                 id: 'activity-1',
-                userId: 'rox|user@example.com',
+                userId: 'macro|user@example.com',
                 channelId: 'channel-1',
                 createdAt: '2025-01-01T00:00:00Z',
                 updatedAt: '2025-01-01T00:00:01Z',
@@ -195,7 +195,7 @@ describe('channel activity and notification GraphQL cache separation', () => {
     graphqlSoupEnabledMock.mockReturnValue(false);
     const activity = {
       id: 'activity-1',
-      user_id: 'rox|user@example.com',
+      user_id: 'macro|user@example.com',
       channel_id: 'channel-1',
       created_at: '2025-01-01T00:00:00Z',
       updated_at: '2025-01-01T00:00:01Z',

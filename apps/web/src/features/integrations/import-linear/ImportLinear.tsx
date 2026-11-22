@@ -3,7 +3,7 @@ import type { IUser } from '@core/user/types';
 import { createTaskForAccount } from '@core/util/create';
 import { parseCsv } from '@core/util/csv';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { linearCsvRecordToMacroTaskDraft } from '@core/util/linearImport';
+import { linearCsvRecordToRoxTaskDraft } from '@core/util/linearImport';
 import { buildSimpleEntityUrl } from '@core/util/url';
 import { Telemetry } from '@rox-one/observability';
 import {
@@ -122,7 +122,7 @@ function ImportFile(props: { account: QueryAccount }) {
         : undefined;
       return {
         rowNum: index + 1,
-        ...linearCsvRecordToMacroTaskDraft({
+        ...linearCsvRecordToRoxTaskDraft({
           record: r,
           assigneeUserId: assigneeUserId ? assigneeUserId : null,
         }),
@@ -214,7 +214,7 @@ function ImportFile(props: { account: QueryAccount }) {
             ? mapping.get(assigneeRaw)
             : undefined;
 
-          const draft = linearCsvRecordToMacroTaskDraft({
+          const draft = linearCsvRecordToRoxTaskDraft({
             record: r,
             assigneeUserId: assigneeUserId ? assigneeUserId : null,
           });

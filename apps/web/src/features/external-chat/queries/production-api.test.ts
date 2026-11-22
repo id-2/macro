@@ -31,7 +31,7 @@ it('decodes shared viewing separately from the callers own sending account and h
     provider: 'whatsapp',
     kind: 'group',
     name: 'Shared group',
-    userId: 'rox|owner@example.test',
+    userId: 'macro|owner@example.test',
     unreadCount: 3,
     lastMessageAt: null,
     canSend: false,
@@ -41,7 +41,7 @@ it('decodes shared viewing separately from the callers own sending account and h
     members: null,
     sharePermission: {
       id: 'share-1',
-      owner: 'rox|owner@example.test',
+      owner: 'macro|owner@example.test',
       channelSharePermissions: [],
     },
     limits: {
@@ -56,7 +56,7 @@ it('decodes shared viewing separately from the callers own sending account and h
   client.detail.mockResolvedValue(ok(detail));
   const chat = await externalChatApi.detail(detail.id);
   expect(chat.provider).toBe('whatsapp');
-  expect(chat.ownerId).toBe('rox|owner@example.test');
+  expect(chat.ownerId).toBe('macro|owner@example.test');
   expect(chat.accessLevel).toBe('view');
   expect(chat.canSend).toBe(false);
   expect(chat.phone).toBeUndefined();
@@ -70,7 +70,7 @@ it('turns provider pictures into static file URLs and leaves hidden ones absent'
     provider: 'whatsapp',
     kind: 'group',
     name: 'Family',
-    userId: 'rox|owner@example.test',
+    userId: 'macro|owner@example.test',
     unreadCount: 0,
     lastMessageAt: null,
     canSend: true,
@@ -106,7 +106,7 @@ it('turns provider pictures into static file URLs and leaves hidden ones absent'
     },
     sharePermission: {
       id: 'share-1',
-      owner: 'rox|owner@example.test',
+      owner: 'macro|owner@example.test',
       channelSharePermissions: [],
     },
     limits: {
@@ -164,7 +164,7 @@ it('decodes pagination, deleted flags, reaction ownership and attachment states 
             emoji: '👍',
             reactors: [
               { name: 'Ana', userId: null },
-              { name: 'Ben', userId: 'rox|ben@example.com' },
+              { name: 'Ben', userId: 'macro|ben@example.com' },
             ],
             mine: true,
           },
@@ -195,7 +195,7 @@ it('decodes pagination, deleted flags, reaction ownership and attachment states 
         emoji: '👍',
         reactors: [
           { name: 'Ana' },
-          { name: 'Ben', userId: 'rox|ben@example.com' },
+          { name: 'Ben', userId: 'macro|ben@example.com' },
         ],
         mine: true,
       },
@@ -233,7 +233,7 @@ it('decodes mentions, forwarding, media presentation and every rich type, keepin
         body: 'Hi @15550001111 and @15550002222',
         forwarded: true,
         mentions: [
-          { token: '15550001111', name: 'Ben', userId: 'rox|ben@x.test' },
+          { token: '15550001111', name: 'Ben', userId: 'macro|ben@x.test' },
           { token: '15550002222', name: '+1 555-000-2222', userId: null },
         ],
       },
@@ -338,7 +338,7 @@ it('decodes mentions, forwarding, media presentation and every rich type, keepin
   expect(messages[0]).toMatchObject({
     forwarded: true,
     mentions: [
-      { token: '15550001111', name: 'Ben', userId: 'rox|ben@x.test' },
+      { token: '15550001111', name: 'Ben', userId: 'macro|ben@x.test' },
       { token: '15550002222', name: '+1 555-000-2222', userId: undefined },
     ],
     rich: undefined,
@@ -492,7 +492,7 @@ it('reads recorded progress by send id', async () => {
       {
         id: 'send-1',
         chatId: 'chat-id',
-        userId: 'rox|me@example.test',
+        userId: 'macro|me@example.test',
         createdAt: '2026-10-21T12:00:00Z',
         state: 'accepted',
         messageId: 'message-9',

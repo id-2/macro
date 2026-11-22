@@ -108,7 +108,7 @@ it('reads stored values the way the pipeline table does', () => {
           __typename: 'GraphqlEntityReferencePropertyValue',
           references: [
             {
-              entityId: 'rox|alice',
+              entityId: 'macro|alice',
               entityType: 'USER',
               specificMessageId: null,
             },
@@ -137,7 +137,7 @@ it('reads stored values the way the pipeline table does', () => {
   expect(mapped.cells.map((cell) => [cell.column.id, cell.value])).toEqual([
     ['stage', 'Lead'],
     ['tags', JSON.stringify(['2', UNAVAILABLE_OPTION])],
-    ['owner', 'rox|alice'],
+    ['owner', 'macro|alice'],
     ['won', 1],
     ['notes', null],
   ]);

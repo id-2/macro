@@ -6,7 +6,7 @@ import type { CalendarEvent } from '@app/features/calendar/types';
 import type { EventContentArg } from '@fullcalendar/core';
 import { cleanup, render, screen } from '@solidjs/testing-library';
 import { afterEach, describe, expect, it } from 'vitest';
-import { attachCalendarMacroCall } from '../utils/rox-call-link';
+import { attachCalendarRoxCall } from '../utils/rox-call-link';
 import { EventContent } from './EventContent';
 
 const CALL_URL =
@@ -51,7 +51,7 @@ function event(overrides: Partial<CalendarEvent> = {}): CalendarEvent {
 /** A Rox call as the editor saves it, next to whatever location was typed. */
 function roxCallEvent(typedLocation: string) {
   return event(
-    attachCalendarMacroCall(
+    attachCalendarRoxCall(
       { description: '<p>Agenda</p>', location: typedLocation },
       CALL_URL
     )

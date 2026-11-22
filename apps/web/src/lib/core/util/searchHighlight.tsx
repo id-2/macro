@@ -74,14 +74,14 @@ export function extractSearchSnippet(highlightedContent: string): string {
  * @returns Content with adjacent rox_em tags merged
  *
  * @example
- * mergeAdjacentMacroEmTags("The <rox_em>quick</rox_em> <rox_em>brown</rox_em> fox")
+ * mergeAdjacentRoxEmTags("The <rox_em>quick</rox_em> <rox_em>brown</rox_em> fox")
  * // Returns: "The <rox_em>quick brown</rox_em> fox"
  *
  * @example
- * mergeAdjacentMacroEmTags("<rox_em>Hello</rox_em> <rox_em>world</rox_em>, <rox_em>goodbye</rox_em>")
+ * mergeAdjacentRoxEmTags("<rox_em>Hello</rox_em> <rox_em>world</rox_em>, <rox_em>goodbye</rox_em>")
  * // Returns: "<rox_em>Hello world</rox_em>, <rox_em>goodbye</rox_em>"
  */
-export function mergeAdjacentMacroEmTags(highlightedContent: string): string {
+export function mergeAdjacentRoxEmTags(highlightedContent: string): string {
   return highlightedContent.replace(/<\/rox_em>(\s+)<rox_em>/g, '$1');
 }
 

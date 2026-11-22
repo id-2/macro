@@ -49,7 +49,7 @@ function isBlockRouteReference(
 }
 
 /** Interpret a matched app route as an entity without importing eager view routes. */
-export function createMacroMentionLinkResolver(
+export function createRoxMentionLinkResolver(
   routes: SplitRoutesManifest
 ): RoxMentionLinkResolver {
   return (url) => {
@@ -91,9 +91,9 @@ export function createMacroMentionLinkResolver(
 }
 
 /** Capture an app-owned resolver at an editor host, then pass it to the editor. */
-export function useMacroMentionLinkResolver():
+export function useRoxMentionLinkResolver():
   | RoxMentionLinkResolver
   | undefined {
   const router = useOptionalSplitRouter();
-  return router && createMacroMentionLinkResolver(router.routes);
+  return router && createRoxMentionLinkResolver(router.routes);
 }

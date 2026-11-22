@@ -30,7 +30,7 @@ import { blockDataSignal } from '@core/internal/BlockLoader';
 import { watchPresentationChanges } from '@core/pptx-engine/changes';
 import { blockMetadataSignal } from '@core/signal/load';
 import { useCanEdit, useGetPermissions } from '@core/signal/permissions';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import {
   useBlockDocumentDownloadName,
   useBlockDocumentName,
@@ -169,7 +169,7 @@ function PresentationHost(props: {
 }
 
 const displayName = (userId: string | undefined) =>
-  getDisplayName(tryMacroId(userId ?? ''), { emailFallback: 'local-part' }) ||
+  getDisplayName(tryRoxId(userId ?? ''), { emailFallback: 'local-part' }) ||
   'Someone';
 
 /**

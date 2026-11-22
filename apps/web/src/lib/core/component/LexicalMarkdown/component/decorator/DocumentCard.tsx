@@ -10,7 +10,7 @@ import { resolveBlockAlias, verifyBlockName } from '@core/constant/allBlocks';
 import { ENABLE_BLOCK_IN_BLOCK } from '@core/constant/featureFlags';
 import { canNestBlock, createBlockInstance } from '@core/orchestrator';
 import { blockElementSignal } from '@core/signal/blockElement';
-import { getDisplayName, tryMacroId } from '@core/user';
+import { getDisplayName, tryRoxId } from '@core/user';
 import { copyBranchNameToClipboard } from '@core/util/branchName';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { lazyNamed } from '@core/util/lazyNamed';
@@ -600,8 +600,8 @@ function DocumentCardInner(props: DocumentCardDecoratorProps) {
             <>
               <Show when={props.item.owner}>
                 {(owner) =>
-                  getDisplayName(tryMacroId(owner())) ||
-                  owner().replace('rox|', '')
+                  getDisplayName(tryRoxId(owner())) ||
+                  owner().replace('macro|', '')
                 }
               </Show>
               <Show when={props.item.owner && props.item.updatedAt}>

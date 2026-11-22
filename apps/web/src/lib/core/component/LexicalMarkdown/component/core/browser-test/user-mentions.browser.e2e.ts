@@ -14,7 +14,7 @@ for (const resolveName of [true, false]) {
           body: JSON.stringify({
             names: [
               {
-                id: 'rox|user@example.com',
+                id: 'macro|user@example.com',
                 first_name: 'Example',
                 last_name: 'User',
               },
@@ -38,7 +38,7 @@ for (const resolveName of [true, false]) {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     const markdown =
-      '<m-user-mention>{"userId":"rox|user@example.com"}</m-user-mention>';
+      '<m-user-mention>{"userId":"macro|user@example.com"}</m-user-mention>';
     const nameRequest = page.waitForResponse((response) =>
       response.url().endsWith('/user/get_names_with_email')
     );
@@ -53,7 +53,7 @@ for (const resolveName of [true, false]) {
     await expect(rendered).toHaveText(label);
     await expect(rendered).toHaveAttribute(
       'data-user-id',
-      'rox|user@example.com'
+      'macro|user@example.com'
     );
     await expect(editor.locator('[data-user-mention]')).toHaveText(label);
     await page

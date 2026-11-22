@@ -1,5 +1,5 @@
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { useIsAuthenticated } from '@core/auth';
 import {
   type BlockAlias,
@@ -215,7 +215,7 @@ export function ForwardToChannel(props: ForwardToChannelProps) {
   const [triedToSubmit, setTriedToSubmit] = createSignal(false);
   const [isSubmitting, setIsSubmitting] = createSignal(false);
   const composer = createForwardMessageComposer({
-    resolveAppLink: useMacroMentionLinkResolver(),
+    resolveAppLink: useRoxMentionLinkResolver(),
     isSending: isSubmitting,
     uploadFile: (file) =>
       uploadFile(file, chatRuleset, { hideProgressIndicator: true }),

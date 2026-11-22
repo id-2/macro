@@ -14,7 +14,7 @@ import type { PeopleReferenceRequest } from './protocol';
 
 const REQUEST: PeopleReferenceRequest = {
   scope: {
-    identity: 'rox|viewer@example.com',
+    identity: 'macro|viewer@example.com',
     storageGeneration: '00000000-0000-4000-8000-000000000001',
   },
   labels: ['Sam'],

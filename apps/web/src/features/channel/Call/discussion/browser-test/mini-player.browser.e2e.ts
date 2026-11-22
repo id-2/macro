@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 const PATH =
   '/src/features/channel/Call/discussion/browser-test/call-overlay.html';
-const FIRST = 'rox|member@example.com';
-const SECOND = 'rox|member2@example.com';
+const FIRST = 'macro|member@example.com';
+const SECOND = 'macro|member2@example.com';
 
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(

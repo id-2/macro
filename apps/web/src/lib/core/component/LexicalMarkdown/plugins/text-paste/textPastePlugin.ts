@@ -12,7 +12,7 @@ import {
 } from '@core/block';
 import { shouldUseMobileClipboardImageRecovery } from '@core/mobile/mobileClipboardImageRecovery';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { isValidMacroAppHostname } from '@core/util/roxAppUrl';
+import { isValidRoxAppHostname } from '@core/util/roxAppUrl';
 import { $isCodeNode } from '@lexical/code';
 import { $createLinkNode, $isLinkNode, LinkNode } from '@lexical/link';
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
@@ -23,7 +23,7 @@ import {
   $isCustomCodeNode,
   BookingLinkMentionNode,
   HISTORY_MERGE_TAG,
-  isMacroBookingUrl,
+  isRoxBookingUrl,
   PasteNode,
   PullRequestMentionNode,
   parseBookingUrl,
@@ -80,12 +80,12 @@ const IgnoredParams = new Set(['referral_code']);
 
 const ValidBlockNames = [...BlockRegistry, ...BlockAliasRegistry];
 
-export function parseMacroAppUrl(text: string): RoxAppUrlParsed {
+export function parseRoxAppUrl(text: string): RoxAppUrlParsed {
   try {
     const url: URL = new URL(text);
     if (
       !url.pathname.startsWith('/app/') ||
-      !isValidMacroAppHostname(url.hostname)
+      !isValidRoxAppHostname(url.hostname)
     ) {
       return {
         isValid: false,
@@ -150,11 +150,11 @@ export function parseMacroAppUrl(text: string): RoxAppUrlParsed {
   }
 }
 
-export function resolvePastedMacroAppUrl(
+export function resolvePastedRoxAppUrl(
   text: string,
   resolveAppLink?: MentionLinkResolver
 ) {
-  const legacy = parseMacroAppUrl(text);
+  const legacy = parseRoxAppUrl(text);
   return legacy.isValid ? legacy : resolveAppLink?.(text);
 }
 
@@ -330,7 +330,7 @@ function registerTextPastePlugin(
 
           const trimmedPaste = pastedText.trim();
           if (
-            isMacroBookingUrl(trimmedPaste) &&
+            isRoxBookingUrl(trimmedPaste) &&
             editor.hasNode(BookingLinkMentionNode)
           ) {
             const selection = $getSelection();
@@ -352,11 +352,11 @@ function registerTextPastePlugin(
             }
           }
 
-          const parsedMacroAppUrl = resolvePastedMacroAppUrl(
+          const parsedRoxAppUrl = resolvePastedRoxAppUrl(
             pastedText,
             resolveAppLink
           );
-          if (!parsedMacroAppUrl?.id || !parsedMacroAppUrl.block) {
+          if (!parsedRoxAppUrl?.id || !parsedRoxAppUrl.block) {
             // Large plain-text pastes collapse into a block-level PasteNode
             // (Anthropic-style "pasted" chip). Only handle genuine plain text
             // pastes: defer to the richer paste handlers for HTML / Lexical
@@ -389,18 +389,18 @@ function registerTextPastePlugin(
             return false;
 
           event.preventDefault();
-          if (parsedMacroAppUrl.block === 'pr') {
+          if (parsedRoxAppUrl.block === 'pr') {
             editor.dispatchCommand(INSERT_PR_MENTION_COMMAND, {
-              id: parsedMacroAppUrl.id,
+              id: parsedRoxAppUrl.id,
             });
             return true;
           }
 
           editor.dispatchCommand(INSERT_DOCUMENT_MENTION_COMMAND, {
-            documentId: parsedMacroAppUrl.id,
+            documentId: parsedRoxAppUrl.id,
             documentName: '',
-            blockName: parsedMacroAppUrl.block,
-            blockParams: parsedMacroAppUrl.params || {},
+            blockName: parsedRoxAppUrl.block,
+            blockParams: parsedRoxAppUrl.params || {},
           });
           return true;
         }

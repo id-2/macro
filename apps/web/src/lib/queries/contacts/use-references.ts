@@ -21,7 +21,7 @@ export function useContactReferences(
     if (!needsInboxes() || !queryReadyGate(links)) return undefined;
     return links.data.links.flatMap((link) => {
       if (link.is_primary) return [];
-      const id = canonicalContactUserId(`rox|${link.email_address}`);
+      const id = canonicalContactUserId(`macro|${link.email_address}`);
       return id ? [id] : [];
     });
   });

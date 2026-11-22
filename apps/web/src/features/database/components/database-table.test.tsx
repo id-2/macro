@@ -25,10 +25,10 @@ vi.mock('@property/utils/focus', () => ({
     setTimeout(() => element()?.focus(), 100),
 }));
 vi.mock('../../../lib/core/user/index', () => ({
-  tryMacroId: (id: string) => (id.startsWith('rox|') ? id : undefined),
+  tryRoxId: (id: string) => (id.startsWith('macro|') ? id : undefined),
   roxIdToEmail: (id: string) => id.slice(6),
   getDisplayNameParts: (id: string | undefined) =>
-    id === 'rox|alex@example.com'
+    id === 'macro|alex@example.com'
       ? { firstName: 'Alex', lastName: 'Rivera', fullName: 'Alex Rivera' }
       : { firstName: '', lastName: '', fullName: '' },
   getInitials: (first: string, last: string, email: string) =>
@@ -905,20 +905,20 @@ describe('presence and reveal', () => {
     const onCellFocus = vi.fn();
     const [remoteUsers, setRemoteUsers] = createSignal([
       {
-        userId: 'rox|alex@example.com',
+        userId: 'macro|alex@example.com',
         rowId: 'two',
         columnId: 'notes',
         editing: false,
       },
       {
-        userId: 'rox|sam@example.com',
+        userId: 'macro|sam@example.com',
         rowId: 'one',
         columnId: 'name',
         editing: true,
       },
-      { userId: 'rox|pat@example.com', editing: false },
+      { userId: 'macro|pat@example.com', editing: false },
       {
-        userId: 'rox|lee@example.com',
+        userId: 'macro|lee@example.com',
         rowId: 'two',
         columnId: 'name',
         editing: false,
@@ -961,7 +961,7 @@ describe('presence and reveal', () => {
     const alexCell = alexTag.closest<HTMLElement>('[data-grid-cell]')!;
     expect(alexCell.dataset.gridRow).toBe('1');
     expect(alexCell.dataset.gridColumn).toBe('2');
-    expect(alexCell.dataset.remoteUsers).toBe('rox|alex@example.com');
+    expect(alexCell.dataset.remoteUsers).toBe('macro|alex@example.com');
     // The outline is an overlay, so the cell itself gains no border.
     expect(alexCell.style.borderTop).toBe('');
     const alexOutline = alexCell.querySelector<HTMLElement>(

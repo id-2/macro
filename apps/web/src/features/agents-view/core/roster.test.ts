@@ -20,7 +20,7 @@ function persisted(
       id: `bot-${overrides.harness}`,
       name: 'Agent',
       handle: 'agent',
-      owner: { type: 'user', user_id: 'rox|me@example.com' },
+      owner: { type: 'user', user_id: 'macro|me@example.com' },
     },
     default_model: 'claude-sonnet-5',
     ...overrides,

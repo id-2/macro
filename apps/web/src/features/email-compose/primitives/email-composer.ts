@@ -345,9 +345,9 @@ export function createEmailComposer(props: EmailComposerOptions) {
       'to',
       props.initialTo.map((email) => ({
         kind: 'custom' as const,
-        id: `rox|${email}`,
+        id: `macro|${email}`,
         data: {
-          id: `rox|${email}`,
+          id: `macro|${email}`,
           email,
           invalid: !EmailValidator.validate(email),
         },

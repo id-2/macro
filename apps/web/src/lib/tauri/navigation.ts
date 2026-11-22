@@ -9,7 +9,7 @@ import { useNavigate } from '@solidjs/router';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { createEffect, onCleanup } from 'solid-js';
-import { registerMacroLinkInterceptor } from './roxLinkInterceptor';
+import { registerRoxLinkInterceptor } from './roxLinkInterceptor';
 
 type NavigateEvent = {
   path: string;
@@ -25,7 +25,7 @@ export function useTauriNavigationEffect() {
     // Send side of the same `navigate` bridge as the listener below: route
     // Rox `/app` links opened via `openExternalUrl` in-app instead of the
     // system browser.
-    const unregisterInterceptor = registerMacroLinkInterceptor();
+    const unregisterInterceptor = registerRoxLinkInterceptor();
 
     const unlisten = listen<NavigateEvent>('navigate', (ev) => {
       if (handlePipedreamCallback(ev.payload.path, ev.payload.query)) return;

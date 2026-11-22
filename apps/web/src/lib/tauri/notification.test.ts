@@ -102,7 +102,7 @@ describe('desktop notification delivery', () => {
   it('titles macOS notifications with the sender and names the conversation beneath', async () => {
     const adapter = createTauriNotificationInterface(vi.fn());
     const sender = {
-      id: 'rox|ada@example.com',
+      id: 'macro|ada@example.com',
       name: 'Ada',
       avatarUrl: 'https://cdn.example.com/ada.png',
     };

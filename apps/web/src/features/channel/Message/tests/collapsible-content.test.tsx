@@ -25,7 +25,7 @@ vi.mock('../MentionedImages', () => ({ MentionedImages: () => null }));
 const message = {
   id: 'comment',
   content: 'A very long comment',
-  sender_id: 'rox|ada@example.com',
+  sender_id: 'macro|ada@example.com',
   created_at: '2026-10-21T00:00:00.000Z',
   updated_at: '2026-10-21T00:00:00.000Z',
   attachments: [],

@@ -16,7 +16,7 @@ import {
 import {
   $createBookingLinkMentionNode,
   BookingLinkMentionNode,
-  isMacroBookingUrl,
+  isRoxBookingUrl,
 } from '../nodes/BookingLinkMentionNode';
 import {
   CONNECT_APP_TAG,
@@ -812,7 +812,7 @@ export const I_BOOKING_LINK_MENTION: TextMatchTransformer = {
       const profileId =
         typeof data.profileId === 'string' ? data.profileId : '';
       const url =
-        typeof data.url === 'string' && isMacroBookingUrl(data.url)
+        typeof data.url === 'string' && isRoxBookingUrl(data.url)
           ? data.url
           : undefined;
       if (!profileId && !url) {

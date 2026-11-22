@@ -1,6 +1,6 @@
 import { touchHandler } from '@core/directive/touchHandler';
 import { idToDisplayName } from '@core/user';
-import { tryMacroId } from '@core/user/roxId';
+import { tryRoxId } from '@core/user/roxId';
 import { Popover } from '@kobalte/core/popover';
 import { Button, cn, HoverCard } from '@ui';
 import { createSignal, type JSX, Show } from 'solid-js';
@@ -34,7 +34,7 @@ export function formatReactorNames(
   const isNamed = (id: string) =>
     id === currentUserId ||
     externalNames[id] !== undefined ||
-    tryMacroId(id) !== undefined;
+    tryRoxId(id) !== undefined;
   const ordered = [
     ...userIds.filter((id) => id === currentUserId),
     ...userIds.filter((id) => id !== currentUserId && isNamed(id)),

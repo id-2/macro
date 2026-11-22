@@ -1,7 +1,7 @@
 import { EmailUserTooltip } from '@app/features/email-message/components/email-user-tooltip';
 import { isViewerAddress } from '@app/features/email-message/core/email-user';
 import { UserIcon, type UserIconProps } from '@core/component/UserIcon';
-import { emailToMacroId } from '@core/user/roxId';
+import { emailToRoxId } from '@core/user/roxId';
 import { Key } from '@solid-primitives/keyed';
 import { Badge, Button, badgeTriggerClasses } from '@ui';
 import { createMemo, createSignal, Show } from 'solid-js';
@@ -72,7 +72,7 @@ export function EmailParticipants() {
   };
 
   const getIconProps = (p: Participant): UserIconProps => {
-    const roxId = emailToMacroId(p.email);
+    const roxId = emailToRoxId(p.email);
     if (roxId) return { id: roxId, photoUrl: p.photoUrl };
     return { email: p.email, photoUrl: p.photoUrl };
   };

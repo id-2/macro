@@ -16,7 +16,7 @@ import { TaskGroupHeader } from '../components/task-list/TaskGroupHeader';
 
 enableProjects.override = true;
 enableGraphqlSoup.override = false;
-const VIEWER_ID = 'rox|project-grouping@example.test';
+const VIEWER_ID = 'macro|project-grouping@example.test';
 const PROJECT_ONE = 'ad000000-0000-0000-0000-000000000001';
 const PROJECT_TWO = 'ad000000-0000-0000-0000-000000000002';
 const PROJECTS = new Map([

@@ -10,7 +10,7 @@ import { InputProvider } from '@channel/Input/context';
 import { Input } from '@channel/Input/Input';
 import type { InputAttachmentData, InputCommands } from '@channel/Input/types';
 import { getAttachmentKindFromFile } from '@channel/Input/utils/file-helpers';
-import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
+import { useRoxMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { preloadAgentFold } from '@core/agent-fold/client';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
@@ -123,7 +123,7 @@ export function ChatComposer(props: {
     props.onDraftChange(markdown);
   };
   const editor = buildConfig('chat')
-    .withAppLinkResolver(useMacroMentionLinkResolver())
+    .withAppLinkResolver(useRoxMentionLinkResolver())
     .namespace('agents-chat-composer')
     .withMentions({ showOpenTabs: true, block: 'agent' })
     .withEmojis()

@@ -1,4 +1,4 @@
-import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
+import { AskRoxButton } from '@app/features/chat/ChatWithAgentButton';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import {
   FileDetailsSection,
@@ -28,7 +28,7 @@ function PdfHeaderActions() {
 
   return (
     <HeaderActionGroup label="Actions">
-      <AskMacroButton
+      <AskRoxButton
         grouped
         entity={{
           type: 'document',

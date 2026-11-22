@@ -6,12 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { agentContextText, promptOrigin } from './prompt-origin';
 
 const julia = {
-  id: 'rox|julia@example.com',
+  id: 'macro|julia@example.com',
   name: 'Julia',
   email: 'julia@example.com',
 };
 const teo = {
-  id: 'rox|teo@example.com',
+  id: 'macro|teo@example.com',
   name: 'Teo',
   email: 'teo@example.com',
 };
@@ -580,7 +580,7 @@ describe('promptOrigin', () => {
   it('is undefined when the context names no trigger', () => {
     expect(
       promptOrigin(
-        '<session owner="Julia" owner_id="rox|julia@example.com"/>'
+        '<session owner="Julia" owner_id="macro|julia@example.com"/>'
       )
     ).toBeUndefined();
     expect(promptOrigin('Prior message 1: <unclosed')).toBeUndefined();

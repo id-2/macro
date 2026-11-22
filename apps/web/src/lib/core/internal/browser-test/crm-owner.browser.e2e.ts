@@ -56,7 +56,7 @@ test('CRM keeps team owner options scoped and resolves chip suggestions without 
     .getByRole('button', { name: 'Select only Broader match' })
     .click();
   await expect(page.getByTestId('owners')).toHaveText(
-    '["rox|match@example.com"]'
+    '["macro|match@example.com"]'
   );
   await expect(page.getByTestId('stages')).toHaveText('["kept-stage"]');
   await expect(page.getByTestId('lookup-ids')).not.toContainText('NO_ASSIGNEE');

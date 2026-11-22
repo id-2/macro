@@ -27,7 +27,7 @@ vi.mock('@channel/Call/CallContext', () => ({
   useCallContextOptional: () => ({ activeCallId: () => mocks.activeCallId }),
 }));
 vi.mock('@app/features/chat/ChatWithAgentButton', () => ({
-  AskMacroButton: () => null,
+  AskRoxButton: () => null,
 }));
 vi.mock('@property/tags', () => ({ InlineFetchedEntityTagsPill: () => null }));
 vi.mock('@channel/Call/chat/CallChatHistory', () => ({

@@ -12,7 +12,7 @@ import {
   safeConferenceUrl,
 } from '@app/features/calendar/utils/conference-link';
 import {
-  calendarMacroCallUrl,
+  calendarRoxCallUrl,
   roxCallUrl,
 } from '@app/features/calendar/utils/rox-call-link';
 import { formatCalendarTime } from '@app/features/calendar/utils/time-format';
@@ -98,7 +98,7 @@ function meetingLinkForEvent(
 
   const description =
     details?.description ?? (event.isRecurring ? undefined : event.description);
-  const rox = calendarMacroCallUrl({
+  const rox = calendarRoxCallUrl({
     description,
     location: details?.location,
   });
@@ -114,7 +114,7 @@ function meetingLinkForEvent(
     details?.conferenceUrl ?? event.conferenceUrl
   );
   if (!conference) return undefined;
-  const roxConference = calendarMacroCallUrl({ conferenceUrl: conference });
+  const roxConference = calendarRoxCallUrl({ conferenceUrl: conference });
   if (roxConference) {
     return { url: roxConference, kind: 'rox', label: 'Rox call' };
   }
