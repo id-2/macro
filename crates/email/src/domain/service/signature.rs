@@ -18,7 +18,6 @@ fn signature_selector() -> String {
     format!(".{SIGNATURE_CLASS}, .{LEGACY_SIGNATURE_CLASS}")
 }
 
-
 /// Pure send-time signature policy, shared by immediate and scheduled delivery.
 /// Settings are fetched before entering the persistence transaction; application
 /// uses the current locked body so an autosave cannot race body preparation.

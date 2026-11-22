@@ -125,7 +125,7 @@ internal object PushStore {
         all.put(message.identifier, record)
         save(context, all)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_macro_notification)
+            .setSmallIcon(R.drawable.ic_rox_notification)
             .setContentTitle(message.title.ifBlank { "Rox" })
             .setContentText(message.body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message.body))

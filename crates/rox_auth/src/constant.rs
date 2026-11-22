@@ -46,10 +46,16 @@ mod test {
     fn cookie_names_read_current_then_legacy() {
         let access = access_token_cookie_names();
         assert!(access[0].ends_with(ROX_ACCESS_TOKEN_COOKIE), "{access:?}");
-        assert!(access[1].ends_with(LEGACY_ACCESS_TOKEN_COOKIE), "{access:?}");
+        assert!(
+            access[1].ends_with(LEGACY_ACCESS_TOKEN_COOKIE),
+            "{access:?}"
+        );
 
         let refresh = refresh_token_cookie_names();
-        assert!(refresh[0].ends_with(ROX_REFRESH_TOKEN_COOKIE), "{refresh:?}");
+        assert!(
+            refresh[0].ends_with(ROX_REFRESH_TOKEN_COOKIE),
+            "{refresh:?}"
+        );
         assert!(
             refresh[1].ends_with(LEGACY_REFRESH_TOKEN_COOKIE),
             "{refresh:?}"

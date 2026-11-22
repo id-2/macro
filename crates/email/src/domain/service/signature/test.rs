@@ -132,13 +132,18 @@ fn strips_server_wrapped_signature() {
 
 #[test]
 fn recognizes_and_strips_the_pre_rename_signature_marker() {
-    let legacy =
-        r#"<body><p>Hi</p><div class="macro-email-signature"><p>Regards</p></div></body>"#;
+    let legacy = r#"<body><p>Hi</p><div class="macro-email-signature"><p>Regards</p></div></body>"#;
     assert!(has_signature(legacy), "legacy marker must count as signed");
     let stripped = strip_signature(legacy);
-    assert!(!stripped.contains("macro-email-signature"), "got: {stripped}");
+    assert!(
+        !stripped.contains("macro-email-signature"),
+        "got: {stripped}"
+    );
     assert!(!has_signature(&stripped), "got: {stripped}");
-    assert!(stripped.contains("Hi"), "message body must remain: {stripped}");
+    assert!(
+        stripped.contains("Hi"),
+        "message body must remain: {stripped}"
+    );
 
     // A re-send of a body signed before the rename adds no second signature.
     let mut body = Some(legacy.to_owned());
@@ -151,7 +156,10 @@ fn recognizes_and_strips_the_pre_rename_signature_marker() {
         include_signature: None,
     }
     .apply(false, &mut body, &mut text);
-    assert_eq!(body.as_deref().unwrap().matches("email-signature").count(), 1);
+    assert_eq!(
+        body.as_deref().unwrap().matches("email-signature").count(),
+        1
+    );
 }
 
 #[test]
