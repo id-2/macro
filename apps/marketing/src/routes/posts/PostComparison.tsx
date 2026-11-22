@@ -4,7 +4,7 @@ import { Dynamic } from 'solid-js/web';
 // Brand marks for the comparison-table headers.
 
 export function RoxLogo() {
-  return <img class="mvn-logo-macro" src="/rox-favicon.svg" alt="" />;
+  return <img class="mvn-logo-rox" src="/rox-favicon.svg" alt="" />;
 }
 
 export function LinearLogo() {
@@ -73,7 +73,7 @@ export function ComparisonTable(props: {
             <thead>
               <tr>
                 <th />
-                <th class="mvn-macro-col">
+                <th class="mvn-rox-col">
                   <span class="mvn-th-brand">
                     <RoxLogo /> Rox
                   </span>
@@ -90,7 +90,7 @@ export function ComparisonTable(props: {
                 {(row) => (
                   <tr>
                     <th scope="row">{row.feature}</th>
-                    <td class="mvn-macro-col">{row.macro}</td>
+                    <td class="mvn-rox-col">{row.macro}</td>
                     <td classList={{ 'mvn-no': !!row.themNo }}>{row.them}</td>
                   </tr>
                 )}

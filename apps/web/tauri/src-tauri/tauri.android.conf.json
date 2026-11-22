@@ -13,6 +13,7 @@
       "mobile": [
         {
           "scheme": [
+            "rox",
             "macro"
           ],
           "host": "app",

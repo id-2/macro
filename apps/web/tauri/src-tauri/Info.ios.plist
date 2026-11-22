@@ -32,6 +32,7 @@
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>rox</string>
 		<string>macro</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
@@ -50,10 +51,11 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>rox</string>
 				<string>macro</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>macro</string>
+			<string>rox</string>
 		</dict>
 	</array>
 </dict>

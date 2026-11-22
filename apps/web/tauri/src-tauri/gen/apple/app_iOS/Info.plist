@@ -20,9 +20,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>macro</string>
+			<string>rox</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>rox</string>
 				<string>macro</string>
 			</array>
 		</dict>
@@ -33,6 +34,7 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>rox</string>
 		<string>macro</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>

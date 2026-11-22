@@ -167,7 +167,7 @@ export function Supermodule(props: {
           <path d="M528.3,383.9l-1.6-11.9-1-6.2-1.7-5.8-7.8-17.6-.3-.4c-11.6-21.2-38.9-28.4-70.6-15.7-42.3,17-76.6,62.7-76.6,102.5s10.9,38.1,28,44.5q17.6,6.6,36.3,8.5" />
           <path d="M528.7,389.6c0,33.7-29.1,72.7-65,87.1-35.9,14.4-65-1.3-65-35.1s29.1-72.7,65-87.1c35.9-14.4,65,1.3,65,35.1Z" />
           <g
-            class="supermodule-macro-logo"
+            class="supermodule-rox-logo"
             transform={FRONT_CAP_ROX_TRANSFORM}
           >
             <image

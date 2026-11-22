@@ -27,11 +27,10 @@ use tauri::{AppHandle, Emitter, Manager, RunEvent, Runtime};
 mod android_tls;
 mod tauri_protocol;
 
-/// The custom URL scheme this build mints and routes into the SPA.
-pub(crate) const APP_SCHEME: &str = "rox";
-/// The pre-rename custom scheme. Installed apps and cached web bundles still
-/// emit `macro://` links, so it stays registered and keeps routing.
-pub(crate) const LEGACY_APP_SCHEME: &str = "macro";
+/// The app's custom URL schemes come from the navigation plugin so the
+/// registered scheme list and the routing check cannot drift apart. `rox` is
+/// current; `macro` predates the rename and is still accepted.
+pub(crate) use navigation_plugin::scheme::{APP_SCHEME, is_app_scheme};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -709,12 +708,13 @@ fn open_external_url(
 fn emit_navigate_for_deep_link(url: Url, handle: &AppHandle) -> Result<(), Report> {
     // Auth callbacks belong exclusively to the native browser session. They
     // must not reach SPA routing or application logs, even via an explicit intent.
-    if url.scheme() == APP_SCHEME && url.host_str() == Some("android-auth") {
+    if is_app_scheme(url.scheme()) && url.host_str() == Some("android-auth") {
         return Ok(());
     }
-    // Universal/App links come in as https:// URLs, custom scheme links come in as rox://
+    // Universal/App links come in as https:// URLs, custom scheme links come in
+    // as rox:// (or the legacy macro://).
     let rox_scheme = match url.scheme() {
-        s if s == APP_SCHEME => RoxScheme::new(url)?,
+        s if is_app_scheme(s) => RoxScheme::new(url)?,
         "http" | "https" if navigation_plugin::is_app_link(APP_LINK_HOSTS, &url) => {
             RoxScheme::from_url(&url)?
         }

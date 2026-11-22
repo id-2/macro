@@ -77,7 +77,7 @@ pub fn install_delegate(app: &AppHandle) {
 
 pub(super) fn notification_url(identifier: &str) -> Option<Url> {
     let url = Url::parse(identifier).ok()?;
-    (url.scheme() == crate::APP_SCHEME
+    (crate::is_app_scheme(url.scheme())
         && url.host_str().is_none()
         && url.path() == "/notification"
         && url

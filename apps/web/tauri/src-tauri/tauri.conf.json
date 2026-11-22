@@ -67,6 +67,7 @@
       "mobile": [
         {
           "scheme": [
+            "rox",
             "macro"
           ],
           "appLink": false
@@ -101,6 +102,7 @@
       ],
       "desktop": {
         "schemes": [
+          "rox",
           "macro"
         ]
       }
