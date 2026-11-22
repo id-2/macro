@@ -78,7 +78,7 @@ import {
 import { createFontSource } from './queries/font-source';
 import { openFigEngine, prepareFigEngine } from './queries/prepare-engine';
 import { FigViewer } from './views/fig-viewer';
-import { useMacroComments } from './views/macro-comments';
+import { useMacroComments } from './views/rox-comments';
 
 /**
  * ⌘K on a design opens the command menu, which then offers the design

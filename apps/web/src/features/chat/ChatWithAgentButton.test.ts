@@ -155,12 +155,12 @@ describe('Ask Agent without the agent composer', () => {
     await openChatWithAgent({
       type: 'pr',
       id: 'pr-entity-id',
-      url: 'https://github.com/macro-inc/macro/pull/42',
+      url: 'https://github.com/rox-inc/rox/pull/42',
     });
     const input: string =
       mocks.startPendingSession.mock.calls[0][0].initialInput;
     expect(input).toBe(
-      '<m-pr-mention>{"id":"pr-entity-id","url":"https://github.com/macro-inc/macro/pull/42","label":""}</m-pr-mention> '
+      '<m-pr-mention>{"id":"pr-entity-id","url":"https://github.com/rox-inc/rox/pull/42","label":""}</m-pr-mention> '
     );
     const editor = createHeadlessEditor({ nodes: SupportedNodeTypes });
     editor.update(() => $convertFromMarkdownString(input, ALL_TRANSFORMERS), {
@@ -170,7 +170,7 @@ describe('Ask Agent without the agent composer', () => {
       const serialized = $convertToMarkdownString(ALL_TRANSFORMERS);
       expect(serialized).toContain('"id":"pr-entity-id"');
       expect(serialized).toContain(
-        '"url":"https://github.com/macro-inc/macro/pull/42"'
+        '"url":"https://github.com/rox-inc/rox/pull/42"'
       );
     });
   });

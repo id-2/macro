@@ -14,7 +14,7 @@ import type { HomeViewState } from './types';
 
 export const HOME_ENTRY_STATE_KEY = 'home.view';
 export const HOME_LIST_ENTRY_STATE_KEY = 'home.listState';
-const homeFilterStorage = createUserScopedStorage('macro:home:filters:v1');
+const homeFilterStorage = createUserScopedStorage('rox:home:filters:v1');
 
 /** Status is a single choice; an empty selection means All. */
 export function normalizeHomeFacets(raw: unknown) {

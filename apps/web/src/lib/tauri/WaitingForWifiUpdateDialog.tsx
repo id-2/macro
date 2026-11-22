@@ -18,7 +18,7 @@ import { z } from 'zod';
 import type { BundleUpdateStatus } from './TauriProvider';
 
 /** Device-wide: the update waiting for Wi-Fi belongs to the install. */
-const SNOOZE_STORAGE_KEY = 'macro:bundle-update:wifi-offer-snoozed-until';
+const SNOOZE_STORAGE_KEY = 'rox:bundle-update:wifi-offer-snoozed-until';
 /** How long "Not now" holds off the offer, across relaunches. */
 export const WIFI_OFFER_SNOOZE_MS = 24 * 60 * 60 * 1000;
 const SNOOZED_UNTIL_SCHEMA = z.coerce.number().int().nonnegative();

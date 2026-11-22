@@ -1,9 +1,9 @@
 import { CODEX_BOT_NAME, isCodexBotId } from '@core/constant/codexAgent';
 import { CURSOR_BOT_NAME, isCursorBotId } from '@core/constant/cursorAgent';
-import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/macroAgent';
-import { isMacroCoderId, ROX_CODER_NAME } from '@core/constant/macroCoder';
-import { isMacroNewId } from '@core/constant/macroNew';
-import { isMacroSystemId, ROX_SYSTEM_NAME } from '@core/constant/macroSystem';
+import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/roxAgent';
+import { isMacroCoderId, ROX_CODER_NAME } from '@core/constant/roxCoder';
+import { isMacroNewId } from '@core/constant/roxNew';
+import { isMacroSystemId, ROX_SYSTEM_NAME } from '@core/constant/roxSystem';
 
 /**
  * Display name for a first-party bot (bare UUID or `bot|<uuid>`), resolved

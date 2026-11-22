@@ -10,7 +10,7 @@ function event(
 ): ActivityEvent {
   return {
     id,
-    actorId: 'macro|e2e@macro.local',
+    actorId: 'rox|e2e@rox.local',
     entityId: 'doc-1',
     entityType: 'document',
     occurredAt,

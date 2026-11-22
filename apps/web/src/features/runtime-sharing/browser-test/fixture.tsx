@@ -8,12 +8,12 @@ import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { PendingRequestsSection } from '../../settings/components/pending-requests-section';
 import { TeammateRuntimesSection } from '../../settings/components/teammate-runtimes-section';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { RuntimeShareDialog } from '../views/RuntimeShareDialog';
 import { OWNER_ID } from './preview-adapters';
 
 document.documentElement.dataset.themeLight = 'true';
-for (const [token, value] of Object.entries(macroLightTheme.colorTokens)) {
+for (const [token, value] of Object.entries(roxLightTheme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }
 

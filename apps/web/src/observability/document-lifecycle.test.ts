@@ -6,7 +6,7 @@ import {
 } from './document-lifecycle';
 import { frontendInstanceId } from './frontend-instance';
 
-const key = 'macro-document-lifecycle';
+const key = 'rox-document-lifecycle';
 const previousId = '11111111-1111-4111-8111-111111111111';
 
 beforeEach(() => {

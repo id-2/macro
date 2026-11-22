@@ -128,7 +128,7 @@ export function DraftComposer(props: {
     <FloatRegionOrInline region="accessory">
       <Show when={error()}>
         <div class="shrink-0 w-full @min-[40rem]:px-4 touch:px-(--mobile-chrome-gutter)">
-          <div class="mx-auto w-full macro-message-width macro-message-padding">
+          <div class="mx-auto w-full rox-message-width rox-message-padding">
             <div class="text-sm font-mono text-failure-ink">{error()}</div>
           </div>
         </div>

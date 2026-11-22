@@ -29,7 +29,7 @@ describe('clipboard HTML', () => {
     const html = encodeClipboard({ meta, copied: { document, images } });
     expect(html).toContain('<!--(figmeta)');
     expect(html).toContain('<!--(figma)');
-    expect(html).toContain('<!--(macroimages)');
+    expect(html).toContain('<!--(roximages)');
     const read = decodeClipboard(html);
     expect(read?.meta).toEqual(meta);
     // (Compared as arrays: the encoder's bytes come from another realm.)

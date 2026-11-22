@@ -140,7 +140,7 @@ describe('sanitizeCalendarDescription', () => {
 
   it('keeps mention display text without identity attributes', () => {
     const safe = sanitizeCalendarDescription(
-      '<p>ping <span data-user-mention="true" data-user-id="macro|auth0|u_123" data-email="teo@rox.one" data-display-name="Teo Nys">Teo Nys</span>' +
+      '<p>ping <span data-user-mention="true" data-user-id="rox|auth0|u_123" data-email="teo@rox.one" data-display-name="Teo Nys">Teo Nys</span>' +
         ' re <span data-contact-mention="true" data-contact-id="c_456" data-email-or-domain="glycotech.com" data-is-company="true">GlycoTech</span></p>'
     );
     expect(safe).toBe('<p>ping Teo Nys re GlycoTech</p>');
@@ -197,7 +197,7 @@ describe('exportCalendarDescription', () => {
     const editor = makeEditor();
     setEditorStateFromHtml(
       editor,
-      `<p>ping <span data-user-mention="true" data-user-id="macro|auth0|u_123" data-email="teo@rox.one" data-display-name="Teo Nys">Teo Nys</span>` +
+      `<p>ping <span data-user-mention="true" data-user-id="rox|auth0|u_123" data-email="teo@rox.one" data-display-name="Teo Nys">Teo Nys</span>` +
         ` about <span data-document-mention="true" data-document-id="${DOCUMENT_ID}" data-document-name="August Cycle Planning" data-block-name="md">August Cycle Planning</span></p>`
     );
     expect(exportCalendarDescription(editor)).toBe(

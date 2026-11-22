@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   attachCalendarMacroCall,
   calendarMacroCallUrl,
-  macroCallUrl,
+  roxCallUrl,
   removeCalendarMacroCall,
-} from './macro-call-link';
+} from './rox-call-link';
 
 const URL = 'https://rox.one/app/meet/8m8mGwzHqxzYjeIN5-nJRquRbzyTEhGF';
 const SETUP_URL = URL.replace('/meet/', '/meet/join/');
@@ -17,7 +17,7 @@ describe('Rox calendar call links', () => {
       })
     ).toBe(URL);
     expect(
-      macroCallUrl(
+      roxCallUrl(
         'http://localhost:3003/app/meet/8m8mGwzHqxzYjeIN5-nJRquRbzyTEhGF'
       )
     ).toBe('http://localhost:3003/app/meet/8m8mGwzHqxzYjeIN5-nJRquRbzyTEhGF');
@@ -49,7 +49,7 @@ describe('Rox calendar call links', () => {
       'https://rox.one/app/meet/join/short',
       `${SETUP_URL}/extra`,
     ]) {
-      expect(macroCallUrl(candidate)).toBeUndefined();
+      expect(roxCallUrl(candidate)).toBeUndefined();
     }
   });
 

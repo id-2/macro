@@ -3,7 +3,7 @@
  * fragment whose comments carry the metadata (`(figmeta)`, base64 JSON)
  * and the copied layers as a `.fig` document (`(figma)`, base64), so they
  * paste into another file or tab. Rox adds the images the layers use
- * (`(macroimages)`, a base64 ZIP), which Figma fetches from its servers.
+ * (`(roximages)`, a base64 ZIP), which Figma fetches from its servers.
  */
 
 import type { CopiedLayers, NodeType } from '@core/fig-engine/types';
@@ -53,8 +53,8 @@ export function encodeClipboard(payload: ClipboardPayload): string {
     : '';
   const images =
     payload.copied.images.length > 0
-      ? `<span data-macro-images="${marker(
-          'macroimages',
+      ? `<span data-rox-images="${marker(
+          'roximages',
           toBase64(payload.copied.images)
         )}"></span>`
       : '';
@@ -77,7 +77,7 @@ export function decodeClipboard(html: string): ClipboardPayload | undefined {
   if (!buffer) return undefined;
   try {
     const document = fromBase64(buffer);
-    const images = between(html, 'macroimages');
+    const images = between(html, 'roximages');
     const metaText = between(html, 'figmeta');
     let meta: ClipboardMeta | undefined;
     if (metaText) {

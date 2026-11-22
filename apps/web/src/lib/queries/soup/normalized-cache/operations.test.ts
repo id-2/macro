@@ -727,7 +727,7 @@ describe('removeSearchEntities', () => {
       type: 'agentSession',
       id: 'session-1',
       name: 'Search verification',
-      owner_id: 'macro|owner@example.com',
+      owner_id: 'rox|owner@example.com',
       bot_id: 'bot-1',
       created_at: '2026-09-11T00:00:00Z',
       updated_at: '2026-09-11T00:00:00Z',
@@ -1434,7 +1434,7 @@ describe('optimisticUpdateSoupEntity — parent item filter gate', () => {
 });
 
 /**
- * End-to-end gate for the dynamic-UI `list` widget (macro-2587): the widget
+ * End-to-end gate for the dynamic-UI `list` widget (rox-2587): the widget
  * drives a flat astItems query from a raw `Query` and now attaches
  * `soupItemMatchesQuery` as its `itemFilter`. Without it, any optimistic insert
  * (e.g. creating a task) prepended into an email-scoped list's cache.
@@ -1492,7 +1492,7 @@ describe('insertSoupEntity — dynamic-ui list query gate', () => {
 });
 
 /**
- * End-to-end gate for the folder (project) block (macro-2290): the block drives
+ * End-to-end gate for the folder (project) block (rox-2290): the block drives
  * a project-scoped soup view and attaches `soupItemMatchesProjectMembership` as
  * its `itemFilter`. Without it, creating or opening an entity outside the folder
  * (which refetches the item and prepends it into every matching list cache)
@@ -1553,8 +1553,8 @@ describe('insertSoupEntity — folder membership gate', () => {
 /** Shared's request scope must also gate immediate cache admission, even when
  * restored/mutable client predicates no longer contain `shared-entity`. */
 describe('insertSoupEntity — Shared Files ownership gate', () => {
-  const ME = 'macro|me@example.com';
-  const OTHER = 'macro|other@example.com';
+  const ME = 'rox|me@example.com';
+  const OTHER = 'rox|other@example.com';
   const FOLDER = 'folder-1';
   const GROUP = 'in_progress';
 
@@ -1656,7 +1656,7 @@ describe('insertSoupEntity — Shared Files ownership gate', () => {
 });
 
 /**
- * Regression coverage for macro-3258: a channel row marked done is removed
+ * Regression coverage for rox-3258: a channel row marked done is removed
  * from the done-filtered inbox pages, but the entity stays in the normalized
  * cache (the sidebar still references it), so an incoming notification took
  * the field-merge path and the inbox showed nothing until a refetch.
@@ -1958,7 +1958,7 @@ describe('restoreSoupEntityToDoneFilteredQueries', () => {
 });
 
 /**
- * Regression coverage for macro-3272: the composable inbox's Signal and Noise
+ * Regression coverage for rox-3272: the composable inbox's Signal and Noise
  * queries both carry `emailView: 'inbox'`, so a websocket notification for a
  * cached noise email restored the row into the Signal feed (and vice versa)
  * until an unrelated refetch corrected it. The inbox now attaches

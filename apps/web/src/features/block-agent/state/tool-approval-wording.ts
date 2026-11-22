@@ -218,7 +218,7 @@ export function describeToolCall(
   tool: string,
   whose: string
 ): string {
-  if (server.slug !== 'macro') {
+  if (server.slug !== 'rox') {
     return `use ${whose} ${server.name} account (${toolWords(tool)})`;
   }
   // A tool newer than this build, or one never held, reads by its name.
@@ -238,7 +238,7 @@ export function describeStandingApproval(
   tool: string,
   whose: string
 ): string {
-  return server.slug === 'macro'
+  return server.slug === 'rox'
     ? describeToolCall(server, tool, whose)
     : `use ${whose} ${server.name} account`;
 }

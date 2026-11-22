@@ -130,7 +130,7 @@ function CalendarDraftComposerContent(props: CalendarDraftComposerProps) {
   // The tool mints the Rox call when it executes, so the composer offers the
   // choice under the same flag as the calendar's own event composer.
   const quickCalls = useQuickCallsFlag();
-  const macroCallsEnabled = () => quickCalls().enabled && !quickCalls().loading;
+  const roxCallsEnabled = () => quickCalls().enabled && !quickCalls().loading;
   // Guest permissions roll out with guest invites.
   const guestInvitesEnabled = useCalendarGuestInvitesFlag();
   const [operation, setOperation] = createSignal<'create' | 'reject'>();
@@ -323,7 +323,7 @@ function CalendarDraftComposerContent(props: CalendarDraftComposerProps) {
           </Show>
           <EventForm
             controller={controller}
-            macroCallsEnabled={macroCallsEnabled()}
+            roxCallsEnabled={roxCallsEnabled()}
             guestPolicyEditable={guestInvitesEnabled()}
             class="min-w-0"
             disabled={

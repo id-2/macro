@@ -9,17 +9,17 @@ vi.mock('@core/component/UserIcon', () => ({ UserIcon: () => null }));
 it('keeps off-page selections and self without reordering clicked rows or retaining old pages', () => {
   createRoot((dispose) => {
     const me = {
-      id: 'macro|viewer@example.com',
+      id: 'rox|viewer@example.com',
       email: 'viewer@example.com',
       name: 'Viewer',
     };
     const first = {
-      id: 'macro|first@example.com',
+      id: 'rox|first@example.com',
       email: 'first@example.com',
       name: 'First',
     };
     const second = {
-      id: 'macro|second@example.com',
+      id: 'rox|second@example.com',
       email: 'second@example.com',
       name: 'Second',
     };
@@ -88,13 +88,13 @@ it('keeps off-page selections and self without reordering clicked rows or retain
       query: 'zxq',
       users: [
         {
-          id: 'macro|match@example.com',
+          id: 'rox|match@example.com',
           email: 'match@example.com',
           name: 'Broader match',
         },
       ],
     });
-    expect(options.visibleIds()).toEqual(['macro|match@example.com']);
+    expect(options.visibleIds()).toEqual(['rox|match@example.com']);
     expect(options.options().map((option) => option.id)).toContain(
       'unavailable-person'
     );

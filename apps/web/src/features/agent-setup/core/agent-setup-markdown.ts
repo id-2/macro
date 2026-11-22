@@ -1,16 +1,16 @@
 const QUICK_START = `npm install @macro-inc/sdk
 export ROX_API_KEY="<your token>"`;
 
-const PROFILE_SNIPPET = `const macro = new Macro({});
-const image = await macro.me.uploadProfilePicture(bytes, {
+const PROFILE_SNIPPET = `const rox = new Macro({});
+const image = await rox.me.uploadProfilePicture(bytes, {
   fileName: 'avatar.png',
   contentType: 'image/png',
 });
-await macro.me.update({ name: 'Your Name', profilePicture: image });`;
+await rox.me.update({ name: 'Your Name', profilePicture: image });`;
 
-const NEW_TOKEN_SNIPPET = `const { secret } = await macro.apiKeys.create('my token');`;
+const NEW_TOKEN_SNIPPET = `const { secret } = await rox.apiKeys.create('my token');`;
 
-const ROXD_INSTALL = `curl -fsSL https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install/install.sh | sh
+const ROXD_INSTALL = `curl -fsSL https://raw.githubusercontent.com/rox-inc/rox/main/crates/coding_agent_worker/install/install.sh | sh
 ~/.local/bin/roxd detect-agents`;
 
 const ROXD_START = `mkdir -p ~/.roxd && chmod 700 ~/.roxd
@@ -20,13 +20,13 @@ tmux new-session -d -s roxd-agent '~/.local/bin/roxd service --config ~/.roxd/ag
 
 const ROXD_PAIRING_CODE = `grep '"event":"pairing"' ~/.roxd/agent.log`;
 
-const ROXD_APPROVE = `await macro.harnesses.pairing('<code>').approve();`;
+const ROXD_APPROVE = `await rox.harnesses.pairing('<code>').approve();`;
 
 const PRODUCT_DOCS_URL = 'https://docs.rox.one';
 const SDK_DOCS_URL = 'https://sdk.rox.one';
 const ROXD_DOCS_URL = 'https://docs.rox.one/AI/bring-your-own';
 const ROXD_SOURCE_URL =
-  'https://github.com/macro-inc/macro/tree/main/crates/coding_agent_worker';
+  'https://github.com/rox-inc/rox/tree/main/crates/coding_agent_worker';
 
 /** The page's wording, translated where it renders. */
 export type AgentSetupCopy = {

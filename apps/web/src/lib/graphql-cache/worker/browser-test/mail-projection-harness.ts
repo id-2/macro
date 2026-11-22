@@ -539,7 +539,7 @@ await host.writeQuery({
             id: id(n),
             name: `Wrong last-query preview ${n}`,
             ownerId:
-              n <= 50 ? 'offline-mail-viewer' : 'macro|other@example.com',
+              n <= 50 ? 'offline-mail-viewer' : 'rox|other@example.com',
             cacheProjection: mailProjectionCapsules[index],
             properties: [],
             isFavorited: false,

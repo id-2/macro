@@ -9,7 +9,7 @@ import {
 } from '@core/constant/featureFlags';
 import { useEmail, useUserId } from '@core/context/user';
 import { getDisplayName } from '@core/user/displayName';
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import { getDefaultTimezone } from '@core/util/cron';
 import { writeClipboardData } from '@core/util/dataTransfer';
 import { fireAndForget } from '@core/util/fireAndForget';

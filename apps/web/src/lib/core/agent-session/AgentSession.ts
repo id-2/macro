@@ -484,7 +484,7 @@ export class AgentSession {
 
   /**
    * The tab a prompt is typed in, so what the turn opens for the person
-   * reaches this tab (`macro.ui.open`).
+   * reaches this tab (`rox.ui.open`).
    */
   private typedIn(action: AgentAction): { clientId?: string } {
     if (action.type !== 'prompt') return {};

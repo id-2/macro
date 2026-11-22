@@ -17,7 +17,7 @@ import type { Target } from './target';
 
 /**
  * A new suggestion, or a new version of one with the same `dedupKey`, as a
-generation session hands it back through `macro.suggestions.suggest`.
+generation session hands it back through `rox.suggestions.suggest`.
  */
 export interface NewSuggestion {
   /** The items it is about. */
@@ -32,7 +32,7 @@ export interface NewSuggestion {
    * @minimum 0
    */
   importance: number;
-  /** `prompt` or `entity`; routine suggestions come from `macro.routines.suggest`. */
+  /** `prompt` or `entity`; routine suggestions come from `rox.routines.suggest`. */
   kind: KindName;
   /** A prompt suggestion's prompt. */
   prompt?: NewSuggestionPrompt;

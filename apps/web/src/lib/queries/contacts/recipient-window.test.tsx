@@ -40,7 +40,7 @@ it('replaces pages from a 100k directory and releases them on close without trun
         sync: 'partial',
         offline: false,
         users: Array.from({ length }, (_, index) => ({
-          id: `macro|person${start + index}@example.com`,
+          id: `rox|person${start + index}@example.com`,
           email: `person${start + index}@example.com`,
           name: `Person ${start + index}`,
         })),
@@ -60,11 +60,11 @@ it('replaces pages from a 100k directory and releases them on close without trun
   let source: ReturnType<typeof createContactRecipientSource> | undefined;
   function Harness() {
     source = createContactRecipientSource(
-      () => ({ userId: 'macro|viewer@example.com' }),
+      () => ({ userId: 'rox|viewer@example.com' }),
       {
         search,
         enabled: open,
-        selfId: () => 'macro|viewer@example.com',
+        selfId: () => 'rox|viewer@example.com',
         senderDomain: () => 'example.com',
         includeSelf,
       },
@@ -85,7 +85,7 @@ it('replaces pages from a 100k directory and releases them on close without trun
   expect(source!.items()).toHaveLength(50);
   expect(reader.mock.calls[0][2].policy).toEqual({
     mode: 'recipient',
-    excluded: ['macro|viewer@example.com'],
+    excluded: ['rox|viewer@example.com'],
     senderDomain: 'example.com',
   });
   const selected = source!.items()[0];
@@ -93,21 +93,21 @@ it('replaces pages from a 100k directory and releases them on close without trun
     await source!.next();
     await vi.runOnlyPendingTimersAsync();
     expect(source!.items()).toHaveLength(50);
-    expect(source!.items()[0].id).toBe(`macro|person${page * 50}@example.com`);
+    expect(source!.items()[0].id).toBe(`rox|person${page * 50}@example.com`);
     expect(client.getQueryCache().getAll()).toHaveLength(1);
   }
-  expect(selected.id).toBe('macro|person0@example.com');
+  expect(selected.id).toBe('rox|person0@example.com');
   setOpen(false);
   await vi.runOnlyPendingTimersAsync();
   expect(source!.items()).toEqual([]);
   setOpen(true);
   await vi.runOnlyPendingTimersAsync();
-  expect(source!.items()[0].id).toBe('macro|person0@example.com');
+  expect(source!.items()[0].id).toBe('rox|person0@example.com');
   setSearch('last');
   expect(source!.items()).toEqual([]);
   await vi.advanceTimersByTimeAsync(200);
   expect(source!.items().map((item) => item.id)).toEqual([
-    'macro|person99999@example.com',
+    'rox|person99999@example.com',
   ]);
   expect(source!.hasNext()).toBe(false);
   setIncludeSelf(true);
@@ -143,7 +143,7 @@ it.each(['secondary', 'notifications'])(
         offline: false,
         users: [
           {
-            id: `macro|${local}@example.com`,
+            id: `rox|${local}@example.com`,
             email: `${local}@example.com`,
             name: 'Inbox',
           },
@@ -168,7 +168,7 @@ it.each(['secondary', 'notifications'])(
           senderDomain: () => undefined,
           includeSelf: () => false,
         },
-        (id) => id === 'macro|secondary@example.com',
+        (id) => id === 'rox|secondary@example.com',
         reader
       );
       return null;
@@ -190,7 +190,7 @@ it.each(['secondary', 'notifications'])(
       setSearch('NOTIFICATIONS@example.com');
       await vi.advanceTimersByTimeAsync(200);
       expect(source!.items().map((item) => item.id)).toEqual([
-        'macro|notifications@example.com',
+        'rox|notifications@example.com',
       ]);
     }
     client.clear();

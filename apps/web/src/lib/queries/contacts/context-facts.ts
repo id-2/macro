@@ -1,4 +1,4 @@
-import { emailToMacroId } from '@core/user/macroId';
+import { emailToMacroId } from '@core/user/roxId';
 import type { PeopleContextUpdate } from '@graphql-cache/people/generated';
 import type { Link } from '@service-email/generated/schemas';
 import type { ApiChannelWithLatest } from '@service-storage/channel-list-types';

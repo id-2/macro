@@ -1,5 +1,5 @@
-import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { ROX_SYSTEM_PRINCIPAL_ID } from '@core/constant/macroSystem';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/roxAgent';
+import { ROX_SYSTEM_PRINCIPAL_ID } from '@core/constant/roxSystem';
 import { createRoot } from 'solid-js';
 import { describe, expect, it } from 'vitest';
 import {
@@ -27,7 +27,7 @@ describe('createActorName', () => {
   });
 
   it('resolves other users through displayName', () => {
-    expect(nameOf(context, 'macro|sarah@example.com')).toBe('sarah');
+    expect(nameOf(context, 'rox|sarah@example.com')).toBe('sarah');
   });
 
   it('names the system principal "System"', () => {

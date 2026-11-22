@@ -97,7 +97,7 @@ export function EventComposerSplit(props: EventComposerSplitProps) {
     >
       <EventComposerContent
         {...props}
-        macroCallsEnabled={() => quickCalls().enabled && !quickCalls().loading}
+        roxCallsEnabled={() => quickCalls().enabled && !quickCalls().loading}
       />
     </Show>
   );
@@ -105,18 +105,18 @@ export function EventComposerSplit(props: EventComposerSplitProps) {
 
 function EventComposerContent(
   props: EventComposerSplitProps & {
-    macroCallsEnabled: Accessor<boolean>;
+    roxCallsEnabled: Accessor<boolean>;
   }
 ) {
   const panel = useSplitPanelOrThrow();
-  const macroCallsEnabled = props.macroCallsEnabled;
+  const roxCallsEnabled = props.roxCallsEnabled;
   const [attachHotkeys] = useHotkeyDOMScope('event-composer', true);
   const close = () => panel.handle.close();
   const guestInvitesEnabled = useCalendarGuestInvitesFlag();
   const invitationForwardEnabled = useCalendarInvitationForwardFlag();
   const editor = useEventEditor({
     event: () => props.event,
-    macroCallsEnabled,
+    roxCallsEnabled,
     guestInvitesEnabled,
     invitationForwardEnabled,
     syncedEvent: useSyncedCalendarEvent(() => props.event),
@@ -132,10 +132,10 @@ function EventComposerContent(
   const initialValues =
     editor.initialValues() ??
     props.initialValues ??
-    defaultEditorInitialValues(new Date(), macroCallsEnabled());
+    defaultEditorInitialValues(new Date(), roxCallsEnabled());
   const controller = createCalendarEventFormController({
     initialValue:
-      !isEdit() && initialValues.conference === 'macro' && !macroCallsEnabled()
+      !isEdit() && initialValues.conference === 'rox' && !roxCallsEnabled()
         ? { ...initialValues, conference: 'none' }
         : initialValues,
     isEdit: isEdit(),
@@ -183,7 +183,7 @@ function EventComposerContent(
             />
           </Show>
         }
-        macroCallsEnabled={macroCallsEnabled()}
+        roxCallsEnabled={roxCallsEnabled()}
         isEdit={isEdit()}
         saveError={editor.saveError()}
         disabledFields={editor.disabledFields()}

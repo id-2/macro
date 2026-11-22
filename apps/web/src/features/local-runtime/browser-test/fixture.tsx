@@ -4,8 +4,8 @@ import type { RoxdStatus } from '@macro/tauri/roxd';
 import { Button } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import type { NewLocalAgent, SetupCapabilities } from '../core/setup';
 import { LocalRuntimeSetupDialog } from '../views/local-runtime-setup-dialog';
 import { LocalRuntimeSetupPanel } from '../views/local-runtime-setup-panel';
@@ -14,7 +14,7 @@ const params = new URLSearchParams(location.search);
 document.documentElement.dataset.themeLight = String(
   params.get('theme') !== 'dark'
 );
-const theme = params.get('theme') === 'dark' ? macroDarkTheme : macroLightTheme;
+const theme = params.get('theme') === 'dark' ? roxDarkTheme : roxLightTheme;
 for (const [token, value] of Object.entries(theme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }

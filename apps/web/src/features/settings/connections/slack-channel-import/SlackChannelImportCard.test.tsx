@@ -174,7 +174,7 @@ describe('Slack channel import card', () => {
         channel('general', {
           status: 'imported',
           user_id: 'teammate',
-          entity_id: 'macro-channel',
+          entity_id: 'rox-channel',
           entity_type: 'channel',
         }),
       ],
@@ -183,7 +183,7 @@ describe('Slack channel import card', () => {
       screen
         .getByRole('link', { name: 'Open imported channel general' })
         .getAttribute('href')
-    ).toContain('/app/channel/macro-channel');
+    ).toContain('/app/channel/rox-channel');
     expect(screen.getByText('by a teammate', { exact: false })).toBeTruthy();
     expect(mocks.hidePromotion).toHaveBeenCalledWith('me', 'channels');
   });

@@ -45,8 +45,8 @@ export function ChannelThread(props: ThreadProps) {
   const accountUserId = useUserId();
   const userId = useMessageViewerOverride() ?? accountUserId;
   const replyUserId = () => userId() ?? props.data().sender_id;
-  const macroId = () => tryMacroId(replyUserId());
-  const displayName = () => getDisplayName(macroId());
+  const roxId = () => tryMacroId(replyUserId());
+  const displayName = () => getDisplayName(roxId());
   const thread = () => props.data().thread;
   const hasReplies = () => thread().reply_count > 0;
   const fetchRepliesEnabled = createThreadRepliesFetchGate({

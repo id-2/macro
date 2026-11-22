@@ -16,7 +16,7 @@ const root = document.getElementById('root');
 if (!root) throw new Error('Fixture root missing');
 
 const brief =
-  'Use the GitHub search tool (mcp__github__github-search-issues-and-pull-requests; load it via SearchTools "github search issues and pull requests") to list every open pull request the user authored in macro-inc/macro, with each one\'s labels, review state and CI status.\nGroup them by label and report the result as a table.';
+  'Use the GitHub search tool (mcp__github__github-search-issues-and-pull-requests; load it via SearchTools "github search issues and pull requests") to list every open pull request the user authored in rox-inc/rox, with each one\'s labels, review state and CI status.\nGroup them by label and report the result as a table.';
 const answer =
   'Seven open pull requests: three labelled `bug`, two `feature`, two unlabelled.';
 

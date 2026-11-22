@@ -51,7 +51,7 @@ function occurrence(
   return {
     event: {
       id,
-      ownerId: 'macro|self@example.com',
+      ownerId: 'rox|self@example.com',
       icalUid: id,
       calendarId: source.id,
       title: id,
@@ -88,7 +88,7 @@ function respond(items: CalendarOccurrenceItem[]) {
 function setup(metadataReady = true) {
   const [now, setNow] = createSignal(today);
   const [userId, setUserId] = createSignal<string | undefined>(
-    'macro|self@example.com'
+    'rox|self@example.com'
   );
   const [hidden, setHidden] = createSignal<ReadonlySet<string>>(new Set());
   const [sourcesReady, setSourcesReady] = createSignal(metadataReady);
@@ -309,20 +309,20 @@ describe('upcoming calendar events source', () => {
   });
 
   it('keeps recurring occurrences and recognizes embedded Rox links', async () => {
-    const macroUrl = 'https://rox.one/app/meet/valid-token-1234567890';
+    const roxUrl = 'https://rox.one/app/meet/valid-token-1234567890';
     respond(
       [1, 2, 3, 4, 5].map((day) =>
         occurrence(day, {
           id: 'series',
           conferenceUrl: null,
-          description: `<p>Join <a href="${macroUrl}?join=true">the call</a></p>`,
+          description: `<p>Join <a href="${roxUrl}?join=true">the call</a></p>`,
         })
       )
     );
     const { result } = setup();
     await vi.waitFor(() => expect(result.events()).toHaveLength(5));
     expect(new Set(result.events().map((call) => call.id)).size).toBe(5);
-    expect(result.events().every((call) => call.url === macroUrl)).toBe(true);
+    expect(result.events().every((call) => call.url === roxUrl)).toBe(true);
   });
 
   it('widens when a displayed call ends and refreshes through shared calendar invalidation', async () => {
@@ -358,7 +358,7 @@ describe('upcoming calendar events source', () => {
     const { result, setUserId } = setup();
     await vi.waitFor(() => expect(result.events()).toHaveLength(5));
     list.mockImplementation(() => new Promise(() => {}));
-    setUserId('macro|other@example.com');
+    setUserId('rox|other@example.com');
     expect(result.events()).toEqual([]);
     expect(result.loading()).toBe(true);
   });

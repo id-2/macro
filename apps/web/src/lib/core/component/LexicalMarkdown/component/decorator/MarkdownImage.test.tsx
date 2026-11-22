@@ -39,7 +39,7 @@ const unsetMedia = {
 describe('markdown media loading', () => {
   it('loads a GitHub blob screenshot through the image proxy', () => {
     const src =
-      'https://github.com/macro-inc/macro/blob/pr-assets/time-range-timeline/typed-1-all-day.png?raw=true';
+      'https://github.com/rox-inc/rox/blob/pr-assets/time-range-timeline/typed-1-all-day.png?raw=true';
     const view = render(() => (
       <MarkdownImage {...unsetMedia} key="github-shot" url={src} alt="Picker" />
     ));
@@ -50,7 +50,7 @@ describe('markdown media loading', () => {
     );
     expect(image.getAttribute('src')).toContain(
       encodeURIComponent(
-        'https://raw.githubusercontent.com/macro-inc/macro/pr-assets/time-range-timeline/typed-1-all-day.png'
+        'https://raw.githubusercontent.com/rox-inc/rox/pr-assets/time-range-timeline/typed-1-all-day.png'
       )
     );
   });

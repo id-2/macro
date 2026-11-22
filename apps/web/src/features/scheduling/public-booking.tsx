@@ -17,7 +17,7 @@ type BookingPageParams = { profile: string; slug?: string };
 const isEmbedded = () => window.parent !== window;
 
 /** Tells the page around a framed booking page that a booking was made. */
-const BOOKING_MADE = 'macro:booking-made';
+const BOOKING_MADE = 'rox:booking-made';
 
 function BookingPageContent(params: BookingPageParams) {
   const navigate = useNavigate();

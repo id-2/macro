@@ -38,11 +38,11 @@ vi.mock('@queries/storage/pr-mention', () => ({
   getCachedPullRequestByGithubKey: vi.fn(),
 }));
 
-const PR_URL = 'https://github.com/macro-inc/macro/pull/7870';
+const PR_URL = 'https://github.com/rox-inc/rox/pull/7870';
 const ENTITY = {
   id: '019507e8-14a3-7bc1-8610-419f16bd03a8',
   foreignEntitySource: 'github_pull_request',
-  foreignEntityId: 'macro-inc/macro/pull/7870',
+  foreignEntityId: 'rox-inc/rox/pull/7870',
 } as ForeignEntity;
 
 class TestClipboardEvent extends Event {
@@ -117,7 +117,7 @@ describe('GitHub pull request smart paste', () => {
 
     expect(paste(PR_URL)).toBe(true);
     expect(fetchPullRequestByGithubKey).toHaveBeenCalledWith(
-      'macro-inc/macro/pull/7870'
+      'rox-inc/rox/pull/7870'
     );
     await flushLookup();
 
@@ -127,7 +127,7 @@ describe('GitHub pull request smart paste', () => {
       expect($isPullRequestMentionNode(mention)).toBe(true);
       if (!$isPullRequestMentionNode(mention)) return;
       expect(mention.getId()).toBe(ENTITY.id);
-      expect(mention.getLabel()).toBe('macro-inc/macro#7870');
+      expect(mention.getLabel()).toBe('rox-inc/rox#7870');
       expect(mention.getUrl()).toBe(PR_URL);
     });
   });
@@ -145,7 +145,7 @@ describe('GitHub pull request smart paste', () => {
     unregisterInsert();
 
     expect(insertMention).toHaveBeenCalledWith(
-      { id: ENTITY.id, label: 'macro-inc/macro#7870', url: PR_URL },
+      { id: ENTITY.id, label: 'rox-inc/rox#7870', url: PR_URL },
       editor
     );
     expect(fetchPullRequestByGithubKey).not.toHaveBeenCalled();
@@ -192,7 +192,7 @@ describe('GitHub pull request smart paste', () => {
   });
 
   it('does not handle non-PR GitHub links', () => {
-    expect(paste('https://github.com/macro-inc/macro/issues/1')).toBe(false);
+    expect(paste('https://github.com/rox-inc/rox/issues/1')).toBe(false);
     expect(fetchPullRequestByGithubKey).not.toHaveBeenCalled();
   });
 });

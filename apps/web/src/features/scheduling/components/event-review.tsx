@@ -165,7 +165,7 @@ export function EventReview(props: {
                 : 'Paused'}
             </ReviewValue>
             <ReviewValue label="Meeting location">
-              {props.draft.macroCall ||
+              {props.draft.roxCall ||
               props.draft.googleMeet ||
               props.draft.location
                 ? meetingPlaceLabel(props.draft)
@@ -181,7 +181,7 @@ export function EventReview(props: {
             </Show>
             <Show
               when={
-                (props.draft.macroCall || props.draft.googleMeet) &&
+                (props.draft.roxCall || props.draft.googleMeet) &&
                 props.draft.location
               }
             >

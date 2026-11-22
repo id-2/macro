@@ -64,7 +64,7 @@ const linear = defineViewTour({
   connector: { kind: 'mcp', label: 'Linear', tools: ['Linear'] },
   steps,
 });
-const key = (id: string) => `macro:tour:${id}:tour-user`;
+const key = (id: string) => `rox:tour:${id}:tour-user`;
 const saved = (id: string) =>
   JSON.parse(localStorage.getItem(key(id)) ?? 'null');
 

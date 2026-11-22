@@ -71,7 +71,7 @@ vi.mock('@queries/soup/slash-menu-pull-requests', () => ({
       {
         id: 'pr-42',
         name: 'Fix skills',
-        metadata: { owner: 'macro', repo: 'app', number: 42 },
+        metadata: { owner: 'rox', repo: 'app', number: 42 },
       },
     ],
   }),
@@ -205,7 +205,7 @@ describe('skill slash menu', () => {
     fireEvent.keyDown(document, { key: 'Enter' });
     expect(dispatch).toHaveBeenCalledWith(INSERT_PR_MENTION_COMMAND, {
       id: 'pr-42',
-      label: 'macro/app#42',
+      label: 'rox/app#42',
     });
     menu.openMenu();
     for (let i = 0; i < 6; i++)

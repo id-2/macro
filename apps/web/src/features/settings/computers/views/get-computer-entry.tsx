@@ -67,7 +67,7 @@ export function GetComputerEntry(props: {
 
   return (
     <Show when={shown()}>
-      <div data-settings-target="get-macro-computer">
+      <div data-settings-target="get-rox-computer">
         <Show
           when={props.variant === 'compact'}
           fallback={

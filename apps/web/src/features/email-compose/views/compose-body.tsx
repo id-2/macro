@@ -20,7 +20,7 @@ import {
   Switch,
 } from 'solid-js';
 import { createAttachmentViewer } from '../components/attachment-viewer';
-import { RoxSignatureButton } from '../components/macro-signature-button';
+import { RoxSignatureButton } from '../components/rox-signature-button';
 import { useCompose } from '../context/compose-context';
 import type { DraftFormAttachment } from '../primitives/email-form-state';
 import { EMAIL_FORMAT_SHORTCUTS } from '../primitives/format-shortcuts';

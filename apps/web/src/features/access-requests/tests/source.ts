@@ -5,7 +5,7 @@ import type { RequestState } from '../core/types';
 
 export function fakeSharingSource(initial: Partial<RequestState> = {}) {
   const [state, setState] = createSignal<RequestState>({
-    owner: 'macro|owner@test.com',
+    owner: 'rox|owner@test.com',
     canReview: false,
     accessLevel: 'view',
     supportedLevels: ['view', 'comment', 'edit'],

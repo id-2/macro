@@ -390,7 +390,7 @@ export function PrOriginIcon(props: { tool: PrOriginTool; class?: string }) {
       .with('claude', () => ClaudeIcon)
       .with('codex', () => CodexIcon)
       .with('cursor', () => CursorIcon)
-      .with('macro', () => RoxMark)
+      .with('rox', () => RoxMark)
       .with('copilot', () => GithubIcon)
       .with('devin', 'jules', () => RobotIcon)
       .exhaustive();
@@ -407,7 +407,7 @@ export function PrOriginIcon(props: { tool: PrOriginTool; class?: string }) {
 export function prOriginDescription(origin: PrOrigin) {
   const tool = PR_ORIGIN_LABELS[origin.tool];
   if (origin.signal === 'agent-session')
-    return origin.tool === 'macro'
+    return origin.tool === 'rox'
       ? 'Started from a Rox agent session'
       : `Started from ${tool} in a Rox agent session`;
   return `Started from ${tool}, ${PR_ORIGIN_SIGNAL_LABELS[origin.signal]}`;

@@ -5,7 +5,7 @@ import {
 import {
   calendarMacroCallUrl,
   removeCalendarMacroCall,
-} from '@app/features/calendar/utils/macro-call-link';
+} from '@app/features/calendar/utils/rox-call-link';
 import { SharedEventActions } from '@app/features/calendar-view/components/SharedEventActions';
 import {
   type CalendarMentionTarget,
@@ -46,7 +46,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { parseLocalDate } from '@core/util/local-date';
 import { matches } from '@core/util/match';
 import { buildSimpleEntityUrl, openExternalUrl } from '@core/util/url';
-import RoxEmbed from '@icon/macro-embed.svg';
+import RoxEmbed from '@icon/rox-embed.svg';
 import ArrowSquareOutIcon from '@icon/system/regular/arrow-square-out.svg';
 import CollapseInlinePreview from '@icon/system/regular/arrows-in-line-horizontal.svg';
 import ExpandInlinePreview from '@icon/system/regular/arrows-out-line-horizontal.svg';
@@ -383,12 +383,12 @@ function CalendarEventPreviewDetails(props: {
 }) {
   const organizer = () =>
     props.event.organizerName ?? props.event.organizerEmail;
-  const macroMeetingUrl = () => calendarMacroCallUrl(props.event);
+  const roxMeetingUrl = () => calendarMacroCallUrl(props.event);
   // A channel share exposes the meeting, not a way into its call.
   const joinableMeetingUrl = () =>
-    props.event.viewerEventId ? macroMeetingUrl() : undefined;
+    props.event.viewerEventId ? roxMeetingUrl() : undefined;
   const eventContent = createMemo(() =>
-    removeCalendarMacroCall(props.event, macroMeetingUrl())
+    removeCalendarMacroCall(props.event, roxMeetingUrl())
   );
   const descriptionHtml = () =>
     sanitizeCalendarDescription(eventContent().description);
@@ -1024,7 +1024,7 @@ export function DocumentPreviewContent(props: DocumentPreviewContentProps) {
                           >
                             {(owner) =>
                               getDisplayName(tryMacroId(owner())) ||
-                              owner().replace('macro|', '')
+                              owner().replace('rox|', '')
                             }
                           </Show>
                           <Show

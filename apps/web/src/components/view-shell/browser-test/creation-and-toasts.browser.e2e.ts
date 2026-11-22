@@ -40,7 +40,7 @@ for (const viewport of [
       expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport.width);
       await page.keyboard.press('Escape');
       await page.getByRole('button', { name: 'Show notices' }).click();
-      await expect(page.locator('[data-macro-toast]')).toHaveCount(
+      await expect(page.locator('[data-rox-toast]')).toHaveCount(
         viewport.name === 'desktop' ? 3 : 1
       );
       await page.getByRole('button', { name: 'Show prompt' }).click();
@@ -91,7 +91,7 @@ test.describe('mobile swipe dismissal', () => {
     }) => {
       await page.goto(fixture);
       const deltaX = direction === 'left' ? -120 : 120;
-      const toast = page.locator('[data-macro-toast]');
+      const toast = page.locator('[data-rox-toast]');
 
       await page.getByRole('button', { name: 'Show notices' }).click();
       await expect(toast).toHaveCount(1);

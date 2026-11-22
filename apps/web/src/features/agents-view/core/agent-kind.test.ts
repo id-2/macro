@@ -1,6 +1,6 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/roxCoder';
 import { describe, expect, it } from 'vitest';
 import {
   agentKindNoun,
@@ -14,7 +14,7 @@ import {
 describe('isCoderHarness', () => {
   it('treats the in-process harnesses as chat', () => {
     expect(isCoderHarness('in-memory')).toBe(false);
-    expect(isCoderHarness('macro-inmem')).toBe(false);
+    expect(isCoderHarness('rox-inmem')).toBe(false);
     expect(isCoderHarness(undefined)).toBe(false);
     expect(isCoderHarness('')).toBe(false);
   });

@@ -27,7 +27,7 @@ describe('RoxToolCall failures', () => {
     render(() => (
       <RoxToolCall
         detail={{
-          kind: 'macro',
+          kind: 'rox',
           input: { eventId: '01a16cb6-0000-7000-8000-00000000dead' },
           output: reason,
           error: reason,
@@ -56,7 +56,7 @@ describe('RoxToolCall failures', () => {
 
 describe('RoxToolCall unfinished calls', () => {
   const readEvent = {
-    kind: 'macro' as const,
+    kind: 'rox' as const,
     input: { eventId: '01a16cb6-0000-7000-8000-000000000001' },
     output: null,
     error: null,
@@ -109,7 +109,7 @@ describe('RoxToolCall unfinished calls', () => {
     render(() => (
       <RoxToolCall
         detail={{
-          kind: 'macro',
+          kind: 'rox',
           input: { query: query() },
           output: null,
           error: null,

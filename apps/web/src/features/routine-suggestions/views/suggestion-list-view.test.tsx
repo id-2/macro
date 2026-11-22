@@ -92,13 +92,13 @@ function renderCards() {
 describe('suggestion cards', () => {
   it('say who suggests each one, and why AI picked it', () => {
     renderCards();
-    const [pick, macro, drafts] = screen.getAllByRole('listitem');
+    const [pick, rox, drafts] = screen.getAllByRole('listitem');
     expect(within(pick!).getByText('For you')).toBeTruthy();
     expect(
       within(pick!).getByText('You answer most mail within a day.')
     ).toBeTruthy();
-    expect(within(macro!).getByText('Template')).toBeTruthy();
-    expect(within(macro!).getByText('From Rox')).toBeTruthy();
+    expect(within(rox!).getByText('Template')).toBeTruthy();
+    expect(within(rox!).getByText('From Rox')).toBeTruthy();
     expect(within(drafts!).getByText('Draft')).toBeTruthy();
     expect(
       within(drafts!).getByText('Suppliers write every week.')

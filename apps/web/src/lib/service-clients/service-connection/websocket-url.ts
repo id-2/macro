@@ -10,7 +10,7 @@ export async function resolveWsUrl() {
     const apiToken = await getMacroApiToken();
     if (!apiToken) throw new Error('No Rox API token');
 
-    return `${wsHost}?macro-api-token=${apiToken}`;
+    return `${wsHost}?rox-api-token=${apiToken}`;
   }
   await ensureFreshSession();
   return wsHost;

@@ -865,7 +865,7 @@ export function useCreateCalendarEventMutation(callbacks?: CreateCallbacks) {
             eventId: event.id,
             attendees: args.attendees?.length ?? 0,
             recurring: (args.recurrenceLines?.length ?? 0) > 0,
-            macroCall: args.macroCall === true,
+            roxCall: args.roxCall === true,
             conference: args.conference != null,
           });
         },

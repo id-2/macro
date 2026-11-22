@@ -29,7 +29,7 @@ const GENERIC: AgentSessionMark = { Icon: SparkleIcon, class: 'text-chat' };
 
 /**
  * Harness slugs as the service stamps them (`claude-code`, `codex-cloud`,
- * `macro-inmem`) and as the fold's enum spells them (`claude_code`).
+ * `rox-inmem`) and as the fold's enum spells them (`claude_code`).
  */
 const BY_HARNESS: Record<string, AgentSessionMark> = {
   'claude-code': CLAUDE,
@@ -37,8 +37,8 @@ const BY_HARNESS: Record<string, AgentSessionMark> = {
   codex: CODEX,
   'codex-cloud': CODEX,
   cursor: CURSOR,
-  macro: MACRO,
-  'macro-inmem': MACRO,
+  rox: MACRO,
+  'rox-inmem': MACRO,
   'in-memory': MACRO,
   sandbox: MACRO,
 };

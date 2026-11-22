@@ -9,7 +9,7 @@ import {
 function changeset(overrides: Partial<Changeset> = {}): Changeset {
   return {
     id: 'cs-1',
-    repository: 'https://github.com/macro-inc/macro',
+    repository: 'https://github.com/rox-inc/rox',
     base: { name: 'main' },
     head: { name: 'agent/unread-archived-sessions' },
     files: [
@@ -33,11 +33,11 @@ function changeset(overrides: Partial<Changeset> = {}): Changeset {
 
 describe('repositorySlug', () => {
   it('reads owner/name from a GitHub url', () => {
-    expect(repositorySlug('https://github.com/macro-inc/macro')).toBe(
-      'macro-inc/macro'
+    expect(repositorySlug('https://github.com/rox-inc/rox')).toBe(
+      'rox-inc/rox'
     );
-    expect(repositorySlug('https://github.com/macro-inc/macro.git')).toBe(
-      'macro-inc/macro'
+    expect(repositorySlug('https://github.com/rox-inc/rox.git')).toBe(
+      'rox-inc/rox'
     );
   });
 

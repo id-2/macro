@@ -483,7 +483,7 @@ export default function GlobalShortcuts() {
     icon: IconGear,
     runWithInputFocused: true,
     displayPriority: 9,
-    tags: ['mcp', 'model context protocol', 'setup', 'connect macro'],
+    tags: ['mcp', 'model context protocol', 'setup', 'connect rox'],
   });
 
   const setThemeScope = registerHotkey({

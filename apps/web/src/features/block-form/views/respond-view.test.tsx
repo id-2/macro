@@ -30,7 +30,7 @@ function offsite(): FormDetail {
       id: 'form-1',
       name: 'Q4 offsite RSVP',
       description: 'Tell us if you can come.',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -317,7 +317,7 @@ describe('RespondView', () => {
     fireEvent.click(screen.getByLabelText('Contractor'));
     fireEvent.click(screen.getByRole('button', { name: /Next/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Message the owner' }));
-    expect(calls.messagedOwners).toEqual(['macro|owner@example.com']);
+    expect(calls.messagedOwners).toEqual(['rox|owner@example.com']);
   });
 
   it('offers an anonymous visitor no message to the owner', () => {
@@ -589,7 +589,7 @@ describe('RespondView', () => {
           description: 'A short hello.',
           durationMinutes: 30,
           location: '',
-          macroCall: false,
+          roxCall: false,
           googleMeet: true,
           questions: [],
           requiresConfirmation: false,

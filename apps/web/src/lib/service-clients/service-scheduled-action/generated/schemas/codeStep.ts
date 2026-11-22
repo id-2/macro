@@ -24,7 +24,7 @@ knob's value shows and `{?name}` where a question knob's question
 shows, e.g. "Label it {label} when {?aboutMoney}". Saving checks every
 slot names one of its knobs. */
   sentence?: CodeStepSentence;
-  /** A module exporting `async function main({ macro, run, routine,
+  /** A module exporting `async function main({ rox, run, routine,
 trigger, steps }: StepContext)`: `run` is this run (its time, zone and
 the previous run), `trigger` what started it (a schedule, an event and
 its item, or a person), `steps` the typed outputs of the steps before

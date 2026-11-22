@@ -65,7 +65,7 @@ export const requestAccountManagerBody = zod
     callerRole: zod
       .enum(['managed', 'manager'])
       .describe('One side of a grant.'),
-    counterpartyId: zod.string().describe('The other account (`macro|...`).'),
+    counterpartyId: zod.string().describe('The other account (`rox|...`).'),
   })
   .describe('Request body for asking for a grant.');
 
@@ -4684,7 +4684,7 @@ export const getCallRecordResponse = zod
             id: zod
               .uuid()
               .describe(
-                "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Macro user\nids. Only the server mints them; Macro users keep `macro|…` identities,\nso an RTC identity classifies as exactly one of the two."
+                "A non-account guest of a single call session.\n\nThe id doubles as the guest's RTC participant identity, so identities are\nopaque UUIDs and never share a namespace (or a column) with Macro user\nids. Only the server mints them; Macro users keep `rox|…` identities,\nso an RTC identity classifies as exactly one of the two."
               ),
             joinedAt: zod.iso
               .datetime({})
@@ -4763,7 +4763,7 @@ export const getCallRecordResponse = zod
                 "Link to the call in the provider's app, if it has one."
               ),
             provider: zod
-              .enum(['macro', 'granola'])
+              .enum(['rox', 'granola'])
               .describe(
                 'Supported call and transcript providers. Add variants as integrations grow.'
               ),
@@ -5175,7 +5175,7 @@ export const editCallTranscriptBody = zod
               ),
           })
           .describe(
-            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
+            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `rox|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
           )
       )
       .describe('The set of per-diarized-speaker overrides to apply.'),
@@ -6412,7 +6412,7 @@ export const getOrCreateDmBody = zod
     recipient_id: zod
       .string()
       .describe(
-        'Recipient user id (`macro|...`) or agent persona id (`bot|...`).'
+        'Recipient user id (`rox|...`) or agent persona id (`bot|...`).'
       ),
   })
   .describe('Request to get or create a direct message channel.');
@@ -9817,11 +9817,11 @@ export const searchCrmPipelineEntriesResponseItem = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10023,11 +10023,11 @@ export const listCrmRecordPipelineEntriesResponseItem = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10551,7 +10551,7 @@ export const addCrmPipelineEntriesBody = zod
                       .string()
                       .nullish()
                       .describe(
-                        'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
+                        'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
                       ),
                     values: zod
                       .array(zod.string())
@@ -10645,11 +10645,11 @@ export const addCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10747,11 +10747,11 @@ export const addCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -10829,7 +10829,7 @@ export const updateCrmPipelineEntriesBody = zod
                       .string()
                       .nullish()
                       .describe(
-                        'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
+                        'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
                       ),
                     values: zod
                       .array(zod.string())
@@ -10929,11 +10929,11 @@ export const updateCrmPipelineEntriesResponse = zod
                                 value: zod
                                   .array(zod.string())
                                   .describe(
-                                    'Macro ids: people as macro| user ids, records or other items.'
+                                    'Macro ids: people as rox| user ids, records or other items.'
                                   ),
                               })
                               .describe(
-                                'Macro ids: people as macro| user ids, records or other items.'
+                                'Macro ids: people as rox| user ids, records or other items.'
                               ),
                           ])
                           .describe("A stored value in its field's own terms."),
@@ -11012,11 +11012,11 @@ export const updateCrmPipelineEntriesResponse = zod
                                 value: zod
                                   .array(zod.string())
                                   .describe(
-                                    'Macro ids: people as macro| user ids, records or other items.'
+                                    'Macro ids: people as rox| user ids, records or other items.'
                                   ),
                               })
                               .describe(
-                                'Macro ids: people as macro| user ids, records or other items.'
+                                'Macro ids: people as rox| user ids, records or other items.'
                               ),
                           ])
                           .describe("A stored value in its field's own terms."),
@@ -11089,7 +11089,7 @@ export const findCrmPipelineEntriesBody = zod
               .string()
               .nullish()
               .describe(
-                'One value: an option label, a person as \"me\", an email or a macro|\nuser id, a number, true\/false, or a date.'
+                'One value: an option label, a person as \"me\", an email or a rox|\nuser id, a number, true\/false, or a date.'
               ),
             values: zod
               .array(zod.string())
@@ -11239,11 +11239,11 @@ export const findCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -11527,11 +11527,11 @@ export const removeCrmPipelineEntriesResponse = zod
                         value: zod
                           .array(zod.string())
                           .describe(
-                            'Macro ids: people as macro| user ids, records or other items.'
+                            'Macro ids: people as rox| user ids, records or other items.'
                           ),
                       })
                       .describe(
-                        'Macro ids: people as macro| user ids, records or other items.'
+                        'Macro ids: people as rox| user ids, records or other items.'
                       ),
                   ])
                   .describe("A stored value in its field's own terms.")
@@ -17034,7 +17034,7 @@ export const listDatabasesResponseItem = zod
                       .union([
                         zod
                           .object({
-                            kind: zod.enum(['macro']),
+                            kind: zod.enum(['rox']),
                             name: zod
                               .string()
                               .describe(
@@ -17646,7 +17646,7 @@ export const getDatabaseResponse = zod
                       .union([
                         zod
                           .object({
-                            kind: zod.enum(['macro']),
+                            kind: zod.enum(['rox']),
                             name: zod
                               .string()
                               .describe(
@@ -18473,7 +18473,7 @@ export const setDatabaseAppearanceBody = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -18530,7 +18530,7 @@ export const setDatabaseAppearanceResponse = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -23696,7 +23696,7 @@ export const getUserDocumentsHandlerResponse = zod.object({
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -23810,7 +23810,7 @@ export const getUserDocumentsHandlerResponse = zod.object({
                 zod
                   .enum(['task', 'snippet', 'skill', 'initiative_description'])
                   .describe(
-                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                   ),
               ])
               .optional(),
@@ -23948,7 +23948,7 @@ export const createDocumentResponse = zod.object({
                         .union([
                           zod
                             .object({
-                              kind: zod.enum(['macro']),
+                              kind: zod.enum(['rox']),
                               name: zod
                                 .string()
                                 .describe(
@@ -24046,7 +24046,7 @@ export const createDocumentResponse = zod.object({
               zod
                 .enum(['task', 'snippet', 'skill', 'initiative_description'])
                 .describe(
-                  'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                  'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                 ),
             ])
             .optional(),
@@ -24176,7 +24176,7 @@ export const createCanvasHandlerResponse = zod
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -24274,7 +24274,7 @@ export const createCanvasHandlerResponse = zod
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -24355,7 +24355,7 @@ export const createMarkdownHandlerResponse = zod
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -24453,7 +24453,7 @@ export const createMarkdownHandlerResponse = zod
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -24778,7 +24778,7 @@ export const createTaskHandlerResponse = zod
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -24876,7 +24876,7 @@ export const createTaskHandlerResponse = zod
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -25113,7 +25113,7 @@ export const getBatchPreviewHandlerResponse = zod.object({
                         .union([
                           zod
                             .object({
-                              kind: zod.enum(['macro']),
+                              kind: zod.enum(['rox']),
                               name: zod
                                 .string()
                                 .describe(
@@ -25546,7 +25546,7 @@ export const getDocumentResponse = zod.object({
                         .union([
                           zod
                             .object({
-                              kind: zod.enum(['macro']),
+                              kind: zod.enum(['rox']),
                               name: zod
                                 .string()
                                 .describe(
@@ -25656,7 +25656,7 @@ export const getDocumentResponse = zod.object({
               zod
                 .enum(['task', 'snippet', 'skill', 'initiative_description'])
                 .describe(
-                  'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                  'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                 ),
             ])
             .optional(),
@@ -25797,7 +25797,7 @@ export const saveDocumentHandlerResponse = zod.object({
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -25895,7 +25895,7 @@ export const saveDocumentHandlerResponse = zod.object({
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -26378,7 +26378,7 @@ export const editDocumentBody = zod
                     'swf',
                   ])
                   .describe(
-                    'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis macro takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
+                    'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis rox takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
                   ),
               })
               .describe('Set the file type to a specific value.'),
@@ -26543,7 +26543,7 @@ export const setDocumentAppearanceBody = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -26600,7 +26600,7 @@ export const setDocumentAppearanceResponse = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -26896,7 +26896,7 @@ export const commentOnDocumentTextParams = zod.object({
 
 export const commentOnDocumentTextBody = zod
   .object({
-    content: zod.string().describe('Comment body in macro markdown.'),
+    content: zod.string().describe('Comment body in rox markdown.'),
     mentions: zod
       .array(
         zod
@@ -27191,7 +27191,7 @@ export const copyDocumentResponse = zod
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -27291,7 +27291,7 @@ export const copyDocumentResponse = zod
                 zod
                   .enum(['task', 'snippet', 'skill', 'initiative_description'])
                   .describe(
-                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                   ),
               ])
               .optional(),
@@ -27783,7 +27783,7 @@ export const getDocumentLocationV3Response = zod
                 zod
                   .enum(['task', 'snippet', 'skill', 'initiative_description'])
                   .describe(
-                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                   ),
               ])
               .optional(),
@@ -27839,7 +27839,7 @@ export const getDocumentLocationV3Response = zod
                 zod
                   .enum(['task', 'snippet', 'skill', 'initiative_description'])
                   .describe(
-                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                   ),
               ])
               .optional(),
@@ -27906,7 +27906,7 @@ export const getDocumentLocationV3Response = zod
                 zod
                   .enum(['task', 'snippet', 'skill', 'initiative_description'])
                   .describe(
-                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+                    'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
                   ),
               ])
               .optional(),
@@ -35943,7 +35943,7 @@ export const simpleSaveResponse = zod.object({
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -36041,7 +36041,7 @@ export const simpleSaveResponse = zod.object({
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -36317,7 +36317,7 @@ export const calculateSpreadsheetBody = zod
                         zod
                           .string()
                           .describe(
-                            'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
+                            'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
                           ),
                         zod
                           .null()
@@ -37118,7 +37118,7 @@ export const editSpreadsheetBody = zod
                             zod
                               .string()
                               .describe(
-                                'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"macro|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
+                                'Text, or a formula starting with =, at most 10,000 characters. Macro links render as mention pills.\nFor named pills, use the same inline tags as docs: <m-user-mention>{\"userId\":\"rox|person@example.com\",\"email\":\"person@example.com\",\"displayName\":\"Person\"}<\/m-user-mention>\nor <m-document-mention>{\"documentId\":\"UUID\",\"documentName\":\"Budget\",\"blockName\":\"spreadsheet\"}<\/m-document-mention>.\nA date chip is <m-date-mention>{\"date\":\"2026-09-28T00:00:00.000Z\",\"displayFormat\":\"Sep 28\"}<\/m-date-mention>; a cell holding only that chip calculates as the date.\nPlain dates such as 9\/28\/2026 or =DATE(2026,9,28) display as dates without a number format.\nTags can be mixed with ordinary text. Use IDs from search\/read results; do not invent them. Other Markdown is literal.'
                               ),
                             zod
                               .null()
@@ -39455,7 +39455,7 @@ export const getDocumentVersionResponse = zod.object({
                     .union([
                       zod
                         .object({
-                          kind: zod.enum(['macro']),
+                          kind: zod.enum(['rox']),
                           name: zod
                             .string()
                             .describe(
@@ -39565,7 +39565,7 @@ export const getDocumentVersionResponse = zod.object({
           zod
             .enum(['task', 'snippet', 'skill', 'initiative_description'])
             .describe(
-              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in macrodb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
+              'The document sub type enum represents all values of document sub types.\nThese values should match the `document_sub_type_value` table in roxdb.\n\nWire, database, and `Display` spellings are all `snake_case` so a\nmulti-word variant serializes identically in every system.'
             ),
         ])
         .optional(),
@@ -42453,7 +42453,7 @@ export const listFormsResponseItem = zod
                   .union([
                     zod
                       .object({
-                        kind: zod.enum(['macro']),
+                        kind: zod.enum(['rox']),
                         name: zod
                           .string()
                           .describe('Catalog name without the SVG extension.'),
@@ -42667,7 +42667,7 @@ export const listAccessibleFormsResponseItem = zod
                       .union([
                         zod
                           .object({
-                            kind: zod.enum(['macro']),
+                            kind: zod.enum(['rox']),
                             name: zod
                               .string()
                               .describe(
@@ -42859,7 +42859,7 @@ export const getFormResponse = zod
                       .union([
                         zod
                           .object({
-                            kind: zod.enum(['macro']),
+                            kind: zod.enum(['rox']),
                             name: zod
                               .string()
                               .describe(
@@ -43702,7 +43702,7 @@ export const updateFormResponse = zod
                   .union([
                     zod
                       .object({
-                        kind: zod.enum(['macro']),
+                        kind: zod.enum(['rox']),
                         name: zod
                           .string()
                           .describe('Catalog name without the SVG extension.'),
@@ -43851,7 +43851,7 @@ export const setFormAppearanceBody = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -43908,7 +43908,7 @@ export const setFormAppearanceResponse = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -43998,7 +43998,7 @@ export const collaborateFormResponse = zod
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -45441,7 +45441,7 @@ export const putFormLayoutResponse = zod
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -48596,7 +48596,7 @@ export const listInitiativesResponse = zod
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -48877,7 +48877,7 @@ export const createInitiativeResponse = zod
                   .union([
                     zod
                       .object({
-                        kind: zod.enum(['macro']),
+                        kind: zod.enum(['rox']),
                         name: zod
                           .string()
                           .describe('Catalog name without the SVG extension.'),
@@ -49056,7 +49056,7 @@ export const pageInitiativesResponse = zod
                           .union([
                             zod
                               .object({
-                                kind: zod.enum(['macro']),
+                                kind: zod.enum(['rox']),
                                 name: zod
                                   .string()
                                   .describe(
@@ -49200,7 +49200,7 @@ export const getInitiativeResponse = zod
                   .union([
                     zod
                       .object({
-                        kind: zod.enum(['macro']),
+                        kind: zod.enum(['rox']),
                         name: zod
                           .string()
                           .describe('Catalog name without the SVG extension.'),
@@ -49419,7 +49419,7 @@ export const updateInitiativeResponse = zod
                   .union([
                     zod
                       .object({
-                        kind: zod.enum(['macro']),
+                        kind: zod.enum(['rox']),
                         name: zod
                           .string()
                           .describe('Catalog name without the SVG extension.'),
@@ -49642,7 +49642,7 @@ export const setInitiativeAppearanceBody = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -49699,7 +49699,7 @@ export const setInitiativeAppearanceResponse = zod
           .union([
             zod
               .object({
-                kind: zod.enum(['macro']),
+                kind: zod.enum(['rox']),
                 name: zod
                   .string()
                   .describe('Catalog name without the SVG extension.'),
@@ -50109,7 +50109,7 @@ export const getItemsSoupResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -51149,7 +51149,7 @@ export const getItemsSoupResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -54229,7 +54229,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by session owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
+            "Filter by session owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include every\nowner."
           ),
       })
       .optional()
@@ -54288,7 +54288,7 @@ export const postItemsSoupBody = zod
         speaker_ids: zod
           .array(zod.string())
           .optional()
-          .describe('Speaker macro user ids. Empty to include all.'),
+          .describe('Speaker rox user ids. Empty to include all.'),
         status: zod
           .union([
             zod.null(),
@@ -54446,7 +54446,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by chat owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by chat owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -54531,7 +54531,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by document owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by document owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -54774,7 +54774,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by initiative owner principal — a user ('macro|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
+            "Filter by initiative owner principal — a user ('rox|user@example.com'), a\nbot ('bot|<uuid>'), or a team (a bare hyphenated uuid). Empty to include\nevery owner."
           ),
       })
       .optional()
@@ -54814,7 +54814,7 @@ export const postItemsSoupBody = zod
           .array(zod.string())
           .optional()
           .describe(
-            "Filter by project owner principal — a user ('macro|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['macro|user@example.com'], ['macro|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
+            "Filter by project owner principal — a user ('rox|user@example.com'), a bot\n('bot|<uuid>'), or a team (a bare hyphenated uuid). Examples:\n['rox|user@example.com'], ['rox|user@example.com', 'bot|0199...']. Empty to\nsearch all owners."
           ),
         project_ids: zod
           .array(zod.string())
@@ -55271,7 +55271,7 @@ export const postItemsSoupResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -56311,7 +56311,7 @@ export const postItemsSoupResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -59872,7 +59872,7 @@ export const postItemsSoupAstResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -60912,7 +60912,7 @@ export const postItemsSoupAstResponse = zod
                                   .union([
                                     zod
                                       .object({
-                                        kind: zod.enum(['macro']),
+                                        kind: zod.enum(['rox']),
                                         name: zod
                                           .string()
                                           .describe(
@@ -64929,7 +64929,7 @@ export const postItemsSoupAstGroupedResponse = zod
                                         .union([
                                           zod
                                             .object({
-                                              kind: zod.enum(['macro']),
+                                              kind: zod.enum(['rox']),
                                               name: zod
                                                 .string()
                                                 .describe(
@@ -65981,7 +65981,7 @@ export const postItemsSoupAstGroupedResponse = zod
                                         .union([
                                           zod
                                             .object({
-                                              kind: zod.enum(['macro']),
+                                              kind: zod.enum(['rox']),
                                               name: zod
                                                 .string()
                                                 .describe(
@@ -69502,7 +69502,7 @@ export const postItemsSoupAstGroupedResponse = zod
                                         .union([
                                           zod
                                             .object({
-                                              kind: zod.enum(['macro']),
+                                              kind: zod.enum(['rox']),
                                               name: zod
                                                 .string()
                                                 .describe(
@@ -70554,7 +70554,7 @@ export const postItemsSoupAstGroupedResponse = zod
                                         .union([
                                           zod
                                             .object({
-                                              kind: zod.enum(['macro']),
+                                              kind: zod.enum(['rox']),
                                               name: zod
                                                 .string()
                                                 .describe(
@@ -80033,7 +80033,7 @@ export const uploadFolderHandlerBody = zod.object({
                 'swf',
               ])
               .describe(
-                'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis macro takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
+                'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis rox takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
               ),
           ])
           .optional(),
@@ -80539,7 +80539,7 @@ export const uploadFolderHandlerResponse = zod.object({
                     'swf',
                   ])
                   .describe(
-                    'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis macro takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
+                    'Generates a FileType enum and associated ContentType enum with their implementations.\n\nThis rox takes a list of tuples in the format:\n(Variant, \"extension\", \"mime_type\", CONTENT_TYPE_VARIANT)\n\nFor each tuple it generates:\n- A variant in the FileType enum\n- A variant in the ContentType enum\n- Implementations for:\n  - FileType::to_str() - Converts FileType to extension string\n  - FileType::from_str() - Converts extension string to FileType\n  - From<FileType> for ContentType - Maps FileType to ContentType\n  - ContentType::mime_type() - Gets MIME type for ContentType\n'
                   ),
               ])
               .optional(),

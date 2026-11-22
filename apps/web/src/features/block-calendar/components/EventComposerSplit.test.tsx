@@ -94,7 +94,7 @@ it.each([true, false])(
     expect(screen.getByRole('status').textContent).toBe('Loading event…');
     setFlag({ loading: false, enabled });
     expect(screen.getByLabelText('Conference').textContent).toBe(
-      enabled ? 'macro' : 'none'
+      enabled ? 'rox' : 'none'
     );
     fireEvent.input(screen.getByRole('textbox'), {
       target: { value: 'Draft title' },

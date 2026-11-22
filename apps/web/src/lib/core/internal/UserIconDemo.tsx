@@ -5,13 +5,13 @@ import User from '@icon/system/regular/user.svg?component-solid';
 import { Avatar } from '@ui';
 import { For } from 'solid-js';
 
-// Mock macro user IDs (format: macro|email@domain.com)
+// Mock rox user IDs (format: rox|email@domain.com)
 const MOCK_USERS = [
-  { id: 'macro|seamus@rox.one', firstName: 'Seamus', lastName: 'Edson' },
-  { id: 'macro|teo@rox.one', firstName: 'Teo', lastName: 'Brasoveanu' },
-  { id: 'macro|russel@rox.one', firstName: 'Russel', lastName: 'Smith' },
-  { id: 'macro|rahul@rox.one', firstName: 'Rahul', lastName: 'Gupta' },
-  { id: 'macro|gab@rox.one', firstName: 'Gab', lastName: 'Briones' },
+  { id: 'rox|seamus@rox.one', firstName: 'Seamus', lastName: 'Edson' },
+  { id: 'rox|teo@rox.one', firstName: 'Teo', lastName: 'Brasoveanu' },
+  { id: 'rox|russel@rox.one', firstName: 'Russel', lastName: 'Smith' },
+  { id: 'rox|rahul@rox.one', firstName: 'Rahul', lastName: 'Gupta' },
+  { id: 'rox|gab@rox.one', firstName: 'Gab', lastName: 'Briones' },
 ];
 
 const USER_IDS = MOCK_USERS.map((u) => u.id);
@@ -218,7 +218,7 @@ export default function UserIconDemo() {
       </Section>
 
       {/* Email-only fallback */}
-      <Section title="Email Fallback (no macro ID)">
+      <Section title="Email Fallback (no rox ID)">
         <div class="flex items-center gap-3">
           <UserIcon email="john@example.com" size="sm" suppressClick />
           <UserIcon email="jane@example.com" size="md" suppressClick />

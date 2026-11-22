@@ -107,7 +107,7 @@ export function AppearancePicker(props: {
   let searchElement: HTMLInputElement | undefined;
   let grid: HTMLDivElement | undefined;
   const searching = () => search().trim().length > 0;
-  const macroLabel = (name: string) =>
+  const roxLabel = (name: string) =>
     isPickerIconName(name) ? t(`entityIcons.icon_${name}`) : iconLabel(name);
   const names = createMemo(() => {
     const words = search()
@@ -116,7 +116,7 @@ export function AppearancePicker(props: {
       .split(/[\s-]+/);
     return PICKER_ICON_NAMES.filter((name) => {
       const searchable =
-        `${name} ${PICKER_ICON_LABELS.get(name)} ${macroLabel(name)}`.toLowerCase();
+        `${name} ${PICKER_ICON_LABELS.get(name)} ${roxLabel(name)}`.toLowerCase();
       return words.every((word) => searchable.includes(word));
     });
   });
@@ -130,9 +130,9 @@ export function AppearancePicker(props: {
     icon,
     label,
   });
-  const macroOptions = (section: string, names: readonly string[]) =>
+  const roxOptions = (section: string, names: readonly string[]) =>
     names.map((name) =>
-      option(section, { kind: 'macro', name }, macroLabel(name))
+      option(section, { kind: 'rox', name }, roxLabel(name))
     );
   const emojiOptions = (section: string, emojis: readonly SimpleEmoji[]) =>
     emojis.map((emoji) =>
@@ -152,7 +152,7 @@ export function AppearancePicker(props: {
               {
                 key: 'icons',
                 label: t('appearance.iconCount', { count: names().length }),
-                options: macroOptions('icons', names()),
+                options: roxOptions('icons', names()),
               },
             ]
           : []),
@@ -165,7 +165,7 @@ export function AppearancePicker(props: {
         },
       ];
     const recent = props.recent.filter(
-      (icon) => icon.kind === (tab() === 'icons' ? 'macro' : 'emoji')
+      (icon) => icon.kind === (tab() === 'icons' ? 'rox' : 'emoji')
     );
     const recentSection = {
       key: 'recent',
@@ -174,7 +174,7 @@ export function AppearancePicker(props: {
         option(
           'recent',
           icon,
-          icon.kind === 'macro' ? macroLabel(icon.name) : icon.value
+          icon.kind === 'rox' ? roxLabel(icon.name) : icon.value
         )
       ),
     };
@@ -184,7 +184,7 @@ export function AppearancePicker(props: {
         ...ICON_SECTIONS.map((section) => ({
           key: section.id,
           label: t(`entityIcons.section_${section.id}`),
-          options: macroOptions(
+          options: roxOptions(
             section.id,
             section.icons.map(({ name }) => name)
           ),
@@ -310,7 +310,7 @@ export function AppearancePicker(props: {
         onClick={(event) => pick(optionProps.option, event.currentTarget)}
       >
         <Show
-          when={optionProps.option.icon.kind === 'macro'}
+          when={optionProps.option.icon.kind === 'rox'}
           fallback={
             <span class="emoji text-xl mobile:text-[26px]">
               {optionProps.option.icon.kind === 'emoji'

@@ -3,7 +3,7 @@
 import { isTauri } from '@core/util/platform';
 import { emit } from '@tauri-apps/api/event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { openMacroLinkInApp } from './macroLinkInterceptor';
+import { openMacroLinkInApp } from './roxLinkInterceptor';
 
 vi.mock('@core/util/platform', () => ({
   isTauri: vi.fn(() => false),
@@ -51,7 +51,7 @@ describe('openMacroLinkInApp', () => {
 
   it('leaves external links alone under Tauri', () => {
     vi.mocked(isTauri).mockReturnValue(true);
-    expect(openMacroLinkInApp('https://github.com/macro-inc')).toBe(false);
+    expect(openMacroLinkInApp('https://github.com/rox-inc')).toBe(false);
     expect(emit).not.toHaveBeenCalled();
   });
 

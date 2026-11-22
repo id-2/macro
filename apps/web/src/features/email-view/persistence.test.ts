@@ -107,7 +107,7 @@ describe('createEmailViewPersistence', () => {
   });
 
   it('lands a saved retired Priority sort on most recent, keeping the rest', () => {
-    createUserScopedStorage('macro:email:view-state:v1').write(
+    createUserScopedStorage('rox:email:view-state:v1').write(
       'priority-sort-user',
       JSON.stringify({ version: 1, tab: 'focus', focusSort: 'priority' })
     );

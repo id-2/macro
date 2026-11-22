@@ -4,7 +4,7 @@ import {
 } from '@queries/auth/user-name-cache';
 import { userNameCache } from '@queries/auth/user-name-cache-runtime';
 import { getOwner, onCleanup } from 'solid-js';
-import { type RoxId, macroIdToEmail } from './macroId';
+import { type RoxId, roxIdToEmail } from './roxId';
 import type { UserNameItem, UserNamePreviewFetcher } from './types';
 
 /** Initials from structured names, falling back to the email's first letter. */
@@ -59,7 +59,7 @@ function display(
   id: RoxId,
   options?: DisplayNameOptions
 ): string {
-  const email = macroIdToEmail(id);
+  const email = roxIdToEmail(id);
   const fallback =
     options?.emailFallback === 'local-part'
       ? email.split('@')[0] || email

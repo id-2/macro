@@ -24,13 +24,13 @@ vi.mock('@components/app/split-layout/layoutUtils', () => ({
   useSplitPanel: () => ({ handle: { id: 'folder-split' } }),
 }));
 vi.mock('@core/component/Toast/Toast', () => ({ toast: mocks.toast }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|me' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|me' }));
 vi.mock('@queries/storage/folder-list', () => ({
   createFolderList: () => ({
     folders: () => [
-      { id: 'folder', name: 'Folder', parentId: 'parent', userId: 'macro|me' },
-      { id: 'parent', name: 'Parent', userId: 'macro|me' },
-      { id: 'other', name: 'Other', userId: 'macro|me' },
+      { id: 'folder', name: 'Folder', parentId: 'parent', userId: 'rox|me' },
+      { id: 'parent', name: 'Parent', userId: 'rox|me' },
+      { id: 'other', name: 'Other', userId: 'rox|me' },
     ],
     isPending: () => false,
   }),
@@ -46,7 +46,7 @@ import {
   FolderDropZone,
 } from './folder-drop-zone';
 
-const doc = (id: string, ownerId = 'macro|me'): EntityData => ({
+const doc = (id: string, ownerId = 'rox|me'): EntityData => ({
   id,
   type: 'document',
   name: id,
@@ -147,7 +147,7 @@ const folder = (id: string): EntityData => ({
   id,
   type: 'project',
   name: id,
-  ownerId: 'macro|me',
+  ownerId: 'rox|me',
 });
 
 function ListRow(props: { entity: EntityData }) {
@@ -226,7 +226,7 @@ describe('FolderDropZone', () => {
 
   it('refuses a selection holding a row the user cannot move', () => {
     const mine = doc('mine');
-    const theirs = doc('theirs', 'macro|teammate');
+    const theirs = doc('theirs', 'rox|teammate');
     const { start, drop } = setup(dragData(mine, { selected: [mine, theirs] }));
 
     start();
@@ -253,7 +253,7 @@ describe('FolderDropZone', () => {
       id: 'parent',
       type: 'project',
       name: 'Parent',
-      ownerId: 'macro|me',
+      ownerId: 'rox|me',
     };
     const { start, drop } = setup(dragData(parent, {}));
 

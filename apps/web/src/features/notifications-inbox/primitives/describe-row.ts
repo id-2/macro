@@ -58,7 +58,7 @@ function actorName(
       { kind: 'agent' },
       (actor) => actor.name ?? getNotificationSenderFallbackName(latest)
     )
-    .with({ kind: 'macro' }, () => 'Rox')
+    .with({ kind: 'rox' }, () => 'Rox')
     .with({ kind: 'other' }, () => undefined)
     .exhaustive();
 }

@@ -63,7 +63,7 @@ describe('composeArtifactDocument', () => {
 
   it('expands components around their children, including nested ones', () => {
     const composed = composeArtifactDocument(
-      '<macro-component name="card"><macro-component name="title">Hi</macro-component></macro-component>',
+      '<rox-component name="card"><rox-component name="title">Hi</rox-component></rox-component>',
       {},
       {
         styles: {},
@@ -82,43 +82,43 @@ describe('composeArtifactDocument', () => {
 
   it('terminates on components that use each other', () => {
     const composed = composeArtifactDocument(
-      '<macro-component name="a"></macro-component>',
+      '<rox-component name="a"></rox-component>',
       {},
       {
         styles: {},
         components: {
-          a: '<macro-component name="b"></macro-component>',
-          b: '<macro-component name="a"></macro-component>',
+          a: '<rox-component name="b"></rox-component>',
+          b: '<rox-component name="a"></rox-component>',
         },
       },
       'token'
     );
 
-    expect(composed).not.toContain('macro-component');
+    expect(composed).not.toContain('rox-component');
   });
 
   it('stops expanding a component that fans out past the budget', () => {
-    const fanOut = '<macro-component name="a"></macro-component>'.repeat(20);
+    const fanOut = '<rox-component name="a"></rox-component>'.repeat(20);
     const composed = composeArtifactDocument(
-      '<macro-component name="a"></macro-component>',
+      '<rox-component name="a"></rox-component>',
       {},
       { styles: {}, components: { a: fanOut } },
       'token'
     );
 
-    expect(composed).not.toContain('macro-component');
+    expect(composed).not.toContain('rox-component');
   });
 
   it('adds shared styles and drops unknown names', () => {
     const composed = composeArtifactDocument(
-      '<macro-style name="brand"></macro-style><macro-style name="constructor"></macro-style><macro-component name="constructor">Kept</macro-component>',
+      '<rox-style name="brand"></rox-style><rox-style name="constructor"></rox-style><rox-component name="constructor">Kept</rox-component>',
       {},
       { styles: { brand: 'h1{color:red}' }, components: {} },
       'token'
     );
 
     expect(composed).toContain('<style>h1{color:red}</style>');
-    expect(composed).not.toContain('macro-style');
+    expect(composed).not.toContain('rox-style');
     expect(parse(composed).body.textContent).toContain('Kept');
   });
 
@@ -132,10 +132,10 @@ describe('composeArtifactDocument', () => {
 
     expect(composed.indexOf('secret')).toBeLessThan(composed.indexOf('run()'));
     expect(
-      isArtifactLoadMarker({ macroArtifactLoaded: 'secret' }, 'secret')
+      isArtifactLoadMarker({ roxArtifactLoaded: 'secret' }, 'secret')
     ).toBe(true);
     expect(
-      isArtifactLoadMarker({ macroArtifactLoaded: 'guess' }, 'secret')
+      isArtifactLoadMarker({ roxArtifactLoaded: 'guess' }, 'secret')
     ).toBe(false);
   });
 });

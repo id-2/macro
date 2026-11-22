@@ -108,7 +108,7 @@ describe('templates beside the suggestions', () => {
     const item = templateItem(TAGS, context(true));
     expect(item).toMatchObject({
       id: 'template:email_tags',
-      from: 'macro',
+      from: 'rox',
       template: true,
       title: 'Tag new email',
       summary: 'Tag each new email Reply within 7 days.',
@@ -120,7 +120,7 @@ describe('templates beside the suggestions', () => {
 
   it('come after AI’s picks and Rox’s suggestions, unless one already offers them', () => {
     const pick = required(suggestionItem(forYou, [TAGS], context(true)));
-    const macro = required(suggestionItem(template, [TAGS], context(true)));
+    const rox = required(suggestionItem(template, [TAGS], context(true)));
     const drafts = required(suggestionItem(drafted, [], context(true)));
     const tags = templateItem(TAGS, context(true));
     const brief = {
@@ -129,7 +129,7 @@ describe('templates beside the suggestions', () => {
       catalogKey: 'brief',
     };
     expect(
-      discoverItems([macro, pick, drafts], [tags, brief]).map((item) => item.id)
+      discoverItems([rox, pick, drafts], [tags, brief]).map((item) => item.id)
     ).toEqual(['pick-1', 'drafted-1', 'template-1', 'template:brief']);
   });
 });

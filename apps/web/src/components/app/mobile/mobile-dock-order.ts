@@ -4,7 +4,7 @@ import { createSignal } from 'solid-js';
 import { z } from 'zod';
 
 const orderSchema = z.array(z.string());
-const storage = createUserScopedStorage('macro:mobile:dock-order');
+const storage = createUserScopedStorage('rox:mobile:dock-order');
 
 /** Keep gated destinations in the saved order and append newly added views. */
 export function normalizeDockOrder(

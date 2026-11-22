@@ -13,19 +13,19 @@ import {
 
 describe('parseRepositoryInput', () => {
   it('canonicalizes every way of naming a GitHub repository', () => {
-    const expected = 'https://github.com/macro-inc/macro';
-    expect(parseRepositoryInput('macro-inc/macro')).toBe(expected);
-    expect(parseRepositoryInput(' github.com/macro-inc/macro ')).toBe(expected);
-    expect(parseRepositoryInput('https://github.com/macro-inc/macro.git')).toBe(
+    const expected = 'https://github.com/rox-inc/rox';
+    expect(parseRepositoryInput('rox-inc/rox')).toBe(expected);
+    expect(parseRepositoryInput(' github.com/rox-inc/rox ')).toBe(expected);
+    expect(parseRepositoryInput('https://github.com/rox-inc/rox.git')).toBe(
       expected
     );
-    expect(parseRepositoryInput('https://github.com/macro-inc/macro/')).toBe(
+    expect(parseRepositoryInput('https://github.com/rox-inc/rox/')).toBe(
       expected
     );
     expect(
-      parseRepositoryInput('https://github.com/macro-inc/macro/pull/12')
+      parseRepositoryInput('https://github.com/rox-inc/rox/pull/12')
     ).toBe(expected);
-    expect(parseRepositoryInput('git@github.com:macro-inc/macro.git')).toBe(
+    expect(parseRepositoryInput('git@github.com:rox-inc/rox.git')).toBe(
       expected
     );
   });
@@ -38,7 +38,7 @@ describe('parseRepositoryInput', () => {
 
   it('rejects text that is not a repository', () => {
     expect(parseRepositoryInput('')).toBeUndefined();
-    expect(parseRepositoryInput('macro')).toBeUndefined();
+    expect(parseRepositoryInput('rox')).toBeUndefined();
     expect(parseRepositoryInput('https://example.com')).toBeUndefined();
     expect(parseRepositoryInput('not a repo')).toBeUndefined();
   });
@@ -46,11 +46,11 @@ describe('parseRepositoryInput', () => {
 
 describe('repository names', () => {
   it('shows owner/repo and the bare name', () => {
-    expect(repositoryLabel('https://github.com/macro-inc/macro')).toBe(
-      'macro-inc/macro'
+    expect(repositoryLabel('https://github.com/rox-inc/rox')).toBe(
+      'rox-inc/rox'
     );
-    expect(repositoryShortName('https://github.com/macro-inc/macro')).toBe(
-      'macro'
+    expect(repositoryShortName('https://github.com/rox-inc/rox')).toBe(
+      'rox'
     );
     expect(repositoryLabel('https://gitlab.com/group/project.git')).toBe(
       'group/project'
@@ -58,48 +58,48 @@ describe('repository names', () => {
   });
 });
 
-const macro: ReachableRepository = {
-  url: 'https://github.com/macro-inc/macro',
+const rox: ReachableRepository = {
+  url: 'https://github.com/rox-inc/rox',
   defaultBranch: 'main',
 };
 const infra: ReachableRepository = {
-  url: 'https://github.com/macro-inc/infra',
+  url: 'https://github.com/rox-inc/infra',
   defaultBranch: 'develop',
 };
 const scratch: ReachableRepository = {
-  url: 'https://github.com/macro-inc/scratch',
+  url: 'https://github.com/rox-inc/scratch',
 };
 
 describe('orderRepositories', () => {
   it('puts recents first, in their order, then the rest as listed', () => {
-    expect(orderRepositories([infra, macro, scratch], [scratch.url])).toEqual([
+    expect(orderRepositories([infra, rox, scratch], [scratch.url])).toEqual([
       scratch,
       infra,
-      macro,
+      rox,
     ]);
   });
 
   it('omits a recent the listing no longer carries, and dedupes by spelling', () => {
     expect(
       orderRepositories(
-        [macro],
+        [rox],
         [
-          'https://github.com/macro-inc/gone',
+          'https://github.com/rox-inc/gone',
           'https://github.com/Macro-Inc/MACRO',
         ]
       )
-    ).toEqual([macro]);
+    ).toEqual([rox]);
   });
 });
 
 describe('filterRepositories', () => {
   it('matches the owner/repo label and the url, ignoring case', () => {
-    const all = [macro, infra, scratch];
+    const all = [rox, infra, scratch];
     expect(filterRepositories(all, '')).toEqual(all);
     expect(filterRepositories(all, 'INFRA')).toEqual([infra]);
-    expect(filterRepositories(all, 'macro-inc/s')).toEqual([scratch]);
-    expect(filterRepositories(all, 'github.com/macro-inc/macro')).toEqual([
-      macro,
+    expect(filterRepositories(all, 'rox-inc/s')).toEqual([scratch]);
+    expect(filterRepositories(all, 'github.com/rox-inc/rox')).toEqual([
+      rox,
     ]);
     expect(filterRepositories(all, 'nothing')).toEqual([]);
   });
@@ -107,13 +107,13 @@ describe('filterRepositories', () => {
 
 describe('defaultBranchFor', () => {
   it("starts on the repository's default branch, or main without one", () => {
-    const all = [macro, infra, scratch];
+    const all = [rox, infra, scratch];
     expect(defaultBranchFor(all, infra.url)).toBe('develop');
     expect(defaultBranchFor(all, 'https://github.com/Macro-Inc/Infra')).toBe(
       'develop'
     );
     expect(defaultBranchFor(all, scratch.url)).toBe('main');
-    expect(defaultBranchFor(all, 'https://github.com/macro-inc/unlisted')).toBe(
+    expect(defaultBranchFor(all, 'https://github.com/rox-inc/unlisted')).toBe(
       'main'
     );
     expect(defaultBranchFor(all, undefined)).toBe('main');

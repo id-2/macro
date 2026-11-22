@@ -68,7 +68,7 @@ function LiveBilling(props: { controls?: JSX.Element }) {
   const team = useCurrentTeamQuery();
   const summary = useAiBillingSummaryQuery();
   const aiUsageBilling = useFeatureFlag(enableAiUsageBilling);
-  const macroComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableMacroComputers);
   const changePlan = useChangePlanMutation();
   const checkout = useCreateCheckoutSessionMutation();
   const portal = useCreateBillingPortalMutation();
@@ -207,7 +207,7 @@ function LiveBilling(props: { controls?: JSX.Element }) {
       }
       computers={
         // Flag off: nothing to wait for, so no loading line flashes by.
-        <Show when={macroComputers().enabled}>
+        <Show when={roxComputers().enabled}>
           <Suspense
             fallback={<p role="status">{t('settingsBilling.loading')}</p>}
           >

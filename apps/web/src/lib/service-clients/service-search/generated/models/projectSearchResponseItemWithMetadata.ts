@@ -8,7 +8,7 @@ import type { ProjectSearchResponseItem } from './projectSearchResponseItem';
 import type { ProjectSearchResponseItemWithMetadataAllOf } from './projectSearchResponseItemWithMetadataAllOf';
 
 /**
- * ProjectSearchResponseItem object with project metadata we fetch from macrodb.
+ * ProjectSearchResponseItem object with project metadata we fetch from roxdb.
 The index carries created_at/updated_at for ranking, but viewed_at is
 per-user and deleted_at changes without a reindex, so metadata stays
 database-sourced.

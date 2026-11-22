@@ -695,7 +695,7 @@ export async function executeGraphqlCreate(
               ),
             }
           : {}),
-        ...(args.macroCall ? { macroCall: true } : {}),
+        ...(args.roxCall ? { roxCall: true } : {}),
         ...(args.guestPolicy ? { guestPolicy: args.guestPolicy } : {}),
         ...(args.outOfOffice
           ? {

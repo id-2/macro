@@ -2,7 +2,7 @@ import { useEmailLinksQuery } from '@queries/email/link';
 import { queryReadyGate } from '@queries/gate';
 import type { Link } from '@service-email/generated/schemas';
 import { type Accessor, createMemo } from 'solid-js';
-import { macroIdToEmail, tryMacroId } from '../user/macroId';
+import { roxIdToEmail, tryMacroId } from '../user/roxId';
 import { createAssertedContextProvider } from './createContext';
 import { useIsAuthenticated } from './user';
 
@@ -46,10 +46,10 @@ export const [EmailLinksContextProvider, useEmailLinksContext] =
         id: string | undefined | null
       ): boolean => {
         if (!id) return false;
-        const macroId = tryMacroId(id);
-        if (!macroId) return false;
+        const roxId = tryMacroId(id);
+        if (!roxId) return false;
         return secondaryInboxEmails().has(
-          macroIdToEmail(macroId).toLowerCase()
+          roxIdToEmail(roxId).toLowerCase()
         );
       };
 

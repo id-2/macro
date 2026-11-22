@@ -348,11 +348,11 @@ vi.mock('../FormatButtons', () => ({
 }));
 
 const CONTACT = {
-  id: 'macro|ann@macro.test',
+  id: 'rox|ann@rox.test',
   name: 'Ann',
-  email: 'ann@macro.test',
+  email: 'ann@rox.test',
 };
-const CHANNEL_MEMBER = { user_id: 'macro|bo@macro.test' };
+const CHANNEL_MEMBER = { user_id: 'rox|bo@rox.test' };
 
 vi.mock('@queries/channel/channel-participants', () => ({
   useChannelParticipantsQuery: (channelId: () => string) => ({
@@ -364,7 +364,7 @@ vi.mock('@queries/channel/channel-participants', () => ({
 }));
 vi.mock('@core/context/user', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@core/context/user')>()),
-  useUserId: () => () => 'macro|me@macro.test',
+  useUserId: () => () => 'rox|me@rox.test',
   useIsAuthenticated: () => () => true,
 }));
 vi.mock('@queries/messages/mutations', () => ({
@@ -377,9 +377,9 @@ vi.mock('@queries/messages/typing', () => ({
 import {
   ROX_AGENT_NAME,
   ROX_AGENT_PRINCIPAL_ID,
-} from '@core/constant/macroAgent';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
-import { codexMentionUser, cursorMentionUser } from '../../macroAi';
+} from '@core/constant/roxAgent';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
+import { codexMentionUser, cursorMentionUser } from '../../roxAi';
 import { ThreadReplyChannelInput } from '../../Thread/ThreadReplyChannelInput';
 import { createInputAttachmentTracker } from '../attachment-tracker';
 import { ChannelInput } from '../ChannelInput';

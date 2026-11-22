@@ -7,7 +7,7 @@ import { createSignal } from 'solid-js';
 export const reviewId = '019a0000-0000-7000-8000-000000000005';
 const [messages, setMessages] = createSignal<FoldedMessage[]>([]);
 const [metadata, setMetadata] = createSignal<SessionMetadata>({
-  harness: 'macro',
+  harness: 'rox',
   model: null,
   supportedModels: [],
   configOptions: [],
@@ -22,7 +22,7 @@ const [metadata, setMetadata] = createSignal<SessionMetadata>({
 });
 export const session = {
   sessionId: () => '019a0000-0000-7000-8000-000000000001',
-  userId: () => 'macro|owner@example.com',
+  userId: () => 'rox|owner@example.com',
   session: () => undefined,
   metadata,
   messages,

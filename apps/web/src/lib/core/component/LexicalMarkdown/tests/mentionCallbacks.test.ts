@@ -157,7 +157,7 @@ describe('mentionsPlugin callbacks', () => {
 
     editor.dispatchCommand(INSERT_PR_MENTION_COMMAND, {
       id: 'foreign-1',
-      label: 'macro/macro#123',
+      label: 'rox/rox#123',
       mentionUuid: 'uuid-pr',
     });
     flush();
@@ -187,7 +187,7 @@ describe('mentionsPlugin callbacks', () => {
         itemType: 'foreign',
         itemId: 'foreign-1',
         fileType: 'github_pull_request',
-        documentName: 'macro/macro#123',
+        documentName: 'rox/rox#123',
       })
     );
 
@@ -227,7 +227,7 @@ describe('mentionsPlugin callbacks', () => {
         itemType: 'foreign',
         itemId: 'foreign-1',
         fileType: 'github_pull_request',
-        documentName: 'macro/macro#123',
+        documentName: 'rox/rox#123',
       })
     );
 

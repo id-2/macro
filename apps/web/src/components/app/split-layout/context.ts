@@ -44,7 +44,7 @@ export type SplitFileMenuActionGroups = {
   /** Share, Copy Link, Copy ID, and friends. */
   sharing: SplitFileMenuAction[];
   /** Rox platform features: Favorite, Mute, Remind me, Add tag. */
-  macro: SplitFileMenuAction[];
+  rox: SplitFileMenuAction[];
   /** Non-destructive operations on the file itself: Duplicate, Rename, Move, Download. */
   file: SplitFileMenuAction[];
   /** Destructive actions, always last. */
@@ -72,7 +72,7 @@ export function getSplitFileMenuActionSections(
     { key: 'entity', actions: groups.entity },
     { key: 'sender', actions: groups.sender },
     { key: 'sharing', actions: groups.sharing },
-    { key: 'macro', actions: groups.macro },
+    { key: 'rox', actions: groups.rox },
     { key: 'file', actions: groups.file },
     { key: 'delete', actions: groups.delete },
   ];

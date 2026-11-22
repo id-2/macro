@@ -28,7 +28,7 @@ type StoredDraft = {
   theme: ThemeV3;
 };
 
-const THEME_EDIT_3_DRAFT_KEY = 'macro-theme-edit-3-draft';
+const THEME_EDIT_3_DRAFT_KEY = 'rox-theme-edit-3-draft';
 const FIXED_PALETTE_VERSION = 1;
 
 function readStoredDraft(): StoredDraft | null {

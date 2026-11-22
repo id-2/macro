@@ -1452,13 +1452,13 @@ export function drawingPart(options: {
       );
       const name = xml(drawing.name ?? `Chart ${index + 1}`);
       const frame = (uri: string, element: string) =>
-        `<xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="${id}" name="${name}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="${uri}">${element}</a:graphicData></a:graphic></xdr:graphicFrame>`;
+        `<xdr:graphicFrame rox=""><xdr:nvGraphicFramePr><xdr:cNvPr id="${id}" name="${name}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="${uri}">${element}</a:graphicData></a:graphic></xdr:graphicFrame>`;
       if (ex) {
         // Older Excel shows the fallback: a note where the chart would be.
         const requirement = chartExRequirement(drawing.chart);
         const corner = options.origin(drawing.from);
         const { width, height } = options.size(drawing);
-        const note = `<xdr:sp macro="" textlink=""><xdr:nvSpPr><xdr:cNvPr id="${id}" name="${name}"/><xdr:cNvSpPr><a:spLocks noTextEdit="1"/></xdr:cNvSpPr></xdr:nvSpPr><xdr:spPr><a:xfrm><a:off x="${Math.round(corner.x * EMU_PER_PIXEL)}" y="${Math.round(corner.y * EMU_PER_PIXEL)}"/><a:ext cx="${Math.round(width * EMU_PER_PIXEL)}" cy="${Math.round(height * EMU_PER_PIXEL)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:solidFill><a:prstClr val="white"/></a:solidFill><a:ln w="1"><a:solidFill><a:prstClr val="green"/></a:solidFill></a:ln></xdr:spPr><xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip"/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="1100"/><a:t>This chart isn't available in your version of Excel.</a:t></a:r></a:p></xdr:txBody></xdr:sp>`;
+        const note = `<xdr:sp rox="" textlink=""><xdr:nvSpPr><xdr:cNvPr id="${id}" name="${name}"/><xdr:cNvSpPr><a:spLocks noTextEdit="1"/></xdr:cNvSpPr></xdr:nvSpPr><xdr:spPr><a:xfrm><a:off x="${Math.round(corner.x * EMU_PER_PIXEL)}" y="${Math.round(corner.y * EMU_PER_PIXEL)}"/><a:ext cx="${Math.round(width * EMU_PER_PIXEL)}" cy="${Math.round(height * EMU_PER_PIXEL)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:solidFill><a:prstClr val="white"/></a:solidFill><a:ln w="1"><a:solidFill><a:prstClr val="green"/></a:solidFill></a:ln></xdr:spPr><xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip"/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="1100"/><a:t>This chart isn't available in your version of Excel.</a:t></a:r></a:p></xdr:txBody></xdr:sp>`;
         content = `<mc:AlternateContent xmlns:mc="${COMPATIBILITY}"><mc:Choice xmlns:${requirement.prefix}="${requirement.namespace}" Requires="${requirement.prefix}">${frame(CHARTEX, `<cx:chart xmlns:cx="${CHARTEX}" r:id="rId${relations.length}"/>`)}</mc:Choice><mc:Fallback>${note}</mc:Fallback></mc:AlternateContent>`;
       } else
         content = frame(

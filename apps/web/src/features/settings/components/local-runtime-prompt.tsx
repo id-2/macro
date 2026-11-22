@@ -21,9 +21,9 @@ const LocalRuntimeSetup = lazyNamed(
 );
 
 const dismissal = createUserScopedStorage(
-  'macro:local-runtime-prompt:dismissed'
+  'rox:local-runtime-prompt:dismissed'
 );
-const dismissalEvent = 'macro:local-runtime-prompt:dismissed';
+const dismissalEvent = 'rox:local-runtime-prompt:dismissed';
 
 /**
  * Invite each desktop installation to set up its own bundled local runtime,
@@ -42,7 +42,7 @@ export function LocalRuntimePrompt() {
     setDismissalVersion((version) => version + 1);
   };
   const onStorage = (event: StorageEvent) => {
-    if (event.key?.startsWith('macro:local-runtime-prompt:dismissed:')) {
+    if (event.key?.startsWith('rox:local-runtime-prompt:dismissed:')) {
       refreshDismissal();
     }
   };

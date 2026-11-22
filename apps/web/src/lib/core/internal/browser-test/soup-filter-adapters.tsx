@@ -46,7 +46,7 @@ export const [SoupFilterFixtureProvider, useSoupView] =
                   team: { id: 'fixture-team', crm_enabled: true },
                   members: [
                     { user_id: VIEWER, role: 'member' },
-                    { user_id: 'macro|teammate@example.com', role: 'member' },
+                    { user_id: 'rox|teammate@example.com', role: 'member' },
                   ],
                 },
                 isPending: false,

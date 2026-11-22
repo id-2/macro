@@ -71,16 +71,16 @@ export function memoryAttributes(sample: MemorySample): Attributes {
       (process) => process.role === role
     );
     if (!processes.length) continue;
-    attributes[`macro.memory.${role}.rss_bytes`] = processes.reduce(
+    attributes[`rox.memory.${role}.rss_bytes`] = processes.reduce(
       (sum, process) => sum + process.residentBytes,
       0
     );
-    attributes[`macro.memory.${role}.footprint_bytes`] = processes.reduce(
+    attributes[`rox.memory.${role}.footprint_bytes`] = processes.reduce(
       (sum, process) => sum + process.footprintBytes,
       0
     );
-    attributes[`macro.memory.${role}.process_count`] = processes.length;
-    attributes[`macro.memory.${role}.pids`] = processes.map(
+    attributes[`rox.memory.${role}.process_count`] = processes.length;
+    attributes[`rox.memory.${role}.pids`] = processes.map(
       (process) => process.pid
     );
   }
@@ -255,7 +255,7 @@ export async function readDesktopDiagnostics(): Promise<
 }
 
 export function createDesktopMemoryRecording(snapshot: DesktopSnapshot) {
-  const key = `macro-memory-sequence:${snapshot.identity.instanceId}`;
+  const key = `rox-memory-sequence:${snapshot.identity.instanceId}`;
   let sequence = 0;
   try {
     const saved = Number(sessionStorage.getItem(key));

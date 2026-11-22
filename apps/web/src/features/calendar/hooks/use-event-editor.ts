@@ -55,7 +55,7 @@ import {
   attachCalendarMacroCall,
   calendarMacroCallUrl,
   removeCalendarMacroCall,
-} from '../utils/macro-call-link';
+} from '../utils/rox-call-link';
 
 const EDIT_DISABLED_FIELDS = {
   calendar: true,
@@ -119,7 +119,7 @@ interface UseEventEditorProps {
   onSaved: () => void;
   /** Called with a new event once it exists, before `onSaved`. */
   onCreated?: (created: CreatedCalendarEvent) => void;
-  macroCallsEnabled: Accessor<boolean>;
+  roxCallsEnabled: Accessor<boolean>;
   /**
    * Whether the guest-invites rollout is on: a guest the organizer lets
    * invite may add guests, and the organizer may set guest permissions. Off
@@ -291,7 +291,7 @@ export function useEventEditor(props: UseEventEditorProps) {
     values: EventEditorSubmitValues
   ) => {
     const meeting = await fetchMeeting(shareToken);
-    if (!props.macroCallsEnabled()) return;
+    if (!props.roxCallsEnabled()) return;
     const event = props.event();
     const preservesPoint =
       event && isTimedPointEvent(event) && !hasTimeChanged(event, values.time);
@@ -315,10 +315,10 @@ export function useEventEditor(props: UseEventEditorProps) {
     const existingMeetingUrl = event ? calendarMacroCallUrl(event) : undefined;
     const cleanContent = removeCalendarMacroCall(values, existingMeetingUrl);
     const wantsMacroCall =
-      values.conferenceChoice === 'macro' &&
+      values.conferenceChoice === 'rox' &&
       !values.outOfOffice &&
       event?.eventType !== 'out_of_office';
-    const needsCall = () => props.macroCallsEnabled() && wantsMacroCall;
+    const needsCall = () => props.roxCallsEnabled() && wantsMacroCall;
     const canManageCall =
       !event || (editsPrimaryCopy(event) && viewerReplacesGuests(event));
     if (
@@ -340,7 +340,7 @@ export function useEventEditor(props: UseEventEditorProps) {
       !values.outOfOffice &&
       event?.eventType !== 'out_of_office' &&
       event?.conferenceUrl &&
-      (values.conferenceChoice === 'macro' ||
+      (values.conferenceChoice === 'rox' ||
         values.conferenceChoice === 'none')
         ? 'none'
         : undefined);
@@ -363,7 +363,7 @@ export function useEventEditor(props: UseEventEditorProps) {
               : cleanContent.description,
           attendees: values.guestEmails.map((email) => ({ email })),
           ...(conference ? { conference } : {}),
-          ...(needsCall() ? { macroCall: true } : {}),
+          ...(needsCall() ? { roxCall: true } : {}),
           ...(values.reminders ? { reminders: values.reminders } : {}),
           ...(values.outOfOffice ? { outOfOffice: values.outOfOffice } : {}),
           ...(values.guestPolicy ? { guestPolicy: values.guestPolicy } : {}),

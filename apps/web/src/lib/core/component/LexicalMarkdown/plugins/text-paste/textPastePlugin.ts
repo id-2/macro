@@ -12,7 +12,7 @@ import {
 } from '@core/block';
 import { shouldUseMobileClipboardImageRecovery } from '@core/mobile/mobileClipboardImageRecovery';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { isValidMacroAppHostname } from '@core/util/macroAppUrl';
+import { isValidMacroAppHostname } from '@core/util/roxAppUrl';
 import { $isCodeNode } from '@lexical/code';
 import { $createLinkNode, $isLinkNode, LinkNode } from '@lexical/link';
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';

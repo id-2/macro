@@ -71,7 +71,7 @@ const TauriContext = createContext<TauriContextValue | undefined>(undefined);
 const LOADED_BUNDLE_BUILD = (() => {
   if (typeof document === 'undefined') return undefined;
   const value = document
-    .querySelector<HTMLMetaElement>('meta[name="macro-bundle-build"]')
+    .querySelector<HTMLMetaElement>('meta[name="rox-bundle-build"]')
     ?.getAttribute('content');
   if (value === undefined || value === null || !/^\d+$/.test(value)) {
     return undefined;

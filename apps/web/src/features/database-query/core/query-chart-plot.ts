@@ -121,7 +121,7 @@ export function plotChart(
     style: LEGEND_STYLE,
   };
   const grouped = data.series.length > 1 && !data.stack;
-  const base = { className: 'macro-chart', width: layout.width, style: STYLE };
+  const base = { className: 'rox-chart', width: layout.width, style: STYLE };
   if (data.mark === 'bar' && data.scale === 'category') {
     // Categories read best as rows of bars with their labels beside them.
     const marginLeft = Math.round(

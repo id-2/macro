@@ -60,11 +60,11 @@ export function createCallMiniPlayer(options: {
     viewport: { width: window.innerWidth, height: window.innerHeight },
   });
   const [storedWidth, setWidth] = usePreference(
-    'macro:pref:call:mini-player-width',
+    'rox:pref:call:mini-player-width',
     { default: 336 }
   );
   const [storedAudioHeight, setAudioHeight] = usePreference(
-    'macro:pref:call:mini-player-audio-height',
+    'rox:pref:call:mini-player-audio-height',
     { default: 144 }
   );
   const visibleSnapTarget = createMemo(
@@ -150,8 +150,8 @@ export function createCallMiniPlayer(options: {
     setSize('preview', undefined);
     setWidth(336);
     setAudioHeight(144);
-    localStorage.removeItem('macro:pref:call:mini-player-width');
-    localStorage.removeItem('macro:pref:call:mini-player-audio-height');
+    localStorage.removeItem('rox:pref:call:mini-player-width');
+    localStorage.removeItem('rox:pref:call:mini-player-audio-height');
     setPlacement({ corner: 'bottom-right', snapTarget: undefined });
     if (resetFrame !== undefined) cancelAnimationFrame(resetFrame);
     resetFrame = requestAnimationFrame(() => {

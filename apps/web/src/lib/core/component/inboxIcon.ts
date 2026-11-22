@@ -5,6 +5,6 @@ import { emailToMacroId } from '@core/user';
 // an own secondary inbox shares the parent account's rox_id, so keying on the
 // address gives each inbox its own name and icon.
 export function inboxIconProps(emailAddress: string): UserIconProps {
-  const macroId = emailToMacroId(emailAddress);
-  return macroId ? { id: macroId } : { email: emailAddress };
+  const roxId = emailToMacroId(emailAddress);
+  return roxId ? { id: roxId } : { email: emailAddress };
 }

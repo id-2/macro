@@ -23,8 +23,8 @@ export function MessageSenderName(props: SenderNameProps) {
 }
 
 export function SenderName(props: { message: MessageData }) {
-  const macroId = () => tryMacroId(props.message.sender_id);
-  const displayName = () => getDisplayName(macroId());
+  const roxId = () => tryMacroId(props.message.sender_id);
+  const displayName = () => getDisplayName(roxId());
   const agentName = () =>
     getBotDisplayName(props.message.sender_id, props.message.sender);
   const importedName = () => {

@@ -2,8 +2,8 @@ import '@fontsource-variable/inter';
 import '../../../index.css';
 import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { themeCssVars } from '../../theme/utils/themeCssVars';
 import type { DatabaseCellPresence } from '../components/database-table';
 import { GridCell } from '../components/grid-cell';
@@ -82,7 +82,7 @@ function Fixture() {
 
 const dark = new URLSearchParams(location.search).get('theme') === 'dark';
 for (const [key, token] of Object.entries(
-  themeCssVars(dark ? macroDarkTheme : macroLightTheme)
+  themeCssVars(dark ? roxDarkTheme : roxLightTheme)
 ))
   document.documentElement.style.setProperty(key, token);
 const root = document.getElementById('root');

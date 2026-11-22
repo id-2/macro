@@ -11,7 +11,7 @@ import type { SidePanelSectionLayout } from '@components/app/side-panel/SidePane
 import { References } from '@core/component/References';
 import { useUserId } from '@core/context/user';
 import { getDisplayNameParts } from '@core/user';
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import type { DateValue } from '@core/util/date';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { OwnerLabel } from '@entity/owner/owner-display';

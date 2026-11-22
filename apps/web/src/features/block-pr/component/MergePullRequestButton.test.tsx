@@ -42,8 +42,8 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 
 const target = {
-  owner: 'macro-inc',
-  repo: 'macro',
+  owner: 'rox-inc',
+  repo: 'rox',
   number: 6369,
   title: 'Fix reply state',
 };
@@ -133,11 +133,11 @@ describe('MergePullRequestButton', () => {
       expect.objectContaining({ owner: expect.any(Object) })
     );
     expect(authServiceClient.mergeGithubPullRequest).toHaveBeenCalledWith({
-      owner: 'macro-inc',
-      repo: 'macro',
+      owner: 'rox-inc',
+      repo: 'rox',
       number: 6369,
     });
-    expect(mocks.success).toHaveBeenCalledWith('Merged macro-inc/macro#6369');
+    expect(mocks.success).toHaveBeenCalledWith('Merged rox-inc/rox#6369');
     expect(openHost).not.toHaveBeenCalled();
   });
 

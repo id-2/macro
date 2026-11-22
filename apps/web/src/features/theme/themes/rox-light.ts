@@ -1,7 +1,7 @@
 import type { ThemeV3 } from '../types/themeTypes';
 
 /** Neutral light surfaces with white controls and the shared Rox blue accent. */
-export const macroLightTheme = {
+export const roxLightTheme = {
   id: 'Rox Light',
   name: 'Rox Light',
   version: 3,

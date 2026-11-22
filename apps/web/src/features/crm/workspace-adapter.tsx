@@ -164,7 +164,7 @@ export function createCrmWorkspace(
     | undefined;
 
   const [sortPref, setSortPref] = usePreference<string[]>(
-    'macro:pref:soup:companies:sort',
+    'rox:pref:soup:companies:sort',
     { default: [] }
   );
   const initialCrmView = sharedView;

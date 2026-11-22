@@ -40,7 +40,7 @@ describe('clipboard', () => {
         ],
       })
     );
-    const html = `<div data-macro-docx="${forged}"><p><b>Shown</b></p></div>`;
+    const html = `<div data-rox-docx="${forged}"><p><b>Shown</b></p></div>`;
     expect(readClipboardHtml(html, 'doc-1')).toEqual({
       paragraphs: [{ runs: [{ text: 'Shown', bold: true }] }],
       sameDocument: false,

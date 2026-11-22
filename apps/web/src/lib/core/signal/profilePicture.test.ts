@@ -23,12 +23,12 @@ describe('profile picture refresh', () => {
   });
 
   it('does not fetch users that are not cached', async () => {
-    await refreshProfilePicture('macro|nobody@example.com');
+    await refreshProfilePicture('rox|nobody@example.com');
     expect(postProfilePictures).not.toHaveBeenCalled();
   });
 
   it('refetches a cached user and updates the url', async () => {
-    const id = 'macro|cached@example.com';
+    const id = 'rox|cached@example.com';
     postProfilePictures.mockImplementation(picturesFor('https://x/file/1'));
     expect(await getProfilePictureUrl(id)).toBe('https://x/file/1');
 
@@ -41,7 +41,7 @@ describe('profile picture refresh', () => {
   });
 
   it('handles a removed picture', async () => {
-    const id = 'macro|removed@example.com';
+    const id = 'rox|removed@example.com';
     postProfilePictures.mockImplementation(picturesFor('https://x/file/1'));
     await getProfilePictureUrl(id);
     postProfilePictures.mockImplementation(picturesFor(undefined));
@@ -57,7 +57,7 @@ describe('profile picture refresh', () => {
   });
 
   it('refreshes the cached user from a valid payload', async () => {
-    const id = 'macro|handler@example.com';
+    const id = 'rox|handler@example.com';
     postProfilePictures.mockImplementation(picturesFor('https://x/file/1'));
     await getProfilePictureUrl(id);
     postProfilePictures.mockClear();

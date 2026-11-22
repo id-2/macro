@@ -11,7 +11,7 @@ import type { FrontendEvent } from './generated/native-diagnostics';
 let supported: boolean | undefined;
 let capable = false;
 let retired = false;
-const LEASE = 'macro-native-diagnostic-document';
+const LEASE = 'rox-native-diagnostic-document';
 const MAX_PENDING_DIAGNOSTICS = 32;
 const MAX_DIAGNOSTIC_TIMEOUTS = 3;
 let previousFrontend: string | undefined;

@@ -2,7 +2,7 @@
 export async function getMacroGithubStars(
   signal?: AbortSignal
 ): Promise<number> {
-  const response = await fetch('https://api.github.com/repos/macro-inc/macro', {
+  const response = await fetch('https://api.github.com/repos/rox-inc/rox', {
     credentials: 'omit',
     signal,
   });

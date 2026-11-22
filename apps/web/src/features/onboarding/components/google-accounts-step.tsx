@@ -1,4 +1,4 @@
-import GoogleIcon from '@icon/macro-google.svg';
+import GoogleIcon from '@icon/rox-google.svg';
 import MicrosoftIcon from '@icon/microsoft-color.svg';
 import CheckIcon from '@icon/system/regular/check.svg';
 import HandIcon from '@icon/system/regular/hand-palm.svg';

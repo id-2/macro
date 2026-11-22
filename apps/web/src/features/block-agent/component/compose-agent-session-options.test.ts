@@ -10,7 +10,7 @@ import {
 } from './compose-agent-session-options';
 
 describe('sessionRepositoryUrl', () => {
-  const repoUrl = 'https://github.com/macro-inc/macro';
+  const repoUrl = 'https://github.com/rox-inc/rox';
 
   it('shows the repository of a coding session', () => {
     expect(sessionRepositoryUrl({ harness: 'cursor', repoUrl })).toBe(repoUrl);
@@ -21,7 +21,7 @@ describe('sessionRepositoryUrl', () => {
     expect(sessionRepositoryUrl({ harness: 'in-memory', repoUrl })).toBe(
       undefined
     );
-    expect(sessionRepositoryUrl({ harness: 'macro-inmem', repoUrl })).toBe(
+    expect(sessionRepositoryUrl({ harness: 'rox-inmem', repoUrl })).toBe(
       undefined
     );
   });
@@ -37,7 +37,7 @@ describe('sessionRepositoryUrl', () => {
 describe('harnessDisplayName', () => {
   it('names Rox runtimes after the product', () => {
     expect(harnessDisplayName('in-memory')).toBe('Rox Agent');
-    expect(harnessDisplayName('macro-inmem')).toBe('Rox Agent');
+    expect(harnessDisplayName('rox-inmem')).toBe('Rox Agent');
     expect(harnessDisplayName('sandbox')).toBe('Rox Agent');
   });
 
@@ -52,7 +52,7 @@ describe('harnessDisplayName', () => {
 
 describe('harnessTitle', () => {
   it('uses the product name for Rox slugs instead of title-casing them', () => {
-    expect(harnessTitle('macro-inmem')).toBe('Rox Agent');
+    expect(harnessTitle('rox-inmem')).toBe('Rox Agent');
     expect(harnessTitle('in-memory')).toBe('Rox Agent');
     expect(harnessTitle('sandbox')).toBe('Rox Agent');
   });
@@ -80,7 +80,7 @@ describe('sessionHarnessTitle', () => {
   });
 
   it('uses the product name for Rox slugs', () => {
-    expect(sessionHarnessTitle({ harness: 'macro-inmem' })).toBe('Rox Agent');
+    expect(sessionHarnessTitle({ harness: 'rox-inmem' })).toBe('Rox Agent');
     expect(sessionHarnessTitle({ harness: 'in-memory' })).toBe('Rox Agent');
   });
 });
@@ -88,7 +88,7 @@ describe('sessionHarnessTitle', () => {
 describe('showsSessionHarness', () => {
   it('hides the Details row for in-memory chat agents', () => {
     expect(showsSessionHarness({ harness: 'in-memory' })).toBe(false);
-    expect(showsSessionHarness({ harness: 'macro-inmem' })).toBe(false);
+    expect(showsSessionHarness({ harness: 'rox-inmem' })).toBe(false);
     expect(showsSessionHarness({})).toBe(false);
   });
 

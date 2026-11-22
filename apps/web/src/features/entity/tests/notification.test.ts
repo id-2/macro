@@ -34,15 +34,15 @@ function githubPrStatusChanged(
 ): GithubPrStatusChanged {
   return {
     action: 'opened',
-    displayName: 'macro/macro#42',
+    displayName: 'rox/rox#42',
     foreignEntityId: GITHUB_PR_FOREIGN_ENTITY_ID,
-    githubKey: 'macro/macro/pull/42',
+    githubKey: 'rox/rox/pull/42',
     number: 42,
-    owner: 'macro',
-    repo: 'macro',
+    owner: 'rox',
+    repo: 'rox',
     status: 'open',
     title: 'Add notification support',
-    url: 'https://github.com/macro/macro/pull/42',
+    url: 'https://github.com/rox/rox/pull/42',
     ...overrides,
   };
 }
@@ -65,18 +65,18 @@ function githubPrCheckRun(
     checkName: 'CI / tests',
     checkRunGithubId: 987654321,
     checkStatus: 'completed',
-    checkUrl: 'https://github.com/macro/macro/runs/987654321',
+    checkUrl: 'https://github.com/rox/rox/runs/987654321',
     completedAt: '2026-06-15T20:00:00Z',
     conclusion: 'success',
-    displayName: 'macro/macro#42',
+    displayName: 'rox/rox#42',
     foreignEntityId: GITHUB_PR_FOREIGN_ENTITY_ID,
-    githubKey: 'macro/macro/pull/42',
+    githubKey: 'rox/rox/pull/42',
     number: 42,
-    owner: 'macro',
-    repo: 'macro',
+    owner: 'rox',
+    repo: 'rox',
     state: 'completed',
     title: 'Add notification support',
-    url: 'https://github.com/macro/macro/pull/42',
+    url: 'https://github.com/rox/rox/pull/42',
     ...overrides,
   };
 }
@@ -451,7 +451,7 @@ describe('notification utils', () => {
 
     it('falls back to GitHub PR display name when title is empty', () => {
       expect(extractMessageContent(githubPrNotification({ title: '' }))).toBe(
-        'macro/macro#42'
+        'rox/rox#42'
       );
     });
 
@@ -472,7 +472,7 @@ describe('notification utils', () => {
         extractMessageContent(
           githubPrCheckRunNotification({ checkName: '', title: '' })
         )
-      ).toBe('macro/macro#42');
+      ).toBe('rox/rox#42');
     });
 
     it('returns empty string for channel_invite', () => {

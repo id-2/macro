@@ -1,6 +1,6 @@
 import { t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { useEmail, useUserId } from '@core/context/user';
 import { emailToId, useAugmentUserWithDmActivity } from '@core/user';
 import type { IUser } from '@core/user/types';

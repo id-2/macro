@@ -30,7 +30,7 @@ export type DraftStorageEvent =
 
 /** Transactional working-copy storage. Unlike a query cache, it never evicts edits. */
 export function createLocalDraftStore(
-  dbName = 'macro-email-working-copies-v1',
+  dbName = 'rox-email-working-copies-v1',
   onStorageEvent?: (event: DraftStorageEvent) => void
 ) {
   let recovering = false;

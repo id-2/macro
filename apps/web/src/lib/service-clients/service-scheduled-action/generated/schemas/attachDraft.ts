@@ -8,7 +8,7 @@
 
 /**
  * A reply draft a session wrote for an open reply suggestion, as the user,
-through `macro.email.createDraft`. It replaces the suggestion's draft, if any;
+through `rox.email.createDraft`. It replaces the suggestion's draft, if any;
 nothing is ever sent.
  */
 export interface AttachDraft {

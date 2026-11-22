@@ -14,7 +14,7 @@ const TABLE = '01990000-0000-7000-8000-00000000d001';
 const OWNER = '01990000-0000-7000-8000-00000000c001';
 const EMAIL = '01990000-0000-7000-8000-00000000c002';
 const NAME = '01990000-0000-7000-8000-00000000c003';
-const PERSON = 'macro|late@example.com';
+const PERSON = 'rox|late@example.com';
 async function catalog(): Promise<Catalog> {
   const people = await buildDatabaseSqlCatalog({
     databases: [],
@@ -52,7 +52,7 @@ async function catalog(): Promise<Catalog> {
 /** Real SQL compiler/controller and local people reader; one synthetic ordinary row. */
 export function SqlPeopleJoinFixture(props: { host: CacheHost }) {
   const [sql, setSql] = createSignal(
-    'SELECT p.name FROM fixture.rows r JOIN macro.people p ON r.owner = p.id'
+    'SELECT p.name FROM fixture.rows r JOIN rox.people p ON r.owner = p.id'
   );
   const [reads, setReads] = createSignal(0);
   const exchange: Exchange = () => (operations) =>

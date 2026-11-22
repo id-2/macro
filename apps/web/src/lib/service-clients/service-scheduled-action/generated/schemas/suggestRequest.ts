@@ -9,6 +9,6 @@ import type { SuggestRequestOneOf } from './suggestRequestOneOf';
 import type { SuggestRequestOneOfFive } from './suggestRequestOneOfFive';
 
 /**
- * What a suggestion session hands back through `macro.routines.suggest`.
+ * What a suggestion session hands back through `rox.routines.suggest`.
  */
 export type SuggestRequest = SuggestRequestOneOf | SuggestRequestOneOfFive;

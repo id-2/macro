@@ -35,7 +35,7 @@ export function createTutorialState(id: TutorialId) {
     action: 'opened' | 'played' | 'dismissed' | 'support_clicked'
   ) =>
     analytics.track('tutorial_video', {
-      tutorial: `macro-${tutorial}`,
+      tutorial: `rox-${tutorial}`,
       action,
     });
 

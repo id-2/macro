@@ -1,4 +1,4 @@
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import { validate as isEmail } from 'email-validator';
 import type { Accessor } from 'solid-js';
 import { readContactDirectory } from './directory';

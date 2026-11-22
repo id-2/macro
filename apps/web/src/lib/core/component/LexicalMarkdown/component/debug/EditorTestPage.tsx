@@ -14,7 +14,7 @@ import { MarkdownTextarea } from '../core/MarkdownTextarea';
 import { StaticMarkdown, StaticMarkdownContext } from '../core/StaticMarkdown';
 
 const testMdText = `user mention:
-<m-user-mention>{"userId":"macro|seamus@rox.one","email":"seamus@rox.one"}</m-user-mention>
+<m-user-mention>{"userId":"rox|seamus@rox.one","email":"seamus@rox.one"}</m-user-mention>
 
 
 
@@ -219,7 +219,7 @@ export default function EditorTestPage() {
             initialValue={[
               buildMentionMarkdownString({
                 type: 'user',
-                userId: 'macro|seamus@rox.one',
+                userId: 'rox|seamus@rox.one',
                 email: 'seamus@rox.one',
               }),
               buildMentionMarkdownString({
@@ -230,9 +230,9 @@ export default function EditorTestPage() {
               }),
               buildMentionMarkdownString({
                 type: 'contact',
-                contactId: 'macro',
-                name: 'macro',
-                emailOrDomain: 'macro',
+                contactId: 'rox',
+                name: 'rox',
+                emailOrDomain: 'rox',
                 isCompany: true,
               }),
               buildMentionMarkdownString({

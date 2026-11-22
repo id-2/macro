@@ -1,6 +1,6 @@
 import type { SoupGroupHeaderRow } from '@app/features/soup';
 import { UserIcon } from '@core/component/UserIcon';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { isMobile } from '@core/mobile/isMobile';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { getDisplayName, tryMacroId } from '@core/user';

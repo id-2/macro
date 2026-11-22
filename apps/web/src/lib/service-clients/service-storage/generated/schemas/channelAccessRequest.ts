@@ -8,7 +8,7 @@
 import type { ChannelAccessRequestResolvedAt } from './channelAccessRequestResolvedAt';
 import type { ChannelAccessRequestResolvedBy } from './channelAccessRequestResolvedBy';
 import type { ChannelAccessRequestStatus } from './channelAccessRequestStatus';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 /**
  * One attempt to join a channel. Attempts are never reused, so each timeline

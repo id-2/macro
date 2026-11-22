@@ -17,11 +17,11 @@ it.each([true, false])(
         id: 'dm',
         type: 'channel',
         name: 'Old label',
-        ownerId: 'macro|viewer@example.com',
+        ownerId: 'rox|viewer@example.com',
         channelType: 'direct_message',
         participantIds: [
-          'macro|viewer@example.com',
-          'macro|person@example.com',
+          'rox|viewer@example.com',
+          'rox|person@example.com',
         ],
       },
     };
@@ -34,12 +34,12 @@ it.each([true, false])(
     const user: UserItem = {
       kind: 'user',
       bucket: 'person',
-      id: 'macro|person@example.com',
+      id: 'rox|person@example.com',
       searchText: 'Person',
       sortTimestamp: 1,
       timestamps: {},
       data: {
-        id: 'macro|person@example.com',
+        id: 'rox|person@example.com',
         name: 'Person',
         email: 'person@example.com',
       },
@@ -48,7 +48,7 @@ it.each([true, false])(
     const result = mergeCommandPeople(
       personFirst ? [user, fresh] : [fresh, user],
       [old],
-      'macro|viewer@example.com'
+      'rox|viewer@example.com'
     );
     expect(result).toHaveLength(1);
     expect(result[0].data.name).toBe('Fresh label');
@@ -58,7 +58,7 @@ it.each([true, false])(
       mergeCommandPeople(
         [{ ...user, commandTarget: fresh }],
         [old],
-        'macro|viewer@example.com'
+        'rox|viewer@example.com'
       )[0].data.name
     ).toBe('Fresh label');
   }

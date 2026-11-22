@@ -63,11 +63,11 @@ export function readEntityAppearance(value: unknown): EntityAppearance | null {
   if (typeof rawIcon !== 'object' || !('kind' in rawIcon))
     return { icon: null, color };
   if (
-    rawIcon.kind === 'macro' &&
+    rawIcon.kind === 'rox' &&
     'name' in rawIcon &&
     typeof rawIcon.name === 'string'
   ) {
-    return { icon: { kind: 'macro', name: rawIcon.name }, color };
+    return { icon: { kind: 'rox', name: rawIcon.name }, color };
   }
   if (
     rawIcon.kind === 'emoji' &&

@@ -1,6 +1,6 @@
 import { CURSOR_BOT_PRINCIPAL_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/roxAgent';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
 import type { MessageData } from '@core/messages/types';
 import ClaudeIcon from '@icon/wide-claude.svg';
 import { cleanup, render } from '@solidjs/testing-library';
@@ -77,7 +77,7 @@ describe('SenderIcon', () => {
           type: 'bot',
           id: '00000000-0000-0000-0000-00000000a1a1',
           name: 'Rox',
-          triggered_by: 'macro|alice@example.com',
+          triggered_by: 'rox|alice@example.com',
           triggered_via: client,
         })
       );
@@ -98,7 +98,7 @@ describe('SenderIcon', () => {
         type: 'bot',
         id: '00000000-0000-0000-0000-00000000a1a1',
         name: 'Rox',
-        triggered_by: 'macro|alice@example.com',
+        triggered_by: 'rox|alice@example.com',
         triggered_via: 'Zed',
       })
     );
@@ -143,7 +143,7 @@ describe('SenderIcon', () => {
   });
 
   it('leaves people to the card UserIcon already draws', () => {
-    const { queryByTestId } = renderSender(message('macro|peter@rox.one'));
+    const { queryByTestId } = renderSender(message('rox|peter@rox.one'));
     expect(queryByTestId('user-card')).toBeNull();
   });
 
@@ -162,8 +162,8 @@ describe('SenderIcon', () => {
   });
 
   it('draws people through UserIcon', () => {
-    const { getByTestId } = renderSender(message('macro|peter@rox.one'));
-    expect(getByTestId('user-icon').textContent).toBe('macro|peter@rox.one');
+    const { getByTestId } = renderSender(message('rox|peter@rox.one'));
+    expect(getByTestId('user-icon').textContent).toBe('rox|peter@rox.one');
   });
 
   it('draws an opaque participant with initials and no profile card', () => {

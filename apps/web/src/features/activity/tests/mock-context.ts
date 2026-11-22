@@ -3,7 +3,7 @@ import type { Client } from '@urql/core';
 import type { ActivityContext } from '../context/activity-context';
 import { createMockGraphql, type MockGraphql } from './mock-graphql';
 
-export const MOCK_VIEWER_ID = 'macro|me@example.com';
+export const MOCK_VIEWER_ID = 'rox|me@example.com';
 
 export type MockActivityContext = ActivityContext & {
   graphqlMock: MockGraphql;
@@ -12,7 +12,7 @@ export type MockActivityContext = ActivityContext & {
 /**
  * In-memory implementations of every activity dependency. Entities resolve
  * to `Entity <id>` and link as markdown blocks; actor ids of the form
- * `macro|name@…` resolve to `name`; bot ids resolve to their first-party
+ * `rox|name@…` resolve to `name`; bot ids resolve to their first-party
  * name or `Bot <first uuid group>`.
  */
 export function createMockActivityContext(
@@ -25,8 +25,8 @@ export function createMockActivityContext(
     currentUserId: () => MOCK_VIEWER_ID,
     displayName: (actorId) => {
       const id = actorId();
-      if (!id.startsWith('macro|')) return () => undefined;
-      return () => id.slice('macro|'.length).split('@')[0] ?? '';
+      if (!id.startsWith('rox|')) return () => undefined;
+      return () => id.slice('rox|'.length).split('@')[0] ?? '';
     },
     botName: (botId) => () => {
       const id = botId();

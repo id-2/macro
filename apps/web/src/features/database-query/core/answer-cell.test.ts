@@ -215,10 +215,10 @@ describe('result cells from the engine’s typed cells', () => {
 describe('names instead of counts', () => {
   it('names people, up to three, then says how many more', () => {
     const names: Record<string, string> = {
-      'macro|ada@x.test': 'Ada Lovelace',
-      'macro|grace@x.test': 'Grace Hopper',
-      'macro|alan@x.test': 'Alan Turing',
-      'macro|edsger@x.test': 'Edsger Dijkstra',
+      'rox|ada@x.test': 'Ada Lovelace',
+      'rox|grace@x.test': 'Grace Hopper',
+      'rox|alan@x.test': 'Alan Turing',
+      'rox|edsger@x.test': 'Edsger Dijkstra',
     };
 
     expect(
@@ -227,10 +227,10 @@ describe('names instead of counts', () => {
           kind: 'mentions',
           entityType: 'USER',
           ids: [
-            'macro|ada@x.test',
-            'macro|grace@x.test',
-            'macro|alan@x.test',
-            'macro|edsger@x.test',
+            'rox|ada@x.test',
+            'rox|grace@x.test',
+            'rox|alan@x.test',
+            'rox|edsger@x.test',
           ],
         },
         ({ id }) => names[id]

@@ -38,7 +38,7 @@ type MobileSettingsSheetProps = {
   /** Whether search lists the Outlook connection; see `searchSettings`. */
   outlook?: boolean;
   /** Whether search lists Rox computer settings; see `searchSettings`. */
-  macroComputers?: boolean;
+  roxComputers?: boolean;
   name: string;
   email: string;
   avatar: JSX.Element;
@@ -56,7 +56,7 @@ export function MobileSettingsSheet(props: MobileSettingsSheetProps) {
     searchSettings(props.searchGroups ?? props.groups, query(), {
       emailSignatures: props.emailSignatures,
       outlook: props.outlook,
-      macroComputers: props.macroComputers,
+      roxComputers: props.roxComputers,
     })
   );
   let mainScrollTop = 0;

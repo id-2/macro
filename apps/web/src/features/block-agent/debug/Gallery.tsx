@@ -294,10 +294,10 @@ const TOOL_REPLAY_PARTS: MessagePart[] = [
   {
     kind: 'tool_use',
     id: 'replay-search',
-    name: { kind: 'mcp', server: 'macro', tool: 'SearchSkills' },
+    name: { kind: 'mcp', server: 'rox', tool: 'SearchSkills' },
     status: 'completed',
     detail: {
-      kind: 'macro',
+      kind: 'rox',
       input: { name: 'launch checklist' },
       output: {
         results: [
@@ -474,7 +474,7 @@ function DisplayResultsDemo() {
       {
         kind: 'tool_use',
         id: 'display-results-demo',
-        name: { kind: 'mcp', server: 'macro', tool: 'DisplayResults' },
+        name: { kind: 'mcp', server: 'rox', tool: 'DisplayResults' },
         status: pending() ? 'running' : 'completed',
         detail: {
           kind: 'view',
@@ -695,11 +695,11 @@ const FIXTURE_MESSAGE: FoldedMessage = {
     },
     {
       kind: 'tool_use',
-      id: 'demo-macro',
-      name: { kind: 'mcp', server: 'macro', tool: 'BrandNewTool' },
+      id: 'demo-rox',
+      name: { kind: 'mcp', server: 'rox', tool: 'BrandNewTool' },
       status: 'completed',
       detail: {
-        kind: 'macro',
+        kind: 'rox',
         input: { query: 'fold' },
         output: { hits: 3 },
         error: null,
@@ -709,8 +709,8 @@ const FIXTURE_MESSAGE: FoldedMessage = {
     // keep its summary visible without exposing the raw exchange.
     {
       kind: 'tool_use',
-      id: 'demo-mcp-macro',
-      name: { kind: 'mcp', server: 'macro', tool: 'ReadChannelThread' },
+      id: 'demo-mcp-rox',
+      name: { kind: 'mcp', server: 'rox', tool: 'ReadChannelThread' },
       status: 'completed',
       detail: {
         kind: 'other',
@@ -726,13 +726,13 @@ const FIXTURE_MESSAGE: FoldedMessage = {
           messages: [
             {
               id: '01a0b16e-95d9-79a8-ace0-2dc075b7d49f',
-              sender: 'macro|gab@rox.one',
+              sender: 'rox|gab@rox.one',
               text: 'references for agents so i know where they were dispatched from',
               sentAt: '2026-09-17T22:41:03Z',
             },
             {
               id: '01a0b17a-db3f-75d1-86d9-0d8e86b5106b',
-              sender: 'macro|gab@rox.one',
+              sender: 'rox|gab@rox.one',
               text: 'would be nice to be able to scroll context/copy the entire thing',
               sentAt: '2026-09-17T22:47:19Z',
             },
@@ -777,7 +777,7 @@ const FIXTURE_MESSAGE: FoldedMessage = {
     {
       kind: 'tool_use',
       id: 'demo-email',
-      name: { kind: 'mcp', server: 'macro', tool: 'SendEmail' },
+      name: { kind: 'mcp', server: 'rox', tool: 'SendEmail' },
       status: 'completed',
       detail: {
         kind: 'user_tool',
@@ -792,7 +792,7 @@ const FIXTURE_MESSAGE: FoldedMessage = {
     {
       kind: 'tool_use',
       id: 'demo-email-sent',
-      name: { kind: 'mcp', server: 'macro', tool: 'SendEmail' },
+      name: { kind: 'mcp', server: 'rox', tool: 'SendEmail' },
       status: 'completed',
       detail: {
         kind: 'user_tool',
@@ -812,7 +812,7 @@ const FIXTURE_MESSAGE: FoldedMessage = {
     {
       kind: 'tool_use',
       id: 'demo-event',
-      name: { kind: 'mcp', server: 'macro', tool: 'CreateCalendarEvent' },
+      name: { kind: 'mcp', server: 'rox', tool: 'CreateCalendarEvent' },
       status: 'completed',
       detail: {
         kind: 'user_tool',
@@ -979,7 +979,7 @@ function PromptAuthorDemo() {
       />
       <Message
         message={prompt(
-          'macro|wolf@rox.one',
+          'rox|wolf@rox.one',
           'And run the snapshot tests after.'
         )}
         inFlight={false}
@@ -1198,7 +1198,7 @@ export default function AgentUiGallery() {
                 kind: 'settled',
                 markdown: 'Opened a pull request.',
               }}
-              pullRequestUrl="https://github.com/macro-inc/macro/pull/7045"
+              pullRequestUrl="https://github.com/rox-inc/rox/pull/7045"
             />
           </Item>
 

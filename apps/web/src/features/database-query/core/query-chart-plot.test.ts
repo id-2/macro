@@ -79,7 +79,7 @@ describe('chart spec to Plot options', () => {
   it('draws an old saved bar chart as horizontal bars over its categories', () => {
     const data = chartData(status, 'bar', { x: 'Status', y: ['Count'] });
     expect(plotChart(data, { width: 400, palette })).toEqual({
-      className: 'macro-chart',
+      className: 'rox-chart',
       width: 400,
       height: 96,
       marginTop: 8,

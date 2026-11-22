@@ -13,7 +13,7 @@ export function WhatsAppLinked(props: { resumePairingId?: string }) {
     openChat: (chatId) =>
       navigate({ route: externalChatRoute, params: { chatId } }),
     sections: createOpenSections(
-      'macro:whatsapp:chat-sections:v2',
+      'rox:whatsapp:chat-sections:v2',
       useUserId()
     ),
   });

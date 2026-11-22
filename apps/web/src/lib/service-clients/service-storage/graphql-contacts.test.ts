@@ -19,7 +19,7 @@ vi.mock('./graphql-soup', () => ({
     query.replaceAll('@cacheOnly', ''),
 }));
 const scope = {
-  identity: 'macro|viewer@example.com',
+  identity: 'rox|viewer@example.com',
   storageGeneration: '00000000-0000-4000-8000-000000000001',
 };
 const people = createPeopleCache({
@@ -38,7 +38,7 @@ const data = {
       nodes: [
         {
           id: 'contact-id',
-          userId: 'macro|person@example.com',
+          userId: 'rox|person@example.com',
           email: 'person@example.com',
           name: 'Person',
         },

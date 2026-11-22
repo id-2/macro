@@ -6,7 +6,7 @@ import { formatEventSchedule, parseCalendarDate } from './event-schedule';
 import {
   calendarMacroCallUrl,
   removeCalendarMacroCall,
-} from './macro-call-link';
+} from './rox-call-link';
 import { eventRecurrenceDescription } from './recurrence';
 
 /** What an event is called in a file name or an email subject. */

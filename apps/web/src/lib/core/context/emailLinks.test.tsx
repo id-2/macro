@@ -32,7 +32,7 @@ function Consumer(props: { label: string }) {
   return (
     <span>
       {props.label}:{links().length}:
-      {String(isConnectedSecondaryInbox('macro|secondary@example.com'))}
+      {String(isConnectedSecondaryInbox('rox|secondary@example.com'))}
     </span>
   );
 }

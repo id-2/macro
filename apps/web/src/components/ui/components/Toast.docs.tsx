@@ -114,14 +114,14 @@ function PreviewRegion(props: {
       <Toast.Region
         regionId={props.preview.regionId}
         aria-label={props.label}
-        class="macro-toast-region w-full"
+        class="rox-toast-region w-full"
         limit={3}
         duration={4500}
         pauseOnInteraction
         swipeDirection="right"
       >
         <Toast.List
-          class="macro-toast-list"
+          class="rox-toast-list"
           data-stack={props.stack ? '' : undefined}
         />
       </Toast.Region>
@@ -165,11 +165,11 @@ function CurrentToastPreview(props: { entry: ToastInventoryEntry }) {
         <Toast.Region
           regionId={preview.regionId}
           aria-label={`${props.entry.name} preview`}
-          class="macro-toast-region max-w-full"
+          class="rox-toast-region max-w-full"
           classList={{ 'w-full': isMobile(), 'w-95': !isMobile() }}
           swipeDirection={isMobile() ? swipe.direction() : 'right'}
         >
-          <Toast.List class="macro-toast-list" />
+          <Toast.List class="rox-toast-list" />
         </Toast.Region>
       </div>
       <div class="mt-auto flex flex-col gap-1">
@@ -616,25 +616,25 @@ function AppPositionDemo() {
           <Toast.Region
             regionId={preview.persistentRegionId}
             aria-label="Persistent toast previews at the app position"
-            class="macro-toast-region"
+            class="rox-toast-region"
             duration={Infinity}
             limit={1}
             pauseOnInteraction={false}
             swipeDirection={isMobile() ? mobileSwipe.direction() : 'right'}
           >
-            <Toast.List class="macro-toast-list" />
+            <Toast.List class="rox-toast-list" />
           </Toast.Region>
           <Toast.Region
             regionId={preview.regionId}
             aria-label="Toast previews at the app position"
-            class="macro-toast-region"
+            class="rox-toast-region"
             limit={isMobile() ? 1 : 3}
             duration={4500}
             pauseOnInteraction
             swipeDirection={isMobile() ? mobileSwipe.direction() : 'right'}
           >
             <Toast.List
-              class="macro-toast-list"
+              class="rox-toast-list"
               data-stack={isMobile() ? undefined : ''}
             />
           </Toast.Region>

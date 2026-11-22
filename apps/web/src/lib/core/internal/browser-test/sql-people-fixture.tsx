@@ -74,7 +74,7 @@ export function SqlPeopleFixture() {
                     : index === 1000
                       ? 'late@example.com'
                       : `person${index}@example.com`;
-                const userId = `macro|${email}`;
+                const userId = `rox|${email}`;
                 return {
                   __typename: 'GraphqlContact',
                   id: contactRecordKey(viewer, userId).slice(
@@ -128,7 +128,7 @@ export function SqlPeopleFixture() {
 
 function SqlQuery(props: { host: CacheHost }) {
   const [sql, setSql] = createSignal(
-    'SELECT COUNT(*) AS total FROM macro.people'
+    'SELECT COUNT(*) AS total FROM rox.people'
   );
   const [enabled, setEnabled] = createSignal(true);
   const [reads, setReads] = createSignal(0);

@@ -11,8 +11,8 @@ import { err, ok } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccountManagerCard } from './account-manager-card';
 
-const MANAGED = 'macro|person@example.com';
-const MANAGER = 'macro|agent@example.com';
+const MANAGED = 'rox|person@example.com';
+const MANAGER = 'rox|agent@example.com';
 const GRANT_ID = '019a4f2e-7c1b-7d3a-9e2f-3b1c8d5a6f70';
 
 const mocks = vi.hoisted(() => ({

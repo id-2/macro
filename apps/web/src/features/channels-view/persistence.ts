@@ -17,10 +17,10 @@ import type { ChannelsViewState } from './types';
 
 const CHANNELS_ENTRY_STATE_KEY = 'channels.view';
 const channelsLocalStateStorage = createUserScopedStorage(
-  'macro:channels:view-state:v1'
+  'rox:channels:view-state:v1'
 );
 const channelsPreferencesStorage = createUserScopedStorage(
-  'macro:channels:preferences:v1'
+  'rox:channels:preferences:v1'
 );
 
 const channelsExpandedGroupsSchema = z.preprocess(

@@ -13,8 +13,8 @@ import {
 } from '@app/features/calendar/utils/conference-link';
 import {
   calendarMacroCallUrl,
-  macroCallUrl,
-} from '@app/features/calendar/utils/macro-call-link';
+  roxCallUrl,
+} from '@app/features/calendar/utils/rox-call-link';
 import { formatCalendarTime } from '@app/features/calendar/utils/time-format';
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
 import { IS_MAC } from '@core/constant/isMac';
@@ -70,7 +70,7 @@ const searchEventKey = (eventId: string, occurrenceKey?: string) =>
 
 type CalendarMeetingLink = {
   url: string;
-  kind: 'macro' | 'google' | 'other';
+  kind: 'rox' | 'google' | 'other';
   label: string;
 };
 
@@ -98,11 +98,11 @@ function meetingLinkForEvent(
 
   const description =
     details?.description ?? (event.isRecurring ? undefined : event.description);
-  const macro = calendarMacroCallUrl({
+  const rox = calendarMacroCallUrl({
     description,
     location: details?.location,
   });
-  if (macro) return { url: macro, kind: 'macro', label: 'Rox call' };
+  if (rox) return { url: rox, kind: 'rox', label: 'Rox call' };
 
   const googleContent =
     googleMeetUrlInText(details?.location) ?? googleMeetUrlInText(description);
@@ -114,9 +114,9 @@ function meetingLinkForEvent(
     details?.conferenceUrl ?? event.conferenceUrl
   );
   if (!conference) return undefined;
-  const macroConference = calendarMacroCallUrl({ conferenceUrl: conference });
-  if (macroConference) {
-    return { url: macroConference, kind: 'macro', label: 'Rox call' };
+  const roxConference = calendarMacroCallUrl({ conferenceUrl: conference });
+  if (roxConference) {
+    return { url: roxConference, kind: 'rox', label: 'Rox call' };
   }
   const google = new URL(conference).hostname === 'meet.google.com';
   return {
@@ -487,7 +487,7 @@ function CalendarSearchControl(props: {
       (!event.isRecurring
         ? activeEventDetails().byId.get(event.id)?.location
         : undefined);
-    return location && !macroCallUrl(location.trim()) ? location : undefined;
+    return location && !roxCallUrl(location.trim()) ? location : undefined;
   };
   const subtitleForEvent = (event: CalendarSearchResult) =>
     [
@@ -926,7 +926,7 @@ function CalendarSearchControl(props: {
                                         }
                                       >
                                         <VideoCameraIcon class="size-3.5" />
-                                        {link().kind === 'macro'
+                                        {link().kind === 'rox'
                                           ? 'Rox'
                                           : link().kind === 'google'
                                             ? 'Meet'

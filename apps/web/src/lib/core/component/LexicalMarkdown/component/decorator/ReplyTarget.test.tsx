@@ -97,7 +97,7 @@ it.each<{
       targetMessageId: 'message-id',
       targetThreadId: 'root-id',
       displayText: 'Quoted text',
-      senderId: 'macro|eric@macro.test',
+      senderId: 'rox|eric@rox.test',
       key: 'node-key',
       theme: {},
     };
@@ -116,7 +116,7 @@ it('opens a quoted project message through the project opener', () => {
       targetMessageId="message-id"
       targetThreadId="root-id"
       displayText="Quoted text"
-      senderId="macro|eric@macro.test"
+      senderId="rox|eric@rox.test"
       key="node-key"
       theme={{}}
     />

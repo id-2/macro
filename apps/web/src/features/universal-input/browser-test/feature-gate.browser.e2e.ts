@@ -5,7 +5,7 @@ test('enables the composer from its rollout flag without a local preference or e
 }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
-      'macro:experimental:god-mode:experimental-fixture',
+      'rox:experimental:god-mode:experimental-fixture',
       'false'
     );
   });

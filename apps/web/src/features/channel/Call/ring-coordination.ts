@@ -35,7 +35,7 @@ import { match, P } from 'ts-pattern';
  * the pre-election behavior.
  */
 
-const RING_CHANNEL = 'macro-call-ring';
+const RING_CHANNEL = 'rox-call-ring';
 const RING_STORAGE_KEY = 'rox.call-ring';
 
 /** How often the audible tab re-publishes (heartbeats) its claim. */

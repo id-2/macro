@@ -32,7 +32,7 @@ const intro: PublicEvent = {
   description: 'A short hello.',
   durationMinutes: 30,
   location: '',
-  macroCall: false,
+  roxCall: false,
   googleMeet: true,
   questions: [
     { id: 'question-topic', label: 'What should we cover?', required: true },
@@ -48,7 +48,7 @@ const review: PublicEvent = {
   description: 'An hour on your designs.',
   durationMinutes: 60,
   location: 'Studio 4',
-  macroCall: false,
+  roxCall: false,
   googleMeet: false,
   questions: [],
   requiresConfirmation: true,
@@ -117,7 +117,7 @@ describe('BookingPicker', () => {
     render(() => (
       <BookingPicker
         profile={profile}
-        event={{ ...intro, macroCall: true, googleMeet: false }}
+        event={{ ...intro, roxCall: true, googleMeet: false }}
         source={{ slots: vi.fn(), book: vi.fn() }}
         onReceipt={vi.fn()}
       />

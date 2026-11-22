@@ -14,7 +14,7 @@ import {
   type WorkspaceAccent,
 } from '../core/workspace-accent';
 import { ContinueButton } from './controls';
-import { RoxMarkIcon } from './macro-mark-icon';
+import { RoxMarkIcon } from './rox-mark-icon';
 import './workspace-intro.css';
 
 /** An onboarding-only introduction; the public homepage keeps its own hero. */

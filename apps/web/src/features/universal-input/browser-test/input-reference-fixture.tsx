@@ -32,7 +32,7 @@ export function referenceSearchFields(text: string) {
 
 export type InputPeople = ReturnType<typeof useInputPeople>;
 export function seedInputReferences(client: QueryClient) {
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   client.setQueryData(authKeys.userInfo.queryKey, {
     id: viewer,
     email: 'viewer@example.com',
@@ -41,52 +41,52 @@ export function seedInputReferences(client: QueryClient) {
   client.setQueryData(emailKeys.links(viewer).queryKey, { links: [] });
   registerContactFixture([
     ...Array.from({ length: 60 }, (_, i) => ({
-      id: `macro|person${i}@example.com`,
+      id: `rox|person${i}@example.com`,
       email: `person${i}@example.com`,
       name: `Directory person ${String(i).padStart(3, '0')}`,
     })),
     {
-      id: 'macro|late@example.com',
+      id: 'rox|late@example.com',
       email: 'late@example.com',
       name: 'Late Person',
     },
     {
-      id: 'macro|one@example.com',
+      id: 'rox|one@example.com',
       email: 'one@example.com',
       name: 'Ambiguous One',
     },
     {
-      id: 'macro|two@example.com',
+      id: 'rox|two@example.com',
       email: 'two@example.com',
       name: 'Ambiguous Two',
     },
     {
-      id: 'macro|precise@example.com',
+      id: 'rox|precise@example.com',
       email: 'precise@example.com',
       name: 'Precise',
     },
     {
-      id: 'macro|other@example.com',
+      id: 'rox|other@example.com',
       email: 'other@example.com',
       name: 'Precise Person',
     },
     {
-      id: 'macro|family-given@example.com',
+      id: 'rox|family-given@example.com',
       email: 'family-given@example.com',
       name: 'Family, Given',
     },
     {
-      id: 'macro|family@example.com',
+      id: 'rox|family@example.com',
       email: 'family@example.com',
       name: 'Family',
     },
     {
-      id: 'macro|given@example.com',
+      id: 'rox|given@example.com',
       email: 'given@example.com',
       name: 'Given',
     },
     {
-      id: 'macro|alias@example.com',
+      id: 'rox|alias@example.com',
       email: 'alias@example.com',
       name: 'target@example.com',
     },

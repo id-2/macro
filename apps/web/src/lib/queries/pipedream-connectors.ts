@@ -1,5 +1,5 @@
 import { linkGithubAccount } from '@core/auth/authorize-github';
-import { isFeatureEnabled, macroConnect } from '@core/constant/featureFlags';
+import { isFeatureEnabled, roxConnect } from '@core/constant/featureFlags';
 import {
   openPipedreamConnectUI,
   type PipedreamConnectEvent,
@@ -330,7 +330,7 @@ let pipedreamUnsupported = false;
  * GitHub's server is authorized by the Rox GitHub account link, so GitHub
  * links the account instead.
  *
- * With the `macro-connect` flag, the backend may route the app through Rox
+ * With the `rox-connect` flag, the backend may route the app through Rox
  * Connect instead of Pipedream: consent then runs on Connect's page in a
  * popup (web) or the system browser (native), and the connection is
  * recorded once Connect confirms it.
@@ -358,7 +358,7 @@ export async function connectPipedreamApp(args: {
   // closed again if the backend answers with a Pipedream token.
   const popup =
     (cachedOverlay && !linksGithub(cachedOverlay)) ||
-    (!cachedOverlay && isFeatureEnabled(macroConnect))
+    (!cachedOverlay && isFeatureEnabled(roxConnect))
       ? reserveOauthPopup()
       : null;
   return Telemetry.span('pipedream.connect', async (span) => {

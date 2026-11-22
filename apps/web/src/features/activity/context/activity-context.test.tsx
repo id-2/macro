@@ -1,4 +1,4 @@
-import { ROX_SYSTEM_BOT_ID } from '@core/constant/macroSystem';
+import { ROX_SYSTEM_BOT_ID } from '@core/constant/roxSystem';
 import { createRoot, createSignal } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

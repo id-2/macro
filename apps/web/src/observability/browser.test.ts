@@ -149,7 +149,7 @@ it('drops browser and extension noise from window errors but reports app errors'
 
 it('an older binary without diagnostics still obeys the normal telemetry gate', async () => {
   sessionStorage.setItem(
-    'macro-document-lifecycle',
+    'rox-document-lifecycle',
     JSON.stringify({
       frontendInstanceId: '11111111-1111-4111-8111-111111111111',
       startedAtMs: Date.now() - 1000,
@@ -180,7 +180,7 @@ it('an older binary without diagnostics still obeys the normal telemetry gate', 
 
 it('revokes the previous document identity if logout happens while telemetry initializes', async () => {
   sessionStorage.setItem(
-    'macro-document-lifecycle',
+    'rox-document-lifecycle',
     JSON.stringify({
       frontendInstanceId: '11111111-1111-4111-8111-111111111111',
       startedAtMs: Date.now() - 1000,

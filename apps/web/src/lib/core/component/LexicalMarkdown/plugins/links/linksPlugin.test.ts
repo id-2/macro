@@ -196,8 +196,8 @@ describe('findNextAutoLinkMatch', () => {
     expect(findNextAutoLinkMatch('Visit example.com', 'common-tlds')?.url).toBe(
       'https://example.com'
     );
-    expect(findNextAutoLinkMatch('Visit macro.co', 'common-tlds')?.url).toBe(
-      'https://macro.co'
+    expect(findNextAutoLinkMatch('Visit rox.co', 'common-tlds')?.url).toBe(
+      'https://rox.co'
     );
     expect(findNextAutoLinkMatch('Visit example.org', 'common-tlds')?.url).toBe(
       'https://example.org'

@@ -27,9 +27,9 @@ export function MobileAgentPicker(props: AgentPickerProps) {
   const [showAll, setShowAll] = createSignal(false);
   let searchInput: HTMLInputElement | undefined;
   const [browsing, setBrowsing] = createSignal<RosterAgent>();
-  const macro = () =>
+  const rox = () =>
     props.agents.find((agent) => agent.id === ROX_PERSONA_ID);
-  const catalog = createComposerModels(() => browsing() ?? macro());
+  const catalog = createComposerModels(() => browsing() ?? rox());
   const model = () => props.modelOverride ?? props.selected?.defaultModel;
   const label = () =>
     props.selected?.id === ROX_PERSONA_ID
@@ -67,7 +67,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
   const searchLabel = () =>
     browsing() || showAll()
       ? 'Search models'
-      : macro()
+      : rox()
         ? 'Search agents and models'
         : 'Search agents';
   const changeOpen = (next: boolean) => {
@@ -149,7 +149,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
               {showAll()
                 ? 'All models'
                 : (browsing()?.name ??
-                  (macro() ? 'Agents and models' : 'Choose an agent'))}
+                  (rox() ? 'Agents and models' : 'Choose an agent'))}
             </h2>
             <Show when={browsing()}>
               {(agent) => (
@@ -179,7 +179,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
             />
           </div>
           <MobileDrawer.ScrollBody class="gap-1">
-            <Show when={browsing() ?? macro()}>
+            <Show when={browsing() ?? rox()}>
               <For each={modelSections()}>
                 {(section) => (
                   <div>
@@ -195,10 +195,10 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                         {(option) => (
                           <MobileDrawer.Item
                             disabled={Boolean(
-                              (browsing() ?? macro())?.unavailableReason
+                              (browsing() ?? rox())?.unavailableReason
                             )}
                             onClick={() => {
-                              const agent = browsing() ?? macro();
+                              const agent = browsing() ?? rox();
                               if (agent) choose(agent, option.id);
                             }}
                           >
@@ -209,7 +209,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                             <Show
                               when={
                                 props.selected?.id ===
-                                  (browsing() ?? macro())?.id &&
+                                  (browsing() ?? rox())?.id &&
                                 model() === option.id
                               }
                             >
@@ -306,7 +306,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                   </div>
                 )}
               </For>
-              <Show when={!props.loading && !macro() && groups().length === 0}>
+              <Show when={!props.loading && !rox() && groups().length === 0}>
                 <p role="status" class="px-4 py-3 text-sm text-ink-muted">
                   {query() ? 'No matching agents' : 'No agents available'}
                 </p>

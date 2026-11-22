@@ -1,7 +1,7 @@
 import {
   isBotPrincipalId,
   ROX_AGENT_BOT_ID,
-} from '@core/constant/macroAgent';
+} from '@core/constant/roxAgent';
 import { isAiPeer } from '@macro-inc/collaboration/collab/ai-peer';
 import { usePropertyUserDisplay } from '@property/hooks/usePropertyUserDisplay';
 import type { Accessor } from 'solid-js';

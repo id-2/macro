@@ -78,12 +78,12 @@ describe('collapsed reply groups', () => {
   });
 
   it('separates agent replies triggered by different users', () => {
-    const replies = repliesFromSenders(Array(5).fill('bot|macro'));
+    const replies = repliesFromSenders(Array(5).fill('bot|rox'));
     const triggers = ['user-a', 'user-a', 'user-b', 'user-c', 'user-d'];
     replies.forEach((reply, index) => {
       reply.sender = {
         type: 'bot',
-        id: 'macro',
+        id: 'rox',
         name: 'Rox',
         triggered_by: triggers[index],
       };

@@ -42,7 +42,7 @@ import {
 import {
   getDisplayNameParts,
   getInitials,
-  macroIdToEmail,
+  roxIdToEmail,
   tryMacroId,
 } from '../../../lib/core/user/index';
 import type {
@@ -1436,10 +1436,10 @@ function presenceOutline(
 
 /** First name when known, else the email name before its first separator. */
 function presenceName(userId: string) {
-  const macroId = tryMacroId(userId);
-  const { firstName, lastName } = getDisplayNameParts(macroId);
+  const roxId = tryMacroId(userId);
+  const { firstName, lastName } = getDisplayNameParts(roxId);
   if (firstName) return firstName;
-  const email = macroId ? macroIdToEmail(macroId) : userId;
+  const email = roxId ? roxIdToEmail(roxId) : userId;
   const name = email.split('@')[0]?.split(/[._+-]/)[0];
   return name
     ? name[0].toUpperCase() + name.slice(1)

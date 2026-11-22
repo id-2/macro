@@ -8,14 +8,14 @@ import {
   ROX_AGENT_HANDLE,
   ROX_AGENT_NAME,
   ROX_HARNESS_NAME,
-} from '@core/constant/macroAgent';
+} from '@core/constant/roxAgent';
 import { type AgentKind, kindForHarness, systemBotKind } from './agent-kind';
 
 /**
  * Rox's own chat agent: the deployment's managed default. Started without a
  * `botId`, so the server picks the runtime it is configured to run it on.
  */
-export const ROX_PERSONA_ID = 'macro';
+export const ROX_PERSONA_ID = 'rox';
 
 /** The fields of a persisted agent the roster reads. Structural, so the wire
  *  type satisfies it without the core importing the client. */
@@ -93,7 +93,7 @@ export type RosterInput = {
   cursorConnected: boolean;
   /** Cursor's status is known and it is not connected, so offer to connect. */
   cursorNeedsConnection: boolean;
-  macroDefaultModel?: string;
+  roxDefaultModel?: string;
   cursorDefaultModel?: string;
 };
 
@@ -105,7 +105,7 @@ export function runtimeLabel(
 ): string {
   switch (harness) {
     case 'in-memory':
-    case 'macro-inmem':
+    case 'rox-inmem':
       return ROX_HARNESS_NAME;
     case 'cursor':
       return 'Cursor';
@@ -126,7 +126,7 @@ function runtimeConnected(
 ): boolean {
   switch (harness) {
     case 'in-memory':
-    case 'macro-inmem':
+    case 'rox-inmem':
       return true;
     case 'cursor':
       return input.cursorConnected;
@@ -242,7 +242,7 @@ export function buildAgentRoster(input: RosterInput): RosterAgent[] {
       name: ROX_AGENT_NAME,
       handle: ROX_AGENT_HANDLE,
       harness: 'in-memory',
-      defaultModel: input.macroDefaultModel,
+      defaultModel: input.roxDefaultModel,
       share: 'system',
       runtime: { label: ROX_HARNESS_NAME, connected: true },
     },

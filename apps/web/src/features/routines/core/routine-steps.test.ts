@@ -20,7 +20,7 @@ const code: RoutineStep = {
   id: 'invoice',
   title: 'Label invoices',
   summary: 'Asks whether the email is an invoice and labels it.',
-  source: 'export async function main({ macro }: StepContext) {}',
+  source: 'export async function main({ rox }: StepContext) {}',
 };
 
 const unnamed = (title: string): Extract<RoutineStep, { type: 'code' }> => ({

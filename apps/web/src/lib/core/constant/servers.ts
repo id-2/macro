@@ -195,10 +195,10 @@ const syncServiceHostLocal = {
 
 const syncServiceHostRemote = {
   worker: developmentProxyUrl(
-    `https://sync-service${syncServiceSuffix}.macroverse.workers.dev`
+    `https://sync-service${syncServiceSuffix}.roxverse.workers.dev`
   ),
   ws: developmentProxyUrl(
-    `wss://sync-service${syncServiceSuffix}.macroverse.workers.dev`
+    `wss://sync-service${syncServiceSuffix}.roxverse.workers.dev`
   ),
 } as const;
 

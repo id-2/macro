@@ -524,11 +524,11 @@ describe('saved task filter execution', () => {
     for (const { tab, facets } of [
       {
         tab: 'my-tasks' as const,
-        facets: { assignees: ['macro|fixed@example.com'] },
+        facets: { assignees: ['rox|fixed@example.com'] },
       },
       {
         tab: 'created-by-me' as const,
-        facets: { 'created-by': ['macro|fixed@example.com'] },
+        facets: { 'created-by': ['rox|fixed@example.com'] },
       },
     ]) {
       const captured = captureTaskSavedView({
@@ -539,7 +539,7 @@ describe('saved task filter execution', () => {
       expect(captured.isOk()).toBe(true);
       if (captured.isErr()) continue;
       const restored = materializeTaskSavedView(captured.value);
-      for (const viewer of ['macro|a@example.com', 'macro|b@example.com']) {
+      for (const viewer of ['rox|a@example.com', 'rox|b@example.com']) {
         const query = buildTaskQuery({
           ...options,
           ...restored,
@@ -566,14 +566,14 @@ describe('saved task filter execution', () => {
               {
                 l: {
                   pd: '00000001-0000-0000-0000-000000000001',
-                  v: { er: 'macro|fixed@example.com' },
+                  v: { er: 'rox|fixed@example.com' },
                 },
               },
             ],
           });
           expect(
             search.body.filters?.property_filters?.[0]?.entity_ids
-          ).toEqual(['macro|fixed@example.com', viewer]);
+          ).toEqual(['rox|fixed@example.com', viewer]);
         } else {
           expect(query.body.df).toEqual({
             '&': [
@@ -581,13 +581,13 @@ describe('saved task filter execution', () => {
               {
                 '|': [
                   { l: { o: viewer } },
-                  { l: { o: 'macro|fixed@example.com' } },
+                  { l: { o: 'rox|fixed@example.com' } },
                 ],
               },
             ],
           });
           expect(search.body.filters?.document_filters?.owners).toEqual([
-            'macro|fixed@example.com',
+            'rox|fixed@example.com',
             viewer,
           ]);
         }
@@ -684,7 +684,7 @@ describe('saved task filter execution', () => {
   );
 
   it('resolves relative people separately for every viewer in lists and searches', () => {
-    for (const viewer of ['macro|a@example.com', 'macro|b@example.com']) {
+    for (const viewer of ['rox|a@example.com', 'rox|b@example.com']) {
       const facets = { assignees: ['@viewer'], 'created-by': ['@viewer'] };
       const query = buildTaskQuery({ ...options, userId: viewer, facets });
       const search = buildTaskSearchRequest({

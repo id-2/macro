@@ -40,7 +40,7 @@ export function WhatsAppHistoryImportPrompt() {
         .map((chat) => chat.id)
         .sort()
         .join(','),
-    persistKey: 'macro:whatsapp-history-prompt:dismissed',
+    persistKey: 'rox:whatsapp-history-prompt:dismissed',
     itemsLoaded: () => chats.isSuccess && userId() !== undefined,
     toast: (group) => ({
       title: 'Import WhatsApp history',

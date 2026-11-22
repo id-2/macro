@@ -13,8 +13,8 @@ export type DraftLifecycleChange = {
 };
 
 const lifecycleBus = createCrossTabBus<DraftLifecycleChange>({
-  channelName: 'macro-email-draft-lifecycle',
-  storageKey: 'macro:email-draft-lifecycle',
+  channelName: 'rox-email-draft-lifecycle',
+  storageKey: 'rox:email-draft-lifecycle',
   parse(value) {
     if (typeof value !== 'object' || value === null) return null;
     const candidate = value as Partial<DraftLifecycleChange>;

@@ -12,7 +12,7 @@ export function AgentSessionSkeleton() {
         class="relative min-h-0 min-w-0 flex-1"
       >
         <div class="pane absolute inset-0 flex flex-col">
-          <div class="macro-message-width mx-auto flex min-h-0 w-full flex-1 flex-col gap-3 overflow-hidden px-4 pt-4">
+          <div class="rox-message-width mx-auto flex min-h-0 w-full flex-1 flex-col gap-3 overflow-hidden px-4 pt-4">
             <ListSkeleton.Bar class="mb-3 h-9 w-2/5 self-end" />
             <ListSkeleton.Bar class="w-4/5" />
             <ListSkeleton.Bar class="w-full" />

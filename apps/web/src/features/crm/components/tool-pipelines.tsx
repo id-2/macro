@@ -44,7 +44,7 @@ export function formatFieldValue(
   if (value === null || value === undefined) return 'empty';
   if (Array.isArray(value))
     return value.map((item) => formatFieldValue(item)).join(', ');
-  if (typeof value === 'string') return value.replace(/^macro\|/, '');
+  if (typeof value === 'string') return value.replace(/^rox\|/, '');
   if (typeof value === 'number')
     return currency
       ? `${currency} ${monetaryFormat.format(value)}`

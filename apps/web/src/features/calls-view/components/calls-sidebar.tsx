@@ -104,7 +104,7 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
   const view = useSoupView();
   const { applyTabPreset } = useApplyPreset();
   const [collapsed, setCollapsed] = usePreference<SectionId[]>(
-    'macro:pref:calls:sidebar-collapsed',
+    'rox:pref:calls:sidebar-collapsed',
     { default: [] }
   );
   const isOpen = (id: SectionId) => !collapsed().includes(id);

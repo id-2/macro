@@ -1,6 +1,6 @@
 /**
  * Branded type for RoxId strings.
- * Format: `macro|email@domain.com`
+ * Format: `rox|email@domain.com`
  */
 declare const RoxIdBrand: unique symbol;
 export type RoxId = string & { readonly [RoxIdBrand]: never };
@@ -9,7 +9,7 @@ export type RoxId = string & { readonly [RoxIdBrand]: never };
  * Type guard to check if a string is a valid RoxId.
  */
 export function isMacroId(str: string): str is RoxId {
-  return str.startsWith('macro|') && str.slice(6).includes('@');
+  return str.startsWith('rox|') && str.slice(6).includes('@');
 }
 
 /**
@@ -23,7 +23,7 @@ export function tryMacroId(str: string): RoxId | undefined {
 /**
  * Extracts the email from a RoxId.
  */
-export function macroIdToEmail(id: RoxId): string {
+export function roxIdToEmail(id: RoxId): string {
   return id.slice(6);
 }
 
@@ -35,5 +35,5 @@ export function emailToMacroId(email: string): RoxId | undefined {
   if (!email.includes('@')) {
     return undefined;
   }
-  return `macro|${email}` as RoxId;
+  return `rox|${email}` as RoxId;
 }

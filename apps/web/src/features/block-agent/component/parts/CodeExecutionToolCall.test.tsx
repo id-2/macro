@@ -72,11 +72,11 @@ describe('CodeExecutionToolCall', () => {
           executionId: 'execution-2',
           source: 'export async function main() {}',
           status: 'failed',
-          error: 'ReferenceError: macro is not defined',
+          error: 'ReferenceError: rox is not defined',
           calls: [],
           activity: [],
         }}
-        error="ReferenceError: macro is not defined"
+        error="ReferenceError: rox is not defined"
         loading={false}
         unavailable={false}
       />

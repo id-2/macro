@@ -164,7 +164,7 @@ export * from './itemSharedMetadata';
 export * from './itemSharedMetadataItemName';
 export * from './itemSharedMetadataPermissionLevel';
 export * from './listTypedNotificationsParams';
-export * from './macroUserIdStr';
+export * from './roxUserIdStr';
 export * from './mentionedInDocumentCommentMetadata';
 export * from './mentionedInDocumentCommentMetadataFileType';
 export * from './mentionedInDocumentCommentMetadataSenderDisplayName';

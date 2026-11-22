@@ -1,7 +1,7 @@
 import { useUserId } from '@core/context/user';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { getDisplayName } from '@core/user/displayName';
-import { isMacroId } from '@core/user/macroId';
+import { isMacroId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { queryReadyGate } from '@queries/gate';
 import {
@@ -86,7 +86,7 @@ function pageLoad(
       'whatsapp.chats.count': list.length,
       'whatsapp.chats.direct': list.filter((chat) => chat.kind === 'direct')
         .length,
-      'whatsapp.chats.in_macro': list.filter((chat) => chat.inMacro).length,
+      'whatsapp.chats.in_rox': list.filter((chat) => chat.inMacro).length,
     },
   };
 }

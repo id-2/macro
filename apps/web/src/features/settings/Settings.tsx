@@ -110,7 +110,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
   const navTabs = createMemo(() => navGroups().flatMap((group) => group.items));
   const signatures = useFeatureFlag(enableEmailSignatures);
   const outlook = useOutlookAvailable();
-  const macroComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableMacroComputers);
 
   const activeNavigationTab = activeTabId;
 
@@ -121,7 +121,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
     searchSettings(searchGroups(), searchQuery(), {
       emailSignatures: signatures().enabled,
       outlook: outlook(),
-      macroComputers: macroComputers().enabled,
+      roxComputers: roxComputers().enabled,
     })
   );
 

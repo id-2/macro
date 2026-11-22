@@ -3,7 +3,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { useIsAuthenticated } from '@core/context/user';
 import { useAddInboxFlow } from '@core/email-link';
 import { fireAndForget } from '@core/util/fireAndForget';
-import IconGoogle from '@icon/macro-google.svg';
+import IconGoogle from '@icon/rox-google.svg';
 import GithubIcon from '@icon/mcp-github.svg';
 import {
   useGithubLinkStatusQuery,

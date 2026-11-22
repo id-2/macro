@@ -4,7 +4,7 @@ import type { Component } from 'solid-js';
 export const Watermark: Component<WatermarkDecoratorProps> = (props) => {
   return (
     <span
-      class="select-none macro-watermark-node text-ink/50"
+      class="select-none rox-watermark-node text-ink/50"
       inert
       data-watermark
     >

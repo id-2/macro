@@ -39,7 +39,7 @@ function deferred<T>() {
 const notification = {
   title: 'New message',
   notificationId: '01a1561c-62b1-7ee4-99d5-1fa5988dbf5d',
-  options: { body: 'A teammate mentioned you', icon: 'macro-icon.svg' },
+  options: { body: 'A teammate mentioned you', icon: 'rox-icon.svg' },
 };
 
 describe('desktop notification delivery', () => {
@@ -102,7 +102,7 @@ describe('desktop notification delivery', () => {
   it('titles macOS notifications with the sender and names the conversation beneath', async () => {
     const adapter = createTauriNotificationInterface(vi.fn());
     const sender = {
-      id: 'macro|ada@example.com',
+      id: 'rox|ada@example.com',
       name: 'Ada',
       avatarUrl: 'https://cdn.example.com/ada.png',
     };

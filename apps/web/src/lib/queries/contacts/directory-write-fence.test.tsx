@@ -62,7 +62,7 @@ it('fences a pending local reply when person data changes without changing the a
     ...fresh,
     users: [
       {
-        id: 'macro|obsolete@example.com',
+        id: 'rox|obsolete@example.com',
         email: 'obsolete@example.com',
         name: 'Obsolete',
       },

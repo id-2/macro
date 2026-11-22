@@ -28,7 +28,7 @@ describe('form entity titles', () => {
       type: 'form',
       id: '01a10d51-874a-7b22-9204-41f537bb2572',
       name: 'Workshop booking request',
-      ownerId: 'macro|forms-owner@local.macro.test',
+      ownerId: 'rox|forms-owner@local.rox.test',
       access: 'owner',
     };
     const { getByText, queryByText } = render(() => (
@@ -43,7 +43,7 @@ describe('form entity titles', () => {
       type: 'form',
       id: '01a10d51-874a-7b22-9204-41f537bb2572',
       name: 'Workshop booking request',
-      ownerId: 'macro|forms-owner@local.macro.test',
+      ownerId: 'rox|forms-owner@local.rox.test',
       access: 'owner',
     });
     const { getByText, queryByText } = render(() => (
@@ -59,7 +59,7 @@ describe('form entity titles', () => {
       type: 'form',
       id: '01a10d51-874a-7b22-9204-41f537bb2572',
       name: '',
-      ownerId: 'macro|forms-owner@local.macro.test',
+      ownerId: 'rox|forms-owner@local.rox.test',
       access: 'view',
     };
     const { getByText } = render(() => <EntityTitle entity={form} />);
@@ -73,7 +73,7 @@ describe('email thread titles', () => {
       type: 'email',
       id: '019a1f40-2c7e-7d10-9a4b-6f2b0c1d2e3f',
       name: 'Re: hello from my outlook to your outlook',
-      ownerId: 'macro|teo@rox.one',
+      ownerId: 'rox|teo@rox.one',
       isRead: true,
       isDraft: false,
       isImportant: true,

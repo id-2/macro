@@ -75,7 +75,7 @@ export function entityTypeToItemType(type: EntityType): ItemType | undefined {
     .exhaustive(() => undefined);
 }
 
-export function macroEntityToPropertyEntityType(
+export function roxEntityToPropertyEntityType(
   entity: EntityData
 ): PropertyTargetEntityType {
   return match(entity)

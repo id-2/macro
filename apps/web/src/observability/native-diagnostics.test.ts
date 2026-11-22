@@ -73,7 +73,7 @@ it('bounds a hung bridge and keeps reload and logout usable', async () => {
   await vi.advanceTimersByTimeAsync(250);
   await reload;
   const clearing = diagnostics.clearNativeDiagnostics();
-  expect(sessionStorage.getItem('macro-native-diagnostic-document')).toBeNull();
+  expect(sessionStorage.getItem('rox-native-diagnostic-document')).toBeNull();
   await vi.advanceTimersByTimeAsync(250);
   await clearing;
   expect(invoke).toHaveBeenCalledTimes(3);
@@ -170,7 +170,7 @@ it('still clears the previous document if logout happens during startup', async 
 });
 
 it('does not recover an old account after native clearing fails', async () => {
-  sessionStorage.setItem('macro-native-diagnostic-document', 'launch:previous');
+  sessionStorage.setItem('rox-native-diagnostic-document', 'launch:previous');
   const diagnostics = await import('./native-diagnostics');
   dispose = diagnostics.startNativeDiagnostics(snapshot);
   expect(diagnostics.recoverableNativeFrontend()).toBe('previous');

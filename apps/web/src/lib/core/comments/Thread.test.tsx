@@ -30,7 +30,7 @@ vi.mock('@core/util/url', () => ({
     entity: { type: string; id: string },
     params: Record<string, string>
   ) =>
-    `https://macro.test/app/${entity.type}/${entity.id}?${new URLSearchParams(params)}`,
+    `https://rox.test/app/${entity.type}/${entity.id}?${new URLSearchParams(params)}`,
 }));
 vi.mock('@core/context/user', () => ({ useAuthor: () => () => 'user' }));
 vi.mock('@core/component/Toast/Toast', () => ({

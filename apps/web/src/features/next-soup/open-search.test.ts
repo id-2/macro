@@ -29,7 +29,7 @@ vi.mock('./soup-view/search-controllers', () => ({
 }));
 const search = {
   query: 'budget',
-  filters: { include: { channelSenderId: ['macro|julia@rox.one'] } },
+  filters: { include: { channelSenderId: ['rox|julia@rox.one'] } },
   clientFilters: { and: ['search-supported'], or: ['channels'] },
 };
 beforeEach(() => {

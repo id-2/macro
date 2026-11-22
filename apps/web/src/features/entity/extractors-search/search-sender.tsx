@@ -1,4 +1,4 @@
-import { isMacroId } from '@core/user/macroId';
+import { isMacroId } from '@core/user/roxId';
 import { Show } from 'solid-js';
 import { DisplayName } from '../components/DisplayName';
 import type { ContentHitData } from '../types/search';

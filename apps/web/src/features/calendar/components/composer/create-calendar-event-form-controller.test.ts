@@ -27,8 +27,8 @@ function timedRange(startHoursFromNow: number) {
 function guest(email: string): SelectedEventEditorGuest {
   return {
     kind: 'custom',
-    id: `macro|${email}`,
-    data: { id: `macro|${email}`, email, invalid: false },
+    id: `rox|${email}`,
+    data: { id: `rox|${email}`, email, invalid: false },
   };
 }
 
@@ -332,8 +332,8 @@ describe('pastEventWarning', () => {
 describe('conferencing selection', () => {
   it('defaults new events to Rox without requesting provider conferencing', () => {
     const controller = controllerFor({ title: 'Planning' });
-    expect(controller.state().conference).toBe('macro');
-    expect(controller.submitValues()?.conferenceChoice).toBe('macro');
+    expect(controller.state().conference).toBe('rox');
+    expect(controller.submitValues()?.conferenceChoice).toBe('rox');
     expect(controller.submitValues()?.conference).toBeUndefined();
   });
 
@@ -345,8 +345,8 @@ describe('conferencing selection', () => {
     controller.setField('conference', 'google_meet');
     expect(controller.submitValues()?.conferenceChoice).toBe('google_meet');
     expect(controller.submitValues()?.conference).toBe('google_meet');
-    controller.setField('conference', 'macro');
-    expect(controller.submitValues()?.conferenceChoice).toBe('macro');
+    controller.setField('conference', 'rox');
+    expect(controller.submitValues()?.conferenceChoice).toBe('rox');
     expect(controller.submitValues()?.conference).toBeUndefined();
   });
 
@@ -355,8 +355,8 @@ describe('conferencing selection', () => {
       { title: 'Planning', conference: 'google_meet' },
       { isEdit: true }
     );
-    controller.setField('conference', 'macro');
-    expect(controller.submitValues()?.conferenceChoice).toBe('macro');
+    controller.setField('conference', 'rox');
+    expect(controller.submitValues()?.conferenceChoice).toBe('rox');
     expect(controller.submitValues()?.conference).toBe('none');
   });
 

@@ -3,13 +3,13 @@ import { repositoryLabel } from './session-code-details';
 
 describe('repositoryLabel', () => {
   it.each([
-    ['https://github.com/macro-inc/macro', 'macro-inc/macro'],
-    ['https://github.com/macro-inc/macro.git/', 'macro-inc/macro'],
-    ['git@github.com:macro-inc/macro.git', 'macro-inc/macro'],
-    ['ssh://git@github.com/macro-inc/macro.git', 'macro-inc/macro'],
+    ['https://github.com/rox-inc/rox', 'rox-inc/rox'],
+    ['https://github.com/rox-inc/rox.git/', 'rox-inc/rox'],
+    ['git@github.com:rox-inc/rox.git', 'rox-inc/rox'],
+    ['ssh://git@github.com/rox-inc/rox.git', 'rox-inc/rox'],
     [
-      'https://token@github.com/macro-inc/macro.git?key=private',
-      'macro-inc/macro',
+      'https://token@github.com/rox-inc/rox.git?key=private',
+      'rox-inc/rox',
     ],
     ['', undefined],
     ['not a repository URL', undefined],

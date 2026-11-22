@@ -90,7 +90,7 @@ describe('database chart', () => {
     await waitFor(() =>
       expect(
         Array.from(
-          rendered.container.querySelectorAll('.macro-chart-swatch'),
+          rendered.container.querySelectorAll('.rox-chart-swatch'),
           (swatch) => swatch.textContent
         )
       ).toEqual(['Signups', 'Churn'])

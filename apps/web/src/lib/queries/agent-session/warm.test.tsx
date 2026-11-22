@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_NEW_BOT_ID } from '@core/constant/roxNew';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import type { WarmAgentSessionResponse } from '@service-agent-harness/generated/schemas';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';

@@ -510,7 +510,7 @@ export const FileTypeMap = {
   xls: { extension: 'xls', mime: 'application/vnd.ms-excel', app: 'document' },
   xlsm: {
     extension: 'xlsm',
-    mime: 'application/vnd.ms-excel.sheet.macroEnabled.12',
+    mime: 'application/vnd.ms-excel.sheet.roxEnabled.12',
     app: 'document',
   },
   ppt: {

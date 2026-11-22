@@ -15,8 +15,8 @@ import {
   ROX_AGENT_BOT_ID,
   ROX_AGENT_NAME,
   ROX_HARNESS_NAME,
-} from '@core/constant/macroAgent';
-import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
+} from '@core/constant/roxAgent';
+import { ROX_NEW_BOT_ID } from '@core/constant/roxNew';
 import { useChannelsContext } from '@core/context/channels';
 import { useUserId } from '@core/context/user';
 import { usePipedreamMcpFlag } from '@core/pipedream/flag';
@@ -150,7 +150,7 @@ const IN_MEMORY_HARNESS: ConnectedHarness = {
 const ROX_AGENT: AgentSummary = {
   id: ROX_AGENT_BOT_ID,
   name: ROX_AGENT_NAME,
-  tag: 'macro',
+  tag: 'rox',
   instructions: '',
   whereItRuns: `In ${ROX_AGENT_NAME}`,
   defaultModel: MODEL_PRETTYNAME[Model.sonnet55],
@@ -1552,7 +1552,7 @@ function AgentEditorPage(props: {
                         name="agent-coding"
                         value="chat"
                         title="Chat agent"
-                        description="Replies in the thread the way a person would, like @macro."
+                        description="Replies in the thread the way a person would, like @rox."
                         checked={!isCoding()}
                         onChange={() => setCodingChoice(false)}
                       />
@@ -1651,7 +1651,7 @@ function AgentEditorPage(props: {
                           value="all"
                           checked={channelMode() === 'all'}
                           title="All channels"
-                          description="The agent can be mentioned in every channel, like @macro."
+                          description="The agent can be mentioned in every channel, like @rox."
                           onChange={() => setChannelMode('all')}
                         />
                         <ChoiceRow

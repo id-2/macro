@@ -1,7 +1,7 @@
 import type { ConsentScopes } from '@service-auth/client';
 import type { InboxAddition } from './link-outcome';
 
-const RETURN_LAYOUT_KEY = 'macro:inbox-link:return-layout';
+const RETURN_LAYOUT_KEY = 'rox:inbox-link:return-layout';
 
 const CONSENT_SCOPES: ReadonlyArray<ConsentScopes> = [
   'gmail',

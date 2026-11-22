@@ -35,7 +35,7 @@ describe('mobile dock preferences', () => {
   it.each(['not json', '{}', '[1,2]'])(
     'recovers from malformed storage: %s',
     (stored) => {
-      localStorage.setItem('macro:mobile:dock-order:alice', stored);
+      localStorage.setItem('rox:mobile:dock-order:alice', stored);
       expect(createMobileDockOrder('alice', defaults).order()).toEqual(
         defaults
       );

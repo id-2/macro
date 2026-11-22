@@ -34,7 +34,7 @@ export function MessageCard(props: MessageCardProps) {
   const motion = createMessageResizeMotion();
   return (
     <div class="shrink-0 flex justify-center w-full">
-      <div class="@container/message macro-message-width macro-message-padding mobile:px-0 w-full">
+      <div class="@container/message rox-message-width rox-message-padding mobile:px-0 w-full">
         <ComposerSurface
           ref={motion.setCard}
           as="div"

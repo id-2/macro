@@ -26,7 +26,7 @@ export function AgentModelMenuItem(
   }
 ) {
   const discoverable = () =>
-    ['cursor', 'in-memory', 'macro-inmem'].includes(props.harness ?? '');
+    ['cursor', 'in-memory', 'rox-inmem'].includes(props.harness ?? '');
   return (
     <Show
       when={discoverable() || props.effort}
@@ -48,7 +48,7 @@ function EffortModelSubmenu(
   const [open, setOpen] = createSignal(false);
   const query = useAgentCapabilitiesQuery(() => {
     const harness =
-      props.harness === 'macro-inmem' ? 'in-memory' : props.harness;
+      props.harness === 'rox-inmem' ? 'in-memory' : props.harness;
     return open() &&
       !props.effort &&
       (harness === 'cursor' || harness === 'in-memory')

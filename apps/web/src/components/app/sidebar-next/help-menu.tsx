@@ -9,7 +9,7 @@ import { Dropdown } from '@ui';
 import { Show } from 'solid-js';
 
 const DEMO_URL =
-  'https://rox.one/app/book/6de4003c-15e4-549f-b5a9-0e930bbf56e4/macro-demo';
+  'https://rox.one/app/book/6de4003c-15e4-549f-b5a9-0e930bbf56e4/rox-demo';
 const SUPPORT_EMAIL = 'support@rox.one';
 
 /** The rail's question-mark button: ways to reach the Rox team. */

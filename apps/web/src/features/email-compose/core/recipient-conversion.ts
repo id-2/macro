@@ -22,7 +22,7 @@ export const convertEmailRecipientToContactInfo = (
 export const convertContactInfoToEmailRecipient = (
   contact: ContactInfo
 ): EmailRecipient => {
-  const id = `macro|${contact.email}`;
+  const id = `rox|${contact.email}`;
   return { kind: 'contact', id, data: { ...contact, id, type: 'extracted' } };
 };
 

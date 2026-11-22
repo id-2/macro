@@ -54,7 +54,7 @@ function channel(updatedAt: string, notifiedAt?: string): SoupApiItem {
         id: 'channel-1',
         name: 'Live notification test',
         channel_type: 'direct_message',
-        owner_id: 'macro|sender@example.com',
+        owner_id: 'rox|sender@example.com',
         created_at: OLD,
         updated_at: updatedAt,
       },
@@ -84,7 +84,7 @@ function notification(createdAt = NEW): UnifiedNotification {
     notification_metadata: {
       tag: 'channel_message_send',
       content: {
-        sender: 'macro|sender@example.com',
+        sender: 'rox|sender@example.com',
         messageId: 'message-1',
         messageContent: 'Live notification test',
         channelType: 'directMessage',

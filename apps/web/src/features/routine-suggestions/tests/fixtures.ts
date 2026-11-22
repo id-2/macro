@@ -63,7 +63,7 @@ export const template: RoutineSuggestion = {
   kind: 'catalog',
   key: 'email_tags',
   knobs: {},
-  from: 'macro',
+  from: 'rox',
   surfaces: ['email'],
   reason: null,
   keepProbability: null,

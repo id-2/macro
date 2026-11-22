@@ -1,9 +1,9 @@
 import { isCodexBotId } from '@core/constant/codexAgent';
 import { isCursorBotId } from '@core/constant/cursorAgent';
-import { isMacroAgentId } from '@core/constant/macroAgent';
-import { isMacroCoderId } from '@core/constant/macroCoder';
-import { isMacroNewId } from '@core/constant/macroNew';
-import { isMacroSystemId } from '@core/constant/macroSystem';
+import { isMacroAgentId } from '@core/constant/roxAgent';
+import { isMacroCoderId } from '@core/constant/roxCoder';
+import { isMacroNewId } from '@core/constant/roxNew';
+import { isMacroSystemId } from '@core/constant/roxSystem';
 import { RoxMark } from '@core/component/RoxMark';
 import ClaudeIcon from '@icon/wide-claude.svg';
 import CodexIcon from '@icon/wide-codex-ide.svg';

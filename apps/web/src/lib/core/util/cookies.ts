@@ -15,7 +15,7 @@ type LoginCookieOptions = {
   sameSite: 'Lax';
 };
 
-const LOGIN_STORAGE_KEY = 'macro:login';
+const LOGIN_STORAGE_KEY = 'rox:login';
 
 /** Check if the user appears to be authenticated based on the login cookie or localStorage fallback. */
 export function hasLoginCookie(): boolean {

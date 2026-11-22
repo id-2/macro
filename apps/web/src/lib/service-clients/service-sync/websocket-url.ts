@@ -14,7 +14,7 @@ export async function resolveSyncRouterWsUrl(): Promise<string> {
     if (ENABLE_BEARER_TOKEN_AUTH) {
       const token = await getMacroApiToken();
       if (!token) throw new Error('No Rox API token');
-      url.searchParams.set('macro-api-token', token);
+      url.searchParams.set('rox-api-token', token);
     } else {
       const refreshed = await ensureFreshSession();
       if (refreshed.isErr()) throw new Error('Unable to refresh sync session');

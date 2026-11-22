@@ -1,4 +1,4 @@
-import { macroThemeExtension } from '@block-code/component/cmTheme';
+import { roxThemeExtension } from '@block-code/component/cmTheme';
 import { SQLDialect, sql } from '@codemirror/lang-sql';
 import { Compartment, EditorState, Prec } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
@@ -7,7 +7,7 @@ import { createEffect, on, onCleanup, onMount } from 'solid-js';
 import { type QuerySchema, unquoteIdentifier } from '../core/query';
 
 /** The Rox Databases subset (`crates/database_sql`): its keywords and nothing more. */
-const macroDialect = SQLDialect.define({
+const roxDialect = SQLDialect.define({
   keywords:
     'select distinct from join on where and or not in has is null like group by order asc desc limit offset true false count sum avg min max',
   identifierQuotes: '"',
@@ -26,7 +26,7 @@ export function SqlEditor(props: {
   const language = new Compartment();
   const completion = () =>
     sql({
-      dialect: macroDialect,
+      dialect: roxDialect,
       schema: Object.fromEntries(
         props.schema.tables.map((table) => [
           unquoteIdentifier(table.sqlName),
@@ -46,7 +46,7 @@ export function SqlEditor(props: {
         extensions: [
           basicSetup,
           language.of(completion()),
-          macroThemeExtension,
+          roxThemeExtension,
           EditorView.contentAttributes.of({
             'aria-label': 'Query SQL',
             spellcheck: 'false',

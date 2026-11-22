@@ -4,7 +4,7 @@ import { appearanceColor, readEntityAppearance } from './appearance';
 describe('appearance palette transport', () => {
   it('preserves icons when GraphQL reads include the added tag colors', () => {
     for (const color of ['tomato', 'amber', 'indigo']) {
-      const value = { icon: { kind: 'macro', name: 'star' }, color };
+      const value = { icon: { kind: 'rox', name: 'star' }, color };
       expect(readEntityAppearance(value)).toEqual(value);
       expect(appearanceColor(readEntityAppearance(value)?.color)).toMatch(
         /^#[0-9A-F]{6}$/
@@ -14,7 +14,7 @@ describe('appearance palette transport', () => {
 
   it('keeps icons when newer servers add an unknown color', () => {
     for (const icon of [
-      { kind: 'macro', name: 'star' },
+      { kind: 'rox', name: 'star' },
       { kind: 'emoji', value: '🚀' },
     ]) {
       expect(readEntityAppearance({ icon, color: 'future-color' })).toEqual({

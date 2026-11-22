@@ -158,7 +158,7 @@ const documentId = params.get('document') ?? 'local';
 const worker = params.get('worker') ?? '';
 const socketUrl = params.get('socket') ?? '';
 const token = params.get('token') ?? '';
-const user = params.get('user') ?? 'macro|alice@example.com';
+const user = params.get('user') ?? 'rox|alice@example.com';
 const readonly = params.has('readonly');
 /** A bundled fixture by name, or any document URL (`src`). */
 const fixture =
@@ -168,7 +168,7 @@ const fixture =
 
 const shortName = (id: string | undefined) =>
   (id ?? '')
-    .replace(/^macro\|/, '')
+    .replace(/^rox\|/, '')
     .split('@')[0]
     .replace(/^./, (c) => c.toUpperCase());
 

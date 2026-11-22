@@ -60,7 +60,7 @@ function agent(channelIds: string[]): Agent {
     bot: {
       id: 'agent-1',
       kind: 'owned',
-      owner: { type: 'user', user_id: 'macro|user@example.com' },
+      owner: { type: 'user', user_id: 'rox|user@example.com' },
       name: 'Bug fixer',
       handle: 'bug-fixer',
       has_agent: true,

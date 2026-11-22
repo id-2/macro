@@ -1198,7 +1198,7 @@ export type ParseError = {
 
 /**  A table every viewer has, whatever databases they can see. */
 export type PlatformTable =
-  /**  `macro.people`. */
+  /**  `rox.people`. */
   'people';
 
 /**
@@ -1555,7 +1555,7 @@ export type ResolveError =
       /**  Why no value converts. */
       reason: string;
     }
-  /**  A write to a table nobody writes, such as `macro.people`. */
+  /**  A write to a table nobody writes, such as `rox.people`. */
   | {
       kind: 'readOnlyTable';
       /**  The qualified table name. */

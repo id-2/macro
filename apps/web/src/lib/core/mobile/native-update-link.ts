@@ -3,8 +3,8 @@ import { invoke } from '@tauri-apps/api/core';
 /** Store listing for the app; HTTPS works even when the Play Store app is absent. */
 export function storeListingUrl(platform: 'ios' | 'android'): string {
   return platform === 'android'
-    ? 'https://play.google.com/store/apps/details?id=com.macro.workspace.mobile'
-    : 'https://apps.apple.com/us/app/macro-app/id6743133649';
+    ? 'https://play.google.com/store/apps/details?id=com.rox.workspace.mobile'
+    : 'https://apps.apple.com/us/app/rox-app/id6743133649';
 }
 
 /** Keep the current app usable when the operating system cannot open the link. */

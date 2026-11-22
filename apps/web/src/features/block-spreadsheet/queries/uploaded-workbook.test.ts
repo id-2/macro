@@ -33,7 +33,7 @@ describe('uploaded workbook retrieval', () => {
     expect(query().queryKey).not.toEqual(query('csv').queryKey);
   });
   it.each(['xlsm', 'XLSM'])(
-    'decodes a macro-enabled %s upload with the Excel worker',
+    'decodes a rox-enabled %s upload with the Excel worker',
     async (fileType) => {
       const signal = new AbortController().signal;
       vi.mocked(platformFetch).mockResolvedValueOnce(

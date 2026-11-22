@@ -46,7 +46,7 @@ const KEY_BRIDGE = `addEventListener('keydown', function (event) {
   if (!escape && ['ArrowLeft', 'ArrowRight', ' ', 'PageUp', 'PageDown'].indexOf(event.key) === -1) return;
   var target = event.target;
   if (!escape && target.closest && target.closest('input,textarea,select,button,a,[contenteditable]')) return;
-  parent.postMessage({ macroArtifactKey: event.key }, '*');
+  parent.postMessage({ roxArtifactKey: event.key }, '*');
 });`;
 
 /** Bound cycles and fan-out between components. Expansion runs on the host's main
@@ -61,13 +61,13 @@ const entry = (
   name !== null && Object.hasOwn(entries, name) ? entries[name] : undefined;
 
 /**
- * `<macro-component name="card">` becomes that component, with its children in
- * place of the component's `<slot>`. `<macro-style name="brand">` becomes a style
+ * `<rox-component name="card">` becomes that component, with its children in
+ * place of the component's `<slot>`. `<rox-style name="brand">` becomes a style
  * element. An unknown component keeps its children, and an unknown style is dropped.
  */
 function expandLibrary(parsed: Document, library: ArtifactLibrary) {
   // One work list rather than re-querying after each expansion, which is quadratic.
-  const pending = Array.from(parsed.querySelectorAll('macro-component'));
+  const pending = Array.from(parsed.querySelectorAll('rox-component'));
   let expansions = 0;
   let expandedLength = 0;
   while (pending.length) {
@@ -89,13 +89,13 @@ function expandLibrary(parsed: Document, library: ArtifactLibrary) {
 
     const template = parsed.createElement('template');
     template.innerHTML = source ?? '<slot></slot>';
-    const nested = template.content.querySelectorAll('macro-component');
+    const nested = template.content.querySelectorAll('rox-component');
     pending.push(...nested);
     template.content.querySelector('slot')?.replaceWith(...use.childNodes);
     use.replaceWith(template.content);
   }
 
-  for (const use of parsed.querySelectorAll('macro-style')) {
+  for (const use of parsed.querySelectorAll('rox-style')) {
     const source = entry(library.styles, use.getAttribute('name'));
     if (source === undefined) {
       use.remove();
@@ -116,7 +116,7 @@ function expandLibrary(parsed: Document, library: ArtifactLibrary) {
 const loadMarker = (token: string) =>
   `(function (host, token) {
     addEventListener('load', function () {
-      host.postMessage({ macroArtifactLoaded: token }, '*');
+      host.postMessage({ roxArtifactLoaded: token }, '*');
     });
   })(parent, ${JSON.stringify(token)});
   document.currentScript.remove();`;
@@ -124,8 +124,8 @@ const loadMarker = (token: string) =>
 export const isArtifactLoadMarker = (data: unknown, token: string) =>
   !!data &&
   typeof data === 'object' &&
-  'macroArtifactLoaded' in data &&
-  data.macroArtifactLoaded === token;
+  'roxArtifactLoaded' in data &&
+  data.roxArtifactLoaded === token;
 
 /** Build the srcdoc. The parser never runs scripts, and the policy is parsed
  * first so that nothing in the artifact can run or load before it applies. */

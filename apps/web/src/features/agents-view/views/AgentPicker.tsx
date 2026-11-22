@@ -55,9 +55,9 @@ export function AgentPicker(props: AgentPickerProps) {
 function DesktopAgentPicker(props: AgentPickerProps) {
   const [open, setOpen] = createSignal(false);
   const catalog = createComposerModels(() => props.selected);
-  const macro = () =>
+  const rox = () =>
     props.agents.find((agent) => agent.id === ROX_PERSONA_ID);
-  const macroCatalog = createComposerModels(macro);
+  const roxCatalog = createComposerModels(rox);
   const groups = () => agentPickerGroups(props.agents);
   const rawModel = () => props.selected?.id === ROX_PERSONA_ID;
   const model = () =>
@@ -133,9 +133,9 @@ function DesktopAgentPicker(props: AgentPickerProps) {
         <div class="flex min-h-0 max-h-[min(28rem,var(--kb-popper-content-available-height))] flex-col">
           <div
             class="min-h-0 space-y-1 overflow-y-auto overscroll-contain px-2 pb-2"
-            classList={{ 'pt-2': !macro() }}
+            classList={{ 'pt-2': !rox() }}
           >
-            <Show when={macro()}>
+            <Show when={rox()}>
               {(agent) => (
                 <ModelCatalogMenu
                   autoFocusSearch
@@ -143,7 +143,7 @@ function DesktopAgentPicker(props: AgentPickerProps) {
                     props.selected?.id === agent().id ? (model() ?? null) : null
                   }
                   disabled={Boolean(agent().unavailableReason)}
-                  options={macroCatalog.models().map((option) => ({
+                  options={roxCatalog.models().map((option) => ({
                     id: option.id,
                     label: modelLabel(option.id, option.name),
                     description: option.description ?? undefined,
@@ -168,7 +168,7 @@ function DesktopAgentPicker(props: AgentPickerProps) {
                         )
                       : undefined
                   }
-                  emptyMessage={macroCatalog.message()}
+                  emptyMessage={roxCatalog.message()}
                 />
               )}
             </Show>
@@ -210,7 +210,7 @@ function DesktopAgentPicker(props: AgentPickerProps) {
                 </Dropdown.Group>
               )}
             </For>
-            <Show when={!props.loading && !macro() && groups().length === 0}>
+            <Show when={!props.loading && !rox() && groups().length === 0}>
               <p role="status" class="px-3 py-2 text-sm text-ink-muted">
                 No agents available
               </p>

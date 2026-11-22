@@ -172,7 +172,7 @@ export function startPendingSession(
       : undefined;
   // The tab the prompt was typed in, sent with a prompt on the create as a
   // control prompt carries it, so what the first turn opens
-  // (`macro.ui.open`) reaches this tab.
+  // (`rox.ui.open`) reaches this tab.
   const promptClientId = typedInClientId();
   const [sessionId, setSessionId] = createSignal<string>();
   const [error, setError] = createSignal<string>();

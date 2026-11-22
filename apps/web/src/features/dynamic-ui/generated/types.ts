@@ -28,7 +28,7 @@ export type AgentSessionRef = {
   id: string;
 };
 
-/**  One item of macro.agentSessions.updates(); its other fields are ignored. */
+/**  One item of rox.agentSessions.updates(); its other fields are ignored. */
 export type AgentUpdateItem = {
   session: AgentSessionRef;
   sessionName: string;
@@ -759,7 +759,7 @@ export type Widget_Deserialize =
   /**
    *  Live cards on which the user answers coding agents' waiting
    *  permission requests and questions, and sees stalled sessions. Pass the
-   *  items macro.agentSessions.updates() returned, unchanged, whenever it
+   *  items rox.agentSessions.updates() returned, unchanged, whenever it
    *  returns any: these cards are the only place the user can answer them.
    */
   | ({ type: 'agentUpdates'; items: AgentUpdateItem[] } & {
@@ -963,7 +963,7 @@ export type Widget_Serialize =
   /**
    *  Live cards on which the user answers coding agents' waiting
    *  permission requests and questions, and sees stalled sessions. Pass the
-   *  items macro.agentSessions.updates() returned, unchanged, whenever it
+   *  items rox.agentSessions.updates() returned, unchanged, whenever it
    *  returns any: these cards are the only place the user can answer them.
    */
   | ({ type: 'agentUpdates'; items: AgentUpdateItem[] } & {

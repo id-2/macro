@@ -35,7 +35,7 @@ export function SecurityStep(props: {
       >
         <a
           data-security-item
-          href="https://github.com/macro-inc/macro"
+          href="https://github.com/rox-inc/rox"
           target="_blank"
           rel="noreferrer"
           class="group flex min-w-0 flex-col items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"

@@ -1,5 +1,5 @@
 import { UserCardTrigger } from '@core/component/UserCardTrigger';
-import { getDisplayNameParts, macroIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayNameParts, roxIdToEmail, tryMacroId } from '@core/user';
 import type { UserMentionDecoratorProps } from '@macro-inc/lexical-core';
 import { cn } from '@ui';
 import { createEffect, createMemo, useContext } from 'solid-js';
@@ -25,18 +25,18 @@ export function UserMention(props: UserMentionDecoratorProps) {
   const propEmail = () => String(props.email);
   const propDisplayName = () => props.displayName?.trim() ?? '';
 
-  const macroId = createMemo(() =>
+  const roxId = createMemo(() =>
     props.userId ? tryMacroId(userId()) : undefined
   );
 
   const email = createMemo(() => {
-    const id = macroId();
-    if (id) return macroIdToEmail(id);
+    const id = roxId();
+    if (id) return roxIdToEmail(id);
     return propEmail();
   });
 
   const displayNameParts = createMemo(() => {
-    const id = macroId();
+    const id = roxId();
     if (!id) return undefined;
     return getDisplayNameParts(id, { emailFallback: 'local-part' });
   });

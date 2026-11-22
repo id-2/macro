@@ -13,7 +13,7 @@ const MAX_SESSIONS = 25;
 
 /**
  * The cards a ListAgentUpdates result draws, for the items an ExecuteCode
- * program read with `macro.agentSessions.updates()`: each waiting session is
+ * program read with `rox.agentSessions.updates()`: each waiting session is
  * opened live, so its card answers the current request. The items are the
  * model's, and a view can be posted where others see it, so only sessions the
  * viewer owns, as loaded with the viewer's own access, get a card.

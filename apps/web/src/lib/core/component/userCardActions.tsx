@@ -2,7 +2,7 @@ import { createCrmUserCardAction } from '@app/features/crm/crm-user-action';
 import { createBotSettingsUserCardAction } from '@app/features/settings/bot-settings-user-action';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { toast } from '@core/component/Toast/Toast';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { useUserId } from '@core/context/user';
 import { useIsConnectedSecondaryInbox } from '@core/user';
 import { useOpenDirectMessage } from '@core/util/open-direct-message';

@@ -1208,11 +1208,11 @@ function partXml(part: ShapePart, box: Box, id: number, name: string): string {
   const properties = `<xdr:spPr>${transform}${outline}${connector ? '' : fill}${line}</xdr:spPr>`;
   const label = `<xdr:cNvPr id="${id}" name="${xmlAttribute(name)}"/>`;
   if (connector)
-    return `<xdr:cxnSp macro=""><xdr:nvCxnSpPr>${label}<xdr:cNvCxnSpPr/></xdr:nvCxnSpPr>${properties}</xdr:cxnSp>`;
+    return `<xdr:cxnSp rox=""><xdr:nvCxnSpPr>${label}<xdr:cNvCxnSpPr/></xdr:nvCxnSpPr>${properties}</xdr:cxnSp>`;
   const link = part.text?.link
     ? ` textlink="${xmlAttribute(part.text.link)}"`
     : '';
-  return `<xdr:sp macro=""${link}><xdr:nvSpPr>${label}<xdr:cNvSpPr/></xdr:nvSpPr>${properties}${part.text ? textXml(part.text) : ''}</xdr:sp>`;
+  return `<xdr:sp rox=""${link}><xdr:nvSpPr>${label}<xdr:cNvSpPr/></xdr:nvSpPr>${properties}${part.text ? textXml(part.text) : ''}</xdr:sp>`;
 }
 
 /**

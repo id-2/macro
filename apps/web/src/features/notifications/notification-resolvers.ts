@@ -2,7 +2,7 @@ import type { BlockName } from '@core/block';
 import { itemToResolvedBlockName } from '@core/constant/allBlocks';
 import { getProfilePictureUrl } from '@core/signal/profilePicture';
 import type { EntityType } from '@core/types';
-import { getDisplayName, macroIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, roxIdToEmail, tryMacroId } from '@core/user';
 import { getItemPreview, isAccessiblePreviewItem } from '@queries/preview';
 import { stringToItemType } from '@service-storage/client';
 import { raceTimeout, until } from '@solid-primitives/promise';
@@ -22,13 +22,13 @@ export type NotificationBlockNameResolver = (
 const RESOLVER_TIMEOUT = 1000;
 
 export const DefaultUserNameResolver: UserNameResolver = async (id: string) => {
-  const macroId = tryMacroId(id);
+  const roxId = tryMacroId(id);
   const resolvedName = await raceTimeout(
-    until(() => getDisplayName(macroId)),
+    until(() => getDisplayName(roxId)),
     RESOLVER_TIMEOUT
   );
   if (resolvedName) return resolvedName;
-  return macroId ? macroIdToEmail(macroId) : id || undefined;
+  return roxId ? roxIdToEmail(roxId) : id || undefined;
 };
 
 export const DefaultUserAvatarResolver: UserAvatarResolver = async (

@@ -1,7 +1,7 @@
 import Color from 'colorjs.io';
 import { match } from 'ts-pattern';
-import { macroDarkTheme } from '../themes/macro-dark';
-import { macroLightTheme } from '../themes/macro-light';
+import { roxDarkTheme } from '../themes/rox-dark';
+import { roxLightTheme } from '../themes/rox-light';
 import type { ThemeColorMode, ThemeColorTokens } from '../types/themeTypes';
 import { type OklchColor, sanitizeOklch } from './colorUtil';
 import { parseThemeAssignment } from './themeAssignments';
@@ -184,7 +184,7 @@ export function resolveThemeColors(
   authored: ThemeColorTokens,
   mode: ThemeColorMode
 ): ResolvedThemeColors {
-  const defaults = mode === 'dark' ? macroDarkTheme : macroLightTheme;
+  const defaults = mode === 'dark' ? roxDarkTheme : roxLightTheme;
   const defaultTokens = {
     // index.css defines control outside the authored theme registry; input
     // may link to it (as Rox Dark does).

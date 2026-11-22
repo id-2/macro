@@ -80,17 +80,17 @@ describe('deriveMagicChipPresentation', () => {
   });
 
   it('names a Rox tool and a drafted user tool by their tools', () => {
-    const macro = deriveMagicChipPresentation({
+    const rox = deriveMagicChipPresentation({
       persistedStatus: 'booting',
       response: response({
         parts: [
           {
             kind: 'tool_use',
             id: 'read',
-            name: { kind: 'mcp', server: 'macro', tool: 'ReadContent' },
+            name: { kind: 'mcp', server: 'rox', tool: 'ReadContent' },
             status: 'running',
             detail: {
-              kind: 'macro',
+              kind: 'rox',
               input: { documentId: 'd' },
               output: null,
               error: null,
@@ -99,7 +99,7 @@ describe('deriveMagicChipPresentation', () => {
         ],
       }),
     });
-    expect(macro).toMatchObject({
+    expect(rox).toMatchObject({
       kind: 'working',
       activity: { label: 'Using ReadContent', busy: true },
     });
@@ -111,7 +111,7 @@ describe('deriveMagicChipPresentation', () => {
           {
             kind: 'tool_use',
             id: 'email',
-            name: { kind: 'mcp', server: 'macro', tool: 'SendEmail' },
+            name: { kind: 'mcp', server: 'rox', tool: 'SendEmail' },
             status: 'completed',
             detail: {
               kind: 'user_tool',
@@ -373,7 +373,7 @@ describe('deriveMagicChipPresentation', () => {
         stop: {
           kind: 'failed',
           message:
-            "Cursor can't access macro-inc/macro. Connect the repository to Cursor's GitHub app, then prompt again.",
+            "Cursor can't access rox-inc/rox. Connect the repository to Cursor's GitHub app, then prompt again.",
         },
       }),
     });
@@ -384,7 +384,7 @@ describe('deriveMagicChipPresentation', () => {
         label: "Agent couldn't answer",
         tone: 'failure',
         detail:
-          "Cursor can't access macro-inc/macro. Connect the repository to Cursor's GitHub app, then prompt again.",
+          "Cursor can't access rox-inc/rox. Connect the repository to Cursor's GitHub app, then prompt again.",
         busy: false,
       },
     });
@@ -438,7 +438,7 @@ describe('deriveMagicChipPresentation', () => {
               id: 'tool',
               name: { kind: 'native', name: 'ListCalendars' },
               status: 'running',
-              detail: { kind: 'macro', input: {}, output: null, error: null },
+              detail: { kind: 'rox', input: {}, output: null, error: null },
             },
           ],
         }),

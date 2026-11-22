@@ -28,7 +28,7 @@ import type { EmailViewState } from './types';
 const EMAIL_ENTRY_STATE_KEY = 'email.view';
 const EMAIL_LIST_ENTRY_STATE_KEY = 'email.listState';
 const emailLocalStateStorage = createUserScopedStorage(
-  'macro:email:view-state:v1'
+  'rox:email:view-state:v1'
 );
 
 const emailTabSchema = z.enum(EMAIL_TAB_IDS).catch(DEFAULT_EMAIL_TAB);
@@ -313,7 +313,7 @@ export function createEmailViewPersistence(
   return {
     storages: [
       createCollapsedSidebarSectionsStorage({
-        key: 'macro:email:preferences:v1',
+        key: 'rox:email:preferences:v1',
         userId: options.userId,
         restore: options.restorePreferences ?? true,
       }),

@@ -450,24 +450,24 @@ test('imports independent XLSX through the file picker and exports real formulas
   });
 });
 
-test('imports a macro-enabled .xlsm without its macros and exports a macro-free .xlsx', async ({
+test('imports a rox-enabled .xlsm without its roxs and exports a rox-free .xlsx', async ({
   page,
 }) => {
   const chooser = page.waitForEvent('filechooser');
   await menu(page, 'Import and export', 'Import…');
   await (await chooser).setFiles(
     fileURLToPath(
-      new URL('../core/xlsx-fixtures/poi-simple-macro.xlsm', import.meta.url)
+      new URL('../core/xlsx-fixtures/poi-simple-rox.xlsm', import.meta.url)
     )
   );
   const dialog = page.getByRole('dialog', { name: 'Import Excel workbook' });
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText('VBA macros are not imported.');
+  await expect(dialog).toContainText('VBA roxs are not imported.');
   await page.getByRole('radio', { name: /Replace workbook/ }).check();
   await page.getByRole('button', { name: 'Import workbook' }).click();
   await expect(page.getByRole('tab')).toHaveCount(3);
   await expect(page.locator('[data-address="A1"]')).toHaveText(
-    'This is a macro workbook'
+    'This is a rox workbook'
   );
 
   const downloaded = page.waitForEvent('download');
@@ -484,7 +484,7 @@ test('imports a macro-enabled .xlsm without its macros and exports a macro-free 
     'Sheet3',
   ]);
   expect(workbook.getWorksheet('Sheet1')?.getCell('A1').value).toBe(
-    'This is a macro workbook'
+    'This is a rox workbook'
   );
   const { unzipSync } = await import('fflate');
   const { readFileSync } = await import('node:fs');

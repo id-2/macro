@@ -16,7 +16,7 @@ import { captureContactWriteScope } from './sync';
 import { isContactReconcile, parseContactSnapshot } from './sync-protocol';
 
 const scope = {
-  identity: 'macro|viewer@example.com',
+  identity: 'rox|viewer@example.com',
   storageGeneration: '00000000-0000-4000-8000-000000000001',
 };
 const fence = '00000000-0000-4000-8000-000000000002';
@@ -25,7 +25,7 @@ const reconcile = {
   scope,
   fence,
   viewer: scope.identity,
-  requested: ['macro|person@example.com'],
+  requested: ['rox|person@example.com'],
   present: [],
 };
 beforeEach(() => {
@@ -44,7 +44,7 @@ it('validates explicit continuation and bounded requested evidence', () => {
   expect(
     isContactReconcile({
       ...reconcile,
-      requested: Array(501).fill('macro|person@example.com'),
+      requested: Array(501).fill('rox|person@example.com'),
     })
   ).toBe(false);
   expect(

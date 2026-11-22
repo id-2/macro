@@ -24,7 +24,7 @@ import {
 import { Portal } from 'solid-js/web';
 import { loadLanguageFromExtensionWithFallback } from '../util/languageSupport';
 import { CodeSearchPanel } from './CodeSearchPanel';
-import { macroThemeExtension } from './cmTheme';
+import { roxThemeExtension } from './cmTheme';
 
 /**
  * Read-only viewers keep a caret and can select text: `EditorState.readOnly`
@@ -212,7 +212,7 @@ export function CodeMirror(props: CodeMirrorProps) {
             debouncedSave();
             throttledSave();
           }),
-          macroThemeExtension,
+          roxThemeExtension,
         ],
       }),
     });

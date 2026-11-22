@@ -12,6 +12,6 @@ import type { AccountManagerRole } from './accountManagerRole';
 export interface RequestAccountManagerBody {
   /** The side the caller takes. */
   callerRole: AccountManagerRole;
-  /** The other account (`macro|...`). */
+  /** The other account (`rox|...`). */
   counterpartyId: string;
 }

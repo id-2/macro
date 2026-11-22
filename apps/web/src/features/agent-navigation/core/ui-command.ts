@@ -1,6 +1,6 @@
 /**
  * The `ui_command` frame an agent's program sends to the person who prompted
- * it (`macro.ui.open`), and what this tab does with it.
+ * it (`rox.ui.open`), and what this tab does with it.
  *
  * The connection gateway delivers a frame to every connection the person has
  * open. A tab applies it only when it names this tab and this person, and

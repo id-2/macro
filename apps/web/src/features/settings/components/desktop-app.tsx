@@ -14,7 +14,7 @@ export function DesktopAppDownload() {
           stackOnNarrow
         >
           <a
-            href="https://github.com/macro-inc/macro/releases/latest"
+            href="https://github.com/rox-inc/rox/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
             class={buttonClasses({ variant: 'secondary', size: 'md' })}

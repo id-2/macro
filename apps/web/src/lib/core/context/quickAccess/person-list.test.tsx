@@ -19,7 +19,7 @@ afterEach(() => vi.useRealTimers());
 
 it('replaces ranked windows, forwards queries, excludes inboxes and retains no query/name history', async () => {
   vi.useFakeTimers();
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   const search = vi
     .fn<PeopleCache['search']>()
     .mockImplementation(async (request) => {
@@ -30,7 +30,7 @@ it('replaces ranked windows, forwards queries, excludes inboxes and retains no q
         people: [
           {
             recordKey: `GraphqlContact:${id}`,
-            userId: `macro|${id}@example.com`,
+            userId: `rox|${id}@example.com`,
             email: `${id}@example.com`,
             name: request.query || id,
             lastInteractionMs: 0,
@@ -91,7 +91,7 @@ it('replaces ranked windows, forwards queries, excludes inboxes and retains no q
   await vi.advanceTimersByTimeAsync(200);
   await committed.promise;
   expect(list?.items().map((item) => item.id)).toEqual([
-    'macro|first@example.com',
+    'rox|first@example.com',
   ]);
   committed = Promise.withResolvers<void>();
   const next = list?.loadMore();
@@ -99,7 +99,7 @@ it('replaces ranked windows, forwards queries, excludes inboxes and retains no q
   await next;
   await committed.promise;
   expect(list?.items().map((item) => item.id)).toEqual([
-    'macro|next@example.com',
+    'rox|next@example.com',
   ]);
   expect(list?.hasMore()).toBe(false);
   for (let i = 0; i < 10; i++) {
@@ -127,7 +127,7 @@ it('replaces ranked windows, forwards queries, excludes inboxes and retains no q
 
 it('keeps still-matching people listed while the next read is pending', async () => {
   vi.useFakeTimers();
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   const directory = ['Jacob Adams', 'Jacob Baker', 'Jane Cole'];
   let changed: CacheChangeListener | undefined;
   const search = vi
@@ -141,7 +141,7 @@ it('keeps still-matching people listed while the next read is pending', async ()
           const id = name.toLowerCase().replace(' ', '.');
           return {
             recordKey: `GraphqlContact:${id}`,
-            userId: `macro|${id}@example.com`,
+            userId: `rox|${id}@example.com`,
             email: `${id}@example.com`,
             name,
             lastInteractionMs: 0,
@@ -230,10 +230,10 @@ it('keeps still-matching people listed while the next read is pending', async ()
 
 it('lists the next page below the first when pages are appended', async () => {
   vi.useFakeTimers();
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   const person = (id: string) => ({
     recordKey: `GraphqlContact:${id}`,
-    userId: `macro|${id}@example.com`,
+    userId: `rox|${id}@example.com`,
     email: `${id}@example.com`,
     name: id,
     lastInteractionMs: 0,

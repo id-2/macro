@@ -17,7 +17,7 @@ const pipeline: TrackedPipeline = {
   id: 'pipeline',
   teamId: 'team',
   name: 'Q4 Deals',
-  userId: 'macro|owner@rox.one',
+  userId: 'rox|owner@rox.one',
   recordType: 'company',
   databaseId: 'database',
   tableId: 'table',
@@ -180,7 +180,7 @@ describe('pipeline import', () => {
     expect(await state.run()).toBe('saved');
     expect(download).toHaveBeenCalledWith(
       '\uFEFFCompany,Domain,Stage\nAcme,acme.com,Lead',
-      expect.stringMatching(/^macro-q4-deals-\d{4}-\d{2}-\d{2}\.csv$/)
+      expect.stringMatching(/^rox-q4-deals-\d{4}-\d{2}-\d{2}\.csv$/)
     );
     dispose();
   });

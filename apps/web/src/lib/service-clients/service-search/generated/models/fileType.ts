@@ -8,7 +8,7 @@
 /**
  * Generates a FileType enum and associated ContentType enum with their implementations.
 
-This macro takes a list of tuples in the format:
+This rox takes a list of tuples in the format:
 (Variant, "extension", "mime_type", CONTENT_TYPE_VARIANT)
 
 For each tuple it generates:

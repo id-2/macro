@@ -27,7 +27,7 @@ vi.mock('@macro-inc/observability', () => ({
 }));
 
 afterEach(() => {
-  document.head.querySelector('meta[name="macro-bundle-build"]')?.remove();
+  document.head.querySelector('meta[name="rox-bundle-build"]')?.remove();
   vi.restoreAllMocks();
   vi.clearAllMocks();
   sessionStorage.clear();
@@ -125,7 +125,7 @@ describe('native WebView startup diagnostics', () => {
 
   it('correlates replacement documents with their native launch and termination history', () => {
     const meta = document.createElement('meta');
-    meta.name = 'macro-bundle-build';
+    meta.name = 'rox-bundle-build';
     meta.content = '42';
     document.head.append(meta);
     vi.spyOn(performance, 'getEntriesByType').mockReturnValue([]);

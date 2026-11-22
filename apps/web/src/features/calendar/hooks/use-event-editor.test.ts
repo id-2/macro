@@ -65,7 +65,7 @@ const values: EventEditorSubmitValues = {
   },
   location: 'Meeting room',
   description: '<p>Roadmap discussion</p>',
-  conferenceChoice: 'macro',
+  conferenceChoice: 'rox',
   guestEmails: ['guest@example.com'],
 };
 
@@ -118,7 +118,7 @@ beforeEach(() => {
 describe('editing event times', () => {
   function editorFor(
     overrides: Partial<CalendarEvent> = {},
-    macroCallsEnabled = false
+    roxCallsEnabled = false
   ) {
     return createRoot((dispose) => {
       const event: CalendarEvent = {
@@ -135,7 +135,7 @@ describe('editing event times', () => {
       const editor = useEventEditor({
         event: () => event,
         onSaved,
-        macroCallsEnabled: () => macroCallsEnabled,
+        roxCallsEnabled: () => roxCallsEnabled,
       });
       const form = createCalendarEventFormController({
         initialValue: calendarEventToEditorInitialValues(event),
@@ -207,7 +207,7 @@ describe('editing event times', () => {
       true
     );
     try {
-      form.setField('conference', 'macro');
+      form.setField('conference', 'rox');
       form.setField('title', 'A new point call');
       await editor.save(form.submitValues()!);
       expect(editor.saveError()).toBe(
@@ -446,7 +446,7 @@ describe('scheduling a Rox call', () => {
         (dispose) =>
           [
             useEventEditor({
-              macroCallsEnabled: () =>
+              roxCallsEnabled: () =>
                 mocks.quickCalls && !mocks.quickCallsLoading,
               event: () => undefined,
               onSaved: saved,
@@ -458,7 +458,7 @@ describe('scheduling a Rox call', () => {
         await editor.save(values);
         expect(mocks.createEvent).toHaveBeenCalledOnce();
         expect(mocks.createEvent.mock.calls[0]?.[0]).not.toHaveProperty(
-          'macroCall'
+          'roxCall'
         );
         expect(mocks.createMeeting).not.toHaveBeenCalled();
         expect(mocks.updateMeeting).not.toHaveBeenCalled();
@@ -475,7 +475,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: saved,
@@ -491,7 +491,7 @@ describe('scheduling a Rox call', () => {
           title: 'Planning',
           location: 'Meeting room',
           description: '<p>Roadmap discussion</p>',
-          macroCall: true,
+          roxCall: true,
         })
       );
       expect(mocks.createMeeting).not.toHaveBeenCalled();
@@ -510,7 +510,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () => false,
+            roxCallsEnabled: () => false,
             event: () => undefined,
             onCreated: created,
             onSaved: () => order.push('saved'),
@@ -539,7 +539,7 @@ describe('scheduling a Rox call', () => {
         (dispose) =>
           [
             useEventEditor({
-              macroCallsEnabled: () =>
+              roxCallsEnabled: () =>
                 mocks.quickCalls && !mocks.quickCallsLoading,
               event: () => savedEvent,
               onSaved: vi.fn(),
@@ -571,7 +571,7 @@ describe('scheduling a Rox call', () => {
           useEventEditor({
             event: () => savedEvent,
             onSaved: vi.fn(),
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
           }),
           dispose,
@@ -589,7 +589,7 @@ describe('scheduling a Rox call', () => {
     }
   });
 
-  it.each(['none', 'macro'] as const)(
+  it.each(['none', 'rox'] as const)(
     'clears legacy provider conferencing when %s is selected on an event carrying both links',
     async (conferenceChoice) => {
       const event = {
@@ -601,7 +601,7 @@ describe('scheduling a Rox call', () => {
         (dispose) =>
           [
             useEventEditor({
-              macroCallsEnabled: () =>
+              roxCallsEnabled: () =>
                 mocks.quickCalls && !mocks.quickCallsLoading,
               event: () => event,
               onSaved: vi.fn(),
@@ -616,7 +616,7 @@ describe('scheduling a Rox call', () => {
         );
         expect(mocks.createMeeting).not.toHaveBeenCalled();
         expect(mocks.updateMeeting).toHaveBeenCalledTimes(
-          conferenceChoice === 'macro' ? 1 : 0
+          conferenceChoice === 'rox' ? 1 : 0
         );
       } finally {
         dispose();
@@ -630,7 +630,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => event,
             onSaved: vi.fn(),
@@ -667,7 +667,7 @@ describe('scheduling a Rox call', () => {
         (dispose) =>
           [
             useEventEditor({
-              macroCallsEnabled: () =>
+              roxCallsEnabled: () =>
                 mocks.quickCalls && !mocks.quickCallsLoading,
               event: () => undefined,
               onSaved: saved,
@@ -707,7 +707,7 @@ describe('scheduling a Rox call', () => {
         (dispose) =>
           [
             useEventEditor({
-              macroCallsEnabled: () =>
+              roxCallsEnabled: () =>
                 mocks.quickCalls && !mocks.quickCallsLoading,
               event: () => event,
               onSaved: vi.fn(),
@@ -717,7 +717,7 @@ describe('scheduling a Rox call', () => {
       );
       try {
         const initial = calendarEventToEditorInitialValues(event);
-        expect(initial.conference).toBe('macro');
+        expect(initial.conference).toBe('rox');
         await editor.save({
           ...values,
           location: initial.location,
@@ -746,7 +746,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => event,
             onSaved: vi.fn(),
@@ -773,7 +773,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: vi.fn(),
@@ -792,7 +792,7 @@ describe('scheduling a Rox call', () => {
       });
       expect(mocks.createEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          macroCall: true,
+          roxCall: true,
           time: {
             kind: 'allDay',
             startDate: '2026-09-22',
@@ -811,7 +811,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: vi.fn(),
@@ -858,7 +858,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => event,
             onSaved: vi.fn(),
@@ -885,7 +885,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: vi.fn(),
@@ -913,7 +913,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: saved,
@@ -931,7 +931,7 @@ describe('scheduling a Rox call', () => {
       await editor.save(values);
       expect(mocks.createEvent).toHaveBeenCalledTimes(2);
       expect(mocks.createEvent.mock.lastCall?.[0]).toMatchObject({
-        macroCall: true,
+        roxCall: true,
       });
       expect(mocks.updateEvent).not.toHaveBeenCalled();
       expect(saved).toHaveBeenCalledOnce();
@@ -951,7 +951,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => undefined,
             onSaved: vi.fn(),
@@ -981,7 +981,7 @@ describe('scheduling a Rox call', () => {
           useEventEditor({
             event: () => savedEvent,
             onSaved: vi.fn(),
-            macroCallsEnabled: () => true,
+            roxCallsEnabled: () => true,
           }),
           dispose,
         ] as const
@@ -1013,7 +1013,7 @@ describe('scheduling a Rox call', () => {
       (dispose) =>
         [
           useEventEditor({
-            macroCallsEnabled: () =>
+            roxCallsEnabled: () =>
               mocks.quickCalls && !mocks.quickCallsLoading,
             event: () => savedEvent,
             onSaved: saved,
@@ -1100,7 +1100,7 @@ describe('guests of an event the viewer was invited to', () => {
         event: () => event,
         syncedEvent,
         onSaved: vi.fn(),
-        macroCallsEnabled: () => false,
+        roxCallsEnabled: () => false,
         guestInvitesEnabled: () => invitesEnabled,
         invitationForwardEnabled: () => forwardEnabled,
         onDetailsLocked,
@@ -1444,7 +1444,7 @@ describe('guest permissions', () => {
       editor: useEventEditor({
         event: () => event,
         onSaved: vi.fn(),
-        macroCallsEnabled: () => false,
+        roxCallsEnabled: () => false,
         guestInvitesEnabled: () => invitesEnabled,
       }),
       dispose,

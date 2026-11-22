@@ -167,8 +167,8 @@ export const enableEntityAppearance = defineFlag({
  * reserves the consent popup inside the click. Off in dev too: dev has no
  * Connect customer key until one is added to Doppler.
  */
-export const macroConnect = defineFlag({
-  key: 'macro-connect',
+export const roxConnect = defineFlag({
+  key: 'rox-connect',
   env: 'ENABLE_ROX_CONNECT',
 });
 
@@ -181,7 +181,7 @@ export const enableCanvasArtifacts = defineFlag({
 
 /**
  * Agents open items for the person who prompted them, in the tab they typed
- * in (`macro.ui.open`). The harness reads the same PostHog key.
+ * in (`rox.ui.open`). The harness reads the same PostHog key.
  */
 export const enableAgentNavigation = defineFlag({
   key: 'enable-agent-navigation',
@@ -209,7 +209,7 @@ export const enableSlackArchiveImport = defineFlag({
  * No dev default: dev follows PostHog like the backend, which fails closed.
  */
 export const enableMacroComputers = defineFlag({
-  key: 'enable-macro-computers',
+  key: 'enable-rox-computers',
   env: 'ENABLE_ROX_COMPUTERS',
 });
 
@@ -288,7 +288,7 @@ export const ENABLE_PDF_MARKUP = defineFlag({
 
 // NOTE: disabling scripting: event listener needs to be properly unmounted first
 // this is the offending line in our pdfjs repo, which has been fixed in the upstream
-// https://github.com/macro-inc/pdf.js/blob/d22768d78ebaaf038707d3d926992a7aeb88e730/web/pdf_scripting_manager.js?plain=1#L59
+// https://github.com/rox-inc/pdf.js/blob/d22768d78ebaaf038707d3d926992a7aeb88e730/web/pdf_scripting_manager.js?plain=1#L59
 export const ENABLE_SCRIPTING = defineFlag({
   env: 'ENABLE_SCRIPTING',
   default: false,
@@ -958,7 +958,7 @@ export const enableAgentUpdates = defineFlag({
 });
 
 // AI agents: the folded agent-session view in channels, and which bot the
-// single `@macro` mention targets — the agent session when on, the classic
+// single `@rox` mention targets — the agent session when on, the classic
 // in-channel reply when off.
 // Override with VITE_ENABLE_CHAT_V3_AGENTS.
 export const enableChatV3Agents = defineFlag({

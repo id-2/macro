@@ -62,9 +62,9 @@ afterEach(() => {
 });
 
 describe('MobileApp', () => {
-  const APP_STORE_URL = 'https://apps.apple.com/us/app/macro-app/id6743133649';
+  const APP_STORE_URL = 'https://apps.apple.com/us/app/rox-app/id6743133649';
   const PLAY_STORE_URL =
-    'https://play.google.com/store/apps/details?id=com.macro.workspace.mobile';
+    'https://play.google.com/store/apps/details?id=com.rox.workspace.mobile';
 
   it('renders the QR code and text', () => {
     render(() => <MobileApp />);

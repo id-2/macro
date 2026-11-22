@@ -1,4 +1,4 @@
-export const COMPOSER_STORAGE_CLEARED = 'macro:composer-storage-cleared';
+export const COMPOSER_STORAGE_CLEARED = 'rox:composer-storage-cleared';
 
 /** Remove saved composer text and attachment references on explicit logout. */
 export function clearComposerStorage(): void {

@@ -9,8 +9,8 @@ import {
 import {
   ROX_AGENT_NAME,
   ROX_AGENT_PRINCIPAL_ID,
-} from '@core/constant/macroAgent';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+} from '@core/constant/roxAgent';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
 import type { IUser } from '@core/user/types';
 
 // Re-export the shared Rox identity under the names used in this package.
@@ -20,9 +20,9 @@ export {
   ROX_AGENT_HANDLE as ROX_AI_HANDLE,
   ROX_AGENT_NAME as ROX_AI_NAME,
   ROX_AGENT_PRINCIPAL_ID as ROX_AI_PRINCIPAL_ID,
-} from '@core/constant/macroAgent';
-export { isMacroCoderId } from '@core/constant/macroCoder';
-export { isMacroNewId } from '@core/constant/macroNew';
+} from '@core/constant/roxAgent';
+export { isMacroCoderId } from '@core/constant/roxCoder';
+export { isMacroNewId } from '@core/constant/roxNew';
 
 /**
  * The single synthetic [`IUser`] entry for Rox in the channel `@`-mention
@@ -33,10 +33,10 @@ export { isMacroNewId } from '@core/constant/macroNew';
  * bot sender/participant ids.
  *
  * Which Rox answers is the rollout's business, not the mentioning user's:
- * under chat-v3 `@macro` opens an agent session, otherwise it gets the classic
+ * under chat-v3 `@rox` opens an agent session, otherwise it gets the classic
  * in-channel reply. Only ever one entry, named "Rox" either way.
  */
-export function macroMentionUser(agentSessions: boolean): IUser {
+export function roxMentionUser(agentSessions: boolean): IUser {
   return {
     id: agentSessions ? ROX_NEW_PRINCIPAL_ID : ROX_AGENT_PRINCIPAL_ID,
     name: ROX_AGENT_NAME,
@@ -46,7 +46,7 @@ export function macroMentionUser(agentSessions: boolean): IUser {
 
 /**
  * The Cursor bot as a synthetic mention user, exactly like
- * [`macroMentionUser`]. Mentioning it opens an agent session served by
+ * [`roxMentionUser`]. Mentioning it opens an agent session served by
  * a Cursor cloud agent.
  */
 export function cursorMentionUser(): IUser {

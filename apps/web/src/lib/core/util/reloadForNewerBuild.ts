@@ -178,7 +178,7 @@ export interface ReloadOnce {
   claim(build: string): boolean;
 }
 
-const FAILED_LOAD_RELOAD_KEY = 'macro:failed-load-reload';
+const FAILED_LOAD_RELOAD_KEY = 'rox:failed-load-reload';
 
 /** Records every build this tab session reloaded for, so two stale builds
  * served in turn cannot reload each other in a loop. */

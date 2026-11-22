@@ -10,7 +10,7 @@ vi.mock('@queries/preview', () => ({
 
 vi.mock('@core/user', () => ({
   tryMacroId: () => undefined,
-  macroIdToEmail: () => undefined,
+  roxIdToEmail: () => undefined,
   getDisplayName: () => undefined,
 }));
 

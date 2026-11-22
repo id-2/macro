@@ -21,8 +21,8 @@ export { useIsConnectedSecondaryInbox } from './inboxOnly';
 export {
   emailToMacroId,
   type RoxId,
-  macroIdToEmail,
+  roxIdToEmail,
   tryMacroId,
-} from './macroId';
+} from './roxId';
 export type * from './types';
 export { emailToId, idToDisplayName, idToEmail } from './util';

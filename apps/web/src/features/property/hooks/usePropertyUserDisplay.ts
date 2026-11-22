@@ -1,4 +1,4 @@
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { getDisplayName, getDisplayNameParts, tryMacroId } from '@core/user';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 import { useBotProfile } from '@queries/bots/profiles';

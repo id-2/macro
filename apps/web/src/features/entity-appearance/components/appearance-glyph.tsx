@@ -22,9 +22,9 @@ export function AppearanceGlyph(props: {
   children: JSX.Element;
 }) {
   const fallback = children(() => props.children);
-  const macro = () => {
+  const rox = () => {
     const icon = props.appearance?.icon;
-    return icon?.kind === 'macro'
+    return icon?.kind === 'rox'
       ? GLYPHS.get(ALIASES.get(icon.name) ?? icon.name)
       : undefined;
   };
@@ -45,7 +45,7 @@ export function AppearanceGlyph(props: {
           </span>
         )}
       </Match>
-      <Match when={macro()}>
+      <Match when={rox()}>
         {(glyph) => (
           <Suspense fallback={fallback()}>
             <Dynamic component={glyph()} class="size-full" />

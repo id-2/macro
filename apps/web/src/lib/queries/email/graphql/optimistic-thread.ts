@@ -35,7 +35,7 @@ function draftAggregateEntry(
 ): DraftState['drafts'][number] {
   return {
     id: draft.id,
-    macroDraft: true,
+    roxDraft: true,
     facts: {
       ...emptyAggregate(),
       messageCount: 1,
@@ -240,14 +240,14 @@ export function updateDraftThread(
           ...previous.facts,
           isRead: true,
           isSignal: previous.facts.preview ? isSignal : false,
-          inboxVisible: previous.macroDraft
+          inboxVisible: previous.roxDraft
             ? fresh.facts.inboxVisible
             : previous.facts.inboxVisible,
-          latestInboundMessageTs: previous.macroDraft
+          latestInboundMessageTs: previous.roxDraft
             ? fresh.facts.latestInboundMessageTs
             : previous.facts.latestInboundMessageTs,
           latestNonSpamMessageTs:
-            previous.macroDraft &&
+            previous.roxDraft &&
             previous.facts.latestNonSpamMessageTs !== null
               ? draft.updatedAt
               : previous.facts.latestNonSpamMessageTs,

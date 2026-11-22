@@ -13,7 +13,7 @@ for (const field of ['email', 'name', 'row_id']) {
     await page
       .getByRole('textbox', { name: 'SQL', exact: true })
       .fill(
-        `SELECT p.name FROM fixture.rows r JOIN macro.people p ON r.${field} = p.${field}`
+        `SELECT p.name FROM fixture.rows r JOIN rox.people p ON r.${field} = p.${field}`
       );
     await expect(page.getByTestId('join-error')).toHaveText('rejected');
     await expect(page.getByTestId('join-result')).not.toHaveText('[]');
@@ -22,7 +22,7 @@ for (const field of ['email', 'name', 'row_id']) {
     await page
       .getByRole('textbox', { name: 'SQL', exact: true })
       .fill(
-        'SELECT p.email FROM fixture.rows r JOIN macro.people p ON r.owner = p.id'
+        'SELECT p.email FROM fixture.rows r JOIN rox.people p ON r.owner = p.id'
       );
     await expect(page.getByTestId('join-error')).toBeEmpty();
     await expect(page.getByTestId('join-result')).toContainText(

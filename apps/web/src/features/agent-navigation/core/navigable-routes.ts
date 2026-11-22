@@ -1,6 +1,6 @@
 /**
  * Which app routes an agent may open for the person who prompted it
- * (`macro.ui.open`). Closed by default: a route opts in with
+ * (`rox.ui.open`). Closed by default: a route opts in with
  * `info: { navigableByAgent }` on `defineRoute`, so a new route stays closed
  * until someone opens it on purpose. Routes with side effects (calls, sign-in
  * and OAuth callbacks, composing mail, credential settings, debug views)

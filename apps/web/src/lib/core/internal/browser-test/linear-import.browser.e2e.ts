@@ -38,19 +38,19 @@ test('import resolves exact assignees without a catalog and keeps ambiguity/addr
   await submit.click();
   await expect(page.getByTestId('import-write-count')).toHaveText('4');
   await expect(page.getByTestId('import-writes')).toContainText(
-    'macro|person99999@example.com'
+    'rox|person99999@example.com'
   );
   await expect(page.getByTestId('import-writes')).toContainText(
-    'macro|comma@example.com'
+    'rox|comma@example.com'
   );
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|shared1@example.com'
+    'rox|shared1@example.com'
   );
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|shared2@example.com'
+    'rox|shared2@example.com'
   );
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|alias@example.com'
+    'rox|alias@example.com'
   );
   await expect(submit).toBeDisabled();
 });
@@ -80,7 +80,7 @@ test('explicit Unassigned survives late inference but does not leak into the nex
   await page.getByRole('button', { name: 'Import tasks', exact: true }).click();
   await expect(page.getByTestId('import-write-count')).toHaveText('1');
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|person99999@example.com'
+    'rox|person99999@example.com'
   );
   await file.setInputFiles({
     name: 'second.csv',
@@ -91,7 +91,7 @@ test('explicit Unassigned survives late inference but does not leak into the nex
   await page.getByRole('button', { name: 'Import tasks', exact: true }).click();
   await expect(page.getByTestId('import-write-count')).toHaveText('2');
   await expect(page.getByTestId('import-writes')).toContainText(
-    'macro|person99999@example.com'
+    'rox|person99999@example.com'
   );
 });
 
@@ -135,10 +135,10 @@ test('manual assignee selection pages, searches, keeps the chosen name and remai
   await page.getByRole('button', { name: 'Import tasks', exact: true }).click();
   await expect(page.getByTestId('import-write-count')).toHaveText('1');
   await expect(page.getByTestId('import-writes')).toContainText(
-    'macro|person99999@example.com'
+    'rox|person99999@example.com'
   );
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|person50@example.com'
+    'rox|person50@example.com'
   );
   expect(
     await page.evaluate(
@@ -182,7 +182,7 @@ test('offline incomplete evidence requires an explicit choice which survives rec
   await submit.click();
   await expect(page.getByTestId('import-write-count')).toHaveText('1');
   await expect(page.getByTestId('import-writes')).not.toContainText(
-    'macro|person99999@example.com'
+    'rox|person99999@example.com'
   );
 });
 
@@ -229,7 +229,7 @@ test('a late file read cannot replace a newer upload or its submitted assignees'
   await expect(page.getByTestId('import-write-count')).toHaveText('1');
   await expect(page.getByTestId('import-writes')).toContainText('New task');
   await expect(page.getByTestId('import-writes')).toContainText(
-    'macro|comma@example.com'
+    'rox|comma@example.com'
   );
   await expect(page.getByTestId('import-writes')).not.toContainText('Old task');
 });

@@ -70,7 +70,7 @@ export interface FixtureCollab {
 
 const shortName = (id: string | undefined) =>
   (id ?? '')
-    .replace(/^macro\|/, '')
+    .replace(/^rox\|/, '')
     .split('@')[0]
     .replace(/^./, (c) => c.toUpperCase()) || 'Someone';
 

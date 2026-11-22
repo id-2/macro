@@ -34,7 +34,7 @@ import {
 export function Notifications() {
   const dialogOwner = getOwner();
   const analytics = useAnalytics();
-  const macroComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableMacroComputers);
   const platformSettings = useNotificationSettings();
   const [pushPending, setPushPending] = createSignal(false);
   const preferencesQuery = useNotificationTypePreferencesQuery();
@@ -163,7 +163,7 @@ export function Notifications() {
             <SettingsCard>
               <For
                 each={group.events.filter(
-                  (event) => !event.macroComputers || macroComputers().enabled
+                  (event) => !event.roxComputers || roxComputers().enabled
                 )}
               >
                 {(event) => (

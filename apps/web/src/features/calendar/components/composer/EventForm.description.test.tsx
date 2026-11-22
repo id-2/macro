@@ -89,7 +89,7 @@ function showForm(initiallyLocked: boolean) {
     return (
       <EventForm
         controller={controller}
-        macroCallsEnabled={false}
+        roxCallsEnabled={false}
         isEdit
         disabledFields={locked() ? LOCKED_DETAILS : { calendar: true }}
         detailsReadOnlyReason={

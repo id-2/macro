@@ -38,7 +38,7 @@ beforeEach(() => {
 });
 
 describe('desktop GitHub authorization', () => {
-  it('returns through the macro deep link and opens consent in the system browser', async () => {
+  it('returns through the rox deep link and opens consent in the system browser', async () => {
     const getAuthorizationUrl = vi.fn().mockResolvedValue(AUTHORIZATION_URL);
     mocks.invoke.mockResolvedValue(undefined);
 

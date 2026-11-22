@@ -284,7 +284,7 @@ function ManagedComputerRow(props: {
     }
   };
 
-  const run = (work: Promise<void>) => fireAndForget(work, 'macro-computers');
+  const run = (work: Promise<void>) => fireAndForget(work, 'rox-computers');
   const billingPending = () =>
     cancel.isPending || undoCancel.isPending || restore.isPending;
 
@@ -472,7 +472,7 @@ export function RoxComputers(props: {
   return (
     <Show when={enabled()}>
       <Show when={computers().length > 0 || failed()}>
-        <div data-settings-target="macro-computer">
+        <div data-settings-target="rox-computer">
           <h2 class="mb-3 px-6 text-sm font-semibold text-ink">
             {t('computers.title')}
           </h2>
@@ -535,7 +535,7 @@ export function RoxComputers(props: {
             error={releaseError()}
             onClose={closeRelease}
             onRelease={(typedName) =>
-              fireAndForget(releaseNow(computer, typedName), 'macro-computers')
+              fireAndForget(releaseNow(computer, typedName), 'rox-computers')
             }
           />
         )}

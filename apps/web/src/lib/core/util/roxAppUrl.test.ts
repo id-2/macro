@@ -1,6 +1,6 @@
 import { isTauri } from '@core/util/platform';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseInternalAppLink } from './macroAppUrl';
+import { parseInternalAppLink } from './roxAppUrl';
 
 vi.mock('@core/util/platform', () => ({
   isTauri: vi.fn(() => false),
@@ -13,7 +13,7 @@ afterEach(() => {
 // jsdom's window.location.hostname is 'localhost', which
 // isValidMacroAppHostname pairs with dev.rox.one outside of Tauri.
 describe('parseInternalAppLink', () => {
-  it('parses a macro app link into path and query', () => {
+  it('parses a rox app link into path and query', () => {
     expect(
       parseInternalAppLink('https://dev.rox.one/app/component/abc?foo=bar')
     ).toEqual({ path: '/component/abc', query: 'foo=bar' });
@@ -45,17 +45,17 @@ describe('parseInternalAppLink', () => {
     });
   });
 
-  it('does not treat a mid-string www. as a macro host', () => {
-    // Only a leading `www.` is stripped, so `macro.www.com` (a subdomain of
+  it('does not treat a mid-string www. as a rox host', () => {
+    // Only a leading `www.` is stripped, so `rox.www.com` (a subdomain of
     // the foreign `www.com`) must not collapse to `rox.one`. Checked under
     // Tauri, where localhost is paired with the prod/dev/staging hosts.
     vi.mocked(isTauri).mockReturnValue(true);
     expect(
-      parseInternalAppLink('https://macro.www.com/app/component/abc')
+      parseInternalAppLink('https://rox.www.com/app/component/abc')
     ).toBeNull();
   });
 
-  it('rejects non-/app paths on a macro host', () => {
+  it('rejects non-/app paths on a rox host', () => {
     expect(parseInternalAppLink('https://dev.rox.one/pricing')).toBeNull();
     expect(parseInternalAppLink('https://dev.rox.one/apple')).toBeNull();
   });
@@ -66,13 +66,13 @@ describe('parseInternalAppLink', () => {
     ).toBeNull();
   });
 
-  it('rejects prod macro links outside of Tauri when not on rox.one', () => {
+  it('rejects prod rox links outside of Tauri when not on rox.one', () => {
     expect(
       parseInternalAppLink('https://rox.one/app/component/abc')
     ).toBeNull();
   });
 
-  it('accepts prod macro links under Tauri', () => {
+  it('accepts prod rox links under Tauri', () => {
     vi.mocked(isTauri).mockReturnValue(true);
     expect(parseInternalAppLink('https://rox.one/app/component/abc')).toEqual(
       {
@@ -82,7 +82,7 @@ describe('parseInternalAppLink', () => {
     );
   });
 
-  it('accepts staging macro links under Tauri', () => {
+  it('accepts staging rox links under Tauri', () => {
     vi.mocked(isTauri).mockReturnValue(true);
     expect(
       parseInternalAppLink('https://staging.rox.one/app/component/abc')
@@ -92,7 +92,7 @@ describe('parseInternalAppLink', () => {
     });
   });
 
-  it('accepts macro links under Tauri when served from tauri.localhost', () => {
+  it('accepts rox links under Tauri when served from tauri.localhost', () => {
     // Under the http asset scheme (e.g. Windows/Android) the webview origin is
     // tauri.localhost, not localhost.
     vi.mocked(isTauri).mockReturnValue(true);

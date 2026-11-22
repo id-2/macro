@@ -72,15 +72,15 @@ vi.mock(
   })
 );
 
-const url = 'https://github.com/macro-inc/macro/pull/6303';
+const url = 'https://github.com/rox-inc/rox/pull/6303';
 
 function entity(status: string): ForeignEntity {
   return {
     id: '019f0000-0000-7000-8000-000000000001',
-    foreignEntityId: 'macro-inc/macro/pull/6303',
+    foreignEntityId: 'rox-inc/rox/pull/6303',
     foreignEntitySource: 'github_pull_request',
     metadata: { status, name: 'Add the header chip', number: 6303 },
-    storedForId: 'macro|wolf@rox.one',
+    storedForId: 'rox|wolf@rox.one',
     storedForAuthEntity: 'user',
     createdAt: '2026-09-11T00:00:00Z',
     updatedAt: '2026-09-11T00:00:00Z',

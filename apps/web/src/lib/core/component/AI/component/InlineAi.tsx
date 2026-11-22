@@ -1,4 +1,4 @@
-import GridLoader from '@icon/macro-grid-noise-loader-4.svg';
+import GridLoader from '@icon/rox-grid-noise-loader-4.svg';
 import PaperPlaneRight from '@icon/system/regular/paper-plane-right.svg';
 import { cn } from '@ui';
 import { createSignal, onMount } from 'solid-js';

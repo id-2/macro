@@ -42,7 +42,7 @@ describe('dedicated DSS sync socket credentials', () => {
     auth.bearer = true;
     const url = new URL(await resolveSyncRouterWsUrl());
     expect(url.pathname).toBe('/dss/sync/ws');
-    expect(url.searchParams.get('macro-api-token')).toBe('token+/=');
+    expect(url.searchParams.get('rox-api-token')).toBe('token+/=');
     expect(auth.cookie).not.toHaveBeenCalled();
   });
 

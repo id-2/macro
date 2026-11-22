@@ -45,15 +45,15 @@ import {
 } from './PullRequestMention';
 
 const title = 'feat(text-paste): smart paste for GitHub pull request URLs';
-const url = 'https://github.com/macro-inc/macro/pull/7956';
+const url = 'https://github.com/rox-inc/rox/pull/7956';
 const pullRequest: ForeignEntity = {
   id: 'pr-1',
-  foreignEntityId: 'macro-inc/macro/pull/7956',
+  foreignEntityId: 'rox-inc/rox/pull/7956',
   foreignEntitySource: 'github_pull_request',
   metadata: {
     name: title,
-    owner: 'macro-inc',
-    repo: 'macro',
+    owner: 'rox-inc',
+    repo: 'rox',
     number: 7956,
     url,
     status: 'merged',
@@ -116,7 +116,7 @@ describe('pull request mention face', () => {
     const view = render(() => (
       <PullRequestMention
         id={pullRequest.id}
-        label={`macro-inc/macro#7956 ${title}`}
+        label={`rox-inc/rox#7956 ${title}`}
         key="node"
         theme={{}}
       />
@@ -148,7 +148,7 @@ describe('pull request mention face', () => {
         <PullRequestMention id="" url={url} label="" key="agent" theme={{}} />
         <PullRequestMention
           id={pullRequest.id}
-          label={`macro-inc/macro#7956 ${title}`}
+          label={`rox-inc/rox#7956 ${title}`}
           key="composed"
           theme={{}}
         />
@@ -156,7 +156,7 @@ describe('pull request mention face', () => {
     ));
     const [agentWritten, composed] =
       view.container.querySelectorAll('[data-pr-mention]');
-    expect(agentWritten.textContent).toBe('macro-inc/macro#7956');
+    expect(agentWritten.textContent).toBe('rox-inc/rox#7956');
     expect(agentWritten.classList.contains('w-[32em]')).toBe(true);
     expect(composed.classList.contains('w-[32em]')).toBe(false);
 
@@ -173,7 +173,7 @@ describe('pull request mention face', () => {
       <PullRequestMention
         id=""
         url={url}
-        label="macro-inc/macro#7956"
+        label="rox-inc/rox#7956"
         key="node"
         theme={{}}
       />
@@ -182,7 +182,7 @@ describe('pull request mention face', () => {
     const link = screen.getByRole('link');
     expect(link.getAttribute('href')).toBe(url);
     expect(link.getAttribute('target')).toBe('_blank');
-    expect(link.textContent).toBe('macro-inc/macro#7956');
+    expect(link.textContent).toBe('rox-inc/rox#7956');
     expect(view.container.querySelector('[data-pr-mention]')).toBeNull();
   });
 
@@ -193,7 +193,7 @@ describe('pull request mention face', () => {
       <PullRequestMention
         id=""
         url={url}
-        label="macro-inc/macro#7956"
+        label="rox-inc/rox#7956"
         key="node"
         theme={{}}
       />
@@ -211,7 +211,7 @@ describe('pull request mention face', () => {
       <PullRequestMention
         id=""
         url={url}
-        label="macro-inc/macro#7956"
+        label="rox-inc/rox#7956"
         key="node"
         theme={{}}
       />
@@ -229,7 +229,7 @@ describe('pull request mention face', () => {
       <PullRequestMention
         id={pullRequest.id}
         url={url}
-        label="macro-inc/macro#7956"
+        label="rox-inc/rox#7956"
         key="node"
         theme={{}}
       />
@@ -275,7 +275,7 @@ describe('pull request mention face', () => {
         <PullRequestMention
           id={pullRequest.id}
           url={url}
-          label="macro-inc/macro#7956"
+          label="rox-inc/rox#7956"
           key="node"
           theme={{}}
         />

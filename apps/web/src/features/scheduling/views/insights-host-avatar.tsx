@@ -1,7 +1,7 @@
 import { ENABLE_PROFILE_PICTURES } from '@core/constant/featureFlags';
 import { staticFileSizedUrl } from '@core/constant/servers';
 import { useProfilePictureUrl } from '@core/signal/profilePicture';
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import { Show } from 'solid-js';
 import { InsightHostAvatar } from '../components/insights-host-filter';
 import type { InsightHostOption } from '../core/insight-host-options';

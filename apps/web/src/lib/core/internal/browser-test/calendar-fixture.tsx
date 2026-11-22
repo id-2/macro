@@ -33,14 +33,14 @@ export function CalendarFilterFixture() {
               let users: ContactDirectoryPage['users'] = [];
               if (!request.query)
                 users = Array.from({ length: 50 }, (_, index) => ({
-                  id: `macro|person${index + (second ? 50 : 0)}@example.com`,
+                  id: `rox|person${index + (second ? 50 : 0)}@example.com`,
                   email: `person${index + (second ? 50 : 0)}@example.com`,
                   name: `Person ${index + (second ? 50 : 0)}`,
                 }));
               else if (request.query.toLowerCase() === 'rare')
                 users = [
                   {
-                    id: 'macro|rare@example.com',
+                    id: 'rox|rare@example.com',
                     email: 'rare@example.com',
                     name: 'Rare Person',
                   },
@@ -48,7 +48,7 @@ export function CalendarFilterFixture() {
               else if (request.query.toLowerCase() === 'slt')
                 users = [
                   {
-                    id: 'macro|selected@example.com',
+                    id: 'rox|selected@example.com',
                     email: 'selected@example.com',
                     name: 'Selected Person',
                   },

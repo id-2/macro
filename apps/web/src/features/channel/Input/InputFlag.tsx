@@ -27,7 +27,7 @@ export function InputFlag(props: {
           of ChannelInput, outside its container) doesn't dismiss the keyboard. */}
       <div
         data-keep-keyboard
-        class="w-full macro-message-width flex justify-center"
+        class="w-full rox-message-width flex justify-center"
       >
         <div class="w-[calc(100%-2px)] max-w-full flex items-center justify-between bg-surface rounded-t-2xl border-t border-l border-r border-edge -mb-6.5 pb-6">
           <Show

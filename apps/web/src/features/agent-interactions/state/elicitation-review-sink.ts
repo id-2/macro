@@ -3,7 +3,7 @@
  * elicitation the agent is blocked on.
  *
  * Accept sends the whole edited draft under the `draft` field (Rox's
- * `_macro/json` extension); the agent's finisher runs the tool with it.
+ * `_rox/json` extension); the agent's finisher runs the tool with it.
  * Reject declines. There is nothing to persist between edits - the draft
  * lives in the form until the user decides - so `onEdit` is left out.
  */

@@ -19,7 +19,7 @@ export function simple_compare_validate(data: { [name: string]: unknown }) {
 
 /**
  * Compares the provided source upload against the revised upload. It also
- * saves the resulting docx document to the users macro cloud via DSS.
+ * saves the resulting docx document to the users rox cloud via DSS.
  * @returns the compared documents documentMetadata as well as the revision
  * count.
  */

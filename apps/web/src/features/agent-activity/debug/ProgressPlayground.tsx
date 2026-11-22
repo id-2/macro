@@ -13,7 +13,7 @@ import { PersonaAvatar } from '@app/features/agent-dms/components/persona-avatar
 import { Message as AgentMessage } from '@app/features/block-agent/component/AgentMessage';
 import { WorkingLine } from '@app/features/block-agent/ui/WorkingLine';
 import { ChannelMessage } from '@channel/Message/ChannelMessage';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
 import type { MessageData } from '@core/messages/types';
 import {
   type AgentChatReply,
@@ -85,7 +85,7 @@ function tool(
   };
 }
 
-function macro(
+function rox(
   id: string,
   name: string,
   input: unknown,
@@ -93,13 +93,13 @@ function macro(
   status: ToolStatus = 'completed',
   error: string | null = null
 ): ToolUsePart {
-  return tool(id, name, { kind: 'macro', input, output, error }, status);
+  return tool(id, name, { kind: 'rox', input, output, error }, status);
 }
 
 /** The call as it was before it finished: no result yet. */
 function running(part: ToolUsePart): ToolUsePart {
   const detail = part.detail;
-  if (detail.kind === 'macro')
+  if (detail.kind === 'rox')
     return { ...part, status: 'running', detail: { ...detail, output: null } };
   if (detail.kind === 'terminal')
     return {
@@ -118,7 +118,7 @@ function documentResult(id: string, name: string, snippet?: string) {
     type: 'document',
     id,
     name,
-    owner_id: 'macro|ada@example.com',
+    owner_id: 'rox|ada@example.com',
     document_id: id,
     document_name: name,
     file_type: 'md',
@@ -132,7 +132,7 @@ function documentResult(id: string, name: string, snippet?: string) {
   };
 }
 
-const SEARCH_DOCS = macro(
+const SEARCH_DOCS = rox(
   'search-docs',
   'ContentSearch',
   { query: 'launch checklist' },
@@ -156,7 +156,7 @@ const SEARCH_DOCS = macro(
     ],
   }
 );
-const SEARCH_NAMES = macro(
+const SEARCH_NAMES = rox(
   'search-names',
   'NameSearch',
   { name: 'launch' },
@@ -167,7 +167,7 @@ const SEARCH_NAMES = macro(
     ],
   }
 );
-const SEARCH_SKILLS = macro(
+const SEARCH_SKILLS = rox(
   'search-skills',
   'SearchSkills',
   { name: 'launch checklist' },
@@ -179,13 +179,13 @@ const SEARCH_SKILLS = macro(
     ],
   }
 );
-const SEARCH_NOTHING = macro(
+const SEARCH_NOTHING = rox(
   'search-nothing',
   'NameSearch',
   { name: 'postmortem' },
   { results: [] }
 );
-const READ_DOC = macro(
+const READ_DOC = rox(
   'read-doc',
   'ReadContent',
   { documentId: DOC_CHECKLIST },
@@ -196,7 +196,7 @@ const READ_DOC = macro(
     comments: [],
   }
 );
-const LIST_FAILED = macro(
+const LIST_FAILED = rox(
   'list-entities',
   'ListEntities',
   { limit: 5 },
@@ -204,10 +204,10 @@ const LIST_FAILED = macro(
   'failed',
   'Failed to list entities: permission denied'
 );
-const WEB_SEARCH_FAILED = macro(
+const WEB_SEARCH_FAILED = rox(
   'web-search',
   'WebSearch',
-  { query: 'macro launch status' },
+  { query: 'rox launch status' },
   'web_search_throttled: Web search is busy; try again shortly',
   'failed',
   'web_search_throttled: Web search is busy; try again shortly'
@@ -305,7 +305,7 @@ const THOUGHT: MessagePart = {
 };
 
 const ANSWER =
-  'The <m-document-mention>{"documentId":"4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46","documentName":"Launch checklist","blockName":"md"}</m-document-mention> has two open items: confirming the date and telling support. <m-user-mention>{"userId":"macro|ada@example.com","email":"ada@example.com","displayName":"Ada"}</m-user-mention> owns the date.';
+  'The <m-document-mention>{"documentId":"4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46","documentName":"Launch checklist","blockName":"md"}</m-document-mention> has two open items: confirming the date and telling support. <m-user-mention>{"userId":"rox|ada@example.com","email":"ada@example.com","displayName":"Ada"}</m-user-mention> owns the date.';
 
 const LONG_QUERY =
   'launch checklist for the agent progress line in channels and agent sessions, including the collapsed summary and every expanded row';
@@ -438,7 +438,7 @@ const SCENARIOS: Scenario[] = [
     title: 'Long details',
     note: 'The session truncates queries and paths on one line; a conversation names only the step.',
     parts: [
-      macro(
+      rox(
         'long-search',
         'ContentSearch',
         { query: LONG_QUERY },

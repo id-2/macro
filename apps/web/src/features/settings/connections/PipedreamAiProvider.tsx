@@ -1,7 +1,7 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { linkGithubAccount } from '@core/auth/authorize-github';
 import { toast } from '@core/component/Toast/Toast';
-import { macroConnect } from '@core/constant/featureFlags';
+import { roxConnect } from '@core/constant/featureFlags';
 import { createPipedreamCatalogConnect } from '@core/pipedream/catalog';
 import { connectSlugForPipedreamApp } from '@core/pipedream/slugs';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -96,8 +96,8 @@ export function PipedreamAiProvider(props: {
     );
   const status = () => row()?.status ?? 'not-connected';
   const indicator = () => statusIndicator(status());
-  const macroConnectFlag = useFeatureFlag(macroConnect);
-  const aiFacts = () => capabilityFacts(row(), macroConnectFlag().enabled);
+  const roxConnectFlag = useFeatureFlag(roxConnect);
+  const aiFacts = () => capabilityFacts(row(), roxConnectFlag().enabled);
   const update = useUpdatePipedreamConnectionMutation();
   const remove = useDeletePipedreamConnectionMutation();
   const native = useNativeMcpActions();

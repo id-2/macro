@@ -80,7 +80,7 @@ function showForm(props: Partial<ComponentProps<typeof EventForm>> = {}) {
     return (
       <EventForm
         controller={controller}
-        macroCallsEnabled
+        roxCallsEnabled
         pending={false}
         onCancel={vi.fn()}
         onSubmit={vi.fn()}

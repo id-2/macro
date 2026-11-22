@@ -205,6 +205,6 @@ describe('useEmailFocusQuery', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     expect(remoteContext).toHaveBeenCalledWith(traceparent);
-    expect(reads[0]?.context.macroTraceParent).toBeDefined();
+    expect(reads[0]?.context.roxTraceParent).toBeDefined();
   });
 });

@@ -2492,7 +2492,7 @@ describe('CacheWorkerCore', () => {
     core.addPort(port);
     await core.handleRequest(port, { id: 1, kind: 'init', scope: 'scope-1' });
     const scope = {
-      identity: 'macro|viewer@example.com',
+      identity: 'rox|viewer@example.com',
       storageGeneration: '00000000-0000-4000-8000-000000000001',
     };
     const update = {

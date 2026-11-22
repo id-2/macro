@@ -16,7 +16,7 @@ function saved(revision: number, status: 'pending' | 'completed'): Review {
   return {
     id: 'review',
     sessionId: 'session',
-    actingUser: 'macro|owner@macro.local',
+    actingUser: 'rox|owner@rox.local',
     executionId: null,
     kind: 'email',
     title: 'Review',

@@ -56,7 +56,7 @@ export function SetupField(props: { class?: string; children: JSX.Element }) {
 }
 
 const INSTALL_SCRIPT_BASE =
-  'https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install';
+  'https://raw.githubusercontent.com/rox-inc/rox/main/crates/coding_agent_worker/install';
 
 /** A shell command to type, behind its prompt; long commands wrap. */
 function SetupCommand(props: { prompt: string; command: string }) {

@@ -10,7 +10,7 @@ export function AiDraft(props: {
   const s = props.state;
   const a = props.actions;
   const selected = () =>
-    a.roster().find((agent) => agent.id === (s.fields().botId || 'macro'));
+    a.roster().find((agent) => agent.id === (s.fields().botId || 'rox'));
   return (
     <div class="flex min-w-0 items-center gap-2">
       <AgentPicker

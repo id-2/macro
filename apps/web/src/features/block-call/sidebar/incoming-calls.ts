@@ -43,10 +43,10 @@ type DebugIncomingCallOptions = {
 
 declare global {
   interface Window {
-    macroDebugIncomingCall?: (
+    roxDebugIncomingCall?: (
       options?: DebugIncomingCallOptions
     ) => IncomingCall | null;
-    macroClearDebugIncomingCalls?: () => void;
+    roxClearDebugIncomingCalls?: () => void;
   }
 }
 
@@ -83,7 +83,7 @@ export function dismissIncomingCall(callId: string) {
  * auto-dismiss, joining) run in every tab already and should use
  * `dismissIncomingCall`.
  *
- * Dev-only debug calls (`window.macroDebugIncomingCall`) have no server
+ * Dev-only debug calls (`window.roxDebugIncomingCall`) have no server
  * record, so they are only dismissed locally.
  */
 export function dismissIncomingCallEverywhere(
@@ -206,7 +206,7 @@ export function IncomingCallEvents() {
   createEffect(() => {
     if (!DEV_MODE_ENV) return;
 
-    window.macroDebugIncomingCall = (options = {}) => {
+    window.roxDebugIncomingCall = (options = {}) => {
       const channelsById = channelsCtx.channelsById();
       const channelId = options.channelId ?? Object.keys(channelsById)[0];
 
@@ -230,14 +230,14 @@ export function IncomingCallEvents() {
       return call;
     };
 
-    window.macroClearDebugIncomingCalls = () => {
+    window.roxClearDebugIncomingCalls = () => {
       clearIncomingCallTimeouts();
       setIncomingCalls([]);
     };
 
     onCleanup(() => {
-      delete window.macroDebugIncomingCall;
-      delete window.macroClearDebugIncomingCalls;
+      delete window.roxDebugIncomingCall;
+      delete window.roxClearDebugIncomingCalls;
     });
   });
 
@@ -246,7 +246,7 @@ export function IncomingCallEvents() {
     if (activeCallId) dismissIncomingCall(activeCallId);
   });
 
-  // Dev-only debug calls (`window.macroDebugIncomingCall`) have no server
+  // Dev-only debug calls (`window.roxDebugIncomingCall`) have no server
   // record to reconcile against.
   const reconcilableCalls = createMemo(() =>
     incomingCalls().filter((call) => !isDebugIncomingCall(call))

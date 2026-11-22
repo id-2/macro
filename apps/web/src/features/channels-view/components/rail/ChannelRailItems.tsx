@@ -11,7 +11,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { getDisplayName, tryMacroId } from '@core/user';
-import type { RoxId } from '@core/user/macroId';
+import type { RoxId } from '@core/user/roxId';
 import { type ChannelEntity, Entity } from '@entity';
 import PhoneIncomingIcon from '@icon/system/fill/phone-incoming-fill.svg';
 import ReplyIcon from '@icon/system/regular/arrow-bend-up-left.svg';
@@ -271,7 +271,7 @@ function UserDisplayName(props: { id: RoxId }) {
 
 function MessageSenderName(props: { id?: string }) {
   const currentUserId = useUserId();
-  const macroId = () => (props.id ? tryMacroId(props.id) : undefined);
+  const roxId = () => (props.id ? tryMacroId(props.id) : undefined);
   const botName = () => (props.id ? getBotDisplayName(props.id) : undefined);
   const isCurrentUser = () =>
     props.id?.toLocaleLowerCase() === currentUserId()?.toLocaleLowerCase();
@@ -281,7 +281,7 @@ function MessageSenderName(props: { id?: string }) {
       <Match when={!props.id}>Unknown sender</Match>
       <Match when={isCurrentUser()}>You</Match>
       <Match when={botName()}>{(name) => name()}</Match>
-      <Match when={macroId()}>{(id) => <UserDisplayName id={id()} />}</Match>
+      <Match when={roxId()}>{(id) => <UserDisplayName id={id()} />}</Match>
       <Match when={true}>Someone</Match>
     </Switch>
   );

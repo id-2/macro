@@ -18,7 +18,7 @@ export function toQuerySchema(
   detail: DatabaseDetail,
   activeTableId?: string
 ): QuerySchema {
-  // The one platform table the dialect exposes: `macro.people`, every
+  // The one platform table the dialect exposes: `rox.people`, every
   // person the viewer can see, keyed by entity id so entity columns join to it.
   const platformTables: QuerySchema['tables'] = [
     {

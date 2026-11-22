@@ -47,8 +47,8 @@ if (import.meta.env.DEV) {
       const m = globalSplitManager();
       if (m)
         (
-          globalThis as { __macroSplitManager?: SplitManager }
-        ).__macroSplitManager = m;
+          globalThis as { __roxSplitManager?: SplitManager }
+        ).__roxSplitManager = m;
     });
   });
 }

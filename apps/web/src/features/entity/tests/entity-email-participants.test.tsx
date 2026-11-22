@@ -6,13 +6,13 @@ import type { EmailEntity } from '../types/entity';
 // The viewer's address book knows notifications@cal.com as "Nathan Flurry"
 // (the first person who booked through it) and wolf@rox.one as a Rox user.
 const addressBook: Record<string, string> = {
-  'macro|notifications@cal.com': 'Nathan Flurry',
-  'macro|wolf@rox.one': 'Wolf Ryan',
+  'rox|notifications@cal.com': 'Nathan Flurry',
+  'rox|wolf@rox.one': 'Wolf Ryan',
 };
 
 vi.mock('@core/user', () => ({
-  emailToMacroId: (email: string) => `macro|${email.toLowerCase()}`,
-  getDisplayName: (id: string) => addressBook[id] ?? id.replace('macro|', ''),
+  emailToMacroId: (email: string) => `rox|${email.toLowerCase()}`,
+  getDisplayName: (id: string) => addressBook[id] ?? id.replace('rox|', ''),
 }));
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'teo@rox.one',

@@ -728,7 +728,7 @@ export const [EmailViewProvider, useEmailView] = createAssertedContextProvider<
   };
 
   const [readingPane, setReadingPane] = usePreference(
-    'macro:pref:email:reading-pane',
+    'rox:pref:email:reading-pane',
     { default: false }
   );
 

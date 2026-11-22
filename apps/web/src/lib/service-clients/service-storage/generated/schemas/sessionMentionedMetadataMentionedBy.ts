@@ -4,6 +4,6 @@
  * document_storage_service
  * OpenAPI spec version: 0.1.0
  */
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 export type SessionMentionedMetadataMentionedBy = null | RoxUserIdStr;

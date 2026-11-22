@@ -2,17 +2,17 @@ import { CODEX_BOT_PRINCIPAL_ID } from '@core/constant/codexAgent';
 import {
   ROX_AGENT_NAME,
   ROX_AGENT_PRINCIPAL_ID,
-} from '@core/constant/macroAgent';
+} from '@core/constant/roxAgent';
 import {
   ROX_CODER_BOT_ID,
   ROX_CODER_NAME,
   ROX_CODER_PRINCIPAL_ID,
-} from '@core/constant/macroCoder';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+} from '@core/constant/roxCoder';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
 import type { IUser } from '@core/user/types';
 import { createRoot, createSignal } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { codexMentionUser } from './macroAi';
+import { codexMentionUser } from './roxAi';
 import { useAgentMentionUsers } from './use-agent-mention-users';
 
 const flags = vi.hoisted(() => ({
@@ -36,7 +36,7 @@ vi.mock('@app/lib/analytics/posthog', () => ({
   }),
 }));
 
-function macroEntries(users: IUser[]): IUser[] {
+function roxEntries(users: IUser[]): IUser[] {
   return users.filter((user) => user.name === ROX_AGENT_NAME);
 }
 
@@ -69,7 +69,7 @@ describe('useAgentMentionUsers', () => {
   it('offers the classic Rox bot as the only Rox entry without the rollout', () => {
     createRoot((dispose) => {
       const users = useAgentMentionUsers(() => []);
-      expect(macroEntries(users())).toEqual([
+      expect(roxEntries(users())).toEqual([
         {
           id: ROX_AGENT_PRINCIPAL_ID,
           name: ROX_AGENT_NAME,
@@ -85,11 +85,11 @@ describe('useAgentMentionUsers', () => {
       const [enabled, setEnabled] = createSignal(false);
       flags.agents = enabled;
       const users = useAgentMentionUsers(() => []);
-      expect(macroEntries(users()).map((user) => user.id)).toEqual([
+      expect(roxEntries(users()).map((user) => user.id)).toEqual([
         ROX_AGENT_PRINCIPAL_ID,
       ]);
       setEnabled(true);
-      expect(macroEntries(users()).map((user) => user.id)).toEqual([
+      expect(roxEntries(users()).map((user) => user.id)).toEqual([
         ROX_NEW_PRINCIPAL_ID,
       ]);
       dispose();
@@ -107,11 +107,11 @@ describe('useAgentMentionUsers', () => {
         },
         {
           id: ROX_NEW_PRINCIPAL_ID,
-          name: 'macro(new)',
-          email: 'macro(new)',
+          name: 'rox(new)',
+          email: 'rox(new)',
         },
       ]);
-      expect(macroEntries(users()).map((user) => user.id)).toEqual([
+      expect(roxEntries(users()).map((user) => user.id)).toEqual([
         ROX_NEW_PRINCIPAL_ID,
       ]);
       dispose();

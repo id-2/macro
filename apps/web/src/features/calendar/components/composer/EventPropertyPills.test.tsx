@@ -74,7 +74,7 @@ vi.mock('@property/editors/selectors/PropertyEntitySelector', async () => {
 
 function guest(email: string, name: string): EventEditorGuestOption {
   return recipientEntityMapper('user')({
-    id: `macro|${email}`,
+    id: `rox|${email}`,
     email,
     name,
   });
@@ -296,7 +296,7 @@ describe('EventComposerConferencePill', () => {
     render(() => (
       <EventComposerConferencePill
         value="none"
-        macroCallsEnabled={enabled()}
+        roxCallsEnabled={enabled()}
         canKeepExisting={false}
         onChange={vi.fn()}
       />
@@ -317,13 +317,13 @@ describe('EventComposerConferencePill', () => {
     const user = userEvent.setup();
     render(() => {
       const [choice, setChoice] =
-        createSignal<EventEditorConferenceChoice>('macro');
+        createSignal<EventEditorConferenceChoice>('rox');
       return (
         <Dialog open>
           <input aria-label="Title" />
           <EventComposerConferencePill
             value={choice()}
-            macroCallsEnabled
+            roxCallsEnabled
             canKeepExisting={false}
             onChange={setChoice}
           />
@@ -351,11 +351,11 @@ describe('EventComposerConferencePill', () => {
     const [edits, setEdits] = createSignal(0);
     render(() => (
       <EventComposerConferencePill
-        value="macro"
+        value="rox"
         // The real provider arrives through the selected calendar, which the
         // composer rereads on every edit even when the answer is the same.
         provider={edits() >= 0 ? 'google_meet' : null}
-        macroCallsEnabled
+        roxCallsEnabled
         canKeepExisting={false}
         onChange={onChange}
       />
@@ -369,7 +369,7 @@ describe('EventComposerConferencePill', () => {
     render(() => (
       <EventComposerConferencePill
         value="none"
-        macroCallsEnabled={false}
+        roxCallsEnabled={false}
         canKeepExisting={false}
         onChange={vi.fn()}
       />

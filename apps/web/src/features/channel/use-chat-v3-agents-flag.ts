@@ -4,7 +4,7 @@ import type { Accessor } from 'solid-js';
 
 /**
  * Whether the AI agents surfaces are enabled: the folded agent-session view
- * in channels, and whether `@macro` opens an agent session instead of the
+ * in channels, and whether `@rox` opens an agent session instead of the
  * classic reply. Reactive, so the
  * gated surfaces appear once PostHog answers rather than only on remount.
  */

@@ -331,11 +331,11 @@ export function ToastContent(props: {
   return (
     <Toast
       toastId={props.toastId}
-      data-macro-toast
+      data-rox-toast
       data-toast-id={props.toastId}
       data-mobile={isMobile() ? '' : undefined}
       data-single-row={singleRow() ? '' : undefined}
-      class="macro-toast"
+      class="rox-toast"
       style={{ '--toast-height': height() ? `${height()}px` : undefined }}
       persistent={props.persistent}
       duration={props.duration ?? 4500}
@@ -344,10 +344,10 @@ export function ToastContent(props: {
         if (!event.defaultPrevented) props.onUserDismiss?.();
       }}
     >
-      <div ref={surface} class="macro-toast-surface">
+      <div ref={surface} class="rox-toast-surface">
         <div
           class={cn(
-            'macro-toast-content min-w-0',
+            'rox-toast-content min-w-0',
             showCloseButton() && (hasActions() ? 'pr-8' : 'pr-10')
           )}
         >
@@ -355,7 +355,7 @@ export function ToastContent(props: {
             when={props.embed}
             fallback={
               <div class={cn('min-w-0', icon() && 'pl-7')}>
-                <div class="macro-toast-heading flex min-w-0 flex-wrap items-center gap-2">
+                <div class="rox-toast-heading flex min-w-0 flex-wrap items-center gap-2">
                   <Toast.Title
                     class="relative min-w-0 flex-auto text-base font-medium leading-normal text-ink wrap-anywhere"
                     style={{ color: props.custom?.titleColor }}

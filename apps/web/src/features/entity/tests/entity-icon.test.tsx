@@ -99,9 +99,9 @@ function pullRequest(
     metadata: {
       number: 42,
       name: 'Update icons',
-      owner: 'macro-inc',
-      repo: 'macro',
-      url: 'https://github.com/macro-inc/macro/pull/42',
+      owner: 'rox-inc',
+      repo: 'rox',
+      url: 'https://github.com/rox-inc/rox/pull/42',
       status,
       draft,
       additions: 1,

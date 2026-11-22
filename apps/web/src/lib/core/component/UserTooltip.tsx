@@ -1,5 +1,5 @@
 import { AgentRuntime } from '@app/features/runtime-sharing/views/AgentRuntime';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import IconCheck from '@icon/system/regular/check.svg';
 import { debounce } from '@solid-primitives/scheduled';
 import { Surface } from '@ui';

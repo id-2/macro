@@ -22,14 +22,14 @@ describe('makeGraphqlSoupInput', () => {
   it('preserves agent session opt-in and owner exclusions', () => {
     const input = makeInput({
       include: { includeAgentSessions: true },
-      exclude: { agentSessionOwnerId: ['macro|me@example.com'] },
+      exclude: { agentSessionOwnerId: ['rox|me@example.com'] },
     });
     expect(input).toMatchObject({
       initial: {
         filters: {
           agentSessionFilter: {
             and: {
-              left: { not: { literal: { owner: 'macro|me@example.com' } } },
+              left: { not: { literal: { owner: 'rox|me@example.com' } } },
               right: { literal: { include: true } },
             },
           },

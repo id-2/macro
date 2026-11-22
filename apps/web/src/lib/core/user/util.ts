@@ -1,14 +1,14 @@
 import { getDisplayName } from './displayName';
-import { tryMacroId } from './macroId';
+import { tryMacroId } from './roxId';
 import type { IUser } from './types';
 
 // TODO: consolidate idToEmail, see idToEmail in email.ts
 /**
  * Converts a user id to an email address.
- * @deprecated Use `macroIdToEmail` with a validated `RoxId` instead.
+ * @deprecated Use `roxIdToEmail` with a validated `RoxId` instead.
  */
 export function idToEmail(id: string): string {
-  return id.replace('macro|', '');
+  return id.replace('rox|', '');
 }
 
 /**
@@ -16,7 +16,7 @@ export function idToEmail(id: string): string {
  * @deprecated Use `emailToMacroId` instead for type-safe RoxId creation.
  */
 export function emailToId(email: string): string {
-  return `macro|${email}`;
+  return `rox|${email}`;
 }
 
 export function idToDisplayName(id: string): string {

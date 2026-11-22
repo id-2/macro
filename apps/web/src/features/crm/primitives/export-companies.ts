@@ -92,7 +92,7 @@ export function createCrmExport(
     if (value.type === 'EntityReference')
       return value.value
         .map((ref) =>
-          ref.entity_id.startsWith('macro|')
+          ref.entity_id.startsWith('rox|')
             ? idToEmail(ref.entity_id)
             : ref.entity_id
         )
@@ -106,7 +106,7 @@ export function createCrmExport(
   const metadataError = () =>
     props.kind === 'companies' && (definitions.isError || stages.isError());
   const filename = () =>
-    `macro-${
+    `rox-${
       scope() === 'all'
         ? `all-${props.kind}`
         : props.currentView

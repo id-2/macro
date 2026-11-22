@@ -202,7 +202,7 @@ export function buildGraphqlSoupWebSocketUrl(
   else if (url.protocol !== 'ws:' && url.protocol !== 'wss:') {
     throw new Error(`unsupported GraphQL websocket protocol ${url.protocol}`);
   }
-  if (apiToken) url.searchParams.set('macro-api-token', apiToken);
+  if (apiToken) url.searchParams.set('rox-api-token', apiToken);
   return url.toString();
 }
 

@@ -281,14 +281,14 @@ describe('an id whose create is in flight', () => {
       botId: 'persona-1',
       modelOverride: 'model-2',
       prompt: 'Fix the tests',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'feature/home',
     });
     expect(agentHarnessServiceClient.create).toHaveBeenLastCalledWith({
       id: placeholder,
       botId: 'persona-1',
       model: 'model-2',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'feature/home',
     });
     await createRoot(async (dispose) => {

@@ -101,10 +101,10 @@ function urlLink(url: string): string {
 }
 const MARKDOWN_FOR: Record<string, string> = { '*': '**', _: '*', '~': '~~' };
 
-/** `macro|ana@example.com` → its email; the mention chip resolves the name. */
-function macroEmail(userId: string): string | undefined {
-  return userId.startsWith('macro|')
-    ? userId.slice('macro|'.length)
+/** `rox|ana@example.com` → its email; the mention chip resolves the name. */
+function roxEmail(userId: string): string | undefined {
+  return userId.startsWith('rox|')
+    ? userId.slice('rox|'.length)
     : undefined;
 }
 
@@ -114,7 +114,7 @@ function macroEmail(userId: string): string | undefined {
  * it. The chip's JSON escapes `<` and `>`, so a name can't close the tag.
  */
 function mentionMarkdown(mention: Mention): string {
-  const email = mention.userId ? macroEmail(mention.userId) : undefined;
+  const email = mention.userId ? roxEmail(mention.userId) : undefined;
   if (!mention.userId || !email) return `**@${literal(mention.name)}**`;
   const json = JSON.stringify({
     userId: mention.userId,

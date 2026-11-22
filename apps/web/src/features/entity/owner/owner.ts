@@ -1,4 +1,4 @@
-import { type RoxId, tryMacroId } from '@core/user/macroId';
+import { type RoxId, tryMacroId } from '@core/user/roxId';
 import { isHexHyphenatedId } from '@queries/bots/bot-id';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 

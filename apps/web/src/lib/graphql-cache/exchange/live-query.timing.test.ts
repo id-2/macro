@@ -63,7 +63,7 @@ function page(rows: number) {
     id: `doc-${i}`,
     frecencyScore: 0.5,
     documentName: `Document ${i}`,
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     fileType: 'md',
     projectId: i % 3 === 0 ? null : 'project-1',
     createdAt: '2026-10-01T00:00:00Z',

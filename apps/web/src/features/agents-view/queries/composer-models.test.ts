@@ -26,7 +26,7 @@ vi.mock('@queries/agents/models', () => ({
 
 describe('composer model discovery', () => {
   it('uses runtime identities rather than bot ids to discover models', () => {
-    expect(composerModelTarget({ harness: 'macro-inmem' })).toEqual({
+    expect(composerModelTarget({ harness: 'rox-inmem' })).toEqual({
       harness: 'in-memory',
     });
     expect(composerModelTarget({ harness: 'cursor' })).toEqual({
@@ -37,7 +37,7 @@ describe('composer model discovery', () => {
     ).toEqual({ harness: 'roxd', harnessId: 'paired-runtime' });
     expect(composerModelTarget({ harness: 'roxd' })).toBeUndefined();
     expect(composerModelTarget({ harness: 'sandbox' })).toBeUndefined();
-    expect(composerModelTarget({ harness: 'macro-inmem' })).toEqual({
+    expect(composerModelTarget({ harness: 'rox-inmem' })).toEqual({
       harness: 'in-memory',
     });
   });

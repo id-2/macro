@@ -26,16 +26,16 @@ import { PullRequestMention } from '../PullRequestMention';
 setDecorator(PullRequestMentionNode, PullRequestMention);
 
 const title = 'feat(text-paste): smart paste for GitHub pull request URLs';
-const url = 'https://github.com/macro-inc/macro/pull/7956';
-const githubKey = 'macro-inc/macro/pull/7956';
+const url = 'https://github.com/rox-inc/rox/pull/7956';
+const githubKey = 'rox-inc/rox/pull/7956';
 const pullRequest: ForeignEntity = {
   id: 'pr-mention-fixture',
   foreignEntityId: githubKey,
   foreignEntitySource: 'github_pull_request',
   metadata: {
     name: title,
-    owner: 'macro-inc',
-    repo: 'macro',
+    owner: 'rox-inc',
+    repo: 'rox',
     number: 7956,
     url,
     status: 'merged',
@@ -51,7 +51,7 @@ const mention = (data: Record<string, string>) =>
 // Sent from a Rox composer, which writes the resolved label to the node.
 const composed = mention({
   id: pullRequest.id,
-  label: `macro-inc/macro#7956 ${title}`,
+  label: `rox-inc/rox#7956 ${title}`,
 });
 // Written by an agent, which knows only the GitHub URL.
 const agentWritten = mention({ url, label: '' });

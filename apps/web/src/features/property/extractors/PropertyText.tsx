@@ -1,4 +1,4 @@
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import type { EntityReference } from '@service-properties/generated/schemas/entityReference';
 import { cn } from '@ui';
 import { type JSX, Show, useContext } from 'solid-js';

@@ -12,8 +12,8 @@ import { StaticMarkdown, StaticMarkdownContext } from '../StaticMarkdown';
 
 initializeLexical();
 
-const url = 'https://apps.apple.com/us/app/macro-app/id6743133649';
-const original = `hey! can you rate the Rox app on the App Store (5 stars if you're feeling it) and leave a quick review if you can? takes 30 seconds:\n${url}\n\n(sent by @macro on behalf of Jacob)`;
+const url = 'https://apps.apple.com/us/app/rox-app/id6743133649';
+const original = `hey! can you rate the Rox app on the App Store (5 stars if you're feeling it) and leave a quick review if you can? takes 30 seconds:\n${url}\n\n(sent by @rox on behalf of Jacob)`;
 
 function Fixture() {
   const initialValue =

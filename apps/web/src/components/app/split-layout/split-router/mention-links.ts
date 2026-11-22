@@ -13,7 +13,7 @@ import {
   useOptionalSplitRouter,
 } from '@app/lib/split-router';
 import type { BlockAlias, BlockName } from '@core/block';
-import { parseInternalAppLink } from '@core/util/macroAppUrl';
+import { parseInternalAppLink } from '@core/util/roxAppUrl';
 import { z } from 'zod';
 
 export type RoxMentionLink = {

@@ -19,19 +19,19 @@ test('executes people SQL in real local Turso, including a fresh query offline',
   await page
     .getByRole('textbox', { name: 'SQL', exact: true })
     .fill(
-      "SELECT name FROM macro.people WHERE email = 'late@example.com' LIMIT 1"
+      "SELECT name FROM rox.people WHERE email = 'late@example.com' LIMIT 1"
     );
   await expect(page.getByTestId('sql-result')).toContainText(
     'Late private name'
   );
   await page
     .getByRole('textbox', { name: 'SQL', exact: true })
-    .fill('SELECT COUNT(*) AS total FROM macro.people');
+    .fill('SELECT COUNT(*) AS total FROM rox.people');
   await expect(page.getByTestId('sql-result')).toContainText('1001');
   const reads = await page.getByTestId('sql-native-reads').textContent();
   await page
     .getByRole('textbox', { name: 'SQL', exact: true })
-    .fill("DELETE FROM macro.people WHERE id = 'macro|late@example.com'");
+    .fill("DELETE FROM rox.people WHERE id = 'rox|late@example.com'");
   await expect(page.getByRole('alert')).not.toBeEmpty();
   await expect(page.getByTestId('sql-native-reads')).toHaveText(reads ?? '');
   expect(forbidden).toEqual([]);

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 const png = readFileSync(
-  new URL('../../../../public/macro-email-logo.png', import.meta.url)
+  new URL('../../../../public/rox-email-logo.png', import.meta.url)
 );
 
 test('public and inline images load and open the image viewer', async ({

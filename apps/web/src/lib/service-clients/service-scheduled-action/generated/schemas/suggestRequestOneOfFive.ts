@@ -18,7 +18,7 @@ import type { Surface } from './surface';
 export type SuggestRequestOneOfFive = {
   /** How it shows in the person's Suggestions feed. */
   card: RoutineSuggestionCard;
-  /** What the session created for it, as `macro.routines.check` takes. */
+  /** What the session created for it, as `rox.routines.check` takes. */
   created?: CreatedItem[];
   keepProbability: number;
   kind: SuggestRequestOneOfFiveKind;

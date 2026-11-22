@@ -13,7 +13,7 @@ import { useUserId } from '@core/context/user';
 import {
   getDisplayName,
   isAgentAccount,
-  macroIdToEmail,
+  roxIdToEmail,
   tryMacroId,
 } from '@core/user';
 import { debouncedDependent } from '@core/util/debounce';
@@ -173,7 +173,7 @@ function MemberRow(props: {
   const isMemberOwner = () => props.member.role === TeamRole.owner;
   const email = () => {
     const id = tryMacroId(props.member.user_id);
-    return id ? macroIdToEmail(id) : undefined;
+    return id ? roxIdToEmail(id) : undefined;
   };
   const showEmail = () => {
     const e = email();
@@ -352,9 +352,9 @@ export function TeamMembers(props: { team: TeamSummary }) {
   // name lookup per member (not recreated on every keystroke / re-render), and
   // disposes it when the member leaves the list.
   const memberSearchIndex = mapArray(members, (member) => {
-    const macroId = tryMacroId(member.user_id);
-    const displayName = () => getDisplayName(macroId);
-    const email = macroId ? macroIdToEmail(macroId) : '';
+    const roxId = tryMacroId(member.user_id);
+    const displayName = () => getDisplayName(roxId);
+    const email = roxId ? roxIdToEmail(roxId) : '';
     // Memoized so the lowercased search string is built once (and only rebuilt
     // when the name resolves), not re-allocated for every member on each scan.
     const haystack = createMemo(() =>

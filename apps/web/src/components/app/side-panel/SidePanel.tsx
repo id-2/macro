@@ -74,7 +74,7 @@ function createWideOpenState(
   defaultOpen: boolean
 ): [Accessor<boolean>, Setter<boolean>] {
   if (persistKey === undefined) return createSignal(defaultOpen);
-  return usePreference(`macro:pref:side-panel:open:${persistKey}`, {
+  return usePreference(`rox:pref:side-panel:open:${persistKey}`, {
     default: defaultOpen,
   });
 }

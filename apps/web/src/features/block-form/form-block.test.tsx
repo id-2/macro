@@ -67,7 +67,7 @@ vi.mock('@core/util/useCopyLink', () => ({
   useCopyLink: () => () => {},
 }));
 vi.mock('@core/util/webOrigin', () => ({
-  getWebOrigin: () => 'https://macro.local',
+  getWebOrigin: () => 'https://rox.local',
 }));
 vi.mock('@queries/storage/forms', () => ({
   useFormSharePermissionsQuery: () => ({ isSuccess: false }),
@@ -97,7 +97,7 @@ beforeEach(() => {
         id: 'form-1',
         name: 'Workshop RSVP',
         description: '',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         databaseId: 'database-1',
         tableId: 'table-1',
         audience: 'public',

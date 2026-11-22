@@ -37,7 +37,7 @@ vi.mock('../../../graphql-cache/exchange/record-selection', () => ({
 
 vi.mock('../../../graphql-cache/exchange/normalized-cache-exchange', () => ({
   normalizedCacheResultMetadata: (result: OperationResult) =>
-    result.extensions?.__macroNormalizedCache,
+    result.extensions?.__roxNormalizedCache,
 }));
 
 vi.mock('@service-storage/graphql-soup', () => ({
@@ -147,7 +147,7 @@ function makeFakeClient(): {
           operation,
           data,
           error,
-          extensions: { __macroNormalizedCache: metadata },
+          extensions: { __roxNormalizedCache: metadata },
           stale: false,
           hasNext: false,
         } as OperationResult<unknown, Record<string, unknown>>),

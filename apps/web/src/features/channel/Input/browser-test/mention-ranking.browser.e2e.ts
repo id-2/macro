@@ -64,14 +64,14 @@ for (const mobile of [false, true]) {
     if (mobile) await late.tap();
     else await page.keyboard.press('Enter');
     await expect(page.getByTestId('draft')).toContainText(
-      'macro|person99999@example.com'
+      'rox|person99999@example.com'
     );
     await page.goto(`${url}&scoped`);
     await expect(editor).toBeVisible({ timeout: 60_000 });
     await editor.click();
     await page.keyboard.type('@');
     await expect(menu).toBeVisible({ timeout: 15_000 });
-    await page.keyboard.type('macro');
+    await page.keyboard.type('rox');
     await expect(menu.getByText('Rox', { exact: true })).toBeVisible();
     await expect(page.getByTestId('people-reads')).toHaveText('0');
     await page.keyboard.press('Escape');

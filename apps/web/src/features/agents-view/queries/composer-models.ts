@@ -22,7 +22,7 @@ export function composerModelTarget(
 ): AgentModelTarget | undefined {
   if (!agent) return;
   const requested =
-    agent.harness === 'macro-inmem' ? 'in-memory' : agent.harness;
+    agent.harness === 'rox-inmem' ? 'in-memory' : agent.harness;
   const harness = Object.values(ModelHarnessDto).find(
     (value) => value === requested
   );

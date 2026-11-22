@@ -96,13 +96,13 @@ describe('Slack channel rows', () => {
     const imported = entity({
       status: 'imported',
       user_id: 'teammate',
-      entity_id: 'macro-channel',
+      entity_id: 'rox-channel',
       entity_type: 'channel',
     });
     const [row] = buildRows(state([imported]), 'me');
     expect(row).toMatchObject({
       importedByTeammate: true,
-      entityId: 'macro-channel',
+      entityId: 'rox-channel',
       entityType: 'channel',
     });
     expect(buildRows(state([imported]), 'teammate')[0].importedByTeammate).toBe(

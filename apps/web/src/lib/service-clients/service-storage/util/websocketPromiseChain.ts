@@ -92,7 +92,7 @@ export function createWebsocketPromiseChain<
     const messageHandler = (ev: MessageEvent) => {
       try {
         const response = JSON.parse(ev.data);
-        if (response?.macroRequestId !== requestId) return;
+        if (response?.roxRequestId !== requestId) return;
 
         const errorCheck = websocketErrorFilter(response);
         if (errorCheck.isErr()) {
@@ -200,7 +200,7 @@ type DocumentProcessResponse =
 
 type WebsocketJobSubmissionErrorResponse = {
   jobId?: string;
-  macroRequestId?: string;
+  roxRequestId?: string;
   event?: string;
   requestBody?: any;
   error: string;
@@ -209,7 +209,7 @@ type WebsocketJobSubmissionErrorResponse = {
 
 type WebsocketJobSubmissionSuccessResponseBase = {
   jobId: string;
-  macroRequestId: string;
+  roxRequestId: string;
   event: string;
   status: typeof SUCCESS_STATUS;
   data: any;

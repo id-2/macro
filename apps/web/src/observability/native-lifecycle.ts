@@ -15,7 +15,7 @@ export function recordNativeWebviewStart(
   documentLifecycle?: Attributes
 ) {
   const bundleBuild = document
-    .querySelector('meta[name="macro-bundle-build"]')
+    .querySelector('meta[name="rox-bundle-build"]')
     ?.getAttribute('content');
   const navigation = performance.getEntriesByType('navigation')[0];
   // Native snapshots include this field on every platform, but only the iOS
@@ -117,7 +117,7 @@ export function reportRecoveredEvents(
 ) {
   const recent = snapshot.recentEvents;
   if (!recent || !previousFrontend) return;
-  const key = 'macro-native-diagnostic-cursor';
+  const key = 'rox-native-diagnostic-cursor';
   let after = 0;
   try {
     const saved = sessionStorage.getItem(key)?.split(':');

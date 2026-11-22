@@ -107,7 +107,7 @@ describe('local runtime invitation', () => {
     );
     expect(screen.queryByText('Run agents on this computer')).toBeNull();
     expect(
-      localStorage.getItem('macro:local-runtime-prompt:dismissed:user-1')
+      localStorage.getItem('rox:local-runtime-prompt:dismissed:user-1')
     ).toBe('1');
   });
 

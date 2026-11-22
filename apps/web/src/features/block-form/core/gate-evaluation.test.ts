@@ -53,8 +53,8 @@ describe('gatePasses', () => {
   const RED = '01920000-0000-7000-8000-0000000000d1';
   const BLUE = '01920000-0000-7000-8000-0000000000d2';
   const GREEN = '01920000-0000-7000-8000-0000000000d3';
-  const ALICE = 'macro|alice@example.com';
-  const BOB = 'macro|bob@example.com';
+  const ALICE = 'rox|alice@example.com';
+  const BOB = 'rox|bob@example.com';
 
   type Case = {
     test: GateTest;

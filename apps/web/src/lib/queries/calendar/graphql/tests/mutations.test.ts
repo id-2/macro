@@ -665,13 +665,13 @@ describe('executeGraphqlCreate', () => {
     };
 
     await executeGraphqlCreate(
-      { title: 'Lunch', time, macroCall: true },
+      { title: 'Lunch', time, roxCall: true },
       client
     );
     await executeGraphqlCreate({ title: 'Lunch', time }, client);
 
-    expect(calls[0]?.variables.input.macroCall).toBe(true);
-    expect(calls[1]?.variables.input).not.toHaveProperty('macroCall');
+    expect(calls[0]?.variables.input.roxCall).toBe(true);
+    expect(calls[1]?.variables.input).not.toHaveProperty('roxCall');
   });
 
   it('marks a recurring create uncertain', async () => {

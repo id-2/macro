@@ -19,9 +19,9 @@ describe('propertyValueLabel', () => {
     expect(
       propertyEntityReferences({
         type: 'EntityReference',
-        value: [{ entity_type: 'USER', entity_id: 'macro|bob@example.com' }],
+        value: [{ entity_type: 'USER', entity_id: 'rox|bob@example.com' }],
       })
-    ).toEqual([{ id: 'macro|bob@example.com', type: 'USER' }]);
+    ).toEqual([{ id: 'rox|bob@example.com', type: 'USER' }]);
     expect(
       propertyEntityReferences({ type: 'EntityReference', value: [null] })
     ).toBeUndefined();
@@ -34,7 +34,7 @@ describe('propertyValueLabel', () => {
     expect(
       propertyEntityReferences({
         type: 'String',
-        value: 'macro|bob@example.com',
+        value: 'rox|bob@example.com',
       })
     ).toBeUndefined();
   });

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { isNotificationMessage } from './notification-message';
 
 const NOTIFICATION = [
-  '<system_notification source="github" repo="github.com/macro-inc/macro" conclusion="success" checks="27" subscriptionType="github:ci:branch">',
+  '<system_notification source="github" repo="github.com/rox-inc/rox" conclusion="success" checks="27" subscriptionType="github:ci:branch">',
   'All 27 CI checks completed without failures.',
   '</system_notification>',
 ].join('\n');

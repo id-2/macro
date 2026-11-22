@@ -1,7 +1,7 @@
 import { TutorialPill } from '@app/features/video-tutorials';
 import { useCodexAgentsAccess } from '@core/codex/flag';
 import { toast } from '@core/component/Toast/Toast';
-import { ROX_HARNESS_NAME } from '@core/constant/macroAgent';
+import { ROX_HARNESS_NAME } from '@core/constant/roxAgent';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError, thrownResultErrorHasCode } from '@core/util/result';
 import HardDrivesIcon from '@icon/system/regular/hard-drives.svg';

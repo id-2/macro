@@ -1,6 +1,6 @@
 import { useSsoLogin } from '@app/features/auth/useSsoLogin';
 import { GOOGLE_GMAIL_IDP } from '@core/auth/email';
-import IconGoogle from '@icon/macro-google.svg';
+import IconGoogle from '@icon/rox-google.svg';
 import { useNavigate } from '@solidjs/router';
 import { Button } from '@ui';
 

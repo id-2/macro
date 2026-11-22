@@ -45,7 +45,7 @@ mismatch is refused whoever sends it. */
 join link into the description and location, and detach any provider
 conference. An event already holding a Rox call keeps it. Cannot be
 combined with `conference`. */
-  macroCall?: boolean;
+  roxCall?: boolean;
   outOfOffice?: UpdateCalendarEventRequestOutOfOffice;
   /** Original-start key of the occurrence the update targets. */
   recurrenceId?: UpdateCalendarEventRequestRecurrenceId;

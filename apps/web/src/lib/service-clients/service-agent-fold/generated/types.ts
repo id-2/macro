@@ -120,7 +120,7 @@ export type AgentSessionRef = {
   id: string;
 };
 
-/**  One item of macro.agentSessions.updates(); its other fields are ignored. */
+/**  One item of rox.agentSessions.updates(); its other fields are ignored. */
 export type AgentUpdateItem = {
   session: AgentSessionRef;
   sessionName: string;
@@ -678,7 +678,7 @@ export type ElicitationRequest =
    *  user's review: the agent drafted the call and asks before it runs.
    *
    *  Recognized from the call the form is scoped to - a tool this fold
-   *  already knows as a user tool - or from `_meta.macro.userTool`, which
+   *  already knows as a user tool - or from `_meta.rox.userTool`, which
    *  Rox's own agent stamps. The draft is the call's arguments whole,
    *  so a client with the tool's own composer renders that and answers
    *  with the whole edited draft; `schema` is the flat form the agent also
@@ -1201,7 +1201,7 @@ export type Harness =
   /**  Cursor cloud agents, through this repository's `cursor_cloud_agents`. */
   | 'cursor'
   /**  Rox's own in-process agent, `agent_inmem`. */
-  | 'macro'
+  | 'rox'
   /**  Nous Research's Hermes agent. */
   | 'hermes'
   /**  OpenClaw. */
@@ -1599,7 +1599,7 @@ export type MessagePart_Deserialize =
       kind: 'tool_approval';
       /**  The approval an answer names. */
       approvalId: string;
-      /**  `macro`, or the connected app's slug. */
+      /**  `rox`, or the connected app's slug. */
       serverSlug: string;
       /**  What a person calls the server the tool is on. */
       serverName: string;
@@ -2017,7 +2017,7 @@ export type MessagePart_Serialize =
       kind: 'tool_approval';
       /**  The approval an answer names. */
       approvalId: string;
-      /**  `macro`, or the connected app's slug. */
+      /**  `rox`, or the connected app's slug. */
       serverSlug: string;
       /**  What a person calls the server the tool is on. */
       serverName: string;
@@ -2348,7 +2348,7 @@ export type PendingToolApproval = {
   approvalId: string;
   /**  The turn the call was made in. */
   turn: number;
-  /**  `macro`, or the connected app's slug. */
+  /**  `rox`, or the connected app's slug. */
   serverSlug: string;
   /**  What a person calls the server the tool is on. */
   serverName: string;
@@ -3321,7 +3321,7 @@ export type ToolDetail_Deserialize =
    *  reader that knows the tool renders it without parsing the wire.
    */
   | ({
-      kind: 'macro';
+      kind: 'rox';
       /**  The tool's arguments, as it defines them. */
       input: unknown;
       /**
@@ -3730,7 +3730,7 @@ export type ToolDetail_Serialize =
    *  reader that knows the tool renders it without parsing the wire.
    */
   | ({
-      kind: 'macro';
+      kind: 'rox';
       /**  The tool's arguments, as it defines them. */
       input: unknown;
       /**
@@ -4228,7 +4228,7 @@ export type Widget_Deserialize =
   /**
    *  Live cards on which the user answers coding agents' waiting
    *  permission requests and questions, and sees stalled sessions. Pass the
-   *  items macro.agentSessions.updates() returned, unchanged, whenever it
+   *  items rox.agentSessions.updates() returned, unchanged, whenever it
    *  returns any: these cards are the only place the user can answer them.
    */
   | ({ type: 'agentUpdates'; items: AgentUpdateItem[] } & {
@@ -4432,7 +4432,7 @@ export type Widget_Serialize =
   /**
    *  Live cards on which the user answers coding agents' waiting
    *  permission requests and questions, and sees stalled sessions. Pass the
-   *  items macro.agentSessions.updates() returned, unchanged, whenever it
+   *  items rox.agentSessions.updates() returned, unchanged, whenever it
    *  returns any: these cards are the only place the user can answer them.
    */
   | ({ type: 'agentUpdates'; items: AgentUpdateItem[] } & {

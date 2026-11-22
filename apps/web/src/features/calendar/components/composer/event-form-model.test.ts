@@ -22,7 +22,7 @@ function localMidnight(date: string): string {
 
 describe('new event conferencing', () => {
   it('defaults new events and calendar selections to Rox call', () => {
-    expect(defaultEditorInitialValues(NOW, true).conference).toBe('macro');
+    expect(defaultEditorInitialValues(NOW, true).conference).toBe('rox');
     expect(
       calendarSelectionToEditorInitialValues(
         {
@@ -32,7 +32,7 @@ describe('new event conferencing', () => {
         },
         true
       ).conference
-    ).toBe('macro');
+    ).toBe('rox');
   });
 
   it('defaults to no link when calls are unavailable', () => {
@@ -41,7 +41,7 @@ describe('new event conferencing', () => {
 
   it('uses the host capability when enabling Rox calls', () => {
     expect(defaultEditorInitialValues(NOW).conference).toBe('none');
-    expect(defaultEditorInitialValues(NOW, true).conference).toBe('macro');
+    expect(defaultEditorInitialValues(NOW, true).conference).toBe('rox');
   });
 });
 

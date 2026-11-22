@@ -54,7 +54,7 @@ export function spreadsheetCursors(
           peerId: peer.peerId,
           name:
             peer.name ||
-            peer.userId?.replace(/^macro\|/, '').split('@')[0] ||
+            peer.userId?.replace(/^rox\|/, '').split('@')[0] ||
             'Anonymous',
           color: `var(--color-${color})`,
           selection: { anchor, focus },

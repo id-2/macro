@@ -181,21 +181,21 @@ export function Transcript(props: { searchTarget?: AgentMessageTarget }) {
           <Show
             when={id !== workingKey()}
             fallback={
-              <div class="macro-message-width mx-auto px-4 pb-4 min-w-0">
+              <div class="rox-message-width mx-auto px-4 pb-4 min-w-0">
                 <WorkingLine label={workingLabel()} />
               </div>
             }
           >
             <Show when={id === refusalKey() && runtimeRefusal()}>
               {(reason) => (
-                <div class="macro-message-width mx-auto px-4 pb-4 min-w-0">
+                <div class="rox-message-width mx-auto px-4 pb-4 min-w-0">
                   <RuntimeRefusalRow reason={reason()} />
                 </div>
               )}
             </Show>
             <Show when={eventsById().get(id)}>
               {(event) => (
-                <div class="macro-message-width mx-auto px-4 pb-2 min-w-0">
+                <div class="rox-message-width mx-auto px-4 pb-2 min-w-0">
                   <SessionEventRow event={event()} viewerId={userId()} />
                 </div>
               )}
@@ -203,7 +203,7 @@ export function Transcript(props: { searchTarget?: AgentMessageTarget }) {
             <Show when={messageById().get(id)}>
               {(message) => (
                 <div
-                  class="macro-message-width mx-auto px-4 pb-4 min-w-0 rounded-lg"
+                  class="rox-message-width mx-auto px-4 pb-4 min-w-0 rounded-lg"
                   classList={{ 'bg-accent/10': highlightedId() === id }}
                   data-search-target={
                     highlightedId() === id ? 'true' : undefined

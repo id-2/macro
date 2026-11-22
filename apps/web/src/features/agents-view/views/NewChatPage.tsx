@@ -195,7 +195,7 @@ export function NewChatPage(props: {
   /** In-memory choices come from the owner's catalog; other runtimes keep their rules. */
   const composerModelOverride = () => {
     const agent = selected();
-    if (agent?.harness !== 'macro-inmem' && agent?.harness !== 'in-memory')
+    if (agent?.harness !== 'rox-inmem' && agent?.harness !== 'in-memory')
       return modelOverride();
     const preferred =
       modelOverride() ??
@@ -209,7 +209,7 @@ export function NewChatPage(props: {
   const capabilityTarget = () => {
     const agent = selected();
     const harness =
-      agent?.harness === 'macro-inmem' ? 'in-memory' : agent?.harness;
+      agent?.harness === 'rox-inmem' ? 'in-memory' : agent?.harness;
     if (harness !== 'in-memory' && harness !== 'cursor') return undefined;
     return {
       harness,
@@ -390,7 +390,7 @@ export function NewChatPage(props: {
     if (repo) repositories.remember(repo);
     const model = coder ? undefined : composerModelOverride();
     const inMemory =
-      persona.harness === 'macro-inmem' || persona.harness === 'in-memory';
+      persona.harness === 'rox-inmem' || persona.harness === 'in-memory';
     const submittedTracker = attachmentTracker();
     const submittedUserId = userId();
     props.onStart({
@@ -566,7 +566,7 @@ export function NewChatPage(props: {
             onChange={rememberEffort}
           />
           <Show
-            when={['macro-inmem', 'in-memory'].includes(
+            when={['rox-inmem', 'in-memory'].includes(
               selected()?.harness ?? ''
             )}
           >

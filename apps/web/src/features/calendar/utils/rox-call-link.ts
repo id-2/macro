@@ -5,7 +5,7 @@ interface CalendarCallContent {
 }
 
 /** Accept only Rox meeting links, including local development links. */
-export function macroCallUrl(value: string): string | undefined {
+export function roxCallUrl(value: string): string | undefined {
   try {
     const url = new URL(value);
     const local =
@@ -42,7 +42,7 @@ export function calendarMacroCallUrl(event: CalendarCallContent) {
     event.description,
   ]) {
     for (const candidate of content?.match(/https?:\/\/[^\s<>"']+/gi) ?? []) {
-      const url = macroCallUrl(candidate.replace(/&amp;/g, '&'));
+      const url = roxCallUrl(candidate.replace(/&amp;/g, '&'));
       if (url) return url;
     }
   }
@@ -75,12 +75,12 @@ export function removeCalendarMacroCall(
           const generated =
             text === 'Join Rox call' ||
             text === 'Join Macro call' ||
-            (textUrl !== undefined && macroCallUrl(textUrl) === linkedUrl);
+            (textUrl !== undefined && roxCallUrl(textUrl) === linkedUrl);
           return generated && linkedUrl ? '' : paragraph;
         }
       )
       .trim(),
-    location: macroCallUrl(location.trim()) === existingUrl ? '' : location,
+    location: roxCallUrl(location.trim()) === existingUrl ? '' : location,
   };
 }
 

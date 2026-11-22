@@ -29,7 +29,7 @@ export function ThreadRow(props: ThreadRowProps) {
       data-channel-thread-row
       class="w-full flex justify-center"
     >
-      <div class="macro-message-width relative">
+      <div class="rox-message-width relative">
         <Show when={props.showDividers !== false}>
           <Show when={channelCreatedId()}>
             {(id) => <ChannelCreatedIndicator channelId={id()} />}

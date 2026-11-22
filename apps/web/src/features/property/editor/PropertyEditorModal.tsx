@@ -29,7 +29,7 @@ import type {
   PropertyDefinitionDomain,
 } from '@property/types';
 import {
-  macroEntityToPropertyEntityType,
+  roxEntityToPropertyEntityType,
   PropertyDataTypeIcon,
   toPropertyApiValue,
   toPropertyDefinitionDomain,
@@ -190,7 +190,7 @@ function selectedOptionIds(
 function propertyEditorEntityType(entity: PropertyEditorEntity): EntityType {
   if ('entityType' in entity) return entity.entityType;
   if (isTaskEntity(entity)) return 'TASK';
-  return macroEntityToPropertyEntityType(entity);
+  return roxEntityToPropertyEntityType(entity);
 }
 
 function propertyEditorEntityName(entity: PropertyEditorEntity): string {

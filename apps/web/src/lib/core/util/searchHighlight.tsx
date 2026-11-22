@@ -38,8 +38,8 @@ export function visibleLength(content: string): number {
  */
 export function extractSearchTerms(highlightedContent: string): string[] {
   const terms: string[] = [];
-  const macroEmRegex = /<rox_em>(.*?)<\/rox_em>/gs;
-  const matches = Array.from(highlightedContent.matchAll(macroEmRegex));
+  const roxEmRegex = /<rox_em>(.*?)<\/rox_em>/gs;
+  const matches = Array.from(highlightedContent.matchAll(roxEmRegex));
 
   for (const match of matches) {
     terms.push(match[1].trim());
@@ -219,12 +219,12 @@ export function applyDomHighlights(
 export function windowSearchMatch(text: string, chars: number): string {
   let line = stripInvisibleChars(text);
 
-  const macroOpen = '<rox_em>';
-  const macroClose = '</rox_em>';
-  const tagIndex = line.indexOf(macroOpen);
+  const roxOpen = '<rox_em>';
+  const roxClose = '</rox_em>';
+  const tagIndex = line.indexOf(roxOpen);
   if (tagIndex === -1) return line;
 
-  const lastCloseIndex = line.lastIndexOf(macroClose);
+  const lastCloseIndex = line.lastIndexOf(roxClose);
 
   const visibleBefore = line
     .slice(0, tagIndex)
@@ -233,13 +233,13 @@ export function windowSearchMatch(text: string, chars: number): string {
     lastCloseIndex === -1
       ? 0
       : line
-          .slice(lastCloseIndex + macroClose.length)
+          .slice(lastCloseIndex + roxClose.length)
           .replace(/<\/?rox_em>/g, '').length;
   const visibleMatch =
     lastCloseIndex === -1
       ? 0
       : line
-          .slice(tagIndex, lastCloseIndex + macroClose.length)
+          .slice(tagIndex, lastCloseIndex + roxClose.length)
           .replace(/<\/?rox_em>/g, '').length;
 
   const totalBudget = Math.max(0, chars * 2 - visibleMatch);
@@ -260,9 +260,9 @@ export function windowSearchMatch(text: string, chars: number): string {
   }
 
   // Trim from end to keep total length reasonable
-  const finalCloseIndex = line.lastIndexOf(macroClose);
+  const finalCloseIndex = line.lastIndexOf(roxClose);
   if (finalCloseIndex !== -1) {
-    const afterLastTag = finalCloseIndex + macroClose.length;
+    const afterLastTag = finalCloseIndex + roxClose.length;
     const remainingVisible = line
       .slice(afterLastTag)
       .replace(/<\/?rox_em>/g, '').length;

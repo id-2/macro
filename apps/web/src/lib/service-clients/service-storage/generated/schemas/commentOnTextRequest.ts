@@ -12,7 +12,7 @@ import type { SimpleMention } from './simpleMention';
  * A comment on a quoted passage.
  */
 export interface CommentOnTextRequest {
-  /** Comment body in macro markdown. */
+  /** Comment body in rox markdown. */
   content: string;
   /** The people and items the body mentions, notified as in any comment. */
   mentions?: SimpleMention[];

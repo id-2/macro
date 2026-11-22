@@ -57,7 +57,7 @@ const toActor = (actor: WireRow['actor']): InboxActor | undefined => {
         : { kind: 'other' }
     )
     .with('AGENT', () => ({ kind: 'agent', name: actor.name ?? undefined }))
-    .with('MACRO', () => ({ kind: 'macro' }))
+    .with('MACRO', () => ({ kind: 'rox' }))
     .exhaustive(() => ({ kind: 'other' }));
 };
 

@@ -15,7 +15,7 @@ const PROOF_DIR = process.env.PROOF_DIR;
 const suggestion = (
   id: string,
   key: string,
-  options: { from?: 'for_you' | 'macro'; reason?: string; on?: boolean } = {}
+  options: { from?: 'for_you' | 'rox'; reason?: string; on?: boolean } = {}
 ): RoutineSuggestion => ({
   id,
   kind: 'catalog',
@@ -24,7 +24,7 @@ const suggestion = (
   from: options.from ?? 'for_you',
   surfaces: [key === 'triage' || key === 'stuck' ? 'tasks' : 'email'],
   reason: options.reason ?? null,
-  keepProbability: options.from === 'macro' ? null : 0.9,
+  keepProbability: options.from === 'rox' ? null : 0.9,
   onByDefault: options.on ?? false,
 });
 
@@ -36,8 +36,8 @@ const STUCK = suggestion('stuck', 'stuck', {
   reason: 'Several threads ask you for follow-ups.',
 });
 const TEMPLATES = [
-  suggestion('updates', 'updates', { from: 'macro' }),
-  suggestion('triage', 'triage', { from: 'macro' }),
+  suggestion('updates', 'updates', { from: 'rox' }),
+  suggestion('triage', 'triage', { from: 'rox' }),
 ];
 
 async function snap(page: Page, name: string) {

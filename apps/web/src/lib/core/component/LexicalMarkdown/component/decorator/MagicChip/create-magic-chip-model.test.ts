@@ -66,11 +66,11 @@ vi.mock('@service-agent-harness/client', () => ({
   agentHarnessServiceClient: serviceClient,
 }));
 vi.mock('@core/user', () => ({
-  tryMacroId: (id: string) => (id.startsWith('macro|') ? id : undefined),
+  tryMacroId: (id: string) => (id.startsWith('rox|') ? id : undefined),
   getDisplayName: (id: string) =>
-    id === 'macro|alice@rox.one' ? 'Alice Owner' : '',
+    id === 'rox|alice@rox.one' ? 'Alice Owner' : '',
 }));
-let viewer = 'macro|alice@rox.one';
+let viewer = 'rox|alice@rox.one';
 vi.mock('@core/context/user', () => ({ useUserId: () => () => viewer }));
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { failure: vi.fn(), success: vi.fn() },
@@ -106,7 +106,7 @@ const prompt: FoldedMessage = {
   agentSessionId: 'session',
   key: '0:user',
   turn: 0,
-  author: { kind: 'user', userId: 'macro|wolf@rox.one' },
+  author: { kind: 'user', userId: 'rox|wolf@rox.one' },
   parts: [{ kind: 'text', text: 'Say hi' }],
   stop: null,
   pending: false,
@@ -179,7 +179,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'macro|alice@rox.one',
+        ownerId: 'rox|alice@rox.one',
         canEdit: true,
       },
     });
@@ -404,7 +404,7 @@ describe('createMagicChipModel', () => {
     }
   );
 
-  it.each(['in-memory', 'macro-inmem', 'sandbox'])(
+  it.each(['in-memory', 'rox-inmem', 'sandbox'])(
     'names the %s session Rox Agent, not Rox Agent Agent',
     async (harness) => {
       serviceClient.get.mockResolvedValue({
@@ -637,7 +637,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'macro|alice@rox.one',
+        ownerId: 'rox|alice@rox.one',
         canEdit: false,
       },
     });
@@ -675,10 +675,10 @@ describe('createMagicChipModel', () => {
             kind: 'tool_approval',
             approvalId: 'a1',
             turn: 0,
-            serverSlug: 'macro',
+            serverSlug: 'rox',
             serverName: 'Rox',
             toolName: 'GetThread',
-            requestedBy: 'macro|bob@rox.one',
+            requestedBy: 'rox|bob@rox.one',
           },
         ],
       } as unknown as SessionMetadata,
@@ -688,7 +688,7 @@ describe('createMagicChipModel', () => {
       isErr: () => false,
       value: {
         status: { kind: 'disconnected' },
-        ownerId: 'macro|alice@rox.one',
+        ownerId: 'rox|alice@rox.one',
         canEdit: true,
       },
     });
@@ -707,9 +707,9 @@ describe('createMagicChipModel', () => {
     };
 
     expect(await action()).toBe('Wants to read your email');
-    viewer = 'macro|bob@rox.one';
+    viewer = 'rox|bob@rox.one';
     expect(await action()).toBe("Wants to read the owner's email");
-    viewer = 'macro|alice@rox.one';
+    viewer = 'rox|alice@rox.one';
   });
 
   it("a question from a later turn is not this chip's, and the live metadata moves it", async () => {

@@ -32,7 +32,7 @@ export function createAgentRosterSource(): AgentRosterSource {
     cursorStatus.isSuccess &&
     !cursorStatus.isPlaceholderData &&
     !cursorStatus.data.registered;
-  const macroDefaults = useAgentModelsQuery(() => ({ harness: 'in-memory' }));
+  const roxDefaults = useAgentModelsQuery(() => ({ harness: 'in-memory' }));
   const cursorDefaults = useAgentModelsQuery(
     () => ({ harness: 'cursor' }),
     cursorConnected
@@ -45,8 +45,8 @@ export function createAgentRosterSource(): AgentRosterSource {
       runtimes: harnessesQuery.isSuccess ? harnessesQuery.data : [],
       cursorConnected: cursorConnected(),
       cursorNeedsConnection: cursorNeedsConnection(),
-      macroDefaultModel: macroDefaults.isSuccess
-        ? (macroDefaults.data.currentModel ?? undefined)
+      roxDefaultModel: roxDefaults.isSuccess
+        ? (roxDefaults.data.currentModel ?? undefined)
         : undefined,
       cursorDefaultModel: cursorStatus.isSuccess
         ? (cursorStatus.data.defaultModelId ??

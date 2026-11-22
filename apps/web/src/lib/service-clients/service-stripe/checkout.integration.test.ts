@@ -13,7 +13,7 @@ vi.mock('@core/constant/featureFlags', async (original) => ({
 const token = `header.${btoa(JSON.stringify({ exp: 4_000_000_000 }))}.signature`;
 
 beforeEach(() => {
-  vi.spyOn(authServiceClient, 'macroApiToken').mockResolvedValue(
+  vi.spyOn(authServiceClient, 'roxApiToken').mockResolvedValue(
     ok({ rox_api_token: token })
   );
 });

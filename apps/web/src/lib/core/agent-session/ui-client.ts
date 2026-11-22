@@ -1,6 +1,6 @@
 /**
  * This tab's id, sent with the prompts typed in it so what an agent opens for
- * the person (`macro.ui.open`) reaches this tab and no other. It names a tab,
+ * the person (`rox.ui.open`) reaches this tab and no other. It names a tab,
  * not a person, and grants nothing.
  *
  * Kept in sessionStorage, so every reload of the tab keeps it, including one

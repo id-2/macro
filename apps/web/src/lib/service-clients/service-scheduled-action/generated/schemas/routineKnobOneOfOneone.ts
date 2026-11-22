@@ -9,7 +9,7 @@ import type { KnobName } from './knobName';
 import type { RoutineKnobOneOfOneoneType } from './routineKnobOneOfOneoneType';
 
 /**
- * A yes/no question the code asks AI with `macro.ai.decide`, so the
+ * A yes/no question the code asks AI with `rox.ai.decide`, so the
 owner can reword what AI decides.
  */
 export type RoutineKnobOneOfOneone = {

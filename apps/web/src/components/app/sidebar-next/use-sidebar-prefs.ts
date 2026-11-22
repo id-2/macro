@@ -1,8 +1,8 @@
 import { createAssertedContextProvider } from '@core/context/createContext';
 import { createSignal, onMount } from 'solid-js';
 
-const STORAGE_KEY = 'macro:sidebar:prefs';
-const LEGACY_PINNED_KEY = 'macro:sidebar:pinned-items';
+const STORAGE_KEY = 'rox:sidebar:prefs';
+const LEGACY_PINNED_KEY = 'rox:sidebar:pinned-items';
 
 /** Items hidden from the rail by default (reachable via the More menu). */
 export const DEFAULT_HIDDEN_IDS = [

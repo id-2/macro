@@ -271,11 +271,11 @@ export function ComputerBuyFlow(props: {
                   error={error()}
                   onClose={close}
                   onRetry={() =>
-                    fireAndForget(offers.refetch(), 'macro-computers')
+                    fireAndForget(offers.refetch(), 'rox-computers')
                   }
                   onBilling={openBilling}
                   onConfirm={(offer, computerName) =>
-                    fireAndForget(buy(offer, computerName), 'macro-computers')
+                    fireAndForget(buy(offer, computerName), 'rox-computers')
                   }
                 />
               </Show>

@@ -15,7 +15,7 @@ import { outOfOfficeNoticeFor } from './out-of-office';
 export interface EventFormProps {
   controller: CalendarEventFormController;
   /** Whether this host can create and attach Rox call links. */
-  macroCallsEnabled: boolean;
+  roxCallsEnabled: boolean;
   isEdit?: boolean;
   disabledFields?: EventEditorDisabledFields;
   /** The viewer may add guests but not remove the event's current ones. */

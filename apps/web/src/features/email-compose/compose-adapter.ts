@@ -168,7 +168,7 @@ export function createEmailComposeContext(
   const headerId = (id: string | null | undefined) =>
     nonPrimaryEmailLinkIdHeader(id, primaryId());
   const inboxSource = createEmailInboxSource(viewerEmail, accounts, (email) =>
-    getDisplayName(tryMacroId(`macro|${email}`))
+    getDisplayName(tryMacroId(`rox|${email}`))
   );
   const signatures = useFeatureFlag(enableEmailSignatures);
   const calendarEvents = useCreateEmailEvent();

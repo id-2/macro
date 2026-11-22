@@ -37,7 +37,7 @@ describe('detectPrOrigin', () => {
     ],
     [
       'From https://rox.one/app/agent/0198a4cc-e138-7670',
-      'macro',
+      'rox',
       'https://rox.one/app/agent/0198a4cc-e138-7670',
     ],
   ] as const)('reads a session link in %j', (description, tool, url) => {
@@ -95,8 +95,8 @@ describe('toolForHarness', () => {
     ['claude-code', 'claude'],
     ['codex-cloud', 'codex'],
     ['cursor', 'cursor'],
-    ['roxd', 'macro'],
-    [undefined, 'macro'],
+    ['roxd', 'rox'],
+    [undefined, 'rox'],
   ] as const)('maps %s to %s', (harness, tool) => {
     expect(toolForHarness(harness)).toBe(tool);
   });

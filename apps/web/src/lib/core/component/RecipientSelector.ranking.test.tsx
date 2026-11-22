@@ -12,7 +12,7 @@ import { RecipientSelector } from './RecipientSelector';
 
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'me@rox.one',
-  useUserId: () => () => 'macro|me@rox.one',
+  useUserId: () => () => 'rox|me@rox.one',
 }));
 vi.mock('@core/user/dmActivity', () => ({
   useAugmentUserWithDmActivity: () => (user: unknown) => user,
@@ -61,8 +61,8 @@ const recent = new Date(Date.now() - 60 * 60 * 1000);
 
 const contact = (email: string, name: string): CombinedRecipientItem => ({
   kind: 'contact',
-  id: `macro|${email}`,
-  data: { id: `macro|${email}`, email, name, type: 'extracted' },
+  id: `rox|${email}`,
+  data: { id: `rox|${email}`, email, name, type: 'extracted' },
 });
 
 const user = (
@@ -71,8 +71,8 @@ const user = (
   lastInteraction?: Date
 ): CombinedRecipientItem => ({
   kind: 'user',
-  id: `macro|${email}`,
-  data: { id: `macro|${email}`, email, name, lastInteraction },
+  id: `rox|${email}`,
+  data: { id: `rox|${email}`, email, name, lastInteraction },
 });
 
 function renderSelector(options: CombinedRecipientItem[], selfEmail: string) {

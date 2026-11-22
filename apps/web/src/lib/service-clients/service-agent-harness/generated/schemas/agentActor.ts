@@ -6,7 +6,7 @@
  */
 import type { BotId } from './botId';
 import type { Lineage } from './lineage';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 /**
  * An agent acting for a person.

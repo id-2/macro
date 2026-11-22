@@ -74,15 +74,15 @@ function createGithubPrNotification(): UnifiedNotification {
       tag: 'github_pr_status_changed',
       content: {
         action: 'opened',
-        displayName: 'macro/macro#42',
+        displayName: 'rox/rox#42',
         foreignEntityId: '123e4567-e89b-12d3-a456-426614174000',
-        githubKey: 'macro/macro/pull/42',
+        githubKey: 'rox/rox/pull/42',
         number: 42,
-        owner: 'macro',
-        repo: 'macro',
+        owner: 'rox',
+        repo: 'rox',
         status: 'open',
         title: 'Add notification support',
-        url: 'https://github.com/macro/macro/pull/42',
+        url: 'https://github.com/rox/rox/pull/42',
       },
     },
   });
@@ -99,18 +99,18 @@ function createGithubPrCheckRunNotification(): UnifiedNotification {
         checkName: 'CI / tests',
         checkRunGithubId: 987654321,
         checkStatus: 'completed',
-        checkUrl: 'https://github.com/macro/macro/runs/987654321',
+        checkUrl: 'https://github.com/rox/rox/runs/987654321',
         completedAt: '2026-06-15T20:00:00Z',
         conclusion: 'success',
-        displayName: 'macro/macro#42',
+        displayName: 'rox/rox#42',
         foreignEntityId: '123e4567-e89b-12d3-a456-426614174000',
-        githubKey: 'macro/macro/pull/42',
+        githubKey: 'rox/rox/pull/42',
         number: 42,
-        owner: 'macro',
-        repo: 'macro',
+        owner: 'rox',
+        repo: 'rox',
         state: 'completed',
         title: 'Add notification support',
-        url: 'https://github.com/macro/macro/pull/42',
+        url: 'https://github.com/rox/rox/pull/42',
       },
     },
   });
@@ -334,7 +334,7 @@ it('uses the project discussion bot display name for platform notifications', as
       tag: 'initiative_discussion',
       content: {
         projectName: 'Launch',
-        owner: 'macro|owner@example.com',
+        owner: 'rox|owner@example.com',
         reason: 'mention',
         messageId: '01992d2f-8444-7000-8000-000000000001',
         threadId: '01992d2f-8444-7000-8000-000000000001',
@@ -360,14 +360,14 @@ describe('platform notification sender and conversation', () => {
   ): UnifiedNotification {
     return baseNotification({
       entity_id: 'channel-1',
-      sender_id: 'macro|ada@example.com',
+      sender_id: 'rox|ada@example.com',
       notification_event_type: 'channel_message_send',
       notification_metadata: {
         tag: 'channel_message_send',
         content: {
           messageId: 'message-1',
           messageContent: 'Ship it',
-          sender: 'macro|ada@example.com',
+          sender: 'rox|ada@example.com',
           channelType,
           senderProfilePictureUrl,
         },
@@ -389,14 +389,14 @@ describe('platform notification sender and conversation', () => {
     expect(result).toMatchObject({
       title: 'Ada <design>',
       sender: {
-        id: 'macro|ada@example.com',
+        id: 'rox|ada@example.com',
         name: 'Ada',
         avatarUrl: 'https://cdn.example.com/ada.png',
       },
       conversation: { id: 'channel-1', name: 'design' },
     });
     expect(resolveUserAvatar).toHaveBeenCalledExactlyOnceWith(
-      'macro|ada@example.com'
+      'rox|ada@example.com'
     );
   });
 

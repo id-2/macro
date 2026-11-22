@@ -178,7 +178,7 @@ const handler = createToolRenderer({
       return;
     }
 
-    // Only create macro files for supported code file extensions
+    // Only create rox files for supported code file extensions
     if (!isCodeEditorExtensionSupported(extension)) {
       return;
     }

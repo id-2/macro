@@ -1,4 +1,4 @@
-import { emailToMacroId } from '@core/user/macroId';
+import { emailToMacroId } from '@core/user/roxId';
 import type { EmailRecipient } from '../../email-compose/core/email-recipient';
 import {
   formatRecipientTerms,

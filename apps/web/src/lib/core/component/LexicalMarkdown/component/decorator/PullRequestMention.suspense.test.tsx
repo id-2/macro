@@ -79,8 +79,8 @@ describe('PR mention connection-status suspense', () => {
           <Show when={mounted()}>
             <PullRequestMention
               id="pr-1"
-              url="https://github.com/macro-inc/macro/pull/7956"
-              label="macro-inc/macro#7956"
+              url="https://github.com/rox-inc/rox/pull/7956"
+              label="rox-inc/rox#7956"
               key="sent"
               theme={{}}
             />
@@ -89,7 +89,7 @@ describe('PR mention connection-status suspense', () => {
       </QueryClientProvider>
     ));
     expect(screen.getByRole('link').getAttribute('href')).toBe(
-      'https://github.com/macro-inc/macro/pull/7956'
+      'https://github.com/rox-inc/rox/pull/7956'
     );
     checkGithubLinkStatus.mockResolvedValueOnce(
       err([{ code: 'HTTP_ERROR', message: 'Connection status unavailable' }])
@@ -99,7 +99,7 @@ describe('PR mention connection-status suspense', () => {
     ).rejects.toThrow();
     await new Promise<void>((resolve) => queueMicrotask(resolve));
     expect(screen.getByRole('link').getAttribute('href')).toBe(
-      'https://github.com/macro-inc/macro/pull/7956'
+      'https://github.com/rox-inc/rox/pull/7956'
     );
     setMounted(false);
     setMounted(true);
@@ -137,8 +137,8 @@ describe('PR mention connection-status suspense', () => {
               <Show when={inserted()}>
                 <PullRequestMention
                   id="pr-1"
-                  url="https://github.com/macro-inc/macro/pull/7956"
-                  label="macro-inc/macro#7956"
+                  url="https://github.com/rox-inc/rox/pull/7956"
+                  label="rox-inc/rox#7956"
                   key="draft"
                   theme={{}}
                 />
@@ -151,8 +151,8 @@ describe('PR mention connection-status suspense', () => {
                 Sent message
                 <PullRequestMention
                   id="pr-1"
-                  url="https://github.com/macro-inc/macro/pull/7956"
-                  label="macro-inc/macro#7956"
+                  url="https://github.com/rox-inc/rox/pull/7956"
+                  label="rox-inc/rox#7956"
                   key="sent"
                   theme={{}}
                 />
@@ -176,7 +176,7 @@ describe('PR mention connection-status suspense', () => {
       expect(screen.getByRole('textbox')).toBe(composer);
       expect(document.activeElement).toBe(composer);
       expect(screen.getByTestId('message').textContent).toContain(
-        'macro-inc/macro#7956'
+        'rox-inc/rox#7956'
       );
       expect(suspended).not.toHaveBeenCalled();
 
@@ -184,7 +184,7 @@ describe('PR mention connection-status suspense', () => {
         outcome === 'linked'
           ? ok({
               github_user_id: '123',
-              github_username: 'macro-user',
+              github_username: 'rox-user',
               reauthentication_required: false,
             })
           : err([
@@ -226,7 +226,7 @@ it('refreshes a failed inactive status query after OAuth completes', async () =>
   checkGithubLinkStatus.mockResolvedValueOnce(
     ok({
       github_user_id: '123',
-      github_username: 'macro-user',
+      github_username: 'rox-user',
       reauthentication_required: false,
     })
   );
@@ -236,7 +236,7 @@ it('refreshes a failed inactive status query after OAuth completes', async () =>
   expect(checkGithubLinkStatus).toHaveBeenCalledTimes(2);
   expect(client.getQueryData(githubLinkStatusQueryOptions().queryKey)).toEqual({
     status: 'linked',
-    username: 'macro-user',
+    username: 'rox-user',
     userId: '123',
   });
 });
@@ -258,7 +258,7 @@ it('refreshes a failed status query after OAuth when all observers are disabled'
     checkGithubLinkStatus.mockResolvedValueOnce(
       ok({
         github_user_id: '123',
-        github_username: 'macro-user',
+        github_username: 'rox-user',
         reauthentication_required: false,
       })
     );
@@ -282,7 +282,7 @@ it('does not reuse an in-flight pre-OAuth status request', async () => {
   checkGithubLinkStatus.mockResolvedValueOnce(
     ok({
       github_user_id: '123',
-      github_username: 'macro-user',
+      github_username: 'rox-user',
       reauthentication_required: false,
     })
   );

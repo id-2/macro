@@ -14,7 +14,7 @@ import type {
  * character formatting.
  */
 
-const NATIVE = 'data-macro-docx';
+const NATIVE = 'data-rox-docx';
 
 /**
  * A copy carries this browser's clipboard key, so a paste trusts only
@@ -30,7 +30,7 @@ type Native = {
   paragraphs: ClipParagraph[];
 };
 
-const KEY_STORAGE = 'macro-docx-clipboard-key';
+const KEY_STORAGE = 'rox-docx-clipboard-key';
 let sessionKey: string | undefined;
 
 function clipboardKey(): string {

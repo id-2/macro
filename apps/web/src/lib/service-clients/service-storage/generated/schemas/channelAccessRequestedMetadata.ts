@@ -6,7 +6,7 @@
  */
 
 import type { ChannelAccessRequestedMetadataRequesterName } from './channelAccessRequestedMetadataRequesterName';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 /**
  * Metadata for [`ChannelTopicEvent::AccessRequested`].

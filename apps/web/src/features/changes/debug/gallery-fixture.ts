@@ -14,7 +14,7 @@ export function gallerySummary(): ChangesSummary {
     },
     changeset: {
       id: 'gallery-changeset',
-      repository: 'https://github.com/macro-inc/macro',
+      repository: 'https://github.com/rox-inc/rox',
       base: { name: 'main' },
       head: { name: 'agent/unread-archived-sessions' },
       files: SAMPLE_FILES,

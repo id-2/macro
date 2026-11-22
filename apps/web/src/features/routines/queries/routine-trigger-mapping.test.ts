@@ -256,7 +256,7 @@ describe('GitHub triggers', () => {
       events: [workflowFailed.value],
       ...structuredClone(workflowFailed.preset),
     };
-    trigger.github!.repositories = ['macro-inc/macro'];
+    trigger.github!.repositories = ['rox-inc/rox'];
     trigger.match!.push(
       { path: 'workflow_run.name', op: 'equals', value: 'CI' },
       { path: 'workflow_run.run_attempt', op: 'equals', value: '1' },
@@ -274,7 +274,7 @@ describe('GitHub triggers', () => {
           github: {
             events: ['workflow_run'],
             actions: ['completed'],
-            repositories: ['macro-inc/macro'],
+            repositories: ['rox-inc/rox'],
             includeBots: false,
           },
           match: [
@@ -331,7 +331,7 @@ describe('GitHub triggers', () => {
     expect(validateTriggers(github({ events: ['Workflow Run'] }))).toMatch(
       /lowercase/
     );
-    expect(validateTriggers(github({ repositories: ['macro'] }))).toMatch(
+    expect(validateTriggers(github({ repositories: ['rox'] }))).toMatch(
       /owner\/name/
     );
     expect(

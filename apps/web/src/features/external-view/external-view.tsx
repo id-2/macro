@@ -20,7 +20,7 @@ import { providerIdentity } from '../external-chat/providers/identity';
 import { externalChatApi } from '../external-chat/queries/production-api';
 import { createOpenSections } from '../whatsapp-linked/primitives/open-sections';
 import { WhatsAppLinked } from '../whatsapp-linked/whatsapp-linked';
-import { InMacroChats, UnreadCount } from './components/in-macro-section';
+import { InMacroChats, UnreadCount } from './components/in-rox-section';
 
 const PROVIDERS = Object.values(ExternalChatProvider);
 
@@ -77,7 +77,7 @@ export function ExternalView() {
         : [...current, provider]
     );
   const sections = createOpenSections(
-    'macro:whatsapp:sidebar-sections:v2',
+    'rox:whatsapp:sidebar-sections:v2',
     userId
   );
   const inMacroChats = (provider: ExternalChatProvider) => (

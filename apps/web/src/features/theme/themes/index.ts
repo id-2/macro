@@ -3,9 +3,9 @@ import { decepticonTheme } from './decepticon';
 import { emberTheme } from './ember';
 import { floraTheme } from './flora';
 import { lapisTheme } from './lapis';
-import { macroDarkTheme } from './macro-dark';
-import { macroGruvboxTheme } from './macro-gruvbox';
-import { macroLightTheme } from './macro-light';
+import { roxDarkTheme } from './rox-dark';
+import { roxGruvboxTheme } from './rox-gruvbox';
+import { roxLightTheme } from './rox-light';
 import { moonTheme } from './moon';
 import { paperTheme } from './paper';
 import { rainTheme } from './rain';
@@ -16,14 +16,14 @@ import { voidTheme } from './void';
 // Ordered for the theme picker: dark themes first (led by Rox Dark), then
 // light themes (led by Rox Light).
 export const DEFAULT_THEMES = [
-  macroDarkTheme,
-  macroGruvboxTheme,
+  roxDarkTheme,
+  roxGruvboxTheme,
   voidTheme,
   emberTheme,
   spiritTheme,
   moonTheme,
   rainTheme,
-  macroLightTheme,
+  roxLightTheme,
   satsumaTheme,
   lapisTheme,
   floraTheme,

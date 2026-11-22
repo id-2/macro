@@ -31,7 +31,7 @@ it('switches exclusively between output, PR and error detail as live state chang
   ));
   expect(screen.getByText('Checking the stack build.')).toBeTruthy();
   expect(screen.queryByText('private command')).toBeNull();
-  setUrl('https://github.com/macro-inc/macro/pull/42');
+  setUrl('https://github.com/rox-inc/rox/pull/42');
   expect(screen.getByRole('button', { name: 'Open PR fixture' })).toBeTruthy();
   expect(screen.queryByText('Checking the stack build.')).toBeNull();
   setPresentation({

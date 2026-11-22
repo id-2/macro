@@ -5,7 +5,7 @@ import { Button } from '@ui';
 import { createSignal } from 'solid-js';
 import type { AppUpdate } from './app-update';
 
-const DISMISSED_KEY = 'macro:app-update-dismissed';
+const DISMISSED_KEY = 'rox:app-update-dismissed';
 
 /**
  * A hairline comet on the circle's edge: a soft head with a short tail that

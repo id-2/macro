@@ -2,8 +2,8 @@ import type { MessageTimelineEntry } from '@service-storage/messages';
 import { describe, expect, it } from 'vitest';
 import { outsideMessages } from './outside-messages';
 
-const ME = 'macro|me@example.com';
-const THEM = 'macro|them@example.com';
+const ME = 'rox|me@example.com';
+const THEM = 'rox|them@example.com';
 const SINCE = '2026-11-05T12:00:00Z';
 
 function entry(

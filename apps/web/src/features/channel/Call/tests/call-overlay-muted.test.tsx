@@ -836,7 +836,7 @@ it.each(['speaker', 'sidebar'] as const)(
 );
 
 describe('CallOverlay Work', () => {
-  const account = 'macro|agent@example.com';
+  const account = 'rox|agent@example.com';
   const row: WorkItem = {
     registrationId: 'registration-1',
     accountId: account,
@@ -988,14 +988,14 @@ it.each(['auto', 'speaker', 'sidebar', 'grid'] as const)(
     }
     expect(
       edge?.querySelector(
-        `[data-macro-icon="${layout === 'sidebar' ? 'caret-right' : 'caret-down'}"]`
+        `[data-rox-icon="${layout === 'sidebar' ? 'caret-right' : 'caret-down'}"]`
       )
     ).toBeTruthy();
     fireEvent.click(edge!);
     const restore = screen.getByRole('button', { name: 'Show participants' });
     expect(
       restore.querySelector(
-        `[data-macro-icon="${layout === 'sidebar' ? 'caret-left' : 'caret-up'}"]`
+        `[data-rox-icon="${layout === 'sidebar' ? 'caret-left' : 'caret-up'}"]`
       )
     ).toBeTruthy();
     fireEvent.keyDown(screen.getByRole('button', { name: 'More' }), {
@@ -1030,7 +1030,7 @@ it('leads shared-screen and speaking chips with their action icon before the ava
   (mocks.callContext as CallState).isParticipantSpeaking = () => true;
   const { container } = render(() => <CallOverlay onLeave={() => {}} />);
   const share = container.querySelector('[data-call-stage-chip="share"]');
-  expect(share?.firstElementChild?.getAttribute('data-macro-icon')).toBe(
+  expect(share?.firstElementChild?.getAttribute('data-rox-icon')).toBe(
     'screencast'
   );
   expect(
@@ -1038,7 +1038,7 @@ it('leads shared-screen and speaking chips with their action icon before the ava
   ).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Hide participants' }));
   const speaker = container.querySelector('[data-call-stage-chip="speaker"]');
-  expect(speaker?.firstElementChild?.getAttribute('data-macro-icon')).toBe(
+  expect(speaker?.firstElementChild?.getAttribute('data-rox-icon')).toBe(
     'waveform'
   );
   expect(

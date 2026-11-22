@@ -21,7 +21,7 @@ function parseResolution(value: unknown): MeetingInvitationResolution | null {
 }
 
 const resolutions = createCrossTabBus<MeetingInvitationResolution>({
-  channelName: 'macro-meeting-invitation-resolution',
+  channelName: 'rox-meeting-invitation-resolution',
   storageKey: 'rox.meeting-invitation-resolution',
   parse: parseResolution,
   getMessageKey: (message) =>

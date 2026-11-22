@@ -51,7 +51,7 @@ it('telemetry or storage failure cannot prevent the requested reload', async () 
 it('does not attribute an old or malformed marker to a later startup', async () => {
   const app = await import('./reload');
   sessionStorage.setItem(
-    'macro-pending-reload',
+    'rox-pending-reload',
     JSON.stringify({
       reason: 'user_recovery',
       reloadId: crypto.randomUUID(),
@@ -60,7 +60,7 @@ it('does not attribute an old or malformed marker to a later startup', async () 
     })
   );
   expect(app.consumeReloadIntent(31 * 60_000)).toBeUndefined();
-  sessionStorage.setItem('macro-pending-reload', '{');
+  sessionStorage.setItem('rox-pending-reload', '{');
   expect(app.consumeReloadIntent()).toBeUndefined();
 });
 

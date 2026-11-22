@@ -242,13 +242,13 @@ describe('static pull request mentions', () => {
   it.each([
     [
       'a Rox id',
-      '<m-pr-mention>{"id":"foreign-1","label":"macro-inc/macro#7956"}</m-pr-mention>',
+      '<m-pr-mention>{"id":"foreign-1","label":"rox-inc/rox#7956"}</m-pr-mention>',
       'foreign-1',
     ],
     [
       'a GitHub URL',
-      '<m-pr-mention>{"url":"https://github.com/macro-inc/macro/pull/7956","label":""}</m-pr-mention>',
-      'https://github.com/macro-inc/macro/pull/7956',
+      '<m-pr-mention>{"url":"https://github.com/rox-inc/rox/pull/7956","label":""}</m-pr-mention>',
+      'https://github.com/rox-inc/rox/pull/7956',
     ],
   ])('renders a PR chip from %s', (_, markdown, target) => {
     const rendered = render(() => (

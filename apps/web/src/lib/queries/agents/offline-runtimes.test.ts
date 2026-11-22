@@ -22,7 +22,7 @@ describe('offlineAgentBotIds', () => {
   it('leaves built-in and cloud runtimes alone', () => {
     const offline = offlineAgentBotIds(
       [
-        agent('macro', 'in-memory'),
+        agent('rox', 'in-memory'),
         agent('cursor', 'cursor'),
         agent('codex', 'codex-cloud'),
       ],

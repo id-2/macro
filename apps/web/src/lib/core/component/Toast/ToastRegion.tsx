@@ -45,34 +45,34 @@ export function ToastRegion() {
       */}
       <div class="fixed bottom-5 right-5 m-0 w-[380px] max-w-[calc(100vw-32px)] list-none outline-none pointer-events-none z-toast-region flex flex-col items-stretch gap-4">
         <Toast.Region
-          class="macro-toast-region"
+          class="rox-toast-region"
           regionId="reminder-region"
           duration={Infinity}
           limit={1}
           pauseOnInteraction={false}
           swipeDirection="right"
         >
-          <Toast.List class="macro-toast-list" />
+          <Toast.List class="rox-toast-list" />
         </Toast.Region>
         <Toast.Region
-          class="macro-toast-region"
+          class="rox-toast-region"
           regionId="prompt-region"
           duration={Infinity}
           limit={1}
           pauseOnInteraction={false}
           swipeDirection="right"
         >
-          <Toast.List class="macro-toast-list" />
+          <Toast.List class="rox-toast-list" />
         </Toast.Region>
         <Toast.Region
-          class="macro-toast-region"
+          class="rox-toast-region"
           regionId="toast-region"
           limit={3}
           duration={4500}
           pauseOnInteraction
           swipeDirection="right"
         >
-          <Toast.List class="macro-toast-list" data-stack />
+          <Toast.List class="rox-toast-list" data-stack />
         </Toast.Region>
         <Show when={!isMobile()}>
           <UploadProgressIndicator />
@@ -113,36 +113,36 @@ export function ToastRegion() {
           lift={`${mobileTransientSize.height ?? 0}px + 1.25rem`}
         >
           <Toast.Region
-            class="macro-toast-region"
+            class="rox-toast-region"
             regionId="mobile-reminder-region"
             duration={Infinity}
             limit={1}
             pauseOnInteraction={false}
             swipeDirection={mobileSwipe.direction()}
           >
-            <Toast.List class="macro-toast-list" />
+            <Toast.List class="rox-toast-list" />
           </Toast.Region>
           <Toast.Region
-            class="macro-toast-region"
+            class="rox-toast-region"
             regionId="mobile-prompt-region"
             duration={Infinity}
             limit={1}
             pauseOnInteraction={false}
             swipeDirection={mobileSwipe.direction()}
           >
-            <Toast.List class="macro-toast-list" />
+            <Toast.List class="rox-toast-list" />
           </Toast.Region>
         </MobileToastStack>
         <MobileToastStack ref={setMobileTransientStack} class="z-toast-region">
           <Toast.Region
-            class="macro-toast-region"
+            class="rox-toast-region"
             regionId="mobile-toast-region"
             limit={1}
             duration={4500}
             pauseOnInteraction
             swipeDirection={mobileSwipe.direction()}
           >
-            <Toast.List class="macro-toast-list" />
+            <Toast.List class="rox-toast-list" />
           </Toast.Region>
           <Show when={isMobile()}>
             <div class="flex justify-center">

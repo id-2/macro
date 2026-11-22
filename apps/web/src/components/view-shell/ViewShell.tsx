@@ -98,7 +98,7 @@ const RESIZE_GUTTER = 1;
 
 /** Where a shell with `asidePreferenceKey` saves whether its navigation is hidden. */
 export function asideCollapsedPreferenceKey(app: string) {
-  return `macro:pref:view-sidebar:collapsed:${app}`;
+  return `rox:pref:view-sidebar:collapsed:${app}`;
 }
 
 const ViewShellContext = createContext<ViewShellInternal>();
@@ -224,7 +224,7 @@ function Root(props: ViewShellRootProps) {
   // A width the user dragged to wins over the configured default.
   const [chosenAsideWidth, setChosenAsideWidth] = local.asidePreferenceKey
     ? usePreference<number | undefined>(
-        `macro:pref:view-sidebar:width:${local.asidePreferenceKey}`,
+        `rox:pref:view-sidebar:width:${local.asidePreferenceKey}`,
         { default: undefined }
       )
     : createSignal<number>();

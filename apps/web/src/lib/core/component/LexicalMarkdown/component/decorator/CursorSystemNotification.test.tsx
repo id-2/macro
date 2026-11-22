@@ -21,7 +21,7 @@ const ci = {
   source: 'github',
   text: 'All 27 CI checks completed without failures.',
   attributes: {
-    repo: 'github.com/macro-inc/macro',
+    repo: 'github.com/rox-inc/rox',
     commit: 'ca515d369476de0a33eef36b21724175e2f6bed3',
     branch: 'cursor/settings-menu-search-1f17',
     conclusion: 'success',
@@ -53,7 +53,7 @@ describe('CursorSystemNotification', () => {
   it('shows the repository, branch, short commit and check count, and hides the subscription id', () => {
     const view = render(() => <CursorSystemNotification {...ci} />);
     const card = view.getByRole('region');
-    expect(card.textContent).toContain('macro-inc/macro');
+    expect(card.textContent).toContain('rox-inc/rox');
     expect(card.textContent).toContain('cursor/settings-menu-search-1f17');
     expect(card.textContent).toContain('ca515d3');
     expect(card.textContent).not.toContain(
@@ -68,11 +68,11 @@ describe('CursorSystemNotification', () => {
     const view = render(() => <CursorSystemNotification {...ci} />);
     fireEvent.click(view.getByText('ca515d3'));
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      'https://github.com/macro-inc/macro/commit/ca515d369476de0a33eef36b21724175e2f6bed3'
+      'https://github.com/rox-inc/rox/commit/ca515d369476de0a33eef36b21724175e2f6bed3'
     );
-    fireEvent.click(view.getByText('macro-inc/macro'));
+    fireEvent.click(view.getByText('rox-inc/rox'));
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      'https://github.com/macro-inc/macro'
+      'https://github.com/rox-inc/rox'
     );
   });
 

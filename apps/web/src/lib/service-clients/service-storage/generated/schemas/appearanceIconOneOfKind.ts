@@ -10,5 +10,5 @@ export type AppearanceIconOneOfKind =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AppearanceIconOneOfKind = {
-  macro: 'macro',
+  rox: 'rox',
 } as const;

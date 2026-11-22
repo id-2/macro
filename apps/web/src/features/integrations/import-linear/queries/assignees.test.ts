@@ -54,7 +54,7 @@ it('serializes wire-sized batches and retains only requested matches, isolating 
 
 it('requires one complete witness and keeps model/CSV label boundaries', async () => {
   const person = {
-    userId: 'macro|person@example.com',
+    userId: 'rox|person@example.com',
     email: 'person@example.com',
     name: 'Family, Given',
   };
@@ -69,7 +69,7 @@ it('requires one complete witness and keeps model/CSV label boundaries', async (
           person,
           {
             ...person,
-            userId: 'macro|other@example.com',
+            userId: 'rox|other@example.com',
             email: 'other@example.com',
           },
         ],

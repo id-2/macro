@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
-import { macroDarkTheme } from '@theme/themes/macro-dark';
-import { macroLightTheme } from '@theme/themes/macro-light';
+import { roxDarkTheme } from '@theme/themes/rox-dark';
+import { roxLightTheme } from '@theme/themes/rox-light';
 import { createSignal } from 'solid-js';
 import { afterEach, expect, it } from 'vitest';
 import { AppearanceModePicker } from './appearance-mode-picker';
@@ -18,8 +18,8 @@ it('offers one mutually exclusive choice and reports the selected appearance mod
           chosen = value;
           setMode(value);
         }}
-        lightTheme={macroLightTheme}
-        darkTheme={macroDarkTheme}
+        lightTheme={roxLightTheme}
+        darkTheme={roxDarkTheme}
       />
     );
   });

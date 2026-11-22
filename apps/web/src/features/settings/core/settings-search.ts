@@ -11,8 +11,8 @@ type Setting = {
   title: string;
   target?: string;
   keywords: string;
-  /** Listed only with `enable-macro-computers` on. */
-  macroComputers?: true;
+  /** Listed only with `enable-rox-computers` on. */
+  roxComputers?: true;
 };
 export type SettingsSearchResult = Setting & {
   id: string;
@@ -61,7 +61,7 @@ const SETTINGS: Setting[] = [
       title: `${event.label} · ${group.label}`,
       target: group.label,
       keywords: `${group.label} ${event.description}`,
-      macroComputers: event.macroComputers,
+      roxComputers: event.roxComputers,
     }))
   ),
   {
@@ -402,7 +402,7 @@ export function searchSettings(
   options: {
     emailSignatures?: boolean;
     outlook?: boolean;
-    macroComputers?: boolean;
+    roxComputers?: boolean;
   } = {}
 ): SettingsSearchResult[] {
   const tokens = words(query);
@@ -425,7 +425,7 @@ export function searchSettings(
         (options.emailSignatures !== false ||
           setting.title !== 'Email signatures') &&
         (options.outlook !== false || setting.title !== 'Outlook') &&
-        (options.macroComputers !== false || !setting.macroComputers)
+        (options.roxComputers !== false || !setting.roxComputers)
     ).map((setting) => ({
       ...setting,
       target: settingsTarget(setting.target),

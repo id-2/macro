@@ -90,7 +90,7 @@ describe('rowButtons', () => {
   it('offers the server’s actions in order', () => {
     const review: InboxRowAction = {
       kind: 'review',
-      url: 'https://github.com/macro-inc/macro/pull/1',
+      url: 'https://github.com/rox-inc/rox/pull/1',
     };
     expect(rowButtons(row([approve, deny]))).toEqual([approve, deny]);
     expect(rowButtons(row([{ kind: 'answer' }]))).toEqual([{ kind: 'answer' }]);
@@ -189,7 +189,7 @@ describe('createRowActions', () => {
 
   it('opens the row for Open and Answer, and the pull request for Review', async () => {
     const { rowActions, open, review, complete } = setup();
-    const url = 'https://github.com/macro-inc/macro/pull/1';
+    const url = 'https://github.com/rox-inc/rox/pull/1';
     const target = row([{ kind: 'answer' }]);
 
     await rowActions.run(target, { kind: 'answer' });

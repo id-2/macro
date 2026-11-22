@@ -203,7 +203,7 @@ describe('automatic question source verification', () => {
           truncatedTables: [],
         }),
     });
-    const result = await capabilities.read('SELECT name FROM macro.people');
+    const result = await capabilities.read('SELECT name FROM rox.people');
     expect(result._unsafeUnwrap()).toEqual({
       columns: [{ name: 'name', kind: 'text' }],
       rows: [[{ type: 'text', value: 'Ada' }]],

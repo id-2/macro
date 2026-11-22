@@ -45,7 +45,7 @@ export function LocalRuntimeHost() {
     items: () => (probe()?.needsSetup ? [PROMPT_KEY] : []),
     key: (key) => key,
     // Advisory: Settings › Runtimes keeps setup reachable, so a close sticks.
-    persistKey: 'macro:local-runtime-prompt:dismissed',
+    persistKey: 'rox:local-runtime-prompt:dismissed',
     itemsLoaded: () => probe() !== undefined,
     toast: (_key, dismiss) => ({
       title: t('localRuntime.promptTitle'),

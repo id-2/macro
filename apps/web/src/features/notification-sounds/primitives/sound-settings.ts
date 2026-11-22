@@ -11,7 +11,7 @@ import {
 } from '../core/settings';
 
 /** Per person and per device: each computer or phone chooses its own sounds. */
-const STORAGE = createUserScopedStorage('macro:notification-sounds');
+const STORAGE = createUserScopedStorage('rox:notification-sounds');
 
 /**
  * The saved settings, read fresh so a change made in another tab applies to

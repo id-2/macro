@@ -7,7 +7,7 @@
 
 export type RoxApiTokenParams = {
   /**
-   * The email to generate the macro-api-token for. If not provided, we use your default profile.
+   * The email to generate the rox-api-token for. If not provided, we use your default profile.
    */
   email: string;
 };

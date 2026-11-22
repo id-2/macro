@@ -86,7 +86,7 @@ function setup(filters: GraphqlEntityFilterAst = {}) {
             hasNext: false,
             stale: false,
             extensions: {
-              __macroNormalizedCache: { source, persistence },
+              __roxNormalizedCache: { source, persistence },
             },
           }),
         fail: () =>

@@ -41,7 +41,7 @@ afterEach(() => {
 it('hides merge on a draft or when CI is not passing', async () => {
   const entity: ForeignEntity = {
     id: '019f0000-0000-7000-8000-000000000002',
-    foreignEntityId: 'macro-inc/macro/pull/6369',
+    foreignEntityId: 'rox-inc/rox/pull/6369',
     foreignEntitySource: 'github_pull_request',
     metadata: {
       status: 'open',
@@ -51,7 +51,7 @@ it('hides merge on a draft or when CI is not passing', async () => {
         { id: 1, name: 'ci', status: 'completed', conclusion: 'success' },
       ],
     },
-    storedForId: 'macro|wolf@rox.one',
+    storedForId: 'rox|wolf@rox.one',
     storedForAuthEntity: 'user',
     createdAt: '2026-09-11T00:00:00Z',
     updatedAt: '2026-09-11T00:00:00Z',
@@ -61,7 +61,7 @@ it('hides merge on a draft or when CI is not passing', async () => {
   );
   render(() => (
     <QueryClientProvider client={queryClient}>
-      <MagicChipPullRequest url="https://github.com/macro-inc/macro/pull/6369" />
+      <MagicChipPullRequest url="https://github.com/rox-inc/rox/pull/6369" />
     </QueryClientProvider>
   ));
   await waitFor(() =>
@@ -110,7 +110,7 @@ it('shows a PR link without suspending while the webhook mapping is pending or m
     }) as Lookup
   );
   const client = new QueryClient();
-  const url = 'https://github.com/macro-inc/macro/pull/6369';
+  const url = 'https://github.com/rox-inc/rox/pull/6369';
   render(() => (
     <QueryClientProvider client={client}>
       <Suspense fallback={<span>Loading chip</span>}>
@@ -139,7 +139,7 @@ it('keeps an already mounted chip current through late sync and merge', async ()
   >;
   const entity: ForeignEntity = {
     id: '019f0000-0000-7000-8000-000000000001',
-    foreignEntityId: 'macro-inc/macro/pull/6369',
+    foreignEntityId: 'rox-inc/rox/pull/6369',
     foreignEntitySource: 'github_pull_request',
     metadata: {
       status: 'open',
@@ -151,7 +151,7 @@ it('keeps an already mounted chip current through late sync and merge', async ()
         { id: 1, name: 'ci', status: 'completed', conclusion: 'success' },
       ],
     },
-    storedForId: 'macro|wolf@rox.one',
+    storedForId: 'rox|wolf@rox.one',
     storedForAuthEntity: 'user',
     createdAt: '2026-09-11T00:00:00Z',
     updatedAt: '2026-09-11T00:00:00Z',
@@ -162,7 +162,7 @@ it('keeps an already mounted chip current through late sync and merge', async ()
   const client = queryClient;
   const rendered = render(() => (
     <QueryClientProvider client={client}>
-      <MagicChipPullRequest url="https://github.com/macro-inc/macro/pull/6369" />
+      <MagicChipPullRequest url="https://github.com/rox-inc/rox/pull/6369" />
     </QueryClientProvider>
   ));
   await vi.advanceTimersByTimeAsync(1);

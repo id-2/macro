@@ -41,7 +41,7 @@ export function Root(props: RootProps) {
         containerRef = el;
       }}
       class={cn(
-        'relative macro-message-width flex flex-col flex-1 items-center justify-between',
+        'relative rox-message-width flex flex-col flex-1 items-center justify-between',
         isInlineReplyInput(local.input) && 'mb-4',
         local.class
       )}

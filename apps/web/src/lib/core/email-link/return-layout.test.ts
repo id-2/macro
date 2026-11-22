@@ -37,7 +37,7 @@ describe('inbox link return layout', () => {
 
   it('drops permissions it does not recognize', () => {
     sessionStorage.setItem(
-      'macro:inbox-link:return-layout',
+      'rox:inbox-link:return-layout',
       JSON.stringify({ linkId: LINK_ID, url: '/home', scopes: 'everything' })
     );
 
@@ -99,7 +99,7 @@ describe('inbox link return layout', () => {
   });
 
   it('returns undefined for corrupt stored data', () => {
-    sessionStorage.setItem('macro:inbox-link:return-layout', 'not json');
+    sessionStorage.setItem('rox:inbox-link:return-layout', 'not json');
 
     expect(consumeInboxLinkReturn(LINK_ID)).toBeUndefined();
   });

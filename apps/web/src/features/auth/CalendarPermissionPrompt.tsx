@@ -54,7 +54,7 @@ export function CalendarPermissionPrompt() {
             )
         : [],
     key: (link) => link.id,
-    persistKey: 'macro:calendar-prompt:dismissed',
+    persistKey: 'rox:calendar-prompt:dismissed',
     // Until the flag, the links and the viewer's id resolve, the empty list
     // above means "don't know yet", not "no inbox needs this" — stored
     // dismissals must survive that window.

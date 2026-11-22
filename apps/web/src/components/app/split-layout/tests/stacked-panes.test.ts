@@ -179,7 +179,7 @@ describe('stacked panes', () => {
     }
     await Promise.resolve();
     expect(
-      JSON.parse(sessionStorage.getItem('macro-document-lifecycle')!).navigation
+      JSON.parse(sessionStorage.getItem('rox-document-lifecycle')!).navigation
     ).toMatchObject({
       paneCount: 1,
       historyEntryCount: 1,
@@ -193,7 +193,7 @@ describe('stacked panes', () => {
     await Promise.resolve();
 
     expect(
-      JSON.parse(sessionStorage.getItem('macro-document-lifecycle')!).navigation
+      JSON.parse(sessionStorage.getItem('rox-document-lifecycle')!).navigation
     ).toMatchObject({
       paneCount: 1,
       historyEntryCount: 1,
@@ -224,7 +224,7 @@ describe('stacked panes', () => {
     await Promise.resolve();
     expect(handle.canGoForward()).toBe(false);
     expect(
-      JSON.parse(sessionStorage.getItem('macro-document-lifecycle')!).navigation
+      JSON.parse(sessionStorage.getItem('rox-document-lifecycle')!).navigation
     ).toMatchObject({ historyEntryCount: 2, savedEntryStateCount: 1 });
     handle.goBack();
     expect(handle.currentEntryState()?.rows).toEqual(['search']);

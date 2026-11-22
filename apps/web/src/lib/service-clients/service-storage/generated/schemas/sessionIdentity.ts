@@ -6,7 +6,7 @@
  */
 
 import type { BotId } from './botId';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { SessionIdentityOrigin } from './sessionIdentityOrigin';
 import type { SessionSource } from './sessionSource';
 

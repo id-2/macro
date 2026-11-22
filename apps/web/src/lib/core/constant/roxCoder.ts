@@ -3,7 +3,7 @@ import { displayName } from '@core/constant/brand';
 /**
  * Identity for the first-party Rox coding agent. Mirrors
  * `bot_id::ROX_CODER_BOT_ID` on the backend. Deliberately a distinct bot
- * from Rox (see `macroAgent.ts`): mentioning Rox answers in chat, while
+ * from Rox (see `roxAgent.ts`): mentioning Rox answers in chat, while
  * mentioning the coding agent opens a sandboxed coding-agent session.
  */
 export const ROX_CODER_BOT_ID = '00000000-0000-0000-0000-00000000a9e7';

@@ -3,7 +3,7 @@ import { frontendInstanceId } from './frontend-instance';
 import type { ReloadReason } from './generated/native-diagnostics';
 import { sendNativeDiagnostic } from './native-diagnostics';
 
-const KEY = 'macro-pending-reload';
+const KEY = 'rox-pending-reload';
 const REASONS = [
   'cache_replaced_automatic',
   'update_accepted',

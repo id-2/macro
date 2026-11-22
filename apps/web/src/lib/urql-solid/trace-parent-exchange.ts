@@ -3,7 +3,7 @@ import { type Exchange, makeOperation, type Operation } from '@urql/core';
 import { map, pipe } from 'wonka';
 
 /** Operation context key for the trace a query's request should join. */
-export const TRACE_PARENT_CONTEXT_KEY = 'macroTraceParent';
+export const TRACE_PARENT_CONTEXT_KEY = 'roxTraceParent';
 
 /**
  * The caller's context for the operation's first request only: a re-sent

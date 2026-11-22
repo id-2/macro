@@ -141,7 +141,7 @@ test('export a pipeline and import a CSV into it', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Export CSV' }).click();
   const download = await downloaded;
   expect(download.suggestedFilename()).toMatch(
-    /^macro-q4-deals-\d{4}-\d{2}-\d{2}\.csv$/
+    /^rox-q4-deals-\d{4}-\d{2}-\d{2}\.csv$/
   );
   const path = await download.path();
   const { readFile } = await import('node:fs/promises');

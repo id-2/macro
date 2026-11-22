@@ -31,7 +31,7 @@ export const ToolCalendarEvent = z.object({
   attendeeCount: z.number().int().gte(0),
   organizerEmail: z.union([z.string(), z.null()]).optional(),
   conferenceUrl: z.union([z.string(), z.null()]).optional(),
-  macroCallUrl: z.union([z.string(), z.null()]).optional(),
+  roxCallUrl: z.union([z.string(), z.null()]).optional(),
   isReadOnly: z.boolean(),
   calendarId: z.union([z.string().uuid(), z.null()]).optional(),
   calendarName: z.union([z.string(), z.null()]).optional(),
@@ -2084,7 +2084,7 @@ export const CreateBookingLink = z
             description: z.string(),
             durationMinutes: z.number().int().gte(0).lte(65535),
             location: z.string(),
-            macroCall: z.boolean().optional(),
+            roxCall: z.boolean().optional(),
             googleMeet: z.boolean(),
             enabled: z.boolean(),
             mode: z.any().superRefine((x, ctx) => {
@@ -2170,7 +2170,7 @@ export const BookingLinkResult = z.object({
           description: z.string(),
           durationMinutes: z.number().int().gte(0).lte(65535),
           location: z.string(),
-          macroCall: z.boolean().optional(),
+          roxCall: z.boolean().optional(),
           googleMeet: z.boolean(),
           enabled: z.boolean(),
           mode: z.any().superRefine((x, ctx) => {
@@ -2465,7 +2465,7 @@ export const UserToolResponseForToolCalendarEvent = z
             attendeeCount: z.number().int().gte(0),
             organizerEmail: z.union([z.string(), z.null()]).optional(),
             conferenceUrl: z.union([z.string(), z.null()]).optional(),
-            macroCallUrl: z.union([z.string(), z.null()]).optional(),
+            roxCallUrl: z.union([z.string(), z.null()]).optional(),
             isReadOnly: z.boolean(),
             calendarId: z.union([z.string().uuid(), z.null()]).optional(),
             calendarName: z.union([z.string(), z.null()]).optional(),
@@ -4092,7 +4092,7 @@ export const MutationResult = z.object({
                           z
                             .object({
                               name: z.string(),
-                              kind: z.literal('macro'),
+                              kind: z.literal('rox'),
                             })
                             .strict(),
                           z
@@ -6111,7 +6111,7 @@ export const EditBookingLink = z
             description: z.string(),
             durationMinutes: z.number().int().gte(0).lte(65535),
             location: z.string(),
-            macroCall: z.boolean().optional(),
+            roxCall: z.boolean().optional(),
             googleMeet: z.boolean(),
             enabled: z.boolean(),
             mode: z.any().superRefine((x, ctx) => {
@@ -12022,7 +12022,7 @@ export const ListBookingLinksResult = z.object({
               description: z.string(),
               durationMinutes: z.number().int().gte(0).lte(65535),
               location: z.string(),
-              macroCall: z.boolean().optional(),
+              roxCall: z.boolean().optional(),
               googleMeet: z.boolean(),
               enabled: z.boolean(),
               mode: z.any().superRefine((x, ctx) => {
@@ -12944,7 +12944,7 @@ export const ListResult = z.object({
                         z
                           .object({
                             name: z.string(),
-                            kind: z.literal('macro'),
+                            kind: z.literal('rox'),
                           })
                           .strict(),
                         z
@@ -14562,7 +14562,7 @@ export const BookingSettingsResult = z.object({
         description: z.string(),
         durationMinutes: z.number().int().gte(0).lte(65535),
         location: z.string(),
-        macroCall: z.boolean().optional(),
+        roxCall: z.boolean().optional(),
         googleMeet: z.boolean(),
         enabled: z.boolean(),
         scheduleId: z.string().uuid(),
@@ -15832,7 +15832,7 @@ export const ReadResult = z.any().superRefine((x, ctx) => {
                           z
                             .object({
                               name: z.string(),
-                              kind: z.literal('macro'),
+                              kind: z.literal('rox'),
                             })
                             .strict(),
                           z
@@ -16921,7 +16921,7 @@ export const ReadResult = z.any().superRefine((x, ctx) => {
                           z
                             .object({
                               name: z.string(),
-                              kind: z.literal('macro'),
+                              kind: z.literal('rox'),
                             })
                             .strict(),
                           z
@@ -18076,7 +18076,7 @@ export const ReadMetadataResponse = z.object({
                 z.any().superRefine((x, ctx) => {
                   const schemas = [
                     z
-                      .object({ name: z.string(), kind: z.literal('macro') })
+                      .object({ name: z.string(), kind: z.literal('rox') })
                       .strict(),
                     z
                       .object({ value: z.string(), kind: z.literal('emoji') })
@@ -19939,7 +19939,7 @@ export const UpdateBookingSettings = z
           description: z.string(),
           durationMinutes: z.number().int().gte(0).lte(65535),
           location: z.string(),
-          macroCall: z.boolean().optional(),
+          roxCall: z.boolean().optional(),
           googleMeet: z.boolean(),
           enabled: z.boolean(),
           scheduleId: z.string().uuid(),

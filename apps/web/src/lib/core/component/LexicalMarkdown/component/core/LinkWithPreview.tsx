@@ -38,7 +38,7 @@ export function LinkWithPreview(props: LinkWithPreviewProps) {
         onClick={(e) => {
           // Modified/middle clicks keep native anchor behavior (background
           // tab etc.). Plain clicks open in the app where the surface says
-          // so, otherwise through openExternalUrl, so macro links open
+          // so, otherwise through openExternalUrl, so rox links open
           // in-app under Tauri.
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault();

@@ -10,8 +10,8 @@ vi.mock('./primitives/sound-player', () => ({
 }));
 
 const USER_ID = 'user-1';
-const SETTINGS_KEY = `macro:notification-sounds:${USER_ID}`;
-const TAB_KEY = 'macro:notification-sounds:tab';
+const SETTINGS_KEY = `rox:notification-sounds:${USER_ID}`;
+const TAB_KEY = 'rox:notification-sounds:tab';
 
 function notification(
   tag: 'channel_mention' | 'new_email',

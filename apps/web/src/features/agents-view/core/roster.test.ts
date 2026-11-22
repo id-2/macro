@@ -1,6 +1,6 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/roxCoder';
 import { describe, expect, it } from 'vitest';
 import { agentPickerGroups } from './agent-picker-groups';
 import {
@@ -20,7 +20,7 @@ function persisted(
       id: `bot-${overrides.harness}`,
       name: 'Agent',
       handle: 'agent',
-      owner: { type: 'user', user_id: 'macro|me@example.com' },
+      owner: { type: 'user', user_id: 'rox|me@example.com' },
     },
     default_model: 'claude-sonnet-5',
     ...overrides,
@@ -190,19 +190,19 @@ describe('rosterForAgentPicker and kindForBot', () => {
       persisted({ harness: 'future-runtime' }),
       persisted({
         harness: 'in-memory',
-        bot: { id: ROX_AGENT_BOT_ID, name: 'Rox', handle: 'macro' },
+        bot: { id: ROX_AGENT_BOT_ID, name: 'Rox', handle: 'rox' },
       }),
       persisted({
         harness: 'in-memory',
         bot: {
           id: `bot|${ROX_AGENT_BOT_ID}`,
           name: 'Rox',
-          handle: 'macro',
+          handle: 'rox',
         },
       }),
       persisted({
         harness: 'in-memory',
-        bot: { id: 'saved-macro-name', name: 'Rox', handle: 'my-macro' },
+        bot: { id: 'saved-rox-name', name: 'Rox', handle: 'my-rox' },
       }),
     ],
   });
@@ -216,7 +216,7 @@ describe('rosterForAgentPicker and kindForBot', () => {
       'bot-sandbox',
       'bot-codex-cloud',
       'bot-future-runtime',
-      'saved-macro-name',
+      'saved-rox-name',
     ]);
   });
 

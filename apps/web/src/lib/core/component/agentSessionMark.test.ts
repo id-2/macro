@@ -1,6 +1,6 @@
 import { CODEX_BOT_ID } from '@core/constant/codexAgent';
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
 import { describe, expect, it } from 'vitest';
 import { agentSessionMark } from './agentSessionMark';
 
@@ -34,7 +34,7 @@ describe('agentSessionMark', () => {
   });
 
   it('uses the Rox mark for Rox runtimes and first-party Rox bots', () => {
-    expect(agentSessionMark({ harness: 'macro-inmem' }).class).toBe(
+    expect(agentSessionMark({ harness: 'rox-inmem' }).class).toBe(
       'text-accent'
     );
     expect(agentSessionMark({ botId: ROX_AGENT_BOT_ID }).class).toBe(

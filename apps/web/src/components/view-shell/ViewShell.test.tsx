@@ -154,7 +154,7 @@ function setup(preserveDuringResize: boolean, app = 'tasks') {
     fireEvent(window, new MouseEvent('pointerup', { clientX: 296 }));
   };
   const savedWidth = () =>
-    localStorage.getItem(`macro:pref:view-sidebar:width:${app}`);
+    localStorage.getItem(`rox:pref:view-sidebar:width:${app}`);
   return {
     ...view,
     asideWidth,
@@ -256,7 +256,7 @@ describe('ViewShell aside resize preference', () => {
   });
 
   it('fits a saved width to the current bounds', () => {
-    localStorage.setItem('macro:pref:view-sidebar:width:tasks', '900');
+    localStorage.setItem('rox:pref:view-sidebar:width:tasks', '900');
     const view = setup(false);
     expect(view.asideWidth()).toBeCloseTo(360);
   });

@@ -16,7 +16,7 @@ vi.mock('@service-cognition/client', () => ({
 }));
 vi.mock('@queries/auth/use-query-account', () => ({
   useQueryAccount: () => () => ({
-    userId: 'macro|viewer@example.com',
+    userId: 'rox|viewer@example.com',
     session: mocks.session,
   }),
 }));
@@ -26,7 +26,7 @@ vi.mock('@queries/auth/account-scope', () => ({
 }));
 vi.mock('@queries/contacts/use-directory', () => ({
   useContactDirectoryScope: () => () => ({
-    userId: 'macro|viewer@example.com',
+    userId: 'rox|viewer@example.com',
   }),
 }));
 vi.mock('@queries/contacts/reference-reader', () => ({
@@ -54,7 +54,7 @@ const evidence: ContactReferenceResolution = {
       complete: true,
       people: [
         {
-          userId: 'macro|person@example.com',
+          userId: 'rox|person@example.com',
           email: 'person@example.com',
           name: 'Family, Given',
         },
@@ -81,11 +81,11 @@ it('reads only extracted labels, without splitting names or looking up the viewe
     const result = await root.request('assigned tasks', catalog, () => true);
     expect(result.isOk() && result.value.facets).toEqual({
       status: ['completed'],
-      assignees: ['macro|person@example.com'],
+      assignees: ['rox|person@example.com'],
       'created-by': ['@viewer'],
     });
     expect(mocks.read).toHaveBeenCalledWith(
-      'macro|viewer@example.com',
+      'rox|viewer@example.com',
       undefined,
       {
         labels: ['Family, Given'],
@@ -112,7 +112,7 @@ it('keeps partial and ambiguous evidence unresolved instead of applying broader 
         people: [
           ...evidence.matches[0].people,
           {
-            userId: 'macro|other@example.com',
+            userId: 'rox|other@example.com',
             email: 'other@example.com',
             name: 'Family, Given',
           },

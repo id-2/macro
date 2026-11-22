@@ -4,8 +4,8 @@ export const DEVELOPMENT_PROXY_TARGETS = {
   websocket: 'https://services-dev.rox.one',
   static: 'https://static-file-service-dev.rox.one',
   pdf: 'https://pdf-service-dev.rox.one',
-  sync: 'https://sync-service-dev3.macroverse.workers.dev',
-  editing: 'https://ai-editing-worker-dev.macroverse.workers.dev',
+  sync: 'https://sync-service-dev3.roxverse.workers.dev',
+  editing: 'https://ai-editing-worker-dev.roxverse.workers.dev',
   // The machine's local LGTM collector (`just run_local` starts it).
   otlp: 'http://localhost:4318',
 } as const;

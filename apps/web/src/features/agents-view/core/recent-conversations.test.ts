@@ -9,7 +9,7 @@ import {
   selectRecentAgentConversations,
 } from './recent-conversations';
 
-const OWNER = 'macro|me@example.com';
+const OWNER = 'rox|me@example.com';
 
 function session(
   id: string,
@@ -63,7 +63,7 @@ describe('selectRecentAgentConversations', () => {
   it('keeps only the owner’s conversations, newest first, matching the search', () => {
     const mine = session('a', { updatedAt: '2026-09-15T08:00:00Z' });
     const newer = chat('b', { updatedAt: '2026-09-15T11:00:00Z' });
-    const theirs = session('c', { ownerId: 'macro|other@example.com' });
+    const theirs = session('c', { ownerId: 'rox|other@example.com' });
 
     expect(
       selectRecentAgentConversations([mine, theirs, newer], OWNER, '')

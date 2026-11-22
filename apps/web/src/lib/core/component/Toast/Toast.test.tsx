@@ -81,7 +81,7 @@ it('keeps persistent prompts separate from transient notices', () => {
   expect(
     screen
       .getByText('Saved')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-closed')
   ).toBe(true);
   expect(screen.getByText('Reconnect account')).toBeTruthy();
@@ -97,7 +97,7 @@ it('pauses the entire list while a user is reading it', () => {
   expect(
     screen
       .getByText('Reading this notice')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-opened')
   ).toBe(true);
   fireEvent.pointerLeave(list);
@@ -105,7 +105,7 @@ it('pauses the entire list while a user is reading it', () => {
   expect(
     screen
       .getByText('Reading this notice')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-closed')
   ).toBe(true);
 });
@@ -123,7 +123,7 @@ it('keeps keyboard-focused actions alive until focus leaves the list', () => {
   expect(
     screen
       .getByText('Keyboard notice')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-opened')
   ).toBe(true);
   fireEvent.focusOut(action, { relatedTarget: document.body });
@@ -131,7 +131,7 @@ it('keeps keyboard-focused actions alive until focus leaves the list', () => {
   expect(
     screen
       .getByText('Keyboard notice')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-closed')
   ).toBe(true);
 });
@@ -157,7 +157,7 @@ it('preserves actions and only reports explicit dismissal as a user dismissal', 
   expect(
     screen
       .getByText('Action required')
-      .closest('[data-macro-toast]')
+      .closest('[data-rox-toast]')
       ?.hasAttribute('data-closed')
   ).toBe(true);
 });

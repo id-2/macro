@@ -90,8 +90,8 @@ function organizerIconProps(
 ): UserIconProps | undefined {
   const email = entity.organizer?.email;
   if (!email) return undefined;
-  const macroId = emailToMacroId(email);
-  return macroId ? { id: macroId } : { email };
+  const roxId = emailToMacroId(email);
+  return roxId ? { id: roxId } : { email };
 }
 
 /** Organizer display: the Rox profile name when resolved, else the source's
@@ -101,8 +101,8 @@ function organizerIconProps(
  * must not win over the name the source supplied. */
 function organizerName(entity: CalendarEventEntity): string {
   const email = entity.organizer?.email;
-  const macroId = email ? emailToMacroId(email) : undefined;
-  const resolved = macroId ? getDisplayName(macroId).trim() : '';
+  const roxId = email ? emailToMacroId(email) : undefined;
+  const resolved = roxId ? getDisplayName(roxId).trim() : '';
   const profileName = resolved && resolved !== email ? resolved : '';
   return profileName || entity.organizer?.name || email || '';
 }

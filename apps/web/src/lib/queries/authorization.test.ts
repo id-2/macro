@@ -27,7 +27,7 @@ describe('createQueryAuthorization', () => {
       hasNext: false,
       operation: deniedOperation,
       error: denial,
-      extensions: { __macroNormalizedCache: { source: 'live-network' } },
+      extensions: { __roxNormalizedCache: { source: 'live-network' } },
     });
     expect(first.error()).toBe(denial);
     expect(second.error()).toBe(denial);
@@ -51,7 +51,7 @@ describe('createQueryAuthorization', () => {
       hasNext: false,
       operation: recoveryOperation,
       data: { viewer: { id: 'current' } },
-      extensions: { __macroNormalizedCache: { source: 'live-network' } },
+      extensions: { __roxNormalizedCache: { source: 'live-network' } },
     });
     expect(first.error()).toBeUndefined();
     expect(second.error()).toBeUndefined();
@@ -122,7 +122,7 @@ describe('createQueryAuthorization', () => {
       hasNext: false,
       operation,
       error: denial,
-      extensions: { __macroNormalizedCache: { source } },
+      extensions: { __roxNormalizedCache: { source } },
     });
     expect(second.error()).toBeUndefined();
 
@@ -138,7 +138,7 @@ describe('createQueryAuthorization', () => {
       hasNext: false,
       operation: cacheOperation,
       data: { viewer: { id: 'cached' } },
-      extensions: { __macroNormalizedCache: { source } },
+      extensions: { __roxNormalizedCache: { source } },
     });
     expect(first.error()).toBe(denial);
     expect(second.error()).toBe(denial);

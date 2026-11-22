@@ -8,7 +8,7 @@ vi.mock('@core/mobile/isMobile', () => ({ isMobile: () => false }));
 vi.mock('@core/mobile/isTouchDevice', () => ({ isTouchDevice: () => false }));
 
 beforeEach(() => {
-  localStorage.removeItem('macro:sidebar:prefs');
+  localStorage.removeItem('rox:sidebar:prefs');
   vi.stubGlobal('scrollTo', vi.fn());
   vi.stubGlobal(
     'ResizeObserver',
@@ -126,7 +126,7 @@ describe('sidebar customization drag sorting', () => {
     ).toBe(false);
     cleanup();
 
-    localStorage.removeItem('macro:sidebar:prefs');
+    localStorage.removeItem('rox:sidebar:prefs');
     mount();
     expect(
       (
@@ -139,7 +139,7 @@ describe('sidebar customization drag sorting', () => {
 
   it('keeps Scheduling hidden for existing preferences until explicitly enabled', async () => {
     localStorage.setItem(
-      'macro:sidebar:prefs',
+      'rox:sidebar:prefs',
       JSON.stringify({ hidden: ['reviews'], order: ['tasks', 'mail'] })
     );
     const mount = () =>
@@ -167,14 +167,14 @@ describe('sidebar customization drag sorting', () => {
         })
       ).checked
     ).toBe(true);
-    const stored = JSON.parse(localStorage.getItem('macro:sidebar:prefs')!);
+    const stored = JSON.parse(localStorage.getItem('rox:sidebar:prefs')!);
     expect(stored.order).toEqual(['tasks', 'mail']);
     expect(stored.hidden).toEqual(['reviews', 'activity']);
   });
 
   it('keeps Activity hidden for version 1 preferences until explicitly enabled', async () => {
     localStorage.setItem(
-      'macro:sidebar:prefs',
+      'rox:sidebar:prefs',
       JSON.stringify({ version: 1, hidden: ['reviews'], order: [] })
     );
     const mount = () =>
@@ -200,7 +200,7 @@ describe('sidebar customization drag sorting', () => {
       ).checked
     ).toBe(true);
     expect(
-      JSON.parse(localStorage.getItem('macro:sidebar:prefs')!).hidden
+      JSON.parse(localStorage.getItem('rox:sidebar:prefs')!).hidden
     ).toEqual(['reviews']);
   });
 });

@@ -8,6 +8,6 @@ import { usePreference } from '@app/lib/preferences/use-preference';
  * split panes in step when it is toggled.
  */
 export const [markdownWideMode, setMarkdownWideMode] = usePreference(
-  'macro:pref:markdown:wide-mode',
+  'rox:pref:markdown:wide-mode',
   { default: false }
 );

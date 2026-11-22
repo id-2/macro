@@ -178,7 +178,7 @@ export const HYDRATE_ONLY_CONTEXT_KEY = 'normalizedCacheHydrateOnly';
 /** Retains the client-annotated document while the transport uses a stripped copy. */
 const HYDRATION_DOCUMENT_CONTEXT_KEY = 'normalizedCacheHydrationDocument';
 
-const NORMALIZED_CACHE_RESULT_METADATA_KEY = '__macroNormalizedCache';
+const NORMALIZED_CACHE_RESULT_METADATA_KEY = '__roxNormalizedCache';
 
 /** Private authority metadata attached by the normalized-cache exchange. */
 export type NormalizedCacheResultMetadata =

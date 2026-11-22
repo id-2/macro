@@ -66,7 +66,7 @@ function rsvp(access: FormDetail['access']): FormDetail {
       id: 'form-1',
       name: 'RSVP',
       description: '',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -116,7 +116,7 @@ describe('createFormShareInput', () => {
       blockAlias: 'form',
       itemType: 'form',
       name: 'RSVP',
-      owner: 'macro|owner@example.com',
+      owner: 'rox|owner@example.com',
       userPermissions: Permissions.CAN_EDIT,
     });
     current?.copyLink?.();
@@ -196,7 +196,7 @@ describe('openFormShareModal', () => {
         id: 'form-1',
         name: 'Workshop',
         description: '',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         databaseId: 'database-1',
         tableId: 'table-1',
         audience: 'members',

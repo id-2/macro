@@ -222,7 +222,7 @@ export function templateItem(
     (code && sentenceText(code.sentence, code.knobs)) || draft.description;
   return {
     id: `template:${entry.key}`,
-    from: 'macro',
+    from: 'rox',
     kind: 'catalog',
     template: true,
     catalogKey: entry.key,

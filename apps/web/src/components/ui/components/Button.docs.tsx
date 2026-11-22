@@ -3,8 +3,8 @@ import { HeaderActionButton } from '@components/app/HeaderActionButton';
 import ArrowRightIcon from '@icon/system/regular/arrow-right.svg';
 import PlusIcon from '@icon/system/regular/plus.svg';
 import { DropdownMenu } from '@kobalte/core/dropdown-menu';
-import { macroDarkTheme } from '@theme/themes/macro-dark';
-import { macroLightTheme } from '@theme/themes/macro-light';
+import { roxDarkTheme } from '@theme/themes/rox-dark';
+import { roxLightTheme } from '@theme/themes/rox-light';
 import { themeCssVars } from '@theme/utils/themeCssVars';
 import { createSignal, For } from 'solid-js';
 import { Button, type ButtonVariant } from './Button';
@@ -204,7 +204,7 @@ function TriggerDemo() {
 function ThemesDemo() {
   return (
     <div class="flex flex-col gap-4">
-      <For each={[macroLightTheme, macroDarkTheme]}>
+      <For each={[roxLightTheme, roxDarkTheme]}>
         {(theme) => (
           <div
             data-theme-light={String(theme.mode === 'light')}

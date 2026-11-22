@@ -245,7 +245,7 @@ export const appRoute = defineRoute({ id: APP_ROUTE_ID });
 
 /**
  * Agents may open this route for the person who prompted them
- * (`macro.ui.open`). Routes are closed to agents unless they say this; keep
+ * (`rox.ui.open`). Routes are closed to agents unless they say this; keep
  * routes with side effects (calls, auth and OAuth callbacks, composing mail,
  * credential settings, debug views) closed.
  */

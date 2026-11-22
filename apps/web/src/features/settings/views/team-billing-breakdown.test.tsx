@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
   offersRequest: vi.fn(),
 }));
 vi.mock('@app/lib/analytics/posthog', () => ({
-  useFeatureFlag: () => macroFlag,
+  useFeatureFlag: () => roxFlag,
 }));
 vi.mock('@queries/computers/computers', () => ({
   useComputersQuery: (enabled: () => boolean) => {
@@ -27,7 +27,7 @@ vi.mock('../computers/views/BillingComputers', () => ({
   BillingComputers: () => <p>Existing computers view</p>,
 }));
 
-const [macroFlag, setMacroFlag] = createSignal({
+const [roxFlag, setMacroFlag] = createSignal({
   enabled: false,
   loading: true,
 });

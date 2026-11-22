@@ -9,7 +9,7 @@ import { unsupportedContactSync } from './test-support';
 
 const REQUEST: PeopleReferenceRequest = {
   scope: {
-    identity: 'macro|viewer@example.com',
+    identity: 'rox|viewer@example.com',
     storageGeneration: '00000000-0000-4000-8000-000000000001',
   },
   labels: ['Sam'],
@@ -45,7 +45,7 @@ it('bounds raw reference labels and validates the complete coordinator envelope'
 
 it('requires one bounded evidence group per label and preserves scope failures', async () => {
   const person = {
-    userId: 'macro|sam@example.com',
+    userId: 'rox|sam@example.com',
     email: 'sam@example.com',
     name: 'Sam',
   };

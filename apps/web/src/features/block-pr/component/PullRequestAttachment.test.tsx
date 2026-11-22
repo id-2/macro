@@ -28,12 +28,12 @@ import { PullRequestAttachment } from './PullRequestAttachment';
 const title = 'fix(channels): keep the gif picker visible on mobile';
 const pullRequest: ForeignEntity = {
   id: 'pr-1',
-  foreignEntityId: 'macro-inc/macro/pull/8813',
+  foreignEntityId: 'rox-inc/rox/pull/8813',
   foreignEntitySource: 'github_pull_request',
   metadata: {
     name: title,
-    owner: 'macro-inc',
-    repo: 'macro',
+    owner: 'rox-inc',
+    repo: 'rox',
     number: 8813,
     status: 'open',
   },

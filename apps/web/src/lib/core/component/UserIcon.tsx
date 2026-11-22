@@ -1,5 +1,5 @@
 import { ENABLE_PROFILE_PICTURES } from '@core/constant/featureFlags';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { staticFileSizedUrl } from '@core/constant/servers';
 import { internalDrag } from '@core/directive/internalDragState';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
@@ -9,7 +9,7 @@ import {
   getDisplayNameParts,
   getInitials,
   getInitialsFromName,
-  macroIdToEmail,
+  roxIdToEmail,
   tryMacroId,
   useIsConnectedSecondaryInbox,
 } from '@core/user';
@@ -46,14 +46,14 @@ function ProfileImage(props: {
   email?: string;
   photoUrl?: string;
 }) {
-  const macroId = createMemo(() =>
+  const roxId = createMemo(() =>
     props.id ? tryMacroId(props.id) : undefined
   );
 
   const email = createMemo(() => {
     if (props.id) {
       const id = tryMacroId(props.id);
-      return id ? macroIdToEmail(id) : props.email || 'User';
+      return id ? roxIdToEmail(id) : props.email || 'User';
     }
     return props.email || 'User';
   });
@@ -61,7 +61,7 @@ function ProfileImage(props: {
   const initials = () => {
     if (props.name !== undefined)
       return getInitialsFromName(props.name, email());
-    const { firstName, lastName } = getDisplayNameParts(macroId());
+    const { firstName, lastName } = getDisplayNameParts(roxId());
     return getInitials(firstName, lastName, email());
   };
 
@@ -145,15 +145,15 @@ function UserIconContent(props: {
 export function UserIcon(props: UserIconProps) {
   const size = () => props.size ?? 'md';
 
-  const macroId = createMemo(() =>
+  const roxId = createMemo(() =>
     props.id ? tryMacroId(props.id) : undefined
   );
 
-  const displayName = () => props.name ?? getDisplayName(macroId());
+  const displayName = () => props.name ?? getDisplayName(roxId());
 
   const email = createMemo(() => {
-    const id = macroId();
-    if (id) return macroIdToEmail(id);
+    const id = roxId();
+    if (id) return roxIdToEmail(id);
     return props.email;
   });
 
@@ -224,7 +224,7 @@ export function UserIcon(props: UserIconProps) {
         </Avatar>
       </Match>
 
-      <Match when={macroId()} keyed>
+      <Match when={roxId()} keyed>
         {(id) => (
           <UserCardTrigger
             placement="left"

@@ -12,7 +12,7 @@ const flag = vi.hoisted(() => ({ on: false }));
 
 vi.mock('@app/lib/analytics/posthog', () => ({
   useFeatureFlag: (requested: { key: string }) => () => ({
-    enabled: requested.key === 'macro-connect' && flag.on,
+    enabled: requested.key === 'rox-connect' && flag.on,
     loading: false,
   }),
 }));
@@ -61,7 +61,7 @@ describe('PipedreamAiProvider label', () => {
   });
   afterEach(cleanup);
 
-  it('says Rox Connect on a Connect grant with the macro-connect flag on', () => {
+  it('says Rox Connect on a Connect grant with the rox-connect flag on', () => {
     flag.on = true;
     renderLinear('connect');
     expect(screen.getByText('Powered by Rox Connect')).toBeTruthy();

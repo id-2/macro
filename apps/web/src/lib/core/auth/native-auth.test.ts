@@ -46,7 +46,7 @@ describe('native browser authentication', () => {
   it('binds each Android attempt to a distinct callback before starting OAuth', async () => {
     const first = createNativeAuthSession('login');
     const second = createNativeAuthSession('login');
-    expect(first.callbackUrl).toMatch(/^macro:\/\/android-auth\/[\da-f-]{36}$/);
+    expect(first.callbackUrl).toMatch(/^rox:\/\/android-auth\/[\da-f-]{36}$/);
     expect(second.callbackUrl).not.toBe(first.callbackUrl);
     mocks.invoke.mockResolvedValue({ success: true, token: 'one-time-code' });
     await expect(
@@ -74,7 +74,7 @@ describe('native browser authentication', () => {
     expect(mocks.invoke).toHaveBeenCalledWith('plugin:auth|authenticate', {
       payload: {
         authUrl: 'https://accounts.google.com/authorize',
-        callbackScheme: 'macro',
+        callbackScheme: 'rox',
         ephemeralSession: true,
       },
     });
@@ -157,7 +157,7 @@ describe('native browser authentication', () => {
   // an empty host parses that way — `rox://login` would arrive as a host.
   it('points the desktop callback at a route that redeems a session code', () => {
     const callback = new URL(DESKTOP_AUTH_CALLBACK_URL);
-    expect(callback.protocol).toBe('macro:');
+    expect(callback.protocol).toBe('rox:');
     expect(callback.host).toBe('');
     expect(callback.pathname).toBe('/login');
   });

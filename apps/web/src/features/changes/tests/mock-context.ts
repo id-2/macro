@@ -36,7 +36,7 @@ index 0000000..3333333
 export function mockChangeset(overrides: Partial<Changeset> = {}): Changeset {
   return {
     id: 'cs-1',
-    repository: 'https://github.com/macro-inc/macro',
+    repository: 'https://github.com/rox-inc/rox',
     base: { name: 'main' },
     head: { name: 'agent/unread-archived-sessions' },
     files: [

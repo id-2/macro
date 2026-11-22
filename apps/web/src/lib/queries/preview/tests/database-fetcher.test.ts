@@ -30,7 +30,7 @@ it('previews a shared database its owner can open, and a deleted one as gone', a
       database: {
         id: 'wedding',
         name: 'Wedding',
-        owner_id: 'macro|wolf@rox.one',
+        owner_id: 'rox|wolf@rox.one',
         created_at: '2026-09-01T00:00:00Z',
         trashed_at: null,
         appearance: { icon: { kind: 'emoji', value: '📚' }, color: null },
@@ -50,7 +50,7 @@ it('previews a shared database its owner can open, and a deleted one as gone', a
     loading: false,
     rawName: 'Wedding',
     name: 'Wedding',
-    owner: 'macro|wolf@rox.one',
+    owner: 'rox|wolf@rox.one',
     appearance: { icon: { kind: 'emoji', value: '📚' }, color: null },
   });
 

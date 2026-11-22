@@ -1162,7 +1162,7 @@ export async function withLocalAttachmentUpload(
   const id = fileIds.get(file);
   if (!draft || !id)
     throw new Error('Save the attachment on this device before uploading');
-  const name = `macro-email-upload:${owner.accountId}:${draft.key}:${draft.generation}:${id}`;
+  const name = `rox-email-upload:${owner.accountId}:${draft.key}:${draft.generation}:${id}`;
   const run = async () => {
     await emailStorageSession();
     const current = await localDraftStore.read(owner, draft.key);

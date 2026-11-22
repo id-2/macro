@@ -43,7 +43,7 @@ export function createRoxDatabaseApi(
       })
     );
   return {
-    key: ['macro-database', databaseId],
+    key: ['rox-database', databaseId],
     readTable: (id) =>
       detail().andThen((detail) => {
         const table = detail.tables.find((table) => table.table.id === id);

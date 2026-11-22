@@ -21,7 +21,7 @@ export function SpreadsheetDraftMenu(props: {
   const groups = createMemo<SplitFileMenuActionGroups>(() => ({
     entity: [],
     sender: [],
-    macro: [{ label: 'Ask Rox', icon: Sparkle, action: props.onAsk }],
+    rox: [{ label: 'Ask Rox', icon: Sparkle, action: props.onAsk }],
     sharing: [{ label: 'Share', icon: Share, action: props.onShare }],
     file: props.onRename
       ? [{ label: 'Rename', icon: Rename, action: props.onRename }]
@@ -29,7 +29,7 @@ export function SpreadsheetDraftMenu(props: {
     delete: [],
   }));
   const actions = () => [
-    ...groups().macro,
+    ...groups().rox,
     ...groups().sharing,
     ...groups().file,
   ];

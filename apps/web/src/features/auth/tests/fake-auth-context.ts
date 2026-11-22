@@ -73,7 +73,7 @@ const userFor = (
   email: string,
   account: { tutorialComplete: boolean } | undefined
 ): AuthUser => ({
-  id: `macro|${email}`,
+  id: `rox|${email}`,
   email,
   tutorialComplete: account?.tutorialComplete ?? false,
   isAgent: false,

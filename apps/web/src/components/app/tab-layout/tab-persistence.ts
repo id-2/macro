@@ -19,7 +19,7 @@ const persistedTabsSchema = z.object({
 
 export type PersistedTabs = z.infer<typeof persistedTabsSchema>;
 
-const storage = createUserScopedStorage('macro:desktop:tabs');
+const storage = createUserScopedStorage('rox:desktop:tabs');
 
 export function readPersistedTabs(userId: string): PersistedTabs | undefined {
   const raw = storage.read(userId);

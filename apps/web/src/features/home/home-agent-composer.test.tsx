@@ -88,7 +88,7 @@ it('opens the new session inside Home', () => {
     prompt: 'Build it',
     botId: 'selected-agent',
     modelOverride: 'model',
-    repoUrl: 'https://github.com/macro-inc/macro',
+    repoUrl: 'https://github.com/rox-inc/rox',
     repoBranch: 'feature/home',
   };
   mocks.onStart?.(start);

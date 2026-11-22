@@ -9,7 +9,7 @@ describe('native update destination', () => {
     const url = new URL(storeListingUrl('android'));
     expect(url.protocol).toBe('https:');
     expect(url.hostname).toBe('play.google.com');
-    expect(url.searchParams.get('id')).toBe('com.macro.workspace.mobile');
+    expect(url.searchParams.get('id')).toBe('com.rox.workspace.mobile');
     expect(storeListingUrl('ios')).toContain('id6743133649');
   });
 

@@ -36,7 +36,7 @@ export interface BookingLinkEvent {
   durationMinutes: number;
   /** Whether new bookings are accepted. */
   enabled: boolean;
-  /** Generate a Google Meet conference. Mutually exclusive with `macroCall`. */
+  /** Generate a Google Meet conference. Mutually exclusive with `roxCall`. */
   googleMeet: boolean;
   /**
    * Maximum days ahead.
@@ -57,7 +57,7 @@ booking and written onto the calendar invitation. Mutually exclusive
 with `googleMeet`. Prefer this for a Rox booking; omit or false when
 the link should use Google Meet or no video. False is omitted so drafts
 saved before this field still round-trip unchanged. */
-  macroCall?: boolean;
+  roxCall?: boolean;
   /** Host assignment policy. */
   mode: SchedulingMode;
   /**

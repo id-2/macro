@@ -19,7 +19,7 @@ export type RecipientChoices = readonly Recipient[] | RecipientLookup;
 export function recipientReferenceTerm(term: string): string {
   const trimmed = term.trim();
   if (
-    trimmed.toLowerCase().startsWith('macro|') ||
+    trimmed.toLowerCase().startsWith('rox|') ||
     EmailValidator.validate(trimmed)
   )
     return trimmed.toLowerCase();
@@ -98,7 +98,7 @@ export function resolveRecipientTerms(
       continue;
     }
     const address =
-      !query.startsWith('macro|') && EmailValidator.validate(term);
+      !query.startsWith('rox|') && EmailValidator.validate(term);
     if (address) {
       // Explicit addresses cannot be redirected by someone else's display name.
       if (!identity.length && allowExternal)
@@ -112,7 +112,7 @@ export function resolveRecipientTerms(
       else unresolved.push(term);
       continue;
     }
-    if (!choices || identity.length > 1 || query.startsWith('macro|')) {
+    if (!choices || identity.length > 1 || query.startsWith('rox|')) {
       unresolved.push(term);
       continue;
     }

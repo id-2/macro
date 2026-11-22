@@ -6,7 +6,7 @@ import type { CalendarEvent } from '@app/features/calendar/types';
 import type { EventContentArg } from '@fullcalendar/core';
 import { cleanup, render, screen } from '@solidjs/testing-library';
 import { afterEach, describe, expect, it } from 'vitest';
-import { attachCalendarMacroCall } from '../utils/macro-call-link';
+import { attachCalendarMacroCall } from '../utils/rox-call-link';
 import { EventContent } from './EventContent';
 
 const CALL_URL =
@@ -49,7 +49,7 @@ function event(overrides: Partial<CalendarEvent> = {}): CalendarEvent {
 }
 
 /** A Rox call as the editor saves it, next to whatever location was typed. */
-function macroCallEvent(typedLocation: string) {
+function roxCallEvent(typedLocation: string) {
   return event(
     attachCalendarMacroCall(
       { description: '<p>Agenda</p>', location: typedLocation },
@@ -76,14 +76,14 @@ function renderDayChip(calendarEvent: CalendarEvent) {
 
 describe('the location on a day view event chip', () => {
   it('leaves out a Rox call link saved as the only location', () => {
-    const { container } = renderDayChip(macroCallEvent(''));
+    const { container } = renderDayChip(roxCallEvent(''));
 
     expect(screen.getByText('Planning')).toBeTruthy();
     expect(container.textContent).not.toContain('/meet/');
   });
 
   it('shows the location typed next to a Rox call', () => {
-    const { container } = renderDayChip(macroCallEvent('Room 4B'));
+    const { container } = renderDayChip(roxCallEvent('Room 4B'));
 
     expect(screen.getByText('Room 4B')).toBeTruthy();
     expect(container.textContent).not.toContain('/meet/');

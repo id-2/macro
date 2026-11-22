@@ -7,7 +7,7 @@
 
 export type GetUserActivityParams = {
   /**
-   * A `macro|` user id; omit for the caller.
+   * A `rox|` user id; omit for the caller.
    */
   user?: string;
   /**

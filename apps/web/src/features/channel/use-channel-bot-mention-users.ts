@@ -56,7 +56,7 @@ export function availableBotMentionUsers(
 
 /**
  * The channel's bots as synthetic [`IUser`] entries for the `@`-mention
- * typeahead. Like `macroAiMentionUser()`, `email` is set to the bot's name so
+ * typeahead. Like `roxAiMentionUser()`, `email` is set to the bot's name so
  * persisted mentions render as "@BotName", and `id` uses the canonical
  * `bot|<uuid>` principal form so mentions are re-tagged as bot mentions at
  * send time (see `authoredMentions`).

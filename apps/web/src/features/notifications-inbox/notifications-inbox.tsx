@@ -34,7 +34,7 @@ import { createNotificationInboxSource } from './queries/notification-inbox-sour
 import { resolveAccessRequest } from './queries/row-actions';
 import { NotificationsView } from './views/notifications-view';
 
-const filterStorage = createUserScopedStorage('macro:notifications:filters:v1');
+const filterStorage = createUserScopedStorage('rox:notifications:filters:v1');
 
 function userName(userId: string): string | undefined {
   const parts = getDisplayNameParts(tryMacroId(userId), {

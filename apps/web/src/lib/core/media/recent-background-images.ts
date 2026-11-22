@@ -5,7 +5,7 @@ export const MAX_RECENT_IMAGES = 5;
 export const MAX_RECENT_IMAGE_LENGTH = 2 * 1024 * 1024;
 const STORE = 'images';
 const database = new RecoverableIDB(
-  'macro-recent-background-images',
+  'rox-recent-background-images',
   1,
   (db) => {
     db.createObjectStore(STORE);

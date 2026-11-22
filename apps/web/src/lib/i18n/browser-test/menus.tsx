@@ -10,7 +10,7 @@ import { For, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { SettingsSidebar } from '../../../features/settings/components/settings-sidebar';
 import { LanguageSettings } from '../../../features/settings/LanguageSettings';
-import { macroLightTheme } from '../../../features/theme/themes/macro-light';
+import { roxLightTheme } from '../../../features/theme/themes/rox-light';
 import { themeCssVars } from '../../../features/theme/utils/themeCssVars';
 import { authKeys } from '../../queries/auth/keys';
 import { teamKeys } from '../../queries/team/keys';
@@ -143,7 +143,7 @@ function Menu(props: (typeof MENUS)[number]) {
   );
 }
 
-const OWNER = 'macro|owner@acme.test';
+const OWNER = 'rox|owner@acme.test';
 
 function Fixture() {
   const queryClient = new QueryClient({
@@ -206,7 +206,7 @@ function Fixture() {
   );
 }
 
-for (const [key, token] of Object.entries(themeCssVars(macroLightTheme)))
+for (const [key, token] of Object.entries(themeCssVars(roxLightTheme)))
   document.documentElement.style.setProperty(key, token);
 const requested = new URLSearchParams(location.search).get('lang');
 setInterfaceLanguage(isLanguage(requested) ? requested : 'en');

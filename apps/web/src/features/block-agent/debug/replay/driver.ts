@@ -29,7 +29,7 @@ export const REPLAY_BOT: SessionBot = {
   name: 'Replay',
   handle: 'replay',
 };
-export const REPLAY_OWNER = 'macro|replay@example.com';
+export const REPLAY_OWNER = 'rox|replay@example.com';
 
 /** POST ack → frame in the log, same ordering the harness produces. */
 const PROMPT_ECHO_DELAY_MS = 150;

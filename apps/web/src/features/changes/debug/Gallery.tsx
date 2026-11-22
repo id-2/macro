@@ -102,7 +102,7 @@ export default function ChangesGallery() {
                 class="self-start"
                 onClick={() =>
                   context.setPullRequestUrl(
-                    'https://github.com/macro-inc/macro/pull/1482'
+                    'https://github.com/rox-inc/rox/pull/1482'
                   )
                 }
               >

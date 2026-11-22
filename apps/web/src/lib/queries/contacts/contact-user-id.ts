@@ -1,4 +1,4 @@
-import { type RoxId, macroIdToEmail, tryMacroId } from '@core/user/macroId';
+import { type RoxId, roxIdToEmail, tryMacroId } from '@core/user/roxId';
 import { validate as validEmail } from 'email-validator';
 
 const UTF8 = new TextEncoder();
@@ -12,7 +12,7 @@ export function canonicalContactUserId(value: string): RoxId | undefined {
   return id &&
     !id.includes('$') &&
     UTF8.encode(id).length <= MAX_CONTACT_ID_BYTES &&
-    validEmail(macroIdToEmail(id))
+    validEmail(roxIdToEmail(id))
     ? id
     : undefined;
 }

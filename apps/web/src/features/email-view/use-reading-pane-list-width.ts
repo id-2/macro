@@ -16,7 +16,7 @@ export function useReadingPaneListWidth(): [
   setWidth: (width: number) => void,
 ] {
   const [savedWidth, setSavedWidth] = usePreference<unknown>(
-    'macro:pref:email:reading-pane-list-width',
+    'rox:pref:email:reading-pane-list-width',
     { default: READING_PANE_LIST_WIDTH.default }
   );
   const width = () => {

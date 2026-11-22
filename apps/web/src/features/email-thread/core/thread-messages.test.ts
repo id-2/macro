@@ -85,7 +85,7 @@ describe('thread message selection', () => {
       internal_date_ts: '2026-09-01T00:00:00Z',
     });
     const fromLogin = message('from-login', {
-      from: { email: 'me@macro.example' },
+      from: { email: 'me@rox.example' },
       to: [{ email: 'dave@example.com' }],
       internal_date_ts: '2026-09-03T00:00:00Z',
     });
@@ -99,7 +99,7 @@ describe('thread message selection', () => {
       selectThreadParticipants(
         thread([draft, fromLogin, later, original]),
         'viewer@example.com',
-        'me@macro.example'
+        'me@rox.example'
       )
     ).toEqual([
       'alice@example.com',

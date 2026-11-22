@@ -1,4 +1,4 @@
-import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_NEW_BOT_ID } from '@core/constant/roxNew';
 import { throwOnErr } from '@core/util/result';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import {

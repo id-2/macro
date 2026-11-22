@@ -29,7 +29,7 @@ vi.mock('@core/context/channels', () => ({
   }),
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|ada@acme.test',
+  useUserId: () => () => 'rox|ada@acme.test',
 }));
 const openWithSplit = vi.hoisted(() => vi.fn());
 vi.mock('@components/app/split-layout/layout', () => ({
@@ -208,7 +208,7 @@ describe('shelf after a video ends', () => {
     expect(video()?.getAttribute('src')).toBe(TUTORIALS.crm?.videoUrl);
     expect(document.activeElement).toBe(playButton());
     expect(track).toHaveBeenLastCalledWith('tutorial_video', {
-      tutorial: 'macro-crm',
+      tutorial: 'rox-crm',
       action: 'opened',
     });
 
@@ -216,7 +216,7 @@ describe('shelf after a video ends', () => {
     fireEvent.click(playButton());
     fireEvent.playing(video()!);
     expect(track).toHaveBeenLastCalledWith('tutorial_video', {
-      tutorial: 'macro-crm',
+      tutorial: 'rox-crm',
       action: 'played',
     });
   });
@@ -241,16 +241,16 @@ describe('shelf after a video ends', () => {
 describe('support link under the video', () => {
   it("opens the person's support channel and closes the dialog", async () => {
     channelList.channels = [
-      { id: 'general', name: 'general', owner_id: 'macro|ada@acme.test' },
+      { id: 'general', name: 'general', owner_id: 'rox|ada@acme.test' },
       {
         id: 'someone-elses-support',
         name: 'Macro Support x grace',
-        owner_id: 'macro|grace@acme.test',
+        owner_id: 'rox|grace@acme.test',
       },
       {
         id: 'support-ada',
         name: 'Rox Support x ada',
-        owner_id: 'macro|ada@acme.test',
+        owner_id: 'rox|ada@acme.test',
       },
     ];
     render(() => <TutorialPill tutorial="crm" />);
@@ -271,7 +271,7 @@ describe('support link under the video', () => {
       { activate: true }
     );
     expect(track).toHaveBeenCalledWith('tutorial_video', {
-      tutorial: 'macro-crm',
+      tutorial: 'rox-crm',
       action: 'support_clicked',
     });
     await waitFor(() => expect(dialogClosed()).toBe(true));
@@ -283,13 +283,13 @@ describe('support link under the video', () => {
       {
         id: 'older-support',
         name: 'Macro Support x grace',
-        owner_id: 'macro|grace@acme.test',
+        owner_id: 'rox|grace@acme.test',
         updated_at: '2026-11-01T10:00:00Z',
       },
       {
         id: 'recent-support',
         name: 'Macro Support x lin',
-        owner_id: 'macro|lin@acme.test',
+        owner_id: 'rox|lin@acme.test',
         updated_at: '2026-11-04T10:00:00Z',
       },
     ];
@@ -310,7 +310,7 @@ describe('support link under the video', () => {
 
   it('leaves the lip out when the person is in no support channel', async () => {
     channelList.channels = [
-      { id: 'general', name: 'general', owner_id: 'macro|ada@acme.test' },
+      { id: 'general', name: 'general', owner_id: 'rox|ada@acme.test' },
     ];
     render(() => <TutorialRow tutorial="mail" />);
     fireEvent.click(row()!);
@@ -329,7 +329,7 @@ describe('block tutorial pill', () => {
     await screen.findByRole('dialog');
     expect(play).not.toHaveBeenCalled();
     expect(track).toHaveBeenCalledWith('tutorial_video', {
-      tutorial: 'macro-mail',
+      tutorial: 'rox-mail',
       action: 'opened',
     });
   });
@@ -366,7 +366,7 @@ describe('block tutorial sidebar item', () => {
     expect(dialog.textContent).toContain('Learn how to use Rox Spreadsheets');
     expect(video()?.getAttribute('src')).toBe(TUTORIALS.spreadsheets?.videoUrl);
     expect(track).toHaveBeenCalledWith('tutorial_video', {
-      tutorial: 'macro-spreadsheets',
+      tutorial: 'rox-spreadsheets',
       action: 'opened',
     });
   });

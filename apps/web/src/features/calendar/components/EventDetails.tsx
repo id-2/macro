@@ -67,7 +67,7 @@ import {
 import {
   calendarMacroCallUrl,
   removeCalendarMacroCall,
-} from '../utils/macro-call-link';
+} from '../utils/rox-call-link';
 import { eventRecurrenceDescription } from '../utils/recurrence';
 import { CALENDAR_TIME_FORMAT_OPTIONS } from '../utils/time-format';
 
@@ -109,14 +109,14 @@ const compareAttendeeNames = new Intl.Collator(undefined, {
 function resolveCalendarAttendee(
   attendee: CalendarAttendee
 ): ResolvedCalendarAttendee {
-  const macroId = emailToMacroId(attendee.email);
-  const iconProps: UserIconProps = macroId
-    ? { id: macroId }
+  const roxId = emailToMacroId(attendee.email);
+  const iconProps: UserIconProps = roxId
+    ? { id: roxId }
     : { email: attendee.email };
   const displayName = () => {
-    const macroName = getDisplayName(macroId).trim();
-    return isUsableDisplayName(macroName, attendee.email)
-      ? macroName
+    const roxName = getDisplayName(roxId).trim();
+    return isUsableDisplayName(roxName, attendee.email)
+      ? roxName
       : attendee.email;
   };
 
@@ -385,9 +385,9 @@ function EventRemindersItem(props: {
 
 function calendarPersonDisplayName(person: CalendarPerson) {
   const email = person.email ?? '';
-  const macroId = person.email ? emailToMacroId(person.email) : undefined;
-  const macroName = getDisplayName(macroId).trim();
-  if (isUsableDisplayName(macroName, email)) return macroName;
+  const roxId = person.email ? emailToMacroId(person.email) : undefined;
+  const roxName = getDisplayName(roxId).trim();
+  if (isUsableDisplayName(roxName, email)) return roxName;
 
   const providerName = person.displayName?.trim() ?? '';
   if (providerName && (!email || isUsableDisplayName(providerName, email))) {
@@ -424,14 +424,14 @@ function CalendarSourceItem(props: {
 }
 
 function CalendarOrganizerItem(props: { organizer: CalendarPerson }) {
-  const macroId = props.organizer.email
+  const roxId = props.organizer.email
     ? emailToMacroId(props.organizer.email)
     : undefined;
   const displayName = () => calendarPersonDisplayName(props.organizer);
 
   const iconProps: UserIconProps | undefined = props.organizer.email
-    ? macroId
-      ? { id: macroId }
+    ? roxId
+      ? { id: roxId }
       : { email: props.organizer.email }
     : undefined;
 
@@ -476,12 +476,12 @@ export function EventDetails(props: {
   timeFormat: CalendarTimeFormat;
   defaultReminders?: EventReminderOverride[];
 }) {
-  const macroMeetingUrl = () => calendarMacroCallUrl(props.event);
+  const roxMeetingUrl = () => calendarMacroCallUrl(props.event);
   const conferenceUrl = createMemo(
-    () => macroMeetingUrl() ?? safeConferenceUrl(props.event.conferenceUrl)
+    () => roxMeetingUrl() ?? safeConferenceUrl(props.event.conferenceUrl)
   );
   const conferenceLabel = () =>
-    macroMeetingUrl()
+    roxMeetingUrl()
       ? 'Join Rox call'
       : props.event.conferenceProvider === 'google_meet'
         ? 'Join Google Meet'
@@ -493,7 +493,7 @@ export function EventDetails(props: {
     formatOriginalTimeZone(props.event, props.timeFormat)
   );
   const eventContent = createMemo(() =>
-    removeCalendarMacroCall(props.event, macroMeetingUrl())
+    removeCalendarMacroCall(props.event, roxMeetingUrl())
   );
   const descriptionHtml = createMemo(() =>
     sanitizeCalendarDescription(eventContent().description)

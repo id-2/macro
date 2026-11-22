@@ -21,7 +21,7 @@ import { ImperativeDialogHost } from '@ui';
 import { Layer } from '@ui/components/Layer';
 import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroLightTheme } from '../../../theme/themes/macro-light';
+import { roxLightTheme } from '../../../theme/themes/rox-light';
 import { themeCssVars } from '../../../theme/utils/themeCssVars';
 import { TeamMembers } from '../../TeamMembers';
 import {
@@ -29,7 +29,7 @@ import {
   TeamAgentStatusChip,
 } from '../../views/team-agent-dm-status';
 
-for (const [key, token] of Object.entries(themeCssVars(macroLightTheme)))
+for (const [key, token] of Object.entries(themeCssVars(roxLightTheme)))
   document.documentElement.style.setProperty(key, token);
 document.documentElement.dataset.themeLight = 'true';
 // The fixture uses the same touch variant switch as the app entry point.
@@ -39,20 +39,20 @@ const team: Team = {
   id: 'team-1',
   name: 'Northwind',
   slug: 'northwind',
-  owner_id: 'macro|maya@example.com',
+  owner_id: 'rox|maya@example.com',
   allow_non_admin_invites: true,
   crm_enabled: false,
   enterprise: false,
 };
 
-// The viewer comes from the page's URL (`?viewer=macro|sam@example.com`), an
+// The viewer comes from the page's URL (`?viewer=rox|sam@example.com`), an
 // owner by default. The roster, invites and agents come from the spec's
 // scripted auth service, so a refetch after an invite reads its new state.
 const viewer =
   new URLSearchParams(window.location.search).get('viewer') ?? team.owner_id;
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   id: viewer,
-  email: viewer.replace('macro|', ''),
+  email: viewer.replace('rox|', ''),
   authenticated: true,
 });
 queryClient.setQueryData(teamKeys.invites(team.id).queryKey, { invites: [] });
@@ -116,7 +116,7 @@ function DirectMessage(props: { userId: string }) {
       <div class="h-40" />
       <div class="px-4 pb-4">
         <TeamAgentStatusBanner userId={props.userId} />
-        <div class="macro-message-width mx-auto rounded-2xl border border-edge-muted px-3 py-2.5 text-sm text-ink-muted">
+        <div class="rox-message-width mx-auto rounded-2xl border border-edge-muted px-3 py-2.5 text-sm text-ink-muted">
           Message Ada
         </div>
       </div>

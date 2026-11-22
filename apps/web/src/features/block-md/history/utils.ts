@@ -1,5 +1,5 @@
-import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/macroAgent';
-import { macroIdToEmail, tryMacroId } from '@core/user';
+import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/roxAgent';
+import { roxIdToEmail, tryMacroId } from '@core/user';
 import { getHashedPaletteColor } from '@ui/utils/palette';
 
 export function userColor(userId: string): string {
@@ -30,7 +30,7 @@ export function userLabel(userId: string): string {
   if (onBehalfOf !== undefined) return `${userLabel(onBehalfOf)} (AI)`;
   if (isMacroAgentId(userId)) return `${ROX_AGENT_NAME} (AI)`;
   const id = tryMacroId(userId);
-  return id ? macroIdToEmail(id) : userId;
+  return id ? roxIdToEmail(id) : userId;
 }
 
 export function formatTimestamp(at: Date): string {

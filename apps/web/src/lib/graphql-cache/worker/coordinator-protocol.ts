@@ -1619,5 +1619,5 @@ function storageVersion(
 export function databaseOwnerLockName(scope: string): string {
   const databaseIdentity = cacheDatabaseIdentity(scope);
   const byteLength = new TextEncoder().encode(databaseIdentity).byteLength;
-  return `macro:turso-opfs:v1:${byteLength}:${databaseIdentity}`;
+  return `rox:turso-opfs:v1:${byteLength}:${databaseIdentity}`;
 }

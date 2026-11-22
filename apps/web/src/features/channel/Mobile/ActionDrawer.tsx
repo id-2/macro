@@ -36,7 +36,7 @@ type ActionId =
   | 'edit'
   | 'delete'
   | 'create-task'
-  | 'ask-macro';
+  | 'ask-rox';
 
 type ActionItem = {
   id: ActionId;
@@ -86,7 +86,7 @@ function buildActionItems(
       onClick: actions?.onCreateTask,
     },
     {
-      id: 'ask-macro',
+      id: 'ask-rox',
       label: 'Ask Rox',
       icon: SparkleIcon,
       onClick: actions?.onChat,

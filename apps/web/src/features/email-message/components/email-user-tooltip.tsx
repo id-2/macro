@@ -1,6 +1,6 @@
 import { HoverCard } from '@core/component/HoverCard';
 import { UserTooltip } from '@core/component/UserTooltip';
-import { emailToMacroId } from '@core/user/macroId';
+import { emailToMacroId } from '@core/user/roxId';
 import { createSignal, type JSX } from 'solid-js';
 
 interface Recipient {

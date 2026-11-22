@@ -82,7 +82,7 @@ export function createInputActions(
   const chat = useChatInputContext();
   const roster = createAgentRosterSource();
   const selectedAgent = () =>
-    roster.roster().find((agent) => agent.id === (fields().botId || 'macro'));
+    roster.roster().find((agent) => agent.id === (fields().botId || 'rox'));
   const catalog = createComposerModels(selectedAgent);
   const email = createEmailComposeContext();
   const startGoogleConnection = useAddInboxFlow();

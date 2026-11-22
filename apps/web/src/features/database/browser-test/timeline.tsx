@@ -2,8 +2,8 @@ import '@fontsource-variable/inter';
 import '../../../index.css';
 import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { themeCssVars } from '../../theme/utils/themeCssVars';
 import { toCellTimeRange } from '../core/cell-date-range';
 import type { DatabaseViewColumn } from '../core/database-view';
@@ -142,7 +142,7 @@ function Fixture() {
 const dark = params.get('theme') === 'dark';
 document.documentElement.dataset.themeLight = String(!dark);
 for (const [key, token] of Object.entries(
-  themeCssVars(dark ? macroDarkTheme : macroLightTheme)
+  themeCssVars(dark ? roxDarkTheme : roxLightTheme)
 ))
   document.documentElement.style.setProperty(key, token);
 const root = document.getElementById('root');

@@ -3,7 +3,7 @@ import ExclamationIcon from '@icon/system/regular/exclamation-mark.svg';
 import { cn } from '@ui';
 import { Show } from 'solid-js';
 import type { CalendarEvent, CalendarTimeFormat } from '../types';
-import { calendarEventLocation } from '../utils/macro-call-link';
+import { calendarEventLocation } from '../utils/rox-call-link';
 import {
   formatCompactCalendarTime,
   formatCompactCalendarTimeRange,

@@ -38,7 +38,7 @@ vi.mock('@ui', async () => ({
   ),
 }));
 
-const COLLAPSED = 'macro:pref:view-sidebar:collapsed:crm';
+const COLLAPSED = 'rox:pref:view-sidebar:collapsed:crm';
 const close = vi.fn();
 let values: Map<string, string>;
 

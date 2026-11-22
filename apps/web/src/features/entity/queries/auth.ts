@@ -1,7 +1,7 @@
 /** Authentication queries used by the entity feature. */
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { fetchWithToken } from '@core/util/fetchWithToken';
-import type { RoxApiTokenResponse } from '@service-auth/generated/schemas/macroApiTokenResponse';
+import type { RoxApiTokenResponse } from '@service-auth/generated/schemas/roxApiTokenResponse';
 import {
   queryOptions,
   type SolidQueryOptions,

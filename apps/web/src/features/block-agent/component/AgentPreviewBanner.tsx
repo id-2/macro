@@ -29,7 +29,7 @@ export function AgentPreviewBanner() {
       const launch = await preview.open();
       if (tab.closed) return;
       if (
-        launch.action !== `${state()?.url}/.macro-preview/auth` ||
+        launch.action !== `${state()?.url}/.rox-preview/auth` ||
         !launch.action.startsWith('https://')
       )
         throw new Error('Invalid preview destination');

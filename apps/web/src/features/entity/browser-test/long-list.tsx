@@ -1,8 +1,8 @@
 import { ListEntity } from '@app/features/entity/composed/ListEntity';
 import { ListEntityNoopMetadataProvider } from '@app/features/entity/composed/list-entity/list-entity-metadata-provider';
 import type { EntityData } from '@app/features/entity/types/entity';
-import { macroDarkTheme } from '@app/features/theme/themes/macro-dark';
-import { macroLightTheme } from '@app/features/theme/themes/macro-light';
+import { roxDarkTheme } from '@app/features/theme/themes/rox-dark';
+import { roxLightTheme } from '@app/features/theme/themes/rox-light';
 import { AnalyticsContextProvider } from '@app/lib/analytics/analytics-context';
 import { PosthogProvider } from '@app/lib/analytics/posthog';
 import { EmailLinksContextProvider } from '@core/context/emailLinks';
@@ -21,7 +21,7 @@ if (hasLoginCookie())
 const params = new URLSearchParams(location.search);
 const count = Number(params.get('count') ?? 1000);
 const theme =
-  params.get('theme') === 'light' ? macroLightTheme : macroDarkTheme;
+  params.get('theme') === 'light' ? roxLightTheme : roxDarkTheme;
 for (const [token, value] of Object.entries(theme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }

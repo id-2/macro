@@ -1,5 +1,5 @@
-import { macroDarkTheme } from '@app/features/theme/themes/macro-dark';
-import { macroLightTheme } from '@app/features/theme/themes/macro-light';
+import { roxDarkTheme } from '@app/features/theme/themes/rox-dark';
+import { roxLightTheme } from '@app/features/theme/themes/rox-light';
 import { Button, Input, Tabs } from '@ui';
 import {
   type Component,
@@ -56,7 +56,7 @@ const WEIGHTS: { value: IconWeight; label: string }[] = [
   { value: 'fill', label: 'Filled' },
   { value: 'bold', label: 'Bold' },
 ];
-const PREVIEW_THEMES = [macroLightTheme, macroDarkTheme].map((theme) => ({
+const PREVIEW_THEMES = [roxLightTheme, roxDarkTheme].map((theme) => ({
   name: theme.name,
   light: theme.mode === 'light',
   style: {

@@ -317,14 +317,14 @@ it('omits full text for Projects and hides search on result opening', async () =
 it('preserves the search after a failed person lookup and on return from a successful retry', async () => {
   mocks.items = () => [
     {
-      id: 'macro|teo@example.com',
+      id: 'rox|teo@example.com',
       kind: 'user',
       bucket: 'person',
       searchText: 'Teo',
       sortTimestamp: 0,
       timestamps: {},
       data: {
-        id: 'macro|teo@example.com',
+        id: 'rox|teo@example.com',
         email: 'teo@example.com',
         name: 'Teo',
       },
@@ -611,14 +611,14 @@ it.each(['before navigation', 'while away'])(
   async (arrival) => {
     mocks.hasMore = false;
     const people: UserItem[] = Array.from({ length: 100 }, (_, index) => ({
-      id: `macro|person-${index}@example.com`,
+      id: `rox|person-${index}@example.com`,
       kind: 'user',
       bucket: 'person',
       searchText: `Person ${index}`,
       sortTimestamp: 0,
       timestamps: {},
       data: {
-        id: `macro|person-${index}@example.com`,
+        id: `rox|person-${index}@example.com`,
         email: `person-${index}@example.com`,
         name: `Person ${index}`,
       },

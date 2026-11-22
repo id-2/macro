@@ -13,7 +13,7 @@ const OTHER_ROX_XML_TAGS = [
   '<m-user-mention>{"userId":"u1","email":"a@example.com"}</m-user-mention>',
   '<m-date-mention>{"date":"2026-07-08","displayFormat":"Today"}</m-date-mention>',
   '<m-contact-mention>{"contactId":"c1","name":"Ness Chu"}</m-contact-mention>',
-  '<m-pr-mention>{"id":"foreign-1","label":"macro/macro#123"}</m-pr-mention>',
+  '<m-pr-mention>{"id":"foreign-1","label":"rox/rox#123"}</m-pr-mention>',
   '<m-group-mention>{"groupAlias":"here"}</m-group-mention>',
   '<m-agent-session-mention>{"id":"sess-1","label":"Fix login"}</m-agent-session-mention>',
   '<m-theme-mention>{"name":"onboarding","data":{}}</m-theme-mention>',
@@ -83,17 +83,17 @@ describe('Rox XML buffer plugin', () => {
   });
 
   it('never releases a partial Rox XML tag while it is streaming', () => {
-    for (const macroXml of [MENTION, ...OTHER_ROX_XML_TAGS]) {
+    for (const roxXml of [MENTION, ...OTHER_ROX_XML_TAGS]) {
       const plugin = createMentionBufferPlugin();
       let emitted = '';
-      for (const char of Array.from(`a ${macroXml} b`)) {
+      for (const char of Array.from(`a ${roxXml} b`)) {
         emitted += textOf(plugin.transform(textPart(char)));
         /* at no point may a fragment of the tag be visible */
         if (emitted.includes('<')) {
-          expect(emitted).toContain(macroXml);
+          expect(emitted).toContain(roxXml);
         }
       }
-      expect(emitted).toBe(`a ${macroXml} b`);
+      expect(emitted).toBe(`a ${roxXml} b`);
     }
   });
 

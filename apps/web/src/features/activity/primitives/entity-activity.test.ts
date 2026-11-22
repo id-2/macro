@@ -102,7 +102,7 @@ describe('createEntityActivityState', () => {
       events: [
         {
           id: 'evt-13',
-          actorId: 'macro|sarah@example.com',
+          actorId: 'rox|sarah@example.com',
           entityId: 'database-1',
           entityType: 'database',
           occurredAt: '2026-08-21T12:00:00.000Z',

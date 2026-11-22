@@ -29,7 +29,7 @@ describe('agentSetupMarkdown', () => {
     ).toEqual(
       expect.arrayContaining([
         'https://docs.rox.one/AI/bring-your-own',
-        'https://github.com/macro-inc/macro/tree/main/crates/coding_agent_worker',
+        'https://github.com/rox-inc/rox/tree/main/crates/coding_agent_worker',
       ])
     );
   });

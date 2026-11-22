@@ -31,7 +31,7 @@ const threads = SENDERS.map(
       // GitHub thread: hovering the second name is where clicks were lost.
       participants: [
         { email: `sender${i + 1}@example.com`, name },
-        { email: 'notifications@example.com', name: 'macro-application[bot]' },
+        { email: 'notifications@example.com', name: 'rox-application[bot]' },
       ],
     }) as unknown as EmailEntity
 );

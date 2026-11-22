@@ -27,17 +27,17 @@ it('follows empty continuations and bounds retained suggestions, excluding self 
           ? []
           : [
               {
-                id: 'macro|self@team.example.com',
+                id: 'rox|self@team.example.com',
                 email: 'SELF@team.example.com',
                 name: 'Self',
               },
               {
-                id: 'macro|other@unrelated.example.com',
+                id: 'rox|other@unrelated.example.com',
                 email: 'other@unrelated.example.com',
                 name: 'team.example.com',
               },
               ...Array.from({ length: 20 }, (_, i) => ({
-                id: `macro|person${i}@team.example.com`,
+                id: `rox|person${i}@team.example.com`,
                 email: `person${i}@team.example.com`,
                 name: 'Person',
               })),
@@ -76,12 +76,12 @@ it('deduplicates addresses case-insensitively and stops at source exhaustion', a
     query: '@team.example.com',
     users: [
       {
-        id: 'macro|one@team.example.com',
+        id: 'rox|one@team.example.com',
         email: 'one@team.example.com',
         name: 'One',
       },
       {
-        id: 'macro|one@team.example.com',
+        id: 'rox|one@team.example.com',
         email: 'ONE@team.example.com',
         name: 'One',
       },

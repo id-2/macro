@@ -41,7 +41,7 @@ it('animates the bolt and retains its paid-speed preference across mounts', () =
   const view = render(() => <SpeedToggle model={Model.gpt6Astra} />);
   fireEvent.click(screen.getByRole('button'));
   expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe('true');
-  expect(localStorage.getItem('macro:ai-fast-mode')).toBe('true');
+  expect(localStorage.getItem('rox:ai-fast-mode')).toBe('true');
   expect(animate).toHaveBeenCalledOnce();
   view.unmount();
   render(() => <SpeedToggle model={Model.gpt61Sol} />);

@@ -348,7 +348,7 @@ function SidebarCard(props: { surface: RoutineSurface; class?: string }) {
                   count: counts().forYou,
                 },
                 {
-                  value: 'macro',
+                  value: 'rox',
                   label: t('routineSuggestions.templates'),
                   count: counts().templates,
                 },

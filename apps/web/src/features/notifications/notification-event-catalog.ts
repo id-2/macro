@@ -24,8 +24,8 @@ export type NotificationEventDefinition = {
   type: string;
   label: string;
   description: string;
-  /** Shown only with `enable-macro-computers` on. */
-  macroComputers?: true;
+  /** Shown only with `enable-rox-computers` on. */
+  roxComputers?: true;
 };
 
 export type NotificationEventGroup = {
@@ -205,14 +205,14 @@ export const NOTIFICATION_EVENT_GROUPS: readonly NotificationEventGroup[] = [
         label: 'Computer agent sign-ins',
         description:
           "When an agent sign-in on your team's computer is about to expire",
-        macroComputers: true,
+        roxComputers: true,
       },
       {
         type: 'computer_setup',
         label: 'Computer setup',
         description:
           'When a computer you bought is ready, or could not be set up',
-        macroComputers: true,
+        roxComputers: true,
       },
     ],
   },

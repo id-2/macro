@@ -221,10 +221,10 @@ const REGISTERED_HARNESS = {
   allow_permission_bypass: false,
   kind: 'roxd',
   name: 'Dev box',
-  owner: { type: 'user', user_id: 'macro|user@example.com' },
+  owner: { type: 'user', user_id: 'rox|user@example.com' },
   access: 'owner',
   shared_team_ids: ['team-1'],
-  created_by: 'macro|user@example.com',
+  created_by: 'rox|user@example.com',
   created_at: '2026-08-27T12:00:00Z',
   updated_at: '2026-08-27T12:00:00Z',
   connected: true,
@@ -523,7 +523,7 @@ describe('Harness', () => {
     harnessMocks.query.data = [
       {
         ...REGISTERED_HARNESS,
-        owner: { type: 'user', user_id: 'macro|teammate@example.com' },
+        owner: { type: 'user', user_id: 'rox|teammate@example.com' },
         access: 'user',
       },
     ];
@@ -672,7 +672,7 @@ describe('Harness', () => {
           ...REGISTERED_HARNESS,
           access: 'owner',
           computer_id: 'computer-1',
-          team_agent_user_id: 'macro|agent@example.com',
+          team_agent_user_id: 'rox|agent@example.com',
         },
       ];
 

@@ -4,10 +4,10 @@ import { Button, ImperativeDialogHost } from '@ui';
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import type { CalendarEvent } from '../../calendar/types';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { SelectedEventDetails } from '../components/SelectedEventDetails';
 
-for (const [token, value] of Object.entries(macroLightTheme.colorTokens)) {
+for (const [token, value] of Object.entries(roxLightTheme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }
 document.documentElement.dataset.themeLight = 'true';

@@ -223,18 +223,18 @@ describe('workbook import and export actions', () => {
   });
 
   it.each(['budget.xlsm', 'BUDGET.XLSM'])(
-    'previews macro-enabled workbook %s like an .xlsx',
+    'previews rox-enabled workbook %s like an .xlsx',
     async (name) => {
       const { actions } = setup();
       vi.mocked(importWorkbookFile).mockResolvedValue({
         ...imported,
-        warnings: ['VBA macros are not imported.'],
+        warnings: ['VBA roxs are not imported.'],
       });
       await actions.importExcel({ ...file, name });
       expect(importWorkbookFile).toHaveBeenCalled();
       expect(actions.preview()?.name).toBe(name);
       expect(actions.preview()?.data.warnings).toContain(
-        'VBA macros are not imported.'
+        'VBA roxs are not imported.'
       );
       expect(actions.notice()).toBe('');
     }

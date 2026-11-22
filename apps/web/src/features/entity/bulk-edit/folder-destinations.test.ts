@@ -16,7 +16,7 @@ const folder = (
   id,
   name,
   parentId: options.parentId,
-  userId: options.userId ?? 'macro|me',
+  userId: options.userId ?? 'rox|me',
   createdAt: options.createdAt,
 });
 
@@ -24,7 +24,7 @@ const doc = (id: string, projectId?: string): EntityData => ({
   id,
   type: 'document',
   name: id,
-  ownerId: 'macro|me',
+  ownerId: 'rox|me',
   projectId,
 });
 
@@ -32,7 +32,7 @@ const folderRow = (id: string, projectId?: string): EntityData => ({
   id,
   type: 'project',
   name: id,
-  ownerId: 'macro|me',
+  ownerId: 'rox|me',
   projectId,
 });
 
@@ -87,20 +87,20 @@ describe('folderDestinations', () => {
       names({
         folders: [
           folder('old-shared', 'Old shared', {
-            userId: 'macro|teammate',
+            userId: 'rox|teammate',
             createdAt: '2026-01-01T00:00:00Z',
           }),
           folder('old-mine', 'Old mine', { createdAt: '2026-02-01T00:00:00Z' }),
-          folder('open-b', 'Open B', { userId: 'macro|teammate' }),
+          folder('open-b', 'Open B', { userId: 'rox|teammate' }),
           folder('new-mine', 'New mine', { createdAt: '2026-03-01T00:00:00Z' }),
           folder('new-shared', 'New shared', {
-            userId: 'macro|teammate',
+            userId: 'rox|teammate',
             createdAt: '2026-04-01T00:00:00Z',
           }),
           folder('open-a', 'Open A'),
         ],
         openFolderIds: ['open-a', 'open-b'],
-        userId: 'macro|me',
+        userId: 'rox|me',
         entities: [doc('item')],
       })
     ).toEqual([
@@ -121,7 +121,7 @@ describe('folderDestinations', () => {
         folder('work', 'Work'),
       ],
       openFolderIds: ['notes'],
-      userId: 'macro|me',
+      userId: 'rox|me',
       entities: [doc('item')],
     });
 
@@ -133,7 +133,7 @@ describe('folderDestinations', () => {
       names({
         folders: [folder('here', 'Here'), folder('there', 'There')],
         openFolderIds: ['here', 'there'],
-        userId: 'macro|me',
+        userId: 'rox|me',
         entities: [doc('a', 'here'), doc('b', 'here')],
       })
     ).toEqual([['open', 'There']]);
@@ -144,7 +144,7 @@ describe('folderDestinations', () => {
       names({
         folders: [folder('here', 'Here')],
         openFolderIds: [],
-        userId: 'macro|me',
+        userId: 'rox|me',
         entities: [doc('a', 'here'), doc('b')],
       })
     ).toEqual([['created', 'Here']]);
@@ -159,7 +159,7 @@ describe('folderDestinations', () => {
           folder('other', 'Other'),
         ],
         openFolderIds: ['q4'],
-        userId: 'macro|me',
+        userId: 'rox|me',
         entities: [folderRow('work')],
       })
     ).toEqual([['created', 'Other']]);
@@ -170,12 +170,12 @@ describe('folderPickerItems', () => {
   const destinations = folderDestinations({
     folders: [
       folder('roadmap', 'Roadmap'),
-      folder('road', 'Road', { userId: 'macro|teammate' }),
+      folder('road', 'Road', { userId: 'rox|teammate' }),
       folder('broad', 'Broad strokes'),
       folder('unrelated', 'Invoices'),
     ],
     openFolderIds: ['broad'],
-    userId: 'macro|me',
+    userId: 'rox|me',
     entities: [doc('item')],
   });
   const rows = (query: string) =>

@@ -7,7 +7,7 @@
 import { createUserScopedStorage } from '@core/util/userScopedStorage';
 import { z } from 'zod';
 
-const STORAGE = createUserScopedStorage('macro:md-heading-folds');
+const STORAGE = createUserScopedStorage('rox:md-heading-folds');
 
 /** Documents remembered per person; the least recently folded drop first. */
 const MAX_DOCUMENTS = 200;

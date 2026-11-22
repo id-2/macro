@@ -69,7 +69,7 @@ export function createNativeAuthSession(iosCallbackHost: string) {
             {
               payload: android
                 ? { authUrl, callbackUrl }
-                : { authUrl, callbackScheme: 'macro', ephemeralSession: true },
+                : { authUrl, callbackScheme: 'rox', ephemeralSession: true },
             }
           );
           span.setAttr(

@@ -238,9 +238,9 @@ export function CallOverlay(props: {
     callCtx.trackVersion();
 
     const identity = callCtx.room()?.localParticipant.identity?.trim();
-    const macroIdentity = identity ? tryMacroId(identity) : undefined;
+    const roxIdentity = identity ? tryMacroId(identity) : undefined;
     const userId = currentUserId()?.trim();
-    return macroIdentity ?? (userId ? tryMacroId(userId) : undefined);
+    return roxIdentity ?? (userId ? tryMacroId(userId) : undefined);
   };
 
   const localVideoTrack = () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ChatSummary } from '../../external-chat/core/chat';
 import { historyPromptText, waitingForPhone } from './history-import';
 
-const OWNER = 'macro|owner@example.test';
+const OWNER = 'rox|owner@example.test';
 const chat: ChatSummary = {
   id: 'chat-1',
   provider: 'whatsapp',
@@ -24,7 +24,7 @@ describe('waitingForPhone', () => {
         backfill: { state: 'running', imported: 50 },
       },
       { ...chat, id: 'imported', backfill: { state: 'done', imported: 80 } },
-      { ...chat, id: 'shared', ownerId: 'macro|someone@example.test' },
+      { ...chat, id: 'shared', ownerId: 'rox|someone@example.test' },
       {
         ...chat,
         id: 'disconnected',

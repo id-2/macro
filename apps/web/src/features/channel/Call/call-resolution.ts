@@ -13,7 +13,7 @@ import { match, P } from 'ts-pattern';
  * fallback) and the rationale for hand-rolling it.
  */
 
-const CALL_RESOLUTION_CHANNEL = 'macro-call-resolution';
+const CALL_RESOLUTION_CHANNEL = 'rox-call-resolution';
 const CALL_RESOLUTION_STORAGE_KEY = 'rox.call-resolution';
 
 export type CallResolution =

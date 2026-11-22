@@ -35,7 +35,7 @@ afterEach(() => {
   unmount = undefined;
 });
 
-it('shows and fetches no computers with enable-macro-computers off', async () => {
+it('shows and fetches no computers with enable-rox-computers off', async () => {
   mocks.listComputers.mockResolvedValue(ok([]));
   mocks.getHarnesses.mockResolvedValue(ok([]));
   const queryClient = new QueryClient({

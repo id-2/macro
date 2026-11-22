@@ -13,10 +13,10 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|me@example.com',
+  useUserId: () => () => 'rox|me@example.com',
 }));
 vi.mock('@core/user', async () => ({
-  ...(await import('@core/user/macroId')),
+  ...(await import('@core/user/roxId')),
   getDisplayName: (id: string | undefined) =>
     (id && mocks.displayNames.get(id)) ?? '',
   getDisplayNameParts: () => ({ firstName: '', lastName: '' }),
@@ -56,8 +56,8 @@ vi.mock('@core/component/UserCardTrigger', () => ({
 
 import { OwnerLabel } from './owner-display';
 
-const VIEWER = 'macro|me@example.com';
-const PETER = 'macro|peter@example.com';
+const VIEWER = 'rox|me@example.com';
+const PETER = 'rox|peter@example.com';
 const DEPLOY_BOT = '5f0c8a4e-2d1b-4c3a-9e7f-6a5b4c3d2e1f';
 const ENGINEERING = '01234567-89ab-cdef-0123-456789abcdef';
 

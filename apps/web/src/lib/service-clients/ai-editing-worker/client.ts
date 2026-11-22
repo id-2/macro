@@ -1,5 +1,5 @@
 import type { DocumentOp } from '@ai-ops/editor';
-import { ROX_AGENT_NAME } from '@core/constant/macroAgent';
+import { ROX_AGENT_NAME } from '@core/constant/roxAgent';
 import { type Span, Telemetry } from '@macro-inc/observability';
 import { getDocumentPermissionToken } from '@service-storage/client';
 import { createSignal } from 'solid-js';
@@ -18,8 +18,8 @@ const AI_EDITING_WORKER_HOST =
   overrideUrl?.replace(/\/$/, '') ??
   developmentProxyUrl(
     import.meta.env.MODE === 'development'
-      ? 'https://ai-editing-worker-dev.macroverse.workers.dev'
-      : 'https://ai-editing-worker.macroverse.workers.dev'
+      ? 'https://ai-editing-worker-dev.roxverse.workers.dev'
+      : 'https://ai-editing-worker.roxverse.workers.dev'
   );
 
 /**

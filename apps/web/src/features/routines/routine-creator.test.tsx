@@ -108,8 +108,8 @@ vi.mock('@queries/agent-repositories/repositories', () => ({
     isError: false,
     data: {
       repositories: [
-        { url: 'https://github.com/macro-inc/macro' },
-        { url: 'https://github.com/macro-inc/docs' },
+        { url: 'https://github.com/rox-inc/rox' },
+        { url: 'https://github.com/rox-inc/docs' },
       ],
     },
   }),
@@ -392,7 +392,7 @@ function created(body: ActionConfiguration): ScheduledAction {
         ? body.run_visibility
         : 'unlisted',
     id: 'new-routine',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
     created_at: '2026-09-28T00:00:00Z',
     updated_at: '2026-09-28T00:00:00Z',
     configuration_revision: 1,
@@ -737,7 +737,7 @@ describe('routine composer execution selection', () => {
     chooseTrigger('GitHub', 'Workflow failed');
     const panel = await screen.findByRole('dialog', { name: 'Add trigger' });
     fireEvent.click(
-      within(panel).getByRole('checkbox', { name: 'macro-inc/macro' })
+      within(panel).getByRole('checkbox', { name: 'rox-inc/rox' })
     );
     fireEvent.click(
       within(panel).getByRole('button', { name: 'Add a field test' })
@@ -755,7 +755,7 @@ describe('routine composer execution selection', () => {
     expect(
       screen.getByRole('button', { name: 'Repositories for Workflow failed' })
         .textContent
-    ).toContain('macro-inc/macro');
+    ).toContain('rox-inc/rox');
     fireEvent.click(screen.getByRole('button', { name: /Create routine/i }));
     await waitFor(() => expect(host.create).toHaveBeenCalledTimes(1));
     expect(host.create.mock.calls[0][0]).toMatchObject({
@@ -767,7 +767,7 @@ describe('routine composer execution selection', () => {
             github: {
               events: ['workflow_run'],
               actions: ['completed'],
-              repositories: ['macro-inc/macro'],
+              repositories: ['rox-inc/rox'],
               includeBots: false,
             },
             match: [

@@ -2,7 +2,7 @@ import { isMobile } from '@core/mobile/isMobile';
 import type { CalendarPeriodView } from './types';
 
 /** Storage key shared by the calendar view and consumers of its preferences. */
-export const CALENDAR_PREFERENCES_KEY = 'macro:pref:calendar:settings';
+export const CALENDAR_PREFERENCES_KEY = 'rox:pref:calendar:settings';
 
 function isCalendarPeriodView(value: unknown): value is CalendarPeriodView {
   return (

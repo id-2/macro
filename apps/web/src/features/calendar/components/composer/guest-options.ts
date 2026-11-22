@@ -13,7 +13,7 @@ export function eventGuestOptions(
     rows.set(
       key,
       recipientEntityMapper('contact')({
-        id: `macro|${key}`,
+        id: `rox|${key}`,
         type: 'extracted',
         email,
         name: guest.name,

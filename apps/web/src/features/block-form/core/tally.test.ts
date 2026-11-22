@@ -7,7 +7,7 @@ const lunch: FormDetail = {
     id: 'poll',
     name: 'Lunch?',
     description: '',
-    ownerId: 'macro|owner@example.com',
+    ownerId: 'rox|owner@example.com',
     databaseId: 'database',
     tableId: 'table',
     audience: 'members',

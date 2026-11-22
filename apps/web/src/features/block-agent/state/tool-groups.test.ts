@@ -107,7 +107,7 @@ describe('segmentParts', () => {
       label: 'MCP',
       name: {
         kind: 'mcp',
-        server: 'macro',
+        server: 'rox',
         tool: 'DisplayResults',
       } satisfies ToolName,
     },
@@ -389,7 +389,7 @@ describe('rendersOwnView', () => {
     expect(
       rendersOwnView({
         ...part,
-        name: { kind: 'mcp', server: 'macro', tool: 'DisplayResults' },
+        name: { kind: 'mcp', server: 'rox', tool: 'DisplayResults' },
       })
     ).toBe(true);
   });
@@ -401,7 +401,7 @@ describe('rendersOwnView', () => {
   });
 
   // A harness tool that happens to share the name is not Rox's: the fold
-  // decides whose shape a call is in, and only a `macro` detail carries the
+  // decides whose shape a call is in, and only a `rox` detail carries the
   // tool's own arguments.
   it('is false for a same-named call the fold did not read as a Rox tool', () => {
     expect(
@@ -439,11 +439,11 @@ describe.each(['GenerateImage', 'DispatchCodingAgent'])(
             name:
               kind === 'native'
                 ? { kind, name }
-                : { kind, server: 'macro', tool: name },
+                : { kind, server: 'rox', tool: name },
             status,
             detail:
               kind === 'native'
-                ? { kind: 'macro', input: null, output: null, error: null }
+                ? { kind: 'rox', input: null, output: null, error: null }
                 : {
                     kind: 'other',
                     acpKind: 'other',

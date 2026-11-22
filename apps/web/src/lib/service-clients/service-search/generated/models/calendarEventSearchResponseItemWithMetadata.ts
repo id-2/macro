@@ -8,7 +8,7 @@ import type { CalendarEventSearchResponseItem } from './calendarEventSearchRespo
 import type { CalendarEventSearchResponseItemWithMetadataAllOf } from './calendarEventSearchResponseItemWithMetadataAllOf';
 
 /**
- * CalendarEventSearchResponseItem with metadata fetched from macrodb.
+ * CalendarEventSearchResponseItem with metadata fetched from roxdb.
  */
 export type CalendarEventSearchResponseItemWithMetadata =
   CalendarEventSearchResponseItem &

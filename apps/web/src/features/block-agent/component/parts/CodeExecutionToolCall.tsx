@@ -131,7 +131,7 @@ function RecordedCall(props: {
   return (
     <RoxToolCall
       detail={{
-        kind: 'macro',
+        kind: 'rox',
         input: props.call.input,
         output: props.call.output,
         error: props.call.error ?? null,

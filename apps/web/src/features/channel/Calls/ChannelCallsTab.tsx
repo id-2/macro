@@ -61,7 +61,7 @@ type ChannelCallsActivationMetadata = {
 export function ChannelCallsTab(props: { channelId: string }) {
   return (
     <div class="relative flex h-full min-h-0 flex-1 justify-center overflow-hidden p-2 touch:pb-(--mobile-content-inset-bottom)">
-      <div class="macro-message-width size-full min-h-0">
+      <div class="rox-message-width size-full min-h-0">
         <ListEntityMetadataQueryProvider>
           <ChannelCallsList channelId={props.channelId} />
         </ListEntityMetadataQueryProvider>

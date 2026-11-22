@@ -25,12 +25,12 @@ vi.mock('@app/lib/analytics/posthog', () => ({
 }));
 vi.mock('@app/components/view-shell', () => ({
   asideCollapsedPreferenceKey: (app: string) =>
-    `macro:pref:view-sidebar:collapsed:${app}`,
+    `rox:pref:view-sidebar:collapsed:${app}`,
   ViewShell: {
     Root: (props: ParentProps<{ asidePreferenceKey?: string }>) => {
       fixture.root(
         props.asidePreferenceKey,
-        localStorage.getItem('macro:pref:view-sidebar:collapsed:crm')
+        localStorage.getItem('rox:pref:view-sidebar:collapsed:crm')
       );
       return props.children;
     },
@@ -450,22 +450,22 @@ it('puts the shell navigation controls in pipeline and settings headers on deskt
 });
 
 it('moves a collapsed sidebar saved under the old CRM key to the shell preference', () => {
-  localStorage.setItem('macro:pref:crm:sidebar-collapsed', 'true');
+  localStorage.setItem('rox:pref:crm:sidebar-collapsed', 'true');
   setup();
   expect(fixture.root).toHaveBeenCalledWith('crm', 'true');
-  expect(localStorage.getItem('macro:pref:crm:sidebar-collapsed')).toBeNull();
+  expect(localStorage.getItem('rox:pref:crm:sidebar-collapsed')).toBeNull();
 });
 
 it('keeps the shell preference over a choice saved under the old CRM key', () => {
-  localStorage.setItem('macro:pref:crm:sidebar-collapsed', 'true');
-  localStorage.setItem('macro:pref:view-sidebar:collapsed:crm', 'false');
+  localStorage.setItem('rox:pref:crm:sidebar-collapsed', 'true');
+  localStorage.setItem('rox:pref:view-sidebar:collapsed:crm', 'false');
   setup();
   expect(fixture.root).toHaveBeenCalledWith('crm', 'false');
-  expect(localStorage.getItem('macro:pref:crm:sidebar-collapsed')).toBeNull();
+  expect(localStorage.getItem('rox:pref:crm:sidebar-collapsed')).toBeNull();
 });
 
 it('keeps the old CRM choice and renders when saving the shell preference fails', () => {
-  const values = new Map([['macro:pref:crm:sidebar-collapsed', 'true']]);
+  const values = new Map([['rox:pref:crm:sidebar-collapsed', 'true']]);
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: () => {
@@ -475,7 +475,7 @@ it('keeps the old CRM choice and renders when saving the shell preference fails'
   });
   setup();
   expect(fixture.root).toHaveBeenCalledWith('crm', null);
-  expect(values.get('macro:pref:crm:sidebar-collapsed')).toBe('true');
+  expect(values.get('rox:pref:crm:sidebar-collapsed')).toBe('true');
 });
 
 it('opens the company of a pipeline row in its own split on touch', () => {

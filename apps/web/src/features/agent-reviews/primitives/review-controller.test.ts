@@ -11,7 +11,7 @@ type EmailReview = Review & { kind: 'email' };
 const initial: EmailReview = {
   id: 'review',
   sessionId: 'session',
-  actingUser: 'macro|owner@macro.local',
+  actingUser: 'rox|owner@rox.local',
   executionId: 'execution',
   presentedAt: null,
   decision: null,

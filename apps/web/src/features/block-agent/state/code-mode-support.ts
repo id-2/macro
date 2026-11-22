@@ -17,7 +17,7 @@ export function isCodeModeSupportCall(part: MessagePart): boolean {
   if (part.kind !== 'tool_use') return false;
   if (part.name.kind === 'native') return SUPPORT_TOOLS.has(part.name.name);
   return (
-    (part.name.server === 'macro' || part.name.server === 'rox_internal') &&
+    (part.name.server === 'rox' || part.name.server === 'rox_internal') &&
     SUPPORT_TOOLS.has(part.name.tool)
   );
 }

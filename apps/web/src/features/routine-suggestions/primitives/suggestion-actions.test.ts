@@ -102,7 +102,7 @@ describe('suggestion actions', () => {
       suggestionId: 'template-1',
       surface: 'agents',
       placement: 'sidebar',
-      from: 'macro',
+      from: 'rox',
       kind: 'catalog',
       catalogKey: 'email_tags',
     });
@@ -110,7 +110,7 @@ describe('suggestion actions', () => {
       'routine_suggestion_enabled',
       expect.objectContaining({
         suggestionId: 'template-1',
-        from: 'macro',
+        from: 'rox',
         routineId: 'routine-1',
         edited: true,
       })

@@ -1,4 +1,4 @@
-import RoxBrandLoader from '@icon/macro-brand-loader-2.svg';
+import RoxBrandLoader from '@icon/rox-brand-loader-2.svg';
 import { cn } from '@ui';
 import { createSignal, onMount } from 'solid-js';
 

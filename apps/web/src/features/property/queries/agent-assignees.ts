@@ -1,5 +1,5 @@
 import { useAgentMentionUsers } from '@channel/use-agent-mention-users';
-import { isMacroAgentId } from '@core/constant/macroAgent';
+import { isMacroAgentId } from '@core/constant/roxAgent';
 import type { IUser } from '@core/user';
 import { useAgentsQuery } from '@queries/agents/agents';
 import { useBotsQuery } from '@queries/bots/bots';

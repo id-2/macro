@@ -14,7 +14,7 @@ import {
   conferenceJoinUrl,
   safeConferenceUrl,
 } from '../../calendar/utils/conference-link';
-import { calendarMacroCallUrl } from '../../calendar/utils/macro-call-link';
+import { calendarMacroCallUrl } from '../../calendar/utils/rox-call-link';
 import {
   isMeetingEvent,
   selectUpcomingCalendarEvents,

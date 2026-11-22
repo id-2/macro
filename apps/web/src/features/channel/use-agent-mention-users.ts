@@ -11,8 +11,8 @@ import {
   isMacroAiId,
   isMacroCoderId,
   isMacroNewId,
-  macroMentionUser,
-} from './macroAi';
+  roxMentionUser,
+} from './roxAi';
 import { useChatV3AgentsFlag } from './use-chat-v3-agents-flag';
 
 /**
@@ -61,7 +61,7 @@ export function useAgentMentionUserTransform(
     if (canUseCodex() && !base.some((user) => isCodexBotId(user.id))) {
       base.unshift(codexMentionUser());
     }
-    base.unshift(macroMentionUser(canUseAgents()));
+    base.unshift(roxMentionUser(canUseAgents()));
     return uniqueByKey(base, (user) => user.id);
   };
 }

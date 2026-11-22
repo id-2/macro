@@ -77,7 +77,7 @@ export function TeamAgentStatusBanner(props: { userId: string | undefined }) {
           <div
             role="status"
             data-agent-dm-status={current()}
-            class="macro-message-width flex w-full min-w-0 items-center gap-2.5 rounded-2xl border border-edge-muted bg-panel px-3 py-2.5 text-sm text-ink"
+            class="rox-message-width flex w-full min-w-0 items-center gap-2.5 rounded-2xl border border-edge-muted bg-panel px-3 py-2.5 text-sm text-ink"
           >
             <Show
               when={current() === 'setting_up'}

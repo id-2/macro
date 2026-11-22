@@ -445,18 +445,18 @@ export function EventEditor(props: EventEditorProps) {
                   >
                     <For
                       each={[
-                        { kind: 'macro', label: 'Rox call' },
+                        { kind: 'rox', label: 'Rox call' },
                         { kind: 'google', label: 'Video meeting' },
                         { kind: 'custom', label: 'Custom' },
                       ]}
                     >
                       {(option) => {
                         const selected = () =>
-                          option.kind === 'macro'
-                            ? props.draft.macroCall
+                          option.kind === 'rox'
+                            ? props.draft.roxCall
                             : option.kind === 'google'
                               ? props.draft.googleMeet
-                              : !props.draft.macroCall &&
+                              : !props.draft.roxCall &&
                                 !props.draft.googleMeet;
                         return (
                           <Button
@@ -472,8 +472,8 @@ export function EventEditor(props: EventEditorProps) {
                             onClick={() =>
                               batch(() => {
                                 props.onUpdate(
-                                  'macroCall',
-                                  option.kind === 'macro'
+                                  'roxCall',
+                                  option.kind === 'rox'
                                 );
                                 props.onUpdate(
                                   'googleMeet',
@@ -492,7 +492,7 @@ export function EventEditor(props: EventEditorProps) {
                     </For>
                   </div>
                   <Show
-                    when={!props.draft.macroCall && !props.draft.googleMeet}
+                    when={!props.draft.roxCall && !props.draft.googleMeet}
                   >
                     <TextInput
                       size="lg"
@@ -505,7 +505,7 @@ export function EventEditor(props: EventEditorProps) {
                       }
                     />
                   </Show>
-                  <Show when={props.draft.macroCall || props.draft.googleMeet}>
+                  <Show when={props.draft.roxCall || props.draft.googleMeet}>
                     <TextInput
                       size="lg"
                       class="w-full text-base sm:text-sm"

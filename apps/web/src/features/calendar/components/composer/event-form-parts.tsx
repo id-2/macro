@@ -318,7 +318,7 @@ function ConferencePill() {
       <EventComposerConferencePill
         value={form.state().conference}
         provider={form.capabilities()?.conferenceProvider}
-        macroCallsEnabled={form.props.macroCallsEnabled}
+        roxCallsEnabled={form.props.roxCallsEnabled}
         canKeepExisting={
           form.controller.initialConferenceChoice() === 'existing'
         }

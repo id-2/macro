@@ -48,7 +48,7 @@ for (const list of ['list-narrow', 'list-wide']) {
   }) => {
     const sender = page
       .getByTestId(list)
-      .getByText('macro-application[bot]')
+      .getByText('rox-application[bot]')
       .first();
     const card = page.getByText('notifications@example.com');
     await openCard(page, sender, card);

@@ -20,7 +20,7 @@ import { useTeamSettingsGroups } from './teamSettingsGroups';
 export function MobileSettings() {
   const settings = useMobileSettings();
   const signatures = useFeatureFlag(enableEmailSignatures);
-  const macroComputers = useFeatureFlag(enableMacroComputers);
+  const roxComputers = useFeatureFlag(enableMacroComputers);
   // Always mounted on phones; read the providers only once settings open.
   const outlook = useOutlookAvailable(settings.open);
   const { groups, searchGroups } = useSettingsTabs();
@@ -46,7 +46,7 @@ export function MobileSettings() {
       searchGroups={searchGroups()}
       emailSignatures={signatures().enabled}
       outlook={outlook()}
-      macroComputers={macroComputers().enabled}
+      roxComputers={roxComputers().enabled}
       name={displayName()}
       email={email() ?? ''}
       avatar={

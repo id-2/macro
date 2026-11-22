@@ -19,8 +19,8 @@ import {
   updateDragInsertPreviewFromCoordinates,
 } from '@core/component/LexicalMarkdown/utils/dragInsertUtils';
 import { handleUserMention } from '@core/component/LexicalMarkdown/utils/mentionsUtils';
-import { isMacroAgentId } from '@core/constant/macroAgent';
-import { isMacroNewId } from '@core/constant/macroNew';
+import { isMacroAgentId } from '@core/constant/roxAgent';
+import { isMacroNewId } from '@core/constant/roxNew';
 import { registerHotkey, useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { createMessageComposer } from '@core/messages/create-message-composer';
 import { isMobile } from '@core/mobile/isMobile';
@@ -493,9 +493,9 @@ export function ChannelInput(props: ChannelInputProps) {
     );
     editor.dispatchCommand(TYPE_AT_SYMBOL_COMMAND, undefined);
   };
-  // Whichever Rox the `@macro` typeahead offers: the classic chat reply or
+  // Whichever Rox the `@rox` typeahead offers: the classic chat reply or
   // the agent-session bot, depending on rollout.
-  const macroUser = () =>
+  const roxUser = () =>
     (transformUsers ? transformUsers([]) : (mentionUsers() ?? [])).find(
       (user) => isMacroAgentId(user.id) || isMacroNewId(user.id)
     );
@@ -536,7 +536,7 @@ export function ChannelInput(props: ChannelInputProps) {
         },
       ];
     };
-    const macro = features().mentions === true ? macroUser() : undefined;
+    const rox = features().mentions === true ? roxUser() : undefined;
     const startCall = props.onStartCall;
     const callInProgress = !!props.callInProgress;
     return [
@@ -612,18 +612,18 @@ export function ChannelInput(props: ChannelInputProps) {
       },
       {
         items: [
-          ...(macro
+          ...(rox
             ? [
                 {
-                  id: 'ask-macro',
+                  id: 'ask-rox',
                   label: t('channelComposer.askMacro'),
                   icon: <EntityIcon targetType="agent" size="xs" />,
-                  hint: '@macro',
+                  hint: '@rox',
                   onSelect: () =>
                     runInEditor(
                       (editor) => {
                         fireAndForget(
-                          handleUserMention(macro, {
+                          handleUserMention(rox, {
                             editor,
                             blockName: groupMentions ? 'channel' : undefined,
                           }).then(() =>

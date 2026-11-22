@@ -1,7 +1,7 @@
 import { UserIcon } from '@core/component/UserIcon';
 import { useUserId } from '@core/context/user';
 import { getDisplayName } from '@core/user';
-import type { RoxId } from '@core/user/macroId';
+import type { RoxId } from '@core/user/roxId';
 import UsersThreeIcon from '@icon/system/regular/users-three.svg';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 import { useBotProfile } from '@queries/bots/profiles';

@@ -1,4 +1,4 @@
-import { parseInternalAppLink } from '@core/util/macroAppUrl';
+import { parseInternalAppLink } from '@core/util/roxAppUrl';
 import { isTauri } from '@core/util/platform';
 import { registerExternalUrlInterceptor } from '@core/util/url';
 import { emit } from '@tauri-apps/api/event';
@@ -17,7 +17,7 @@ export function openMacroLinkInApp(url: string): boolean {
   const parsed = parseInternalAppLink(url);
   if (!parsed) return false;
   emit('navigate', parsed).catch((e) => {
-    console.error('failed to emit navigate event for macro link', e);
+    console.error('failed to emit navigate event for rox link', e);
     // The navigate event never dispatched, so nothing routed in-app. Fall back
     // to the system browser rather than leaving the link silently unhandled
     // (openExternalUrl has already returned by the time this rejects).

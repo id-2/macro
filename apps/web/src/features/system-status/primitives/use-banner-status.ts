@@ -7,7 +7,7 @@ import { createEffect, createSignal, on } from 'solid-js';
 import { z } from 'zod';
 import { type BannerStatus, bannerStatus } from '../core/status';
 
-const DISMISSED_STORAGE_KEY = 'macro:system-status:dismissed';
+const DISMISSED_STORAGE_KEY = 'rox:system-status:dismissed';
 
 const dismissedIdSchema = z.string().min(1);
 

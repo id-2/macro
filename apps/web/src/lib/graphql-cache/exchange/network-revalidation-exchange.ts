@@ -11,7 +11,7 @@ import {
 } from 'wonka';
 import { optimisticMutationDispositionOf } from './optimistic';
 
-const REQUEST_CONTEXT_KEY = '__macroNetworkRevalidationRequest';
+const REQUEST_CONTEXT_KEY = '__roxNetworkRevalidationRequest';
 const REVALIDATION_WAIT_MS = 15_000;
 
 /**

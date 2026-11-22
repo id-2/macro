@@ -3711,7 +3711,7 @@ export const recoverPipedreamMcpConnection = async (
  * By default, a short-lived Pipedream Connect token: the frontend opens
 Pipedream's hosted Connect UI with it, and the user picks (or is
 deep-linked into) an app and authorizes it there. When the body names an
-app Rox Connect serves and the `macro-connect` rollout is on for the
+app Rox Connect serves and the `rox-connect` rollout is on for the
 user, a Connect URL instead.
  * @summary Start a connect flow for the authenticated user.
  */

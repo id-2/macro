@@ -5,7 +5,7 @@ import { createSignal } from 'solid-js';
 export const [fastModeEnabled, setFastModeEnabled] = makePersisted(
   createSignal(false),
   {
-    name: 'macro:ai-fast-mode',
+    name: 'rox:ai-fast-mode',
     deserialize: (value) => value === 'true',
   }
 );

@@ -449,7 +449,7 @@ const MICROSOFT_TEAMS_OPTION: EventComposerConferenceOption = {
   label: 'Microsoft Teams',
 };
 const ROX_CALL_OPTION: EventComposerConferenceOption = {
-  value: 'macro',
+  value: 'rox',
   label: 'Rox call',
 };
 const NO_CONFERENCING_OPTION: EventComposerConferenceOption = {
@@ -465,7 +465,7 @@ export interface EventComposerConferencePillProps {
   provider?: 'google_meet' | 'microsoft_teams' | 'other' | null;
   value: EventEditorConferenceChoice;
   canKeepExisting: boolean;
-  macroCallsEnabled: boolean;
+  roxCallsEnabled: boolean;
   onChange: (value: EventEditorConferenceChoice) => void;
   disabled?: boolean;
 }
@@ -475,7 +475,7 @@ export function EventComposerConferencePill(
   props: EventComposerConferencePillProps
 ) {
   const includesMacroCall = createMemo(
-    () => props.macroCallsEnabled || props.value === 'macro'
+    () => props.roxCallsEnabled || props.value === 'rox'
   );
   // The list must keep its identity while its contents do. A fresh array makes
   // the select re-assert its selection, which calls `onChange` again; with an

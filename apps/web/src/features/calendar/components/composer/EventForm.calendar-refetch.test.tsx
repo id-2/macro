@@ -101,7 +101,7 @@ function NewEventForm() {
   const editor = useEventEditor({
     event: () => undefined,
     onSaved: vi.fn(),
-    macroCallsEnabled: () => true,
+    roxCallsEnabled: () => true,
   });
   const controller = createCalendarEventFormController({
     initialValue: {
@@ -113,7 +113,7 @@ function NewEventForm() {
       guests: '',
       location: '',
       description: '',
-      conference: 'macro',
+      conference: 'rox',
     },
     calendarOptions: editor.calendarOptions,
     guestOptions: editor.guestOptions,
@@ -121,7 +121,7 @@ function NewEventForm() {
   return (
     <EventForm
       controller={controller}
-      macroCallsEnabled
+      roxCallsEnabled
       pending={false}
       onCancel={vi.fn()}
       onSubmit={editor.save}

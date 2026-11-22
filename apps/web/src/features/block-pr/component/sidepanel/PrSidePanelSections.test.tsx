@@ -18,12 +18,12 @@ vi.mock('./PrAgentSessionsSection', () => ({
 import { PrSidePanelSections } from './PrSidePanelSections';
 
 const pullRequest = {
-  displayName: 'macro-inc/macro#7858',
-  githubKey: 'macro-inc/macro#7858',
+  displayName: 'rox-inc/rox#7858',
+  githubKey: 'rox-inc/rox#7858',
   number: 7858,
-  owner: 'macro-inc',
-  repo: 'macro',
-  url: 'https://github.com/macro-inc/macro/pull/7858',
+  owner: 'rox-inc',
+  repo: 'rox',
+  url: 'https://github.com/rox-inc/rox/pull/7858',
 };
 
 beforeEach(() => {

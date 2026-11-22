@@ -29,7 +29,7 @@ function getEmailLocalPart(email: string): string {
 
 /**
  * Resolves the best display name for a participant
- * Priority: participant.name > macroDisplayName > email local part
+ * Priority: participant.name > roxDisplayName > email local part
  *
  * `participant.name` is the From display name of that sender's message in
  * this thread, so it comes first: the Rox lookup is keyed by address alone
@@ -38,14 +38,14 @@ function getEmailLocalPart(email: string): string {
  */
 function resolveParticipantName(
   participant: EmailThreadParticipants[number],
-  macroDisplayName?: string
+  roxDisplayName?: string
 ): string {
   const participantFullName = participant.name ?? '';
   if (participantFullName && !isLikelyEmail(participantFullName)) {
     return participantFullName;
   }
-  if (macroDisplayName && !isLikelyEmail(macroDisplayName)) {
-    return macroDisplayName;
+  if (roxDisplayName && !isLikelyEmail(roxDisplayName)) {
+    return roxDisplayName;
   }
   return getEmailLocalPart(participant.email);
 }
@@ -60,10 +60,10 @@ function ParticipantWithTooltip(props: {
   displayName: string;
   highlighted?: string;
 }) {
-  const macroId = () => emailToMacroId(props.participant.email);
-  const macroDisplayName = () => getDisplayName(macroId());
+  const roxId = () => emailToMacroId(props.participant.email);
+  const roxDisplayName = () => getDisplayName(roxId());
   const tooltipName = () =>
-    resolveParticipantName(props.participant, macroDisplayName());
+    resolveParticipantName(props.participant, roxDisplayName());
   const [open, setOpen] = createSignal(false);
 
   return (
@@ -90,7 +90,7 @@ function ParticipantWithTooltip(props: {
         <UserTooltip
           displayName={tooltipName()}
           email={props.participant.email}
-          id={macroId()}
+          id={roxId()}
           onClose={() => setOpen(false)}
         />
       }
@@ -116,8 +116,8 @@ function resolveParticipants(
     if (!participant.email) continue;
     if (isViewerAddress(participant.email, viewerEmail)) continue;
 
-    const macroDisplayName = getRoxDisplayName(participant.email);
-    const displayName = resolveParticipantName(participant, macroDisplayName);
+    const roxDisplayName = getRoxDisplayName(participant.email);
+    const displayName = resolveParticipantName(participant, roxDisplayName);
 
     if (seen.has(displayName)) continue;
     seen.add(displayName);

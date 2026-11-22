@@ -14,12 +14,12 @@ vi.mock('@core/mobile/isTouchDevice', () => ({
   isTouchDevice: vi.fn(() => false),
 }));
 
-const macro: ReachableRepository = {
-  url: 'https://github.com/macro-inc/macro',
+const rox: ReachableRepository = {
+  url: 'https://github.com/rox-inc/rox',
   defaultBranch: 'main',
 };
 const infra: ReachableRepository = {
-  url: 'https://github.com/macro-inc/infra',
+  url: 'https://github.com/rox-inc/infra',
   defaultBranch: 'develop',
 };
 
@@ -36,7 +36,7 @@ function picker(
   render(() => (
     <RepositoryPicker
       branch="main"
-      repositories={[macro, infra]}
+      repositories={[rox, infra]}
       repositoriesLoading={false}
       repositoriesError={false}
       recentRepositories={[]}
@@ -89,8 +89,8 @@ describe('RepositoryPicker', () => {
     });
     await waitFor(() => expect(document.activeElement).toBe(field));
     fireEvent.input(field, { target: { value: 'infra' } });
-    expect(optionNames()).toEqual(['macro-inc/infra']);
-    fireEvent.click(screen.getByRole('option', { name: 'macro-inc/infra' }));
+    expect(optionNames()).toEqual(['rox-inc/infra']);
+    fireEvent.click(screen.getByRole('option', { name: 'rox-inc/infra' }));
     expect(handlers.onSelectRepository).toHaveBeenCalledExactlyOnceWith(
       infra.url
     );
@@ -98,7 +98,7 @@ describe('RepositoryPicker', () => {
 
   it('searches and selects branches in the mobile drawer', async () => {
     vi.mocked(isTouchDevice).mockReturnValue(true);
-    const handlers = picker({ repoUrl: macro.url });
+    const handlers = picker({ repoUrl: rox.url });
     fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
     expect(
       await screen.findByRole('dialog', { name: 'Starting branch' })
@@ -116,7 +116,7 @@ describe('RepositoryPicker', () => {
   });
 
   it('keeps a runtime-enforced branch visible without opening the branch menu', () => {
-    const handlers = picker({ repoUrl: macro.url, branchLocked: true });
+    const handlers = picker({ repoUrl: rox.url, branchLocked: true });
     const branch = screen.getByRole('button', { name: 'Branch' });
     expect(branch.textContent).toContain('main');
     expect(branch.hasAttribute('disabled')).toBe(true);
@@ -131,18 +131,18 @@ describe('RepositoryPicker', () => {
     picker({ repoUrl: infra.url, recentRepositories: [infra.url] });
     expect(
       screen.getByRole('button', { name: 'Repository' }).textContent
-    ).toContain('macro-inc/infra');
+    ).toContain('rox-inc/infra');
     openRepositories();
     expect(optionNames()).toEqual([
       'Auto-detect',
-      'macro-inc/infra',
-      'macro-inc/macro',
+      'rox-inc/infra',
+      'rox-inc/rox',
     ]);
-    const selected = screen.getByRole('option', { name: 'macro-inc/infra' });
+    const selected = screen.getByRole('option', { name: 'rox-inc/infra' });
     expect(selected.querySelector('svg.ml-auto')).toBeTruthy();
     expect(
       screen
-        .getByRole('option', { name: 'macro-inc/macro' })
+        .getByRole('option', { name: 'rox-inc/rox' })
         .querySelector('svg.ml-auto')
     ).toBeNull();
   });
@@ -151,7 +151,7 @@ describe('RepositoryPicker', () => {
     const handlers = picker();
     openRepositories();
     fireEvent.input(search(), { target: { value: 'INFRA' } });
-    expect(optionNames()).toEqual(['macro-inc/infra']);
+    expect(optionNames()).toEqual(['rox-inc/infra']);
     fireEvent.submit(search().closest('form') as HTMLFormElement);
     expect(handlers.onSelectRepository).toHaveBeenCalledWith(infra.url);
   });
@@ -168,36 +168,36 @@ describe('RepositoryPicker', () => {
     fireEvent.keyDown(search(), { key: 'ArrowDown' });
     expect(
       screen
-        .getByRole('option', { name: 'macro-inc/infra' })
+        .getByRole('option', { name: 'rox-inc/infra' })
         .getAttribute('aria-selected')
     ).toBe('true');
     fireEvent.keyDown(search(), { key: 'ArrowUp' });
     fireEvent.submit(search().closest('form') as HTMLFormElement);
-    expect(handlers.onSelectRepository).toHaveBeenCalledWith(macro.url);
+    expect(handlers.onSelectRepository).toHaveBeenCalledWith(rox.url);
   });
 
   it('does not offer an unlisted repository typed by hand', () => {
     const handlers = picker();
     openRepositories();
     fireEvent.input(search(), {
-      target: { value: 'https://github.com/macro-inc/other.git' },
+      target: { value: 'https://github.com/rox-inc/other.git' },
     });
     expect(screen.queryAllByRole('option')).toHaveLength(0);
     expect(screen.getByText(/No repositories match/).textContent).toContain(
-      'macro-inc/other'
+      'rox-inc/other'
     );
     expect(handlers.onSelectRepository).not.toHaveBeenCalled();
   });
 
   it('does not offer a recent the listing no longer carries', () => {
     picker({
-      recentRepositories: ['https://github.com/macro-inc/gone'],
+      recentRepositories: ['https://github.com/rox-inc/gone'],
     });
     openRepositories();
     expect(optionNames()).toEqual([
       'Auto-detect',
-      'macro-inc/macro',
-      'macro-inc/infra',
+      'rox-inc/rox',
+      'rox-inc/infra',
     ]);
     expect(screen.queryByRole('option', { name: /gone/ })).toBeNull();
   });
@@ -205,8 +205,8 @@ describe('RepositoryPicker', () => {
   it('does not duplicate a listed repository typed in full', () => {
     picker();
     openRepositories();
-    fireEvent.input(search(), { target: { value: 'macro-inc/macro' } });
-    expect(optionNames()).toEqual(['macro-inc/macro']);
+    fireEvent.input(search(), { target: { value: 'rox-inc/rox' } });
+    expect(optionNames()).toEqual(['rox-inc/rox']);
   });
 
   it('explains when nothing matches and refuses to submit text that names no repository', () => {
@@ -223,7 +223,7 @@ describe('RepositoryPicker', () => {
   });
 
   it('leaves the choice to the coder with Auto-detect', () => {
-    const handlers = picker({ repoUrl: macro.url });
+    const handlers = picker({ repoUrl: rox.url });
     openRepositories();
     fireEvent.click(screen.getByRole('option', { name: 'Auto-detect' }));
     expect(handlers.onSelectRepository).toHaveBeenCalledWith(undefined);

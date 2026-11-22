@@ -1,5 +1,5 @@
-import { ROX_AGENT_NAME } from '@core/constant/macroAgent';
-import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_NAME } from '@core/constant/roxAgent';
+import { ROX_NEW_BOT_ID } from '@core/constant/roxNew';
 import { useUserId } from '@core/context/user';
 import { type CombinedRecipientItem, recipientEntityMapper } from '@core/user';
 import { useAgentsQuery } from '@queries/agents/agents';
@@ -19,7 +19,7 @@ export function useAgentDmRecipients() {
       recipientEntityMapper('agent')({
         id: ROX_NEW_BOT_ID,
         name: ROX_AGENT_NAME,
-        handle: 'macro',
+        handle: 'rox',
         description: `Your private conversation with ${ROX_AGENT_NAME}`,
       }),
       ...visibleAgents

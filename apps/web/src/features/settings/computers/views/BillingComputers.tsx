@@ -15,7 +15,7 @@ export function BillingComputers() {
   return (
     <Show when={enabled() && (computers().length > 0 || failed())}>
       <section
-        data-settings-target="macro-computers"
+        data-settings-target="rox-computers"
         tabIndex={-1}
         class="flex scroll-mt-4 flex-col gap-4 outline-none"
       >

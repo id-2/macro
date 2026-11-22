@@ -3,7 +3,7 @@ import {
   getDisplayNameParts,
   useDisplayName,
 } from '@core/user/displayName';
-import { emailToMacroId } from '@core/user/macroId';
+import { emailToMacroId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { resetQueryAccountSession } from '@queries/auth/account-scope';
 import { authKeys } from '@queries/auth/keys';
@@ -13,10 +13,10 @@ import { queryClient } from '@queries/client';
 import { createSignal, For, Show } from 'solid-js';
 
 export function NameCacheFixture() {
-  const [viewer, setViewer] = createSignal('macro|viewer-a@example.com');
+  const [viewer, setViewer] = createSignal('rox|viewer-a@example.com');
   const identity = () => ({ id: viewer(), authenticated: true });
   queryClient.setQueryData(authKeys.userInfo.queryKey, identity());
-  const [ids, setIds] = createSignal(['macro|person@example.com']);
+  const [ids, setIds] = createSignal(['rox|person@example.com']);
   const [visible, setVisible] = createSignal(true);
   const [inspection, inspect] = createSignal(0);
   const participants = useUserNames({
@@ -29,12 +29,12 @@ export function NameCacheFixture() {
     return JSON.stringify(cache.inspect());
   };
   function Label(props: { id: string }) {
-    const macroId = () => emailToMacroId(props.id.slice(6));
-    const [, controls] = useDisplayName(macroId());
+    const roxId = () => emailToMacroId(props.id.slice(6));
+    const [, controls] = useDisplayName(roxId());
     previous ??= controls;
     return (
       <p data-testid="name-label">
-        {getDisplayName(macroId())} · {getDisplayNameParts(macroId()).firstName}
+        {getDisplayName(roxId())} · {getDisplayNameParts(roxId()).firstName}
       </p>
     );
   }
@@ -61,10 +61,10 @@ export function NameCacheFixture() {
           .map((entry) => entry.name?.first_name ?? 'Unknown')
           .join(', ')}
       </output>
-      <button onClick={() => change('macro|viewer-b@example.com')}>
+      <button onClick={() => change('rox|viewer-b@example.com')}>
         Account B
       </button>
-      <button onClick={() => change('macro|viewer-a@example.com')}>
+      <button onClick={() => change('rox|viewer-a@example.com')}>
         Account A
       </button>
       <button onClick={() => fireAndForget(relogin(), 'name-fixture')}>
@@ -74,7 +74,7 @@ export function NameCacheFixture() {
       <button
         onClick={() =>
           previous?.mutate({
-            id: 'macro|person@example.com',
+            id: 'rox|person@example.com',
             loading: false,
             _createdAt: new Date(),
             firstName: 'Stale override',
@@ -83,7 +83,7 @@ export function NameCacheFixture() {
       >
         Old override
       </button>
-      <button onClick={() => setIds(['macro|other@example.com'])}>
+      <button onClick={() => setIds(['rox|other@example.com'])}>
         Recycle label
       </button>
       <button onClick={() => setVisible(false)}>Hide labels</button>

@@ -4,7 +4,7 @@
  * agent_harness_service
  * OpenAPI spec version: 0.1.0
  */
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { TriggerOriginOneOfNineOrigin } from './triggerOriginOneOfNineOrigin';
 
 /**

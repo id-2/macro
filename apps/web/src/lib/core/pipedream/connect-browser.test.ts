@@ -39,7 +39,7 @@ describe('browser connection handoff', () => {
         })
       );
       const callback = new URL(root.querySelector('a')!.href);
-      expect(callback.protocol).toBe('macro:');
+      expect(callback.protocol).toBe('rox:');
       expect(callback.pathname).toBe('/pipedream-connect-callback');
       expect(callback.searchParams.get('state')).toBe('nonce');
       expect(callback.searchParams.get('outcome')).toBe(

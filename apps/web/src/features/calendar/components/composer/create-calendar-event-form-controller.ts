@@ -571,9 +571,9 @@ export function createCalendarEventFormController(
       selectedCalendarOption()?.capabilities?.guestPolicy !== false &&
       !guestPoliciesEqual(guestPolicy, guestPolicyOf(initialValue()));
     const providerConference =
-      current.conference === 'macro' ? 'none' : current.conference;
+      current.conference === 'rox' ? 'none' : current.conference;
     const initialProviderConference =
-      initialValue().conference === 'macro'
+      initialValue().conference === 'rox'
         ? 'none'
         : initialValue().conference;
     const conference =

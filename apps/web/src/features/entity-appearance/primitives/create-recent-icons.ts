@@ -8,7 +8,7 @@ import { PICKER_ICON_NAMES } from '../core/catalog';
 type AppearanceIcon = NonNullable<EntityAppearance['icon']>;
 const STORAGE = createUserScopedStorage('entity-icons:recent');
 const recentIconSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('macro'), name: z.enum(PICKER_ICON_NAMES) }),
+  z.object({ kind: z.literal('rox'), name: z.enum(PICKER_ICON_NAMES) }),
   z.object({ kind: z.literal('emoji'), value: z.string().min(1) }),
 ]);
 const recentIconsSchema = z.array(z.unknown()).transform((entries) =>

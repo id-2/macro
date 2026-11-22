@@ -29,7 +29,7 @@ test('all-hidden storage parks and another page reopens it without waking the ol
   await page.evaluate(() => window.cacheParkingHarness.parked());
   const locks = await other.evaluate(() => window.cacheParkingHarness.locks());
   expect(
-    locks?.filter((lock) => lock.name?.startsWith('macro:turso-opfs:'))
+    locks?.filter((lock) => lock.name?.startsWith('rox:turso-opfs:'))
   ).toEqual([]);
   await other.evaluate(() => window.cacheParkingHarness.start());
   const after = await other.evaluate(() =>
@@ -70,7 +70,7 @@ test('delivers a query admitted while parked across replacement without API fall
   expect(
     await page.evaluate(() => window.cacheParkingHarness.readResult())
   ).toEqual({
-    data: { user: { id: 'macro|parking-fixture' } },
+    data: { user: { id: 'rox|parking-fixture' } },
     error: false,
   });
   const after = await page.evaluate(() =>
@@ -192,7 +192,7 @@ test('settles a response received while parked before a competing expired-lease 
   expect(await page.evaluate(() => document.visibilityState)).toBe('hidden');
   const locks = await other.evaluate(() => window.cacheParkingHarness.locks());
   expect(
-    locks?.filter((lock) => lock.name?.startsWith('macro:turso-opfs:'))
+    locks?.filter((lock) => lock.name?.startsWith('rox:turso-opfs:'))
   ).toEqual([]);
   await other.evaluate(() => window.cacheParkingHarness.start());
   expect(

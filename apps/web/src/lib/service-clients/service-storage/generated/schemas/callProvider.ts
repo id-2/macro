@@ -12,6 +12,6 @@ export type CallProvider = (typeof CallProvider)[keyof typeof CallProvider];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CallProvider = {
-  macro: 'macro',
+  rox: 'rox',
   granola: 'granola',
 } as const;

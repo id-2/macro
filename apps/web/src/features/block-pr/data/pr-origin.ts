@@ -6,7 +6,7 @@ export type PrOriginTool =
   | 'devin'
   | 'copilot'
   | 'jules'
-  | 'macro';
+  | 'rox';
 
 /** What gave the origin away, strongest first. */
 export type PrOriginSignal =
@@ -32,7 +32,7 @@ export const PR_ORIGIN_TOOLS: readonly PrOriginTool[] = [
   'devin',
   'copilot',
   'jules',
-  'macro',
+  'rox',
 ];
 
 export const PR_ORIGIN_LABELS: Record<PrOriginTool, string> = {
@@ -42,7 +42,7 @@ export const PR_ORIGIN_LABELS: Record<PrOriginTool, string> = {
   devin: 'Devin',
   copilot: 'Copilot',
   jules: 'Jules',
-  macro: 'Rox',
+  rox: 'Rox',
 };
 
 export const PR_ORIGIN_SIGNAL_LABELS: Record<PrOriginSignal, string> = {
@@ -55,11 +55,11 @@ export const PR_ORIGIN_SIGNAL_LABELS: Record<PrOriginSignal, string> = {
 
 /** The tool behind a Rox agent harness slug. */
 export function toolForHarness(harness: string | undefined): PrOriginTool {
-  if (!harness) return 'macro';
+  if (!harness) return 'rox';
   if (harness.startsWith('claude')) return 'claude';
   if (harness.startsWith('codex')) return 'codex';
   if (harness.startsWith('cursor')) return 'cursor';
-  return 'macro';
+  return 'rox';
 }
 
 /** Session links agents leave in the pull requests they open. */
@@ -72,7 +72,7 @@ const SESSION_LINKS: readonly [PrOriginTool, RegExp][] = [
   ],
   ['devin', /https:\/\/app\.devin\.ai\/sessions\/[\w-]+/i],
   ['jules', /https:\/\/jules\.google\.com\/[^\s)\]"'>]+/i],
-  ['macro', /https:\/\/(?:[\w-]+\.)?rox\.one\/app\/agent\/[\w-]+/i],
+  ['rox', /https:\/\/(?:[\w-]+\.)?rox\.one\/app\/agent\/[\w-]+/i],
 ];
 
 /** Footers and trailers that name the tool without a session link. */

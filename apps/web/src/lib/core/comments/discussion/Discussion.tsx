@@ -229,8 +229,8 @@ export function DiscussionThreadView(props: {
   const threadId = () => props.thread.id;
 
   const replyUserId = () => source.currentUserId() ?? root()?.authorId ?? '';
-  const macroId = () => tryMacroId(replyUserId());
-  const displayName = () => getDisplayName(macroId());
+  const roxId = () => tryMacroId(replyUserId());
+  const displayName = () => getDisplayName(roxId());
 
   const isOwn = (comment: DiscussionComment) =>
     comment.authorId === source.currentUserId();

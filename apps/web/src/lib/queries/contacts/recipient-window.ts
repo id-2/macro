@@ -43,7 +43,7 @@ export function createContactRecipientSource(
               input
                 .search()
                 .trim()
-                .replace(/^macro\|/, '')
+                .replace(/^rox\|/, '')
                 .toLowerCase() === user.email.toLowerCase())
         )
         // Selected chips outlive this query window: retain scalar display data,

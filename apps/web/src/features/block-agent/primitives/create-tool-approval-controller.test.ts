@@ -12,10 +12,10 @@ const held = {
   kind: 'tool_approval',
   approvalId: 'approval-1',
   turn: 0,
-  serverSlug: 'macro',
+  serverSlug: 'rox',
   serverName: 'Rox',
   toolName: 'ListEmails',
-  requestedBy: 'macro|julia@rox.one',
+  requestedBy: 'rox|julia@rox.one',
 } satisfies PendingInteraction;
 
 const permission = {
@@ -41,7 +41,7 @@ function setup(viewer: string, canEdit = true) {
     controller: createToolApprovalController({
       sessionId: () => 'session-a',
       pending,
-      ownerId: () => 'macro|wolf@rox.one',
+      ownerId: () => 'rox|wolf@rox.one',
       userId: () => viewer,
       canEdit: () => canEdit,
       onFailure,
@@ -54,13 +54,13 @@ function setup(viewer: string, canEdit = true) {
 
 describe('createToolApprovalController', () => {
   it('lists only held tool calls', () => {
-    const { controller, dispose } = setup('macro|wolf@rox.one');
+    const { controller, dispose } = setup('rox|wolf@rox.one');
     expect(controller.pending()).toEqual([held]);
     dispose();
   });
 
   it('lets the owner approve and decline', async () => {
-    const { controller, dispose, answer } = setup('macro|wolf@rox.one');
+    const { controller, dispose, answer } = setup('rox|wolf@rox.one');
     expect(controller.canApprove()).toBe(true);
     await expect(controller.answer('approval-1', 'approve')).resolves.toBe(
       true
@@ -70,7 +70,7 @@ describe('createToolApprovalController', () => {
   });
 
   it('lets an editor only cancel', async () => {
-    const { controller, dispose, answer } = setup('macro|julia@rox.one');
+    const { controller, dispose, answer } = setup('rox|julia@rox.one');
     expect(controller.canApprove()).toBe(false);
     expect(controller.canCancel()).toBe(true);
     await expect(controller.answer('approval-1', 'approve')).resolves.toBe(
@@ -84,7 +84,7 @@ describe('createToolApprovalController', () => {
 
   it('lets a viewer do nothing', async () => {
     const { controller, dispose, answer } = setup(
-      'macro|visitor@rox.one',
+      'rox|visitor@rox.one',
       false
     );
     await expect(controller.answer('approval-1', 'cancel')).resolves.toBe(
@@ -96,7 +96,7 @@ describe('createToolApprovalController', () => {
 
   it('does not answer a call that is no longer held', async () => {
     const { controller, dispose, answer, setPending } =
-      setup('macro|wolf@rox.one');
+      setup('rox|wolf@rox.one');
     setPending([]);
     await expect(controller.answer('approval-1', 'deny')).resolves.toBe(false);
     expect(answer).not.toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('createToolApprovalController', () => {
 
   it('says so when somebody answered first', async () => {
     const { controller, dispose, answer, onFailure } =
-      setup('macro|wolf@rox.one');
+      setup('rox|wolf@rox.one');
     answer.mockResolvedValueOnce(
       err([{ code: 'CONFLICT' as const, message: 'already resolved' }])
     );

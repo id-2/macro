@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AgentActionId } from './agentActionId';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { SessionIdentity } from './sessionIdentity';
 import type { SessionMentionedMetadataMentionedBy } from './sessionMentionedMetadataMentionedBy';
 import type { SessionMentionedMetadataOriginMessageId } from './sessionMentionedMetadataOriginMessageId';

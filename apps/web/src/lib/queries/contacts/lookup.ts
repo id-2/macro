@@ -1,4 +1,4 @@
-import { emailToMacroId, tryMacroId } from '@core/user/macroId';
+import { emailToMacroId, tryMacroId } from '@core/user/roxId';
 import type { IUser } from '@core/user/types';
 import {
   readRecordsByKeys,

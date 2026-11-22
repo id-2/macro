@@ -1,6 +1,6 @@
 import { t } from '@app/lib/i18n';
 import { getDisplayName } from '@core/user/displayName';
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { formatRelativeDate } from '@core/util/time';
 import { formatDateAndTime } from '@entity';

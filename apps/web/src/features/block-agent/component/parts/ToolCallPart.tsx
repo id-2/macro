@@ -123,14 +123,14 @@ export function ToolCallPart(props: {
           <Show
             when={
               props.part.name.kind === 'mcp' &&
-              props.part.name.server === 'macro' &&
+              props.part.name.server === 'rox' &&
               hasToolRenderer(props.part.name.tool)
             }
             fallback={<ExchangeToolCall detail={detail()} common={common()} />}
           >
             <RoxToolCall
               detail={{
-                kind: 'macro',
+                kind: 'rox',
                 input: detail().input,
                 output: detail().result ?? detail().output,
                 error: detail().error,
@@ -142,7 +142,7 @@ export function ToolCallPart(props: {
           </Show>
         )}
       </Match>
-      <Match when={props.part.detail.kind === 'macro' && props.part.detail}>
+      <Match when={props.part.detail.kind === 'rox' && props.part.detail}>
         {(detail) => (
           <RoxToolCall
             detail={detail()}

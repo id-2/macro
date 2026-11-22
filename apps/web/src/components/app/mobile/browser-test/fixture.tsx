@@ -24,12 +24,12 @@ import {
 } from '@ui';
 import { createSignal, getOwner, Match, onMount, Show, Switch } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroLightTheme } from '../../../../features/theme/themes/macro-light';
+import { roxLightTheme } from '../../../../features/theme/themes/rox-light';
 import { ConfirmDrawer } from '../ConfirmDrawer';
 import { MobileDrawer } from '../MobileDrawer';
 import { PickerSheet } from '../PickerSheet';
 
-for (const [token, value] of Object.entries(macroLightTheme.colorTokens)) {
+for (const [token, value] of Object.entries(roxLightTheme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }
 document.documentElement.dataset.themeLight = 'true';
@@ -446,8 +446,8 @@ function TypingScenario() {
           />
           <MobileDrawer.ScrollBody>
             <MobileDrawer.Section class="flex flex-col">
-              <MobileDrawer.Item onClick={() => press('macro')}>
-                macro
+              <MobileDrawer.Item onClick={() => press('rox')}>
+                rox
               </MobileDrawer.Item>
             </MobileDrawer.Section>
           </MobileDrawer.ScrollBody>

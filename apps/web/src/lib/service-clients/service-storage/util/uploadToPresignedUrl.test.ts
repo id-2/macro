@@ -118,7 +118,7 @@ describe('uploadToPresignedUrl with progress', () => {
 });
 
 describe('uploadToPresignedUrl when S3 rejects the upload', () => {
-  const presignedUrl = `https://macro-email-attachments-dev.s3.us-east-1.amazonaws.com/draft/01a16ebf/0acf54cf?${new URLSearchParams(
+  const presignedUrl = `https://rox-email-attachments-dev.s3.us-east-1.amazonaws.com/draft/01a16ebf/0acf54cf?${new URLSearchParams(
     {
       'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
       'X-Amz-Credential':
@@ -132,7 +132,7 @@ describe('uploadToPresignedUrl when S3 rejects the upload', () => {
     }
   )}`;
   const s3Message =
-    'User: arn:aws:sts::569036502058:assumed-role/email-service-role-2-dev/05c4b09c72544171a6d8cb73f1f8fdfe is not authorized to perform: s3:PutObject on resource: "arn:aws:s3:::macro-email-attachments-dev/draft/01a16ebf/0acf54cf" because no VPC endpoint policy allows the s3:PutObject action';
+    'User: arn:aws:sts::569036502058:assumed-role/email-service-role-2-dev/05c4b09c72544171a6d8cb73f1f8fdfe is not authorized to perform: s3:PutObject on resource: "arn:aws:s3:::rox-email-attachments-dev/draft/01a16ebf/0acf54cf" because no VPC endpoint policy allows the s3:PutObject action';
   const accessDenied = `<?xml version="1.0" encoding="UTF-8"?>\n<Error><Code>AccessDenied</Code><Message>${s3Message}</Message><RequestId>9T8VG69R5KVNCQFK</RequestId><HostId>eogGpUstWUuZTwAMK8B2b2AqUTtW8f</HostId></Error>`;
   const signatureMismatch = `<?xml version="1.0" encoding="UTF-8"?>\n<Error><Code>SignatureDoesNotMatch</Code><Message>The request signature we calculated does not match the signature you provided. Check your key and signing method.</Message><AWSAccessKeyId>ASIAEXAMPLEKEYID1234</AWSAccessKeyId><StringToSign>AWS4-HMAC-SHA256\n20261024T162943Z</StringToSign><SignatureProvided>signature-secret</SignatureProvided><CanonicalRequest>PUT\n/draft/01a16ebf/0acf54cf\nX-Amz-Security-Token=session-token-secret</CanonicalRequest><RequestId>5659KZAZESK3P7X3</RequestId><HostId>4YO3CdvNnyscQZp</HostId></Error>`;
 

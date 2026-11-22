@@ -34,14 +34,14 @@ vi.mock('@core/util/branchName', () => ({
 const pullRequest: GithubPullRequest = {
   additions: 326,
   deletions: 1,
-  displayName: 'macro-inc/macro#5158',
-  githubKey: 'macro-inc/macro/pull/5158',
+  displayName: 'rox-inc/rox#5158',
+  githubKey: 'rox-inc/rox/pull/5158',
   name: 'fix(sync-service): strip comment highlight marks',
   number: 5158,
-  owner: 'macro-inc',
-  repo: 'macro',
+  owner: 'rox-inc',
+  repo: 'rox',
   status: 'open',
-  url: 'https://github.com/macro-inc/macro/pull/5158',
+  url: 'https://github.com/rox-inc/rox/pull/5158',
 };
 
 afterEach(() => {

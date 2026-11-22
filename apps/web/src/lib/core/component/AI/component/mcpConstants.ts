@@ -3,7 +3,7 @@ export const ROX_MCP_URL = 'https://mcp-server.rox.one/mcp';
 export const ROX_MCP_CONFIG = JSON.stringify(
   {
     mcpServers: {
-      macro: {
+      rox: {
         type: 'http',
         url: ROX_MCP_URL,
       },
@@ -17,12 +17,12 @@ export const CLI_COMMANDS = [
   {
     key: 'claude-cli',
     label: 'Claude Code',
-    command: `claude mcp add --transport http macro ${ROX_MCP_URL}`,
+    command: `claude mcp add --transport http rox ${ROX_MCP_URL}`,
   },
   {
     key: 'codex-cli',
     label: 'Codex CLI',
-    command: `codex mcp add macro --url ${ROX_MCP_URL}`,
+    command: `codex mcp add rox --url ${ROX_MCP_URL}`,
   },
 ] as const;
 

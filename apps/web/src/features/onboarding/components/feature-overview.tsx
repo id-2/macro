@@ -260,7 +260,7 @@ export function FeatureOverview(props: {
 }) {
   // Keep the user's starting interests through Back and Google redirects.
   const [selected, setSelected] = makePersisted(createSignal<string[]>([]), {
-    name: 'macro:onboarding-features',
+    name: 'rox:onboarding-features',
     storage: sessionStorage,
     deserialize: (value) => {
       try {

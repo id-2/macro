@@ -21,8 +21,8 @@ import type { EmailFocusQuery } from '@service-storage/graphql/generated/graphql
 import { addDays } from 'date-fns';
 import { createSignal, For } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import {
   EMAIL_FOCUS_WIDE_BREAKPOINT,
   EmailFocusPreviewLeading,
@@ -30,7 +30,7 @@ import {
   EmailFocusScore,
 } from '../components/EmailFocusBadges';
 
-const VIEWER_ID = 'macro|focus-rows@example.test';
+const VIEWER_ID = 'rox|focus-rows@example.test';
 
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
   id: VIEWER_ID,
@@ -42,7 +42,7 @@ document.documentElement.dataset.touchDevice = String(isTouchDevice());
 const search = new URLSearchParams(window.location.search);
 const dark = search.get('theme') !== 'light';
 document.documentElement.dataset.themeLight = String(!dark);
-const theme = dark ? macroDarkTheme : macroLightTheme;
+const theme = dark ? roxDarkTheme : roxLightTheme;
 for (const [token, value] of Object.entries(theme.colorTokens)) {
   document.documentElement.style.setProperty(`--color-${token}`, value);
 }

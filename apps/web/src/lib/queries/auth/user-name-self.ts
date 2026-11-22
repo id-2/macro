@@ -14,7 +14,7 @@ const OWN_USER_NAME_STALE_TIME = 15_000;
  * The current user's own editable first/last name — the fields Account
  * settings reads and writes via getUserName/putUserName. Distinct from
  * userInfo().name (the legacy identity-provider display name) and from
- * useUserNames (viewer-scoped labels, batched by macro id).
+ * useUserNames (viewer-scoped labels, batched by rox id).
  */
 export function useOwnUserNameQuery() {
   const account = useQueryAccount();

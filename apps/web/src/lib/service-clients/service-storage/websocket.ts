@@ -98,8 +98,8 @@ export function createWebSocketJob<T, R, D, U>({
 
       // not our request
       if (
-        !eventMessage.macroRequestId ||
-        eventMessage.macroRequestId !== requestId
+        !eventMessage.roxRequestId ||
+        eventMessage.roxRequestId !== requestId
       )
         return;
 

@@ -57,7 +57,7 @@ export interface BookingEventType {
   /** Generate a Rox call and attach its join link when someone books.
 Mutually exclusive with Google Meet. Omitted on links saved before
 Rox calls were a booking option, which keep their previous conference. */
-  macroCall?: boolean;
+  roxCall?: boolean;
   /** Host assignment policy. */
   mode: SchedulingMode;
   /**

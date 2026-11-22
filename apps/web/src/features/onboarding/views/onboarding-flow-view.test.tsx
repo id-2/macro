@@ -36,7 +36,7 @@ function catalogSuggestion(
   key: string,
   options: {
     onByDefault?: boolean;
-    from?: 'for_you' | 'macro';
+    from?: 'for_you' | 'rox';
     reason?: string;
     surface?: Surface;
   } = {}
@@ -808,7 +808,7 @@ describe('onboarding flow', () => {
       const { fake, navigate } = setup({
         world: {
           viewer: {
-            id: `macro|${email}`,
+            id: `rox|${email}`,
             email,
             tutorialComplete: false,
             licensed: false,
@@ -855,7 +855,7 @@ describe('onboarding flow', () => {
             catalogSuggestion('triage', 'triage', { onByDefault: true }),
             // A third marked on by default is past the cap of two.
             catalogSuggestion('brief', 'brief', { onByDefault: true }),
-            catalogSuggestion('updates', 'updates', { from: 'macro' }),
+            catalogSuggestion('updates', 'updates', { from: 'rox' }),
           ],
         },
       },
@@ -895,11 +895,11 @@ describe('onboarding flow', () => {
     try {
       // The server always fills each surface with Rox's templates.
       const emailTemplate = catalogSuggestion('updates', 'updates', {
-        from: 'macro',
+        from: 'rox',
         surface: 'email',
       });
       const tasksTemplate = catalogSuggestion('triage', 'triage', {
-        from: 'macro',
+        from: 'rox',
         surface: 'tasks',
       });
       const sort = catalogSuggestion('sort', 'inbox', {
@@ -979,7 +979,7 @@ describe('onboarding flow', () => {
         routineSuggestions: {
           status: 'generating',
           suggestions: [
-            catalogSuggestion('updates', 'updates', { from: 'macro' }),
+            catalogSuggestion('updates', 'updates', { from: 'rox' }),
           ],
         },
       },
@@ -991,7 +991,7 @@ describe('onboarding flow', () => {
         status: 'ready',
         suggestions: [
           catalogSuggestion('sort', 'inbox', { reason: 'Busy inbox.' }),
-          catalogSuggestion('updates', 'updates', { from: 'macro' }),
+          catalogSuggestion('updates', 'updates', { from: 'rox' }),
         ],
       };
     });
@@ -1018,9 +1018,9 @@ describe('onboarding flow', () => {
           routineSuggestions: {
             status: 'generating',
             suggestions: [
-              catalogSuggestion('updates', 'updates', { from: 'macro' }),
+              catalogSuggestion('updates', 'updates', { from: 'rox' }),
               catalogSuggestion('triage', 'triage', {
-                from: 'macro',
+                from: 'rox',
                 surface: 'tasks',
               }),
             ],
@@ -1053,7 +1053,7 @@ describe('onboarding flow', () => {
         routineSuggestions: {
           status: 'none',
           suggestions: [
-            catalogSuggestion('updates', 'updates', { from: 'macro' }),
+            catalogSuggestion('updates', 'updates', { from: 'rox' }),
           ],
         },
       },

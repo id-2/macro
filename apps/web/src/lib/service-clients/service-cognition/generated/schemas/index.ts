@@ -198,7 +198,7 @@ export * from './linearIssueMetaUrl';
 export * from './linkShare';
 export * from './listImportEntitiesParams';
 export * from './listSkillsParams';
-export * from './macroUserIdStr';
+export * from './roxUserIdStr';
 export * from './mcpAuthCallbackParams';
 export * from './memoryEdit';
 export * from './memoryEditOneOf';

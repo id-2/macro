@@ -18,9 +18,9 @@ export function RecipientDirectoryFixture() {
   const [selected, setSelected] = createSignal<WithCustomUserInput<'user'>[]>([
     {
       kind: 'custom',
-      id: 'macro|outside@example.com',
+      id: 'rox|outside@example.com',
       data: {
-        id: 'macro|outside@example.com',
+        id: 'rox|outside@example.com',
         email: 'outside@example.com',
         invalid: false,
       },
@@ -58,7 +58,7 @@ export function RecipientDirectoryFixture() {
       offline: false,
       query: request.query,
       users: ids.map((id) => ({
-        id: `macro|person${id}@example.com`,
+        id: `rox|person${id}@example.com`,
         email: `person${id}@example.com`,
         name:
           id === 99_999
@@ -81,7 +81,7 @@ export function RecipientDirectoryFixture() {
   };
   const createSource: RecipientSourceFactory<'user'> = (input) =>
     createContactRecipientSource(
-      () => ({ userId: 'macro|viewer@example.com' }),
+      () => ({ userId: 'rox|viewer@example.com' }),
       input,
       () => false,
       reader

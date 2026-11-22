@@ -322,7 +322,7 @@ describe('mixed Agents sidebar', () => {
             name: 'Morning digest',
             ownerId: 'me',
             archivedBy: null,
-            botId: 'macro',
+            botId: 'rox',
             status: 'acp_ready',
             source: 'routine',
           },
@@ -332,7 +332,7 @@ describe('mixed Agents sidebar', () => {
             name: 'Plan launch',
             ownerId: 'me',
             archivedBy: null,
-            botId: 'macro',
+            botId: 'rox',
             status: 'acp_ready',
           },
         ]}
@@ -478,8 +478,8 @@ describe('Open PRs sidebar section', () => {
     turnState: 'running',
     updatedAt: '2026-10-29T10:00:00Z',
     pullRequestState: 'open',
-    pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
-    repoUrl: 'https://github.com/macro-inc/macro.git',
+    pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
+    repoUrl: 'https://github.com/rox-inc/rox.git',
     workingBranch: 'fix/build',
   };
   const draft: AgentConversationEntity = {
@@ -488,7 +488,7 @@ describe('Open PRs sidebar section', () => {
     name: 'Add tests',
     updatedAt: '2026-10-30T10:00:00Z',
     pullRequestState: 'draft',
-    pullRequestUrl: 'https://github.com/macro-inc/macro/pull/43',
+    pullRequestUrl: 'https://github.com/rox-inc/rox/pull/43',
   };
   const conversations: AgentConversationEntity[] = [
     open,
@@ -557,7 +557,7 @@ describe('Open PRs sidebar section', () => {
     ).toEqual(['Add tests', 'Fix build']);
     expect(within(section).getByText('#42')).toBeTruthy();
     expect(
-      within(section).getAllByText('macro-inc/macro · fix/build')
+      within(section).getAllByText('rox-inc/rox · fix/build')
     ).toHaveLength(2);
     expect(
       section.querySelectorAll('[data-agent-status-indicator]')
@@ -636,7 +636,7 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
     harness: 'cursor',
     status: 'acp_ready',
     turnState: 'idle',
-    repoUrl: 'https://github.com/macro-inc/macro.git',
+    repoUrl: 'https://github.com/rox-inc/rox.git',
     repoBranch: 'main',
     workingBranch: 'fix/build',
   };
@@ -685,19 +685,19 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
   it('shows saved working branch and reactive PR state without taking over session navigation', () => {
     const { open, view, setEntity } = setup();
     const session = screen.getByRole('button', { name: 'Fix build' });
-    expect(screen.getByText('macro-inc/macro · fix/build')).toBeTruthy();
+    expect(screen.getByText('rox-inc/rox · fix/build')).toBeTruthy();
     expect(screen.queryByText('main')).toBeNull();
     expect(screen.queryByRole('link')).toBeNull();
     setEntity({
       ...conversation,
-      pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+      pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       pullRequestState: 'open',
     });
     const pr = screen.getByRole('link', {
       name: 'Open pull request #42, Open on GitHub',
     });
     expect(pr.getAttribute('href')).toBe(
-      'https://github.com/macro-inc/macro/pull/42'
+      'https://github.com/rox-inc/rox/pull/42'
     );
     expect(pr.closest('button')).toBeNull();
     expect(view.container.querySelector('[data-kind="code"]')).toBeTruthy();
@@ -712,7 +712,7 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
     expect(event.shiftKey).toBe(true);
     setEntity({
       ...conversation,
-      pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+      pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       pullRequestState: 'merged',
     });
     expect(
@@ -730,7 +730,7 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
     setEntity({
       ...conversation,
       harness: 'in-memory',
-      pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+      pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
     });
     fireEvent.click(screen.getByRole('button', { name: 'Fix build' }));
     expect(open).toHaveBeenCalledOnce();
@@ -790,7 +790,7 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
     const { setEntity } = setup();
     setEntity({
       ...conversation,
-      pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+      pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
     });
     expect(
       screen.getByRole('link', { name: 'Open pull request #42 on GitHub' })
@@ -858,7 +858,7 @@ describe.each(['home', 'sidebar'] as const)('%s agent rows', (surface) => {
     const { setEntity, open } = setup();
     setEntity({
       ...conversation,
-      pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+      pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       pullRequestId: 'pr-entity',
       pullRequestState: 'merged',
     });

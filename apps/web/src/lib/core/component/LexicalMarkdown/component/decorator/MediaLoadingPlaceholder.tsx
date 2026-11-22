@@ -54,7 +54,7 @@ export function MediaLoadingPlaceholder(props: {
 /** Last path segment when it looks like a file name, otherwise undefined. */
 export function mediaFileNameFromUrl(url: string): string | undefined {
   try {
-    const last = new URL(url, 'https://macro.invalid').pathname
+    const last = new URL(url, 'https://rox.invalid').pathname
       .split('/')
       .filter(Boolean)
       .at(-1);

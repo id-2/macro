@@ -22,15 +22,15 @@ describe('recent icon preferences', () => {
       'bug',
       'cpu',
     ]) {
-      first.recent.record({ kind: 'macro', name });
+      first.recent.record({ kind: 'rox', name });
     }
-    first.recent.record({ kind: 'macro', name: 'file' });
+    first.recent.record({ kind: 'rox', name: 'file' });
     expect(first.recent.icons()).toHaveLength(9);
-    expect(first.recent.icons()[0]).toEqual({ kind: 'macro', name: 'file' });
+    expect(first.recent.icons()[0]).toEqual({ kind: 'rox', name: 'file' });
     expect(
       first.recent
         .icons()
-        .filter((icon) => icon.kind === 'macro' && icon.name === 'file')
+        .filter((icon) => icon.kind === 'rox' && icon.name === 'file')
     ).toHaveLength(1);
     const second = createRoot((dispose) => ({
       dispose,
@@ -52,10 +52,10 @@ describe('recent icon preferences', () => {
       'entity-icons:recent:first',
       JSON.stringify([
         null,
-        { kind: 'macro', name: 'align-bottom-simple' },
-        { kind: 'macro', name: 'calendar-dots' },
-        { kind: 'macro', name: 'unknown-icon' },
-        { kind: 'macro', name: 'star' },
+        { kind: 'rox', name: 'align-bottom-simple' },
+        { kind: 'rox', name: 'calendar-dots' },
+        { kind: 'rox', name: 'unknown-icon' },
+        { kind: 'rox', name: 'star' },
         { kind: 'emoji', value: '🚀' },
         { kind: 'emoji', value: 42 },
       ])
@@ -64,10 +64,10 @@ describe('recent icon preferences', () => {
       dispose,
       recent: createRecentIcons('first'),
     }));
-    recent.record({ kind: 'macro', name: 'calendar-dots' });
-    recent.record({ kind: 'macro', name: 'unknown-icon' });
+    recent.record({ kind: 'rox', name: 'calendar-dots' });
+    recent.record({ kind: 'rox', name: 'unknown-icon' });
     expect(recent.icons()).toEqual([
-      { kind: 'macro', name: 'star' },
+      { kind: 'rox', name: 'star' },
       { kind: 'emoji', value: '🚀' },
     ]);
     dispose();

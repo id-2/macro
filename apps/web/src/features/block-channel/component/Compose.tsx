@@ -176,7 +176,7 @@ export function ChannelCompose() {
       </SplitToolbarLeft>
       <div class="relative flex flex-col size-full panel">
         <div class="pt-2 touch:pt-[calc(var(--mobile-content-inset-top)+.5rem)] size-full grow overflow-y-auto @min-[40rem]:px-4">
-          <div class="macro-message-width macro-message-padding mx-auto pb-1 h-full">
+          <div class="rox-message-width rox-message-padding mx-auto pb-1 h-full">
             <input
               type="text"
               value={channelName()}

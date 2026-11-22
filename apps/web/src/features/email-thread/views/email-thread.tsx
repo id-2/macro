@@ -142,7 +142,7 @@ export function EmailThreadView(props: EmailThreadViewProps) {
                 <Show when={!isTouchDevice() && props.title}>
                   {(title) => (
                     <div class="shrink-0 w-full flex justify-center">
-                      <div class="macro-message-width macro-message-padding w-full pt-2 pb-3.5">
+                      <div class="rox-message-width rox-message-padding w-full pt-2 pb-3.5">
                         <EmailThreadTitle
                           onCopy={viewContext.copySubject}
                           title={title()}

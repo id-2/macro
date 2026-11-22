@@ -601,7 +601,7 @@ function DocumentCardInner(props: DocumentCardDecoratorProps) {
               <Show when={props.item.owner}>
                 {(owner) =>
                   getDisplayName(tryMacroId(owner())) ||
-                  owner().replace('macro|', '')
+                  owner().replace('rox|', '')
                 }
               </Show>
               <Show when={props.item.owner && props.item.updatedAt}>

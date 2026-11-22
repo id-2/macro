@@ -41,7 +41,7 @@ type CommentBase = {
   id: CommentId;
   rootId: CommentId;
   anchorId: string;
-  // macro id of the comment owner
+  // rox id of the comment owner
   owner: string;
   author: string;
   text: string;

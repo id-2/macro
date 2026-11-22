@@ -86,7 +86,7 @@ const EventDetails = (props: {
         </div>
       </Tool.ListItem>
     </Tool.ListButton>
-    <Show when={props.event.macroCallUrl ?? props.event.conferenceUrl}>
+    <Show when={props.event.roxCallUrl ?? props.event.conferenceUrl}>
       {(url) => (
         <Tool.ListItem icon={<VideoCamera class="size-4" />}>
           <a

@@ -17,20 +17,20 @@ function isExpired(token: string) {
   return expiresAt <= 0 || Date.now() >= expiresAt;
 }
 
-let macroApiTokenPromise: Promise<string> | null = null;
+let roxApiTokenPromise: Promise<string> | null = null;
 let tokenGeneration = 0;
 
 /** Login/account replacement must not reuse the previous viewer's bearer token. */
 export function resetMacroApiToken() {
   tokenGeneration++;
-  macroApiTokenPromise = null;
+  roxApiTokenPromise = null;
 }
 function assertTokenGeneration(generation: number) {
   if (generation !== tokenGeneration)
     throw new DOMException('Authentication session changed', 'AbortError');
 }
 async function readMacroApiToken(generation: number) {
-  const result = await authServiceClient.macroApiToken();
+  const result = await authServiceClient.roxApiToken();
   assertTokenGeneration(generation);
   if (result.isErr()) throw result.error;
   return result.value.rox_api_token;
@@ -39,12 +39,12 @@ async function releaseFailedToken(promise: Promise<string>) {
   try {
     await promise;
   } catch {
-    if (macroApiTokenPromise === promise) macroApiTokenPromise = null;
+    if (roxApiTokenPromise === promise) roxApiTokenPromise = null;
   }
 }
 function requestMacroApiToken() {
   const promise = readMacroApiToken(tokenGeneration);
-  macroApiTokenPromise = promise;
+  roxApiTokenPromise = promise;
   fireAndForget(releaseFailedToken(promise), 'auth-token');
   return promise;
 }
@@ -59,7 +59,7 @@ export async function getMacroApiToken(): Promise<string> {
     }
   }
 
-  const cachedPromise = macroApiTokenPromise;
+  const cachedPromise = roxApiTokenPromise;
   if (!cachedPromise) {
     return parent.run(requestMacroApiToken);
   }
@@ -73,7 +73,7 @@ export async function getMacroApiToken(): Promise<string> {
   // Another caller may already have replaced the expired entry while this
   // caller was suspended awaiting it. Reuse that replacement instead of
   // issuing a duplicate request.
-  if (macroApiTokenPromise !== cachedPromise) {
+  if (roxApiTokenPromise !== cachedPromise) {
     return parent.run(getMacroApiToken);
   }
 

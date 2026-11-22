@@ -4,12 +4,12 @@ import { nextPickerOption, type PickerOption, pickerRows } from './picker-grid';
 const OPTIONS: PickerOption[] = Array.from({ length: 30 }, (_, index) => ({
   key: `work:${index}`,
   label: String(index),
-  icon: { kind: 'macro', name: 'star' },
+  icon: { kind: 'rox', name: 'star' },
 }));
 const FILES: PickerOption[] = Array.from({ length: 12 }, (_, index) => ({
   key: `files:${index}`,
   label: String(index),
-  icon: { kind: 'macro', name: 'file' },
+  icon: { kind: 'rox', name: 'file' },
 }));
 
 describe('virtual picker grid navigation', () => {

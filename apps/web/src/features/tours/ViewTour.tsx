@@ -71,7 +71,7 @@ function readProgress(raw: string | null): TourProgress | undefined {
 }
 
 function DismissibleTour(props: ViewTourProps & { userId: string }) {
-  const storage = createUserScopedStorage(`macro:tour:${props.tour.id}`);
+  const storage = createUserScopedStorage(`rox:tour:${props.tour.id}`);
   // Localhost reopens tours from the start on every mount so they can be
   // iterated on, and leaves saved progress alone.
   const localTesting = isLocalTesting();

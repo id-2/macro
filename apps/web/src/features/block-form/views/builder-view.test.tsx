@@ -93,7 +93,7 @@ function rsvp(): FormDetail {
       id: 'form-1',
       name: 'Team survey',
       description: '',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       databaseId: 'database-1',
       tableId: 'table-1',
       audience: 'members',
@@ -812,20 +812,20 @@ describe('BuilderView', () => {
     shared.setPeers([
       {
         peerId: 'peer-ada',
-        userId: 'macro|ada@example.com',
+        userId: 'rox|ada@example.com',
         color: 'blue',
         selection: { sectionId: 'about', questionId: 'q-team' },
       },
     ]);
     expect(
       within(screen.getByRole('group', { name: 'Question 2: Team' })).getByText(
-        'macro|ada@example.com on this question'
+        'rox|ada@example.com on this question'
       )
     ).toBeTruthy();
     expect(
       within(
         screen.getByRole('group', { name: 'Question 1: Name' })
-      ).queryByText(/macro\|ada/)
+      ).queryByText(/rox\|ada/)
     ).toBeNull();
     fireEvent.click(screen.getByRole('group', { name: 'Question 1: Name' }));
     fireEvent.blur(window);
@@ -951,7 +951,7 @@ describe('BuilderView', () => {
           description: '',
           durationMinutes: 30,
           location: '',
-          macroCall: false,
+          roxCall: false,
           googleMeet: true,
           questions: [],
           requiresConfirmation: false,
@@ -1119,7 +1119,7 @@ describe('BuilderView', () => {
             description: '',
             durationMinutes: 60,
             location: '',
-            macroCall: false,
+            roxCall: false,
             googleMeet: true,
             questions: [],
             requiresConfirmation: false,

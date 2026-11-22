@@ -6,12 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { agentContextText, promptOrigin } from './prompt-origin';
 
 const julia = {
-  id: 'macro|julia@example.com',
+  id: 'rox|julia@example.com',
   name: 'Julia',
   email: 'julia@example.com',
 };
 const teo = {
-  id: 'macro|teo@example.com',
+  id: 'rox|teo@example.com',
   name: 'Teo',
   email: 'teo@example.com',
 };
@@ -368,16 +368,16 @@ describe('promptOrigin', () => {
           kind: 'requested',
           requested_by: julia,
           requested_at: '2026-10-15T14:02:00Z',
-          repo_url: 'https://github.com/macro-inc/macro',
+          repo_url: 'https://github.com/rox-inc/rox',
         },
       })
     ).toEqual({
       lead: 'via composer in',
-      place: 'macro-inc/macro',
+      place: 'rox-inc/rox',
       tail: undefined,
       destination: {
         kind: 'external',
-        url: 'https://github.com/macro-inc/macro',
+        url: 'https://github.com/rox-inc/rox',
       },
     });
   });
@@ -565,14 +565,14 @@ describe('promptOrigin', () => {
           delivery: {
             event: 'workflow_run',
             action: 'completed',
-            repository: 'macro-inc/macro',
+            repository: 'rox-inc/rox',
           },
         },
       })
     ).toEqual({
       lead: 'via routine',
       place: 'Watcher',
-      tail: '· GitHub workflow_run completed in macro-inc/macro',
+      tail: '· GitHub workflow_run completed in rox-inc/rox',
       destination: { kind: 'routine', routineId: 'r-2' },
     });
   });
@@ -580,7 +580,7 @@ describe('promptOrigin', () => {
   it('is undefined when the context names no trigger', () => {
     expect(
       promptOrigin(
-        '<session owner="Julia" owner_id="macro|julia@example.com"/>'
+        '<session owner="Julia" owner_id="rox|julia@example.com"/>'
       )
     ).toBeUndefined();
     expect(promptOrigin('Prior message 1: <unclosed')).toBeUndefined();

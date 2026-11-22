@@ -305,7 +305,7 @@ test('a sheet opened by its trigger slides up, and swipes away', async ({
 
 test.describe('a persistent prompt', () => {
   const toastCard = (page: Page, text: string) =>
-    page.locator('[data-macro-toast]', { hasText: text });
+    page.locator('[data-rox-toast]', { hasText: text });
   const prompt = (page: Page) => toastCard(page, 'Enable notifications');
   const notice = (page: Page) => toastCard(page, 'Link copied');
 

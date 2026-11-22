@@ -83,7 +83,7 @@ import {
 
 const CRM_ASIDE_PREFERENCE = 'crm';
 /** Where CRM saved a collapsed sidebar before it used the shell's preference. */
-const LEGACY_COLLAPSED_PREFERENCE = 'macro:pref:crm:sidebar-collapsed';
+const LEGACY_COLLAPSED_PREFERENCE = 'rox:pref:crm:sidebar-collapsed';
 
 /**
  * Moves a choice saved under CRM's old key to the shell's, which wins if set.

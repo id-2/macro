@@ -1,4 +1,4 @@
-import { RoxMarkIcon } from '@app/features/onboarding/components/macro-mark-icon';
+import { RoxMarkIcon } from '@app/features/onboarding/components/rox-mark-icon';
 import { OnboardingShell } from '@app/features/onboarding/components/onboarding-shell';
 import { displayName, sourceUrl } from '@core/constant/brand';
 import { type JSX, Show } from 'solid-js';
@@ -66,12 +66,12 @@ export function LoginCard(props: {
         <p class="mt-3 text-xs leading-5 text-ink-extra-muted [text-wrap:balance]">
           {displayName} is a modified version of{' '}
           <a
-            href="https://github.com/macro-inc/macro"
+            href="https://github.com/rox-inc/rox"
             target="_blank"
             rel="noreferrer"
             class="underline underline-offset-2 hover:text-ink-muted"
           >
-            macro-inc/macro
+            rox-inc/rox
           </a>
           , modified 2026-11-12 under the existing license notices.{' '}
           <a

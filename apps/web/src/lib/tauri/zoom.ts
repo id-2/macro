@@ -19,7 +19,7 @@ import { z } from 'zod';
 /** Chrome's zoom stops, trimmed to the range the app layout stays usable in. */
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
 const DEFAULT_ZOOM = 1;
-const STORAGE_KEY = 'macro:desktop:zoom';
+const STORAGE_KEY = 'rox:desktop:zoom';
 
 const zoomSchema = z
   .number()

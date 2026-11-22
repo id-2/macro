@@ -22,7 +22,7 @@ it('excludes scoped rosters within the IPC budget and restarts when overflow exc
   vi.useFakeTimers();
   const client = new QueryClient();
   const initial = new Set(
-    Array.from({ length: 500 }, (_, i) => `macro|person${i}@example.com`)
+    Array.from({ length: 500 }, (_, i) => `rox|person${i}@example.com`)
   );
   const [roster, setRoster] = createSignal<ReadonlySet<string>>(initial);
   const reader = vi
@@ -34,7 +34,7 @@ it('excludes scoped rosters within the IPC budget and restarts when overflow exc
       const users = [];
       while (index < 100_000 && users.length < 50) {
         const number = index++;
-        const id = `macro|person${number}@example.com`;
+        const id = `rox|person${number}@example.com`;
         if (!excluded.has(id))
           users.push({
             id,
@@ -64,11 +64,11 @@ it('excludes scoped rosters within the IPC budget and restarts when overflow exc
   let source: ReturnType<typeof createContactRecipientSource> | undefined;
   function Harness() {
     source = createContactRecipientSource(
-      () => ({ userId: 'macro|viewer@example.com' }),
+      () => ({ userId: 'rox|viewer@example.com' }),
       {
         search: () => '',
         enabled: () => true,
-        selfId: () => 'macro|viewer@example.com',
+        selfId: () => 'rox|viewer@example.com',
         includeSelf: () => false,
         senderDomain: () => undefined,
         excludedIds: roster,
@@ -86,26 +86,26 @@ it('excludes scoped rosters within the IPC budget and restarts when overflow exc
   await vi.advanceTimersByTimeAsync(0);
   expect(reader.mock.calls[0][2].policy?.excluded).toHaveLength(500);
   expect(source!.items()).toHaveLength(49);
-  expect(source!.items()[0].id).toBe('macro|person500@example.com');
+  expect(source!.items()[0].id).toBe('rox|person500@example.com');
   expect(source!.hasNext()).toBe(true);
   await source!.next();
   await vi.runOnlyPendingTimersAsync();
-  expect(source!.items()[0].id).toBe('macro|person549@example.com');
+  expect(source!.items()[0].id).toBe('rox|person549@example.com');
   const nativeExclusions = reader.mock.calls.at(-1)?.[2].policy?.excluded;
 
   const next = new Set(initial);
-  next.delete('macro|person499@example.com');
-  next.add('macro|person700@example.com');
+  next.delete('rox|person499@example.com');
+  next.add('rox|person700@example.com');
   setRoster(next);
   await vi.runOnlyPendingTimersAsync();
   expect(reader.mock.calls.at(-1)?.[2].cursor).toBeUndefined();
   expect(reader.mock.calls.at(-1)?.[2].policy?.excluded).toEqual(
     nativeExclusions
   );
-  expect(source!.items()[0].id).toBe('macro|person499@example.com');
+  expect(source!.items()[0].id).toBe('rox|person499@example.com');
   setRoster(initial);
   await vi.runOnlyPendingTimersAsync();
-  expect(source!.items()[0].id).toBe('macro|person500@example.com');
+  expect(source!.items()[0].id).toBe('rox|person500@example.com');
   expect(source!.items()).toHaveLength(49);
   expect(client.getQueryCache().getAll()).toHaveLength(1);
   client.clear();
@@ -115,7 +115,7 @@ it('retains an empty continuation after filtering an oversized scoped roster', a
   vi.useFakeTimers();
   const client = new QueryClient();
   const roster = new Set(
-    Array.from({ length: 600 }, (_, i) => `macro|person${i}@example.com`)
+    Array.from({ length: 600 }, (_, i) => `rox|person${i}@example.com`)
   );
   const reader = vi
     .fn<typeof readContactDirectory>()
@@ -126,7 +126,7 @@ it('retains an empty continuation after filtering an oversized scoped roster', a
       offline: false,
       users: [
         {
-          id: 'macro|person599@example.com',
+          id: 'rox|person599@example.com',
           email: 'person599@example.com',
           name: 'Existing member',
         },
@@ -143,7 +143,7 @@ it('retains an empty continuation after filtering an oversized scoped roster', a
   let source: ReturnType<typeof createContactRecipientSource> | undefined;
   function Harness() {
     source = createContactRecipientSource(
-      () => ({ userId: 'macro|viewer@example.com' }),
+      () => ({ userId: 'rox|viewer@example.com' }),
       {
         search: () => '',
         enabled: () => true,

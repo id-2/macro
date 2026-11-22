@@ -2,7 +2,7 @@ import { createRoot } from 'solid-js';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { useReadingPaneListWidth } from './use-reading-pane-list-width';
 
-const STORAGE_KEY = 'macro:pref:email:reading-pane-list-width';
+const STORAGE_KEY = 'rox:pref:email:reading-pane-list-width';
 
 beforeEach(() => {
   const values = new Map<string, string>();

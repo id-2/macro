@@ -160,7 +160,7 @@ test('quiet hours persist and silence sounds without stopping a preview', async 
   );
 
   await page.evaluate(() => {
-    const key = 'macro:notification-sounds:fixture-user';
+    const key = 'rox:notification-sounds:fixture-user';
     const saved = JSON.parse(localStorage.getItem(key) ?? '{}') as {
       enabled?: boolean;
       quietHours?: {

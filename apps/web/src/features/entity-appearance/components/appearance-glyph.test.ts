@@ -12,7 +12,7 @@ it('renders permanent aliases through the entity artwork and falls back for unkn
   const fallback = document.createElement('span');
   fallback.textContent = 'Default';
   const [appearance, setAppearance] = createSignal<EntityAppearance>({
-    icon: { kind: 'macro', name: 'former-idea' },
+    icon: { kind: 'rox', name: 'former-idea' },
     color: null,
   });
   const { container } = render(() =>
@@ -25,10 +25,10 @@ it('renders permanent aliases through the entity artwork and falls back for unkn
   );
   await waitFor(() =>
     expect(
-      container.querySelector('svg')?.getAttribute('data-macro-icon')
+      container.querySelector('svg')?.getAttribute('data-rox-icon')
     ).toBe('lightbulb')
   );
-  setAppearance({ icon: { kind: 'macro', name: 'unknown-icon' }, color: null });
+  setAppearance({ icon: { kind: 'rox', name: 'unknown-icon' }, color: null });
   expect(container.querySelector('svg')).toBeNull();
   expect(container.firstElementChild).toBe(fallback);
 });

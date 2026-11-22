@@ -7,7 +7,7 @@
 
 import type { AiFeature } from './aiFeature';
 import type { CompletionUsageEntity } from './completionUsageEntity';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { Usage } from './usage';
 
 /**

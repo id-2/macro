@@ -221,7 +221,7 @@ it('announces a subscribed review revision as a metadata change, not a message',
           content: {
             type: 'acp',
             jsonrpc: '2.0',
-            method: '_macro/review_updated',
+            method: '_rox/review_updated',
             params: {
               reviewId: '019a0000-0000-7000-8000-000000000005',
               revision: 3,

@@ -294,7 +294,7 @@ function LoadedEmailComposeView(
         {/* No overflow clipping on desktop: the card clips its own content, and
             clipping here would slice the composer shadow flat at the top and
             bottom while the side padding lets it show. */}
-        <div class="macro-message-width sm:macro-message-padding mx-auto w-full min-h-120 max-h-full my-2 sm:my-12 touch:my-0 px-2 sm:px-4 touch:px-0 touch:overflow-y-auto touch:scrollbar-hidden touch:min-h-full">
+        <div class="rox-message-width sm:rox-message-padding mx-auto w-full min-h-120 max-h-full my-2 sm:my-12 touch:my-0 px-2 sm:px-4 touch:px-0 touch:overflow-y-auto touch:scrollbar-hidden touch:min-h-full">
           <WrapUnlessMobile
             wrapper={(children) => (
               // The same card as the chat composer and the thread's message

@@ -25,7 +25,7 @@ vi.mock('@core/util/postLoginRedirect', () => ({
 vi.mock('@solidjs/router', () => ({ useNavigate: () => mocks.navigate }));
 vi.mock('@tauri-apps/api/core', () => ({ invoke: mocks.invoke }));
 vi.mock('@tauri-apps/api/event', () => ({ listen: mocks.listen }));
-vi.mock('./macroLinkInterceptor', () => ({
+vi.mock('./roxLinkInterceptor', () => ({
   registerMacroLinkInterceptor: () => () => {},
 }));
 

@@ -9,7 +9,7 @@ import { useNavigate } from '@solidjs/router';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { createEffect, onCleanup } from 'solid-js';
-import { registerMacroLinkInterceptor } from './macroLinkInterceptor';
+import { registerMacroLinkInterceptor } from './roxLinkInterceptor';
 
 type NavigateEvent = {
   path: string;

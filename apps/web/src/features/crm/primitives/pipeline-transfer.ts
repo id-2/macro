@@ -37,7 +37,7 @@ function pipelineCsvFilename(name: string, now: Date) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '') || 'pipeline';
-  return `macro-${slug}-${now.toISOString().slice(0, 10)}.csv`;
+  return `rox-${slug}-${now.toISOString().slice(0, 10)}.csv`;
 }
 
 /** Every entry of the pipeline, with its company's or contact's name and key. */

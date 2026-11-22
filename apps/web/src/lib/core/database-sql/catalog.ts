@@ -34,7 +34,7 @@ export function databaseSqlSchema(
         })),
       })),
     })),
-    // The server's catalog offers every viewer `macro.people`; so does the browser's.
+    // The server's catalog offers every viewer `rox.people`; so does the browser's.
     platform: ['people'],
   };
 }

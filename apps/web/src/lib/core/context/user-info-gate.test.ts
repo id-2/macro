@@ -48,7 +48,7 @@ it('wakes an anonymous identity observer when another tab publishes a login mark
   hasLoginCookie.mockReturnValue(true);
   window.dispatchEvent(
     new StorageEvent('storage', {
-      key: 'macro:login',
+      key: 'rox:login',
       newValue: 'true',
     })
   );

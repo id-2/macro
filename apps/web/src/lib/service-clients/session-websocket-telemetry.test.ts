@@ -54,7 +54,7 @@ class RecordedSpan implements Span {
 it('links timed URL and handshake phases, retries, and closure without recording credentials', async () => {
   const resolve = vi.fn(() => {
     expect(RecordedSpan.active?.name).toBe('auth.session_socket.resolve_url');
-    return 'wss://example.test/socket?macro-api-token=secret';
+    return 'wss://example.test/socket?rox-api-token=secret';
   });
   const telemetry = createSessionWebsocketTelemetry(
     'connection-gateway',
@@ -62,7 +62,7 @@ it('links timed URL and handshake phases, retries, and closure without recording
   );
   const root = new RecordedSpan('activation');
   const stop = telemetry.activate(root);
-  expect(await telemetry.resolveUrl()).toContain('macro-api-token=secret');
+  expect(await telemetry.resolveUrl()).toContain('rox-api-token=secret');
   const attempt = root.children[1];
   expect(attempt.name).toBe('auth.session_socket.connect');
   expect(attempt.children.map((phase) => [phase.name, phase.ends])).toEqual([

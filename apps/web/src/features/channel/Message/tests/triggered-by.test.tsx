@@ -54,7 +54,7 @@ const reply = {
   id: 'reply',
   content: 'Here you go.',
   sender_id: 'bot|ada',
-  sender: { triggered_by: 'macro|me@example.com' },
+  sender: { triggered_by: 'rox|me@example.com' },
   created_at: '2026-10-07T00:00:00.000Z',
   updated_at: '2026-10-07T00:00:00.000Z',
   attachments: [],
@@ -68,7 +68,7 @@ describe('who triggered a bot message', () => {
     const view = render(() => (
       <ChannelMessage parent={parent} message={reply} />
     ));
-    expect(view.queryByText(/from macro\|me@example.com/)).not.toBeNull();
+    expect(view.queryByText(/from rox\|me@example.com/)).not.toBeNull();
   });
 
   it('is left out where it is always the viewer', () => {

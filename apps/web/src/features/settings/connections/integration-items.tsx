@@ -395,7 +395,7 @@ export function useGranolaItem(): IntegrationItem {
 export function aiAppItems(hosts: IntegrationItemHosts): IntegrationItem[] {
   const items: IntegrationItem[] = [
     {
-      id: 'macro-mcp',
+      id: 'rox-mcp',
       name: 'Claude Code, Codex, and ChatGPT',
       kind: 'mcp',
       icon: <ClaudeIcon />,

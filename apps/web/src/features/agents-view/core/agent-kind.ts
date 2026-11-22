@@ -1,7 +1,7 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
-import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/roxCoder';
+import { ROX_NEW_BOT_ID } from '@core/constant/roxNew';
 import type { AgentsMode } from './mode';
 
 /**
@@ -17,7 +17,7 @@ export type AgentKind = 'agent' | 'coder';
 /** Harness slugs that run inside Rox's process, with no coding runtime. */
 const CHAT_HARNESSES: ReadonlySet<string> = new Set([
   'in-memory',
-  'macro-inmem',
+  'rox-inmem',
 ]);
 
 export function isCoderHarness(harness: string | null | undefined): boolean {

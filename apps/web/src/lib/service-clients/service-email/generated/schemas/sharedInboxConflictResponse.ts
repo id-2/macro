@@ -7,7 +7,7 @@
 
 /**
  * Returned with a `409 Conflict` when a connect targets an external mailbox another
-macro user has already connected. The client surfaces a confirmation; on confirm it
+rox user has already connected. The client surfaces a confirmation; on confirm it
 retries `/email/init` with `force_share=true` to promote the mailbox to a shared inbox.
  */
 export interface SharedInboxConflictResponse {
@@ -15,6 +15,6 @@ export interface SharedInboxConflictResponse {
   email_address: string;
   /** The existing link that would be shared if the caller confirms. */
   existing_link_id: string;
-  /** The email of the macro user who first connected the mailbox. */
+  /** The email of the rox user who first connected the mailbox. */
   existing_owner_email: string;
 }

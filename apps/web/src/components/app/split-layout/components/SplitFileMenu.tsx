@@ -503,7 +503,7 @@ export function SplitFileMenu(props: SplitFileMenuProps) {
       get hotkeyToken() {
         return activeHotkeyToken(TOKENS.entity.action.favorite);
       },
-      group: 'macro' as const,
+      group: 'rox' as const,
     };
   };
 
@@ -523,7 +523,7 @@ export function SplitFileMenu(props: SplitFileMenuProps) {
       get hotkeyToken() {
         return activeHotkeyToken(TOKENS.entity.action.mute);
       },
-      group: 'macro' as const,
+      group: 'rox' as const,
     };
   };
 
@@ -548,7 +548,7 @@ export function SplitFileMenu(props: SplitFileMenuProps) {
       get hotkeyToken() {
         return activeHotkeyToken(TOKENS.entity.action.createReminder);
       },
-      group: 'macro' as const,
+      group: 'rox' as const,
     };
   };
 
@@ -566,7 +566,7 @@ export function SplitFileMenu(props: SplitFileMenuProps) {
       get hotkeyToken() {
         return activeHotkeyToken(TOKENS.entity.action.tags);
       },
-      group: 'macro' as const,
+      group: 'rox' as const,
     };
   };
 
@@ -793,7 +793,7 @@ export function SplitFileMenu(props: SplitFileMenuProps) {
       entity: [],
       sender: [],
       sharing: [],
-      macro: [],
+      rox: [],
       file: [],
       delete: [],
     };

@@ -7,7 +7,7 @@ import type { ComputerStatus } from '@service-auth/computers';
 
 /**
  * The current team's live (not released) Rox computers. Computers are
- * team-only and behind `enable-macro-computers`: with the flag off nothing is
+ * team-only and behind `enable-rox-computers`: with the flag off nothing is
  * fetched or shown, so Settings and Billing look as they do without them.
  */
 export function useTeamComputers() {

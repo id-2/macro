@@ -24,7 +24,7 @@ type SavedReview = {
 const initial: SavedReview = {
   id: '019a0000-0000-7000-8000-000000000005',
   sessionId: '019a0000-0000-7000-8000-000000000001',
-  actingUser: 'macro|owner@macro.local',
+  actingUser: 'rox|owner@rox.local',
   executionId: 'execution',
   title: 'Drafts to review',
   revision: 1,
@@ -61,12 +61,12 @@ async function serveReview(
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.route('https://**', (route) => route.abort());
-  await page.addInitScript(() => localStorage.setItem('macro:login', 'true'));
+  await page.addInitScript(() => localStorage.setItem('rox:login', 'true'));
   await page.route('**/auth/user/legacy_user_permissions', (route) =>
     route.fulfill({
       json: {
-        userId: 'macro|owner@macro.local',
-        email: 'owner@macro.local',
+        userId: 'rox|owner@rox.local',
+        email: 'owner@rox.local',
         aiDataConsent: true,
         hasChromeExt: false,
         hasTrialed: false,

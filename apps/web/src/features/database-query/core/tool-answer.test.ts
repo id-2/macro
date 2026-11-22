@@ -27,7 +27,7 @@ describe('QueryDatabase tool results as answers', () => {
               [
                 { type: 'text', value: 'Ada' },
                 { type: 'options', value: ['option-yes'] },
-                { type: 'entities', value: ['macro|ada@x.test'] },
+                { type: 'entities', value: ['rox|ada@x.test'] },
                 { type: 'entities', value: ['row-party'] },
                 { type: 'date', value: '2026-06-01T18:30:00Z' },
               ],
@@ -87,7 +87,7 @@ describe('QueryDatabase tool results as answers', () => {
           [
             { type: 'text', value: 'Ada' },
             { type: 'options', value: ['option-yes'] },
-            { type: 'entities', value: ['macro|ada@x.test'] },
+            { type: 'entities', value: ['rox|ada@x.test'] },
             { type: 'entities', value: ['row-party'] },
             { type: 'date', value: '2026-06-01T18:30:00Z' },
           ],

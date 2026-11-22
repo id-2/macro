@@ -152,7 +152,7 @@ const SECURITY_QUESTIONS: TrustQuestion[] = [
     answer: (
       <>
         Rox is open source: you can inspect our{' '}
-        <EvidenceLink href="https://github.com/macro-inc/macro">
+        <EvidenceLink href="https://github.com/rox-inc/rox">
           code on GitHub
         </EvidenceLink>
         .

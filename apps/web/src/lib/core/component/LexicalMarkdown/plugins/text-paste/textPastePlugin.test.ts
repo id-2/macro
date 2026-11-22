@@ -134,30 +134,30 @@ describe('route-aware paste resolver', () => {
 
 describe('parsePastedGithubPrUrl', () => {
   it.each([
-    'https://github.com/macro-inc/macro/pull/7870',
-    'https://www.github.com/macro-inc/macro/pull/7870',
-    '  https://github.com/macro-inc/macro/pull/7870\n',
-    'https://github.com/macro-inc/macro/pull/7870/files',
-    'https://github.com/macro-inc/macro/pull/7870/files?w=1#diff-abc',
-    'http://github.com/macro-inc/macro/pull/7870',
+    'https://github.com/rox-inc/rox/pull/7870',
+    'https://www.github.com/rox-inc/rox/pull/7870',
+    '  https://github.com/rox-inc/rox/pull/7870\n',
+    'https://github.com/rox-inc/rox/pull/7870/files',
+    'https://github.com/rox-inc/rox/pull/7870/files?w=1#diff-abc',
+    'http://github.com/rox-inc/rox/pull/7870',
   ])('recognizes %s', (url) => {
     expect(parsePastedGithubPrUrl(url)).toEqual({
-      owner: 'macro-inc',
-      repo: 'macro',
+      owner: 'rox-inc',
+      repo: 'rox',
       number: 7870,
     });
   });
 
   it.each([
-    'https://github.com/macro-inc/macro/issues/7870',
-    'https://github.com/macro-inc/macro/pull/',
-    'https://github.com/macro-inc/macro/pull/0',
-    'https://github.com/macro-inc/macro/pull/7870abc',
-    'https://github.example.com/macro-inc/macro/pull/7870',
-    'https://gist.github.com/macro-inc/macro/pull/7870',
-    'see https://github.com/macro-inc/macro/pull/7870',
-    'https://github.com/macro-inc/macro/pull/7870 and more',
-    'github.com/macro-inc/macro/pull/7870',
+    'https://github.com/rox-inc/rox/issues/7870',
+    'https://github.com/rox-inc/rox/pull/',
+    'https://github.com/rox-inc/rox/pull/0',
+    'https://github.com/rox-inc/rox/pull/7870abc',
+    'https://github.example.com/rox-inc/rox/pull/7870',
+    'https://gist.github.com/rox-inc/rox/pull/7870',
+    'see https://github.com/rox-inc/rox/pull/7870',
+    'https://github.com/rox-inc/rox/pull/7870 and more',
+    'github.com/rox-inc/rox/pull/7870',
   ])('ignores %s', (text) => {
     expect(parsePastedGithubPrUrl(text)).toBeNull();
   });

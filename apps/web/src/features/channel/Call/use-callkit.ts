@@ -873,7 +873,7 @@ function uniqueParticipantIds(ids: string[]): string[] {
 function isMacroParticipantIdentity(identity: string): boolean {
   const trimmedIdentity = identity.trim();
   return (
-    normalizeParticipantIdentity(trimmedIdentity).startsWith('macro|') &&
+    normalizeParticipantIdentity(trimmedIdentity).startsWith('rox|') &&
     trimmedIdentity.includes('@')
   );
 }

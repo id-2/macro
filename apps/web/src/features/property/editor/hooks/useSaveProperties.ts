@@ -5,13 +5,13 @@ import type {
   PropertyApiValues,
   PropertyDefinitionDomain,
 } from '@property/types';
-import { macroEntityToPropertyEntityType } from '@property/utils';
+import { roxEntityToPropertyEntityType } from '@property/utils';
 import { useBulkSaveEntityPropertiesMutation } from '@queries/properties/entity';
 
 function propertyEditorEntityType(entity: PropertyEditorEntity) {
   if ('entityType' in entity) return entity.entityType;
   if (isTaskEntity(entity)) return 'TASK';
-  return macroEntityToPropertyEntityType(entity);
+  return roxEntityToPropertyEntityType(entity);
 }
 
 export function useSavePropertyForMultiEntitites() {

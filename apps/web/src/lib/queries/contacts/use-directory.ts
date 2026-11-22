@@ -1,6 +1,6 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { enableGraphqlSoup } from '@core/constant/featureFlags';
-import { tryMacroId } from '@core/user/macroId';
+import { tryMacroId } from '@core/user/roxId';
 import { getGraphqlSoupCacheHost } from '@service-storage/graphql-soup';
 import { type Accessor, createMemo } from 'solid-js';
 import { useQueryAccount } from '../auth/use-query-account';

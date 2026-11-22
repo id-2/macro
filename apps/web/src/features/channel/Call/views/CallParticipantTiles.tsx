@@ -336,10 +336,10 @@ export function ParticipantTile(props: {
   pinEnabled: boolean;
 }) {
   const callCtx = useCallContext();
-  const macroId = () => tryMacroId(props.participant.identity);
+  const roxId = () => tryMacroId(props.participant.identity);
   const displayName = () =>
     props.participant.name?.trim() ||
-    (macroId() ? getDisplayName(macroId()) : t('calls.guest'));
+    (roxId() ? getDisplayName(roxId()) : t('calls.guest'));
 
   const cameraTrack = () => {
     callCtx.trackVersion();
@@ -388,7 +388,7 @@ export function ParticipantTile(props: {
         when={cameraTrack()}
         fallback={
           <ParticipantAvatar
-            userId={macroId()}
+            userId={roxId()}
             fallbackName={displayName()}
             avatarSize={props.avatarSize}
             mutedForYou={mutedForYou()}
@@ -442,10 +442,10 @@ export function ScreenShareTile(props: {
   pinEnabled: boolean;
 }) {
   const callCtx = useCallContext();
-  const macroId = () => tryMacroId(props.participant.identity);
+  const roxId = () => tryMacroId(props.participant.identity);
   const displayName = () =>
     props.participant.name?.trim() ||
-    (macroId() ? getDisplayName(macroId()) : t('calls.guest'));
+    (roxId() ? getDisplayName(roxId()) : t('calls.guest'));
   const screenTrack = () => {
     callCtx.trackVersion();
     return props.participant.getTrackPublication(LK_TRACK_SOURCE.ScreenShare)
@@ -474,7 +474,7 @@ export function ScreenShareTile(props: {
         </Show>
         <span data-call-stage-chip="share" class="flex items-center gap-1.5">
           <Screencast class="size-3.5 shrink-0" />
-          <Show when={macroId()}>
+          <Show when={roxId()}>
             {(id) => (
               <span
                 class={cn(

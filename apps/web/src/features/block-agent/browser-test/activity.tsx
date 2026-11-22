@@ -53,7 +53,7 @@ function Turn() {
   return (
     <main ref={scroller} class="h-dvh overflow-y-auto">
       <section ref={section} aria-label="Agent session" class="min-w-0 py-6">
-        <div class="macro-message-width mx-auto px-4 pb-4 min-w-0">
+        <div class="rox-message-width mx-auto px-4 pb-4 min-w-0">
           {/* The prompt as the transcript's bubble shows it, without the
               app's user and layout contexts a prompt message reads. */}
           <div class="flex w-full flex-col items-end">
@@ -62,7 +62,7 @@ function Turn() {
             </UserMessageBubble>
           </div>
         </div>
-        <div class="macro-message-width mx-auto px-4 pb-4 min-w-0">
+        <div class="rox-message-width mx-auto px-4 pb-4 min-w-0">
           <Message message={turn.message()} inFlight={turn.inFlight()} />
         </div>
         <div

@@ -11,7 +11,7 @@ export function documentDatabaseDetail(): DatabaseDetail {
     database: {
       id: databaseId,
       name: 'Launch tasks',
-      owner_id: 'macro|fixture@example.com',
+      owner_id: 'rox|fixture@example.com',
       created_at: '2026-10-09T00:00:00Z',
       trashed_at: null,
       project_id: null,

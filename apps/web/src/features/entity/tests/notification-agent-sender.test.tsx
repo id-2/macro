@@ -11,7 +11,7 @@ import type { Notification } from '../types/notification';
 
 vi.mock('@core/user', () => ({
   getDisplayNameParts: (id: string) => ({
-    firstName: id === 'macro|peter@rox.one' ? 'Peter' : 'Ana',
+    firstName: id === 'rox|peter@rox.one' ? 'Peter' : 'Ana',
     fullName: '',
   }),
   tryMacroId: (id: string) => id,
@@ -65,17 +65,17 @@ describe('getNotificationAgentSender', () => {
       getNotificationAgentSender(
         commentNotification({
           senderDisplayName: 'Rox',
-          senderProfilePictureUrl: 'https://cdn/macro.png',
+          senderProfilePictureUrl: 'https://cdn/rox.png',
         })
       )
-    ).toEqual({ name: 'Rox', avatarUrl: 'https://cdn/macro.png' });
+    ).toEqual({ name: 'Rox', avatarUrl: 'https://cdn/rox.png' });
   });
 
   it('ignores human senders and notifications without an agent name', () => {
     expect(
       getNotificationAgentSender(
         commentNotification({
-          senderId: 'macro|peter@rox.one',
+          senderId: 'rox|peter@rox.one',
           senderDisplayName: 'Rox',
         })
       )
@@ -120,18 +120,18 @@ describe('agent-authored comment notifications', () => {
       <NotificationSenderIcon
         notification={commentNotification({
           senderDisplayName: 'Rox',
-          senderProfilePictureUrl: 'https://cdn/macro.png',
+          senderProfilePictureUrl: 'https://cdn/rox.png',
         })}
       />
     ));
     const icon = getByTestId('bot-icon');
     expect(icon.textContent).toBe('Rox');
-    expect(icon.dataset.avatar).toBe('https://cdn/macro.png');
+    expect(icon.dataset.avatar).toBe('https://cdn/rox.png');
   });
 
   it('counts the agent as a sender in a stack', () => {
     const stack = stackOf([
-      commentNotification({ senderId: 'macro|peter@rox.one' }),
+      commentNotification({ senderId: 'rox|peter@rox.one' }),
       commentNotification({ senderDisplayName: 'Rox' }),
       commentNotification({ senderDisplayName: 'Rox' }),
     ]);

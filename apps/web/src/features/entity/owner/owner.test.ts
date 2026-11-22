@@ -8,8 +8,8 @@ const ROX_BOT_ID = '00000000-0000-0000-0000-00000000a1a1';
 describe('parseOwner', () => {
   it.each([
     {
-      principal: 'macro|sarah@example.com',
-      owner: { kind: 'user', id: 'macro|sarah@example.com' },
+      principal: 'rox|sarah@example.com',
+      owner: { kind: 'user', id: 'rox|sarah@example.com' },
     },
     { principal: `bot|${BOT_ID}`, owner: { kind: 'bot', botId: BOT_ID } },
     {

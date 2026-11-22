@@ -40,7 +40,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
   toast: { success: mocks.success, failure: mocks.failure },
 }));
 
-const target = { owner: 'macro-inc', repo: 'macro', number: 6369 };
+const target = { owner: 'rox-inc', repo: 'rox', number: 6369 };
 
 function pullRequest(
   overrides: Partial<PrForeignEntityData['pullRequest']>
@@ -50,9 +50,9 @@ function pullRequest(
     prRef: target,
     pullRequest: {
       ...target,
-      displayName: 'macro-inc/macro#6369',
-      githubKey: 'macro-inc/macro/pull/6369',
-      url: 'https://github.com/macro-inc/macro/pull/6369',
+      displayName: 'rox-inc/rox#6369',
+      githubKey: 'rox-inc/rox/pull/6369',
+      url: 'https://github.com/rox-inc/rox/pull/6369',
       name: 'Fix reply state',
       status: 'open',
       draft: false,
@@ -140,7 +140,7 @@ describe('PullRequestActionsButton', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Merge' }));
     await waitFor(() =>
-      expect(mocks.success).toHaveBeenCalledWith('Merged macro-inc/macro#6369')
+      expect(mocks.success).toHaveBeenCalledWith('Merged rox-inc/rox#6369')
     );
     expect(confirmMerge).toHaveBeenCalledOnce();
 
@@ -155,7 +155,7 @@ describe('PullRequestActionsButton', () => {
         state: 'closed',
       })
     );
-    expect(mocks.success).toHaveBeenCalledWith('Closed macro-inc/macro#6369');
+    expect(mocks.success).toHaveBeenCalledWith('Closed rox-inc/rox#6369');
   });
 
   it('keeps Merge disabled until every check passes', () => {

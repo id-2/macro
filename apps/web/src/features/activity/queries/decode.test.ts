@@ -40,14 +40,14 @@ describe('decodeActivityEvent', () => {
       participantAddedEvent,
       {
         kind: 'participant-added' as const,
-        participant: 'macro|sarah@example.com',
+        participant: 'rox|sarah@example.com',
       },
     ],
     [
       participantRemovedEvent,
       {
         kind: 'participant-removed' as const,
-        participant: 'macro|sarah@example.com',
+        participant: 'rox|sarah@example.com',
       },
     ],
   ] as const)('decodes $0.id', (fragment, action) => {
@@ -66,7 +66,7 @@ describe('decodeActivityEvent', () => {
   it('keeps the unknown-action tag so describeAction can humanize it', () => {
     expect(decodeActivityEvent(unknownActionEvent)).toEqual({
       id: 'evt-11',
-      actorId: 'macro|sarah@example.com',
+      actorId: 'rox|sarah@example.com',
       entityId: 'doc-1',
       entityType: 'document',
       occurredAt: '2026-08-21T12:00:00.000Z',

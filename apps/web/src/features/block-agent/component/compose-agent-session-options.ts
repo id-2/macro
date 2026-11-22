@@ -2,7 +2,7 @@ import { isCoderHarness } from '@app/features/agents-view/core/agent-kind';
 import { modelLabel } from '@core/component/AI/constant/model-label';
 import { isCodexBotId } from '@core/constant/codexAgent';
 import { isCursorBotId } from '@core/constant/cursorAgent';
-import { ROX_HARNESS_NAME } from '@core/constant/macroAgent';
+import { ROX_HARNESS_NAME } from '@core/constant/roxAgent';
 
 /**
  * The repository a session works in, for the header menu and side panel.
@@ -34,7 +34,7 @@ export function harnessTitle(harness: string | undefined): string {
   if (!harness) return 'Agent session';
   if (
     harness === 'in-memory' ||
-    harness === 'macro-inmem' ||
+    harness === 'rox-inmem' ||
     harness === 'sandbox'
   ) {
     return ROX_HARNESS_NAME;
@@ -67,12 +67,12 @@ export function sessionHarnessTitle(session: {
 
 /**
  * User-facing name for the runtime a persona runs on. Harness ids are
- * plumbing (`in-memory`, `macro-inmem`); the product name is Rox Agent.
+ * plumbing (`in-memory`, `rox-inmem`); the product name is Rox Agent.
  */
 export function harnessDisplayName(harness: string): string {
   switch (harness) {
     case 'in-memory':
-    case 'macro-inmem':
+    case 'rox-inmem':
     case 'sandbox':
       return ROX_HARNESS_NAME;
     case 'cursor':

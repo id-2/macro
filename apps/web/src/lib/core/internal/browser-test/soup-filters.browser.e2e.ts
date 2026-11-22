@@ -8,7 +8,7 @@ test('closed Soup filters never read the directory, including on Home', async ({
   await expect(page.getByTestId('lookup-ids')).toHaveText('[]');
   await page.getByRole('button', { name: 'Show owned files' }).click();
   await expect(page.getByTestId('query-filters')).toContainText(
-    'macro|viewer@example.com'
+    'rox|viewer@example.com'
   );
   await expect(page.getByTestId('requests')).toHaveText('0');
 });
@@ -60,7 +60,7 @@ test('Soup assignees page lazily and retain unknown selections and Unassigned', 
   if (phone) await match.click();
   else await match.locator('[data-multiselect-checkbox]').click();
   await expect(page.getByTestId('assignees')).toContainText(
-    'macro|match@example.com'
+    'rox|match@example.com'
   );
   await expect(page.getByTestId('assignees')).toContainText('NO_ASSIGNEE');
   await expect(page.getByTestId('assignees')).toContainText(
@@ -80,7 +80,7 @@ test('Soup assignees page lazily and retain unknown selections and Unassigned', 
       page.getByRole('option', { name: 'Person 0', exact: true })
     ).toBeVisible();
     await expect(page.getByTestId('assignees')).toContainText(
-      'macro|match@example.com'
+      'rox|match@example.com'
     );
   }
 });
@@ -106,11 +106,11 @@ test('Soup chip Only changes its own group and clearing a creator restores Owned
     .getByRole('button', { name: 'Select only Broader match' })
     .click();
   await expect(page.getByTestId('assignees')).toHaveText(
-    '["macro|match@example.com"]'
+    '["rox|match@example.com"]'
   );
   await expect(input).toHaveValue('zxq');
   await expect(page.getByTestId('query-filters')).toContainText(
-    '"documentOwnerId":["macro|selected@example.com"]'
+    '"documentOwnerId":["rox|selected@example.com"]'
   );
   await input.press('Escape');
   if (phone) await page.getByRole('button', { name: 'Close filters' }).click();
@@ -124,6 +124,6 @@ test('Soup chip Only changes its own group and clearing a creator restores Owned
   });
   await creator.locator('[data-multiselect-checkbox]').click();
   await expect(page.getByTestId('query-filters')).toContainText(
-    '"documentOwnerId":["macro|viewer@example.com"]'
+    '"documentOwnerId":["rox|viewer@example.com"]'
   );
 });

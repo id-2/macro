@@ -18,7 +18,7 @@ vi.mock('@ui', async (importOriginal) => ({
   confirmDialog: mocks.confirm,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|owner@x.test',
+  useUserId: () => () => 'rox|owner@x.test',
 }));
 vi.mock('@core/user', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@core/user')>()),
@@ -48,8 +48,8 @@ vi.mock('@queries/team/teams', () => ({
     data: {
       team: { id: 'team-1', name: 'Team One' },
       members: [
-        { user_id: 'macro|owner@x.test' },
-        { user_id: 'macro|alice@x.test' },
+        { user_id: 'rox|owner@x.test' },
+        { user_id: 'rox|alice@x.test' },
       ],
     },
   }),
@@ -72,10 +72,10 @@ const harness = (overrides: Partial<Harness> = {}): Harness => ({
   id: '0198a4cc-e138-7670-a308-a6b766602732',
   kind: 'roxd',
   name: 'Mac mini',
-  owner: { type: 'user', user_id: 'macro|owner@x.test' },
+  owner: { type: 'user', user_id: 'rox|owner@x.test' },
   access: 'owner',
   shared_team_ids: [],
-  created_by: 'macro|owner@x.test',
+  created_by: 'rox|owner@x.test',
   created_at: '2026-11-01T00:00:00Z',
   updated_at: '2026-11-01T00:00:00Z',
   connected: true,
@@ -108,27 +108,27 @@ describe('RuntimeShareDialog', () => {
     open(harness());
     fireEvent.click(await screen.findByRole('button', { name: 'Add' }));
     await waitFor(() =>
-      expect(mocks.setGrant).toHaveBeenCalledWith('macro|alice@x.test', 'edit')
+      expect(mocks.setGrant).toHaveBeenCalledWith('rox|alice@x.test', 'edit')
     );
   });
 
   it('removes access without asking when no resident depends on it', async () => {
-    mocks.grants = [{ userId: 'macro|alice@x.test', accessLevel: 'edit' }];
+    mocks.grants = [{ userId: 'rox|alice@x.test', accessLevel: 'edit' }];
     open(harness());
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }));
     await waitFor(() =>
-      expect(mocks.setGrant).toHaveBeenCalledWith('macro|alice@x.test', null)
+      expect(mocks.setGrant).toHaveBeenCalledWith('rox|alice@x.test', null)
     );
     expect(mocks.confirm).not.toHaveBeenCalled();
   });
 
   it('warns that removing a resident owner shuts their agent down', async () => {
-    mocks.grants = [{ userId: 'macro|alice@x.test', accessLevel: 'edit' }];
+    mocks.grants = [{ userId: 'rox|alice@x.test', accessLevel: 'edit' }];
     mocks.residents = [
       {
         bot_id: 'bot-1',
         name: 'Tod',
-        owner_user_id: 'macro|alice@x.test',
+        owner_user_id: 'rox|alice@x.test',
         team_id: null,
       },
     ];

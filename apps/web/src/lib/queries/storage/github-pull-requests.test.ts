@@ -30,12 +30,12 @@ import {
 import { githubPullRequestRefreshKeys } from './keys';
 
 const rawPullRequest: GithubPullRequest = {
-  displayName: 'macro/macro#42',
-  githubKey: 'macro/macro/pull/42',
+  displayName: 'rox/rox#42',
+  githubKey: 'rox/rox/pull/42',
   number: 42,
-  owner: 'macro',
-  repo: 'macro',
-  url: 'https://github.com/macro/macro/pull/42',
+  owner: 'rox',
+  repo: 'rox',
+  url: 'https://github.com/rox/rox/pull/42',
 };
 
 const rawResponse = { pullRequests: [rawPullRequest] };

@@ -156,7 +156,7 @@ function emailFetch<T extends ObjectLike = never>(
 
 /**
  * Error code `init` returns when the target mailbox is already connected by another
- * macro user. The caller confirms with the user, then retries with `forceShare`.
+ * rox user. The caller confirms with the user, then retries with `forceShare`.
  */
 export const SHARED_INBOX_CONFLICT_CODE = 'SHARED_INBOX_CONFLICT' as const;
 

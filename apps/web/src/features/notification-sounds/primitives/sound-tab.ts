@@ -4,7 +4,7 @@
  * it is the one they are using, and its recent gesture lets it start audio.
  */
 
-const SOUND_TAB_KEY = 'macro:notification-sounds:tab';
+const SOUND_TAB_KEY = 'rox:notification-sounds:tab';
 const TAB_ID = crypto.randomUUID();
 
 export function claimNotificationSoundTab(): void {

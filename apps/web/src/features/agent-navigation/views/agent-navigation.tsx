@@ -1,5 +1,5 @@
 /**
- * Applies an agent's `macro.ui.open` in this tab: the `ui_command` frame the
+ * Applies an agent's `rox.ui.open` in this tab: the `ui_command` frame the
  * harness sends to the person who prompted it. Owned once by the app shell.
  */
 

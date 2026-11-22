@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
   loading: false,
   error: false,
   repositories: [
-    { url: 'https://github.com/macro-inc/macro', defaultBranch: 'main' },
+    { url: 'https://github.com/rox-inc/rox', defaultBranch: 'main' },
   ],
   retry: vi.fn(),
   openSettings: vi.fn(),
@@ -43,7 +43,7 @@ beforeEach(() => {
   mocks.loading = false;
   mocks.error = false;
   mocks.repositories = [
-    { url: 'https://github.com/macro-inc/macro', defaultBranch: 'main' },
+    { url: 'https://github.com/rox-inc/rox', defaultBranch: 'main' },
   ];
   vi.clearAllMocks();
 });
@@ -54,10 +54,10 @@ describe('default repository settings', () => {
     render(() => <DefaultRepository />);
     const select = screen.getByRole('button', { name: /^Default repository/ });
     expect(select.textContent).toContain('Auto-detect');
-    chooseSelectOption(select, 'macro-inc/macro');
+    chooseSelectOption(select, 'rox-inc/rox');
     createRoot((dispose) => {
       expect(createPreferredRepository('user').repository()).toBe(
-        'https://github.com/macro-inc/macro'
+        'https://github.com/rox-inc/rox'
       );
       dispose();
     });
@@ -66,7 +66,7 @@ describe('default repository settings', () => {
     const restored = screen.getByRole('button', {
       name: /^Default repository/,
     });
-    expect(restored.textContent).toContain('macro-inc/macro');
+    expect(restored.textContent).toContain('rox-inc/rox');
     chooseSelectOption(restored, 'Auto-detect');
     createRoot((dispose) => {
       expect(createPreferredRepository('user').repository()).toBeUndefined();

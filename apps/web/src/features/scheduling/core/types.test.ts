@@ -36,16 +36,16 @@ describe('scheduling form validation', () => {
   });
   it('defaults a new link to a Rox call', () => {
     const event = newEventType('schedule', ['host'], false);
-    expect(event.macroCall).toBe(true);
+    expect(event.roxCall).toBe(true);
     expect(event.googleMeet).toBe(false);
     expect(meetingPlaceLabel(event)).toBe('Rox call');
     expect(
-      meetingPlaceLabel({ ...event, macroCall: false, googleMeet: true })
+      meetingPlaceLabel({ ...event, roxCall: false, googleMeet: true })
     ).toBe('Video meeting');
     expect(
       meetingPlaceLabel({
         ...event,
-        macroCall: false,
+        roxCall: false,
         googleMeet: false,
         location: 'Studio 4',
       })

@@ -185,7 +185,7 @@ export type AppEvents = {
   mentions_menu_use: { itemType: string };
   snippets_menu_use: Record<string, unknown>;
   /**
-   * An agent's `macro.ui.open` reached this tab: `opened` a new pane,
+   * An agent's `rox.ui.open` reached this tab: `opened` a new pane,
    * `shown` one already open, `no_room`, `cancelled`, or
    * `not_allowed_route` (refused here). `route` is the route id, never the path.
    */
@@ -302,25 +302,25 @@ export type AppEvents = {
 
   // In-product tutorial videos (the pinned row at the top of an inbox).
   tutorial_video: {
-    /** `macro-<id>` for each id in features/video-tutorials/core/tutorial-id.ts. */
+    /** `rox-<id>` for each id in features/video-tutorials/core/tutorial-id.ts. */
     tutorial:
-      | 'macro-mail'
-      | 'macro-home'
-      | 'macro-chat'
-      | 'macro-tasks'
-      | 'macro-docs'
-      | 'macro-spreadsheets'
-      | 'macro-databases'
-      | 'macro-canvas'
-      | 'macro-drive'
-      | 'macro-crm'
-      | 'macro-calendar'
-      | 'macro-calls'
-      | 'macro-agents'
-      | 'macro-roxd'
-      | 'macro-github'
-      | 'macro-scheduling'
-      | 'macro-whatsapp';
+      | 'rox-mail'
+      | 'rox-home'
+      | 'rox-chat'
+      | 'rox-tasks'
+      | 'rox-docs'
+      | 'rox-spreadsheets'
+      | 'rox-databases'
+      | 'rox-canvas'
+      | 'rox-drive'
+      | 'rox-crm'
+      | 'rox-calendar'
+      | 'rox-calls'
+      | 'rox-agents'
+      | 'rox-roxd'
+      | 'rox-github'
+      | 'rox-scheduling'
+      | 'rox-whatsapp';
     /** `support_clicked`: the dialog's "Talk to us" link under the video. */
     action: 'opened' | 'played' | 'dismissed' | 'support_clicked';
   };
@@ -397,7 +397,7 @@ export type AppEvents = {
     eventId: string;
     attendees: number;
     recurring: boolean;
-    macroCall: boolean;
+    roxCall: boolean;
     conference: boolean;
   };
   calendar_event_rsvp: {
@@ -512,8 +512,8 @@ type RoutineSuggestionEvent = {
   /** The sidebar's surface, or the suggestion's main one on the Routines page. */
   surface: string;
   placement: 'sidebar' | 'routines';
-  /** `for_you` from AI, `macro` for Rox's templates. */
-  from: 'for_you' | 'macro';
+  /** `for_you` from AI, `rox` for Rox's templates. */
+  from: 'for_you' | 'rox';
   /** A catalog routine with AI's values, or a routine AI drafted. */
   kind: 'catalog' | 'routine';
   catalogKey?: string;

@@ -160,7 +160,7 @@ const routine = (overrides: Record<string, unknown> = {}) => ({
   id: 'routine-1',
   name: 'Weekly pipeline digest',
   enabled: true,
-  owner: 'macro|ana@example.com',
+  owner: 'rox|ana@example.com',
   kind: 'agent_task',
   configuration_revision: 1,
   created_at: at(9, 9),

@@ -6,7 +6,7 @@ import { workspaceAccentNamed } from '../core/workspace-accent';
 export function createWorkspaceAccent() {
   const [appearance, setAppearance] = makePersisted(
     createSignal({ color: 'Mint' }),
-    { name: 'macro-workspace-intro-appearance' }
+    { name: 'rox-workspace-intro-appearance' }
   );
   return {
     accent: () => workspaceAccentNamed(appearance().color),

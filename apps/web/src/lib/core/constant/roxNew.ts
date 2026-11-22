@@ -1,9 +1,9 @@
 /**
  * Identity for the agent-session half of Rox. Mirrors
  * `bot_id::ROX_NEW_BOT_ID` on the backend. A distinct bot from the classic
- * chat reply (see `macroAgent.ts`) because one id cannot mean both, but not a
+ * chat reply (see `roxAgent.ts`) because one id cannot mean both, but not a
  * distinct persona: both are "Rox", and the chat-v3 rollout decides which of
- * the two a single `@macro` mention targets.
+ * the two a single `@rox` mention targets.
  */
 export const ROX_NEW_BOT_ID = '00000000-0000-0000-0000-00000000a2a2';
 

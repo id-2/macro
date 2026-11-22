@@ -38,7 +38,7 @@ import {
   EmailScheduleBar,
   EmailScheduleSummary,
 } from '../components/email-schedule-summary';
-import { RoxSignatureButton } from '../components/macro-signature-button';
+import { RoxSignatureButton } from '../components/rox-signature-button';
 import { MobileReplyToolbar } from '../components/mobile-reply-toolbar';
 import { SignaturePreview } from '../components/signature-preview';
 import type { EmailComposeContext } from '../context/compose-capabilities';

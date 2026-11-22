@@ -19,22 +19,22 @@ import type { EntityProperty } from '../../types';
 import { EntityEditor, EntitySheetEditor } from './EntityEditor';
 
 const agentId = 'bot|00000000-0000-0000-0000-000000000123';
-const userId = 'macro|alice@example.com';
+const userId = 'rox|alice@example.com';
 
 vi.mock('@core/context/user', () => ({
   useEmail: () => () => 'alice@example.com',
-  useUserId: () => () => 'macro|alice@example.com',
+  useUserId: () => () => 'rox|alice@example.com',
 }));
 vi.mock('@core/user', () => ({
-  emailToId: (email: string) => `macro|${email}`,
+  emailToId: (email: string) => `rox|${email}`,
   useAugmentUserWithDmActivity: () => (user: unknown) => user,
 }));
 vi.mock('@core/user/util', () => ({
-  idToEmail: (id: string) => id.replace('macro|', ''),
+  idToEmail: (id: string) => id.replace('rox|', ''),
   idToDisplayName: (id: string) => {
-    if (id === 'macro|alice@example.com') return 'Alice';
-    if (id === 'macro|teammate@example.com') return 'Teammate';
-    return id.replace('macro|', '');
+    if (id === 'rox|alice@example.com') return 'Alice';
+    if (id === 'rox|teammate@example.com') return 'Teammate';
+    return id.replace('rox|', '');
   },
 }));
 vi.mock('@core/component/UserIcon', () => ({ UserIcon: () => <span /> }));
@@ -67,18 +67,18 @@ vi.mock('@core/context/quickAccess', () => ({
           : [
               {
                 kind: 'user',
-                id: 'macro|alice@example.com',
+                id: 'rox|alice@example.com',
                 data: {
-                  id: 'macro|alice@example.com',
+                  id: 'rox|alice@example.com',
                   name: 'Alice',
                   email: 'alice@example.com',
                 },
               },
               {
                 kind: 'user',
-                id: 'macro|outside@example.com',
+                id: 'rox|outside@example.com',
                 data: {
-                  id: 'macro|outside@example.com',
+                  id: 'rox|outside@example.com',
                   name: 'Outside',
                   email: 'outside@example.com',
                 },
@@ -115,8 +115,8 @@ vi.mock('@queries/team/teams', () => ({
     isError: false,
     data: {
       members: [
-        { user_id: 'macro|alice@example.com' },
-        { user_id: 'macro|teammate@example.com' },
+        { user_id: 'rox|alice@example.com' },
+        { user_id: 'rox|teammate@example.com' },
       ],
     },
   }),
@@ -421,14 +421,14 @@ describe('team-first assignees', () => {
         ...property,
         value: [
           { entity_id: userId, entity_type: 'USER' },
-          { entity_id: 'macro|teammate@example.com', entity_type: 'USER' },
+          { entity_id: 'rox|teammate@example.com', entity_type: 'USER' },
         ],
       };
       await waitFor(() =>
         expect(onSave).toHaveBeenCalledWith(
           property,
           { valueType: 'ENTITY', refs: selected.value },
-          new Map([['macro|teammate@example.com', 'Teammate']])
+          new Map([['rox|teammate@example.com', 'Teammate']])
         )
       );
       cleanup();
@@ -456,7 +456,7 @@ describe('team-first assignees', () => {
       const assigned: EntityProperty = {
         ...property,
         value: [
-          { entity_id: 'macro|outside@example.com', entity_type: 'USER' },
+          { entity_id: 'rox|outside@example.com', entity_type: 'USER' },
         ],
       };
       const onSave = setup(undefined, assigned, Editor);
@@ -483,7 +483,7 @@ describe('team-first assignees', () => {
       const assigned: EntityProperty = {
         ...property,
         value: [
-          { entity_id: 'macro|outside@example.com', entity_type: 'USER' },
+          { entity_id: 'rox|outside@example.com', entity_type: 'USER' },
         ],
       };
       const onSave = setup(undefined, assigned, Editor);
@@ -495,7 +495,7 @@ describe('team-first assignees', () => {
         expect(onSave).toHaveBeenCalledWith(
           assigned,
           { valueType: 'ENTITY', refs: null },
-          new Map([['macro|outside@example.com', 'Outside']])
+          new Map([['rox|outside@example.com', 'Outside']])
         )
       );
       onSave.setProperty({
@@ -519,7 +519,7 @@ describe('team-first assignees', () => {
         expect(onSave).toHaveBeenCalledWith(
           { ...assigned, propertyId: 'assignees-property-removed', value: [] },
           { valueType: 'ENTITY', refs: assigned.value },
-          new Map([['macro|outside@example.com', 'Outside']])
+          new Map([['rox|outside@example.com', 'Outside']])
         )
       );
     }
@@ -530,7 +530,7 @@ describe('team-first assignees', () => {
       ...property,
       propertyDefinitionId: 'custom-people',
       displayName: 'Participants',
-      value: [{ entity_id: 'macro|outside@example.com', entity_type: 'USER' }],
+      value: [{ entity_id: 'rox|outside@example.com', entity_type: 'USER' }],
     };
     const onSave = setup(undefined, customPeople);
     onSave.setEditorOpen(false);
@@ -565,7 +565,7 @@ describe('team-first assignees', () => {
   it('removes a selected outsider missing from contacts', async () => {
     const assigned: EntityProperty = {
       ...property,
-      value: [{ entity_id: 'macro|former@example.com', entity_type: 'USER' }],
+      value: [{ entity_id: 'rox|former@example.com', entity_type: 'USER' }],
     };
     const onSave = setup(undefined, assigned);
     fireEvent.click(screen.getByText('former@example.com'));
@@ -580,7 +580,7 @@ describe('team-first assignees', () => {
       expect(onSave).toHaveBeenCalledWith(
         assigned,
         { valueType: 'ENTITY', refs: null },
-        new Map([['macro|former@example.com', 'former@example.com']])
+        new Map([['rox|former@example.com', 'former@example.com']])
       )
     );
   });

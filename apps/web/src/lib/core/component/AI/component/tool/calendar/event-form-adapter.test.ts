@@ -49,7 +49,7 @@ describe('createCalendarEventToEditorInitialValues', () => {
     expect(
       createCalendarEventToEditorInitialValues(event({ addMacroCall: true }))
         .conference
-    ).toBe('macro');
+    ).toBe('rox');
     expect(
       createCalendarEventToEditorInitialValues(event({ addConference: true }))
         .conference
@@ -148,13 +148,13 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
   });
 
   it('turns the conferencing choice into exactly one tool flag', () => {
-    const macro = editorSubmitValuesToCreateCalendarEvent(
-      submitValues({ conferenceChoice: 'macro' }),
+    const rox = editorSubmitValuesToCreateCalendarEvent(
+      submitValues({ conferenceChoice: 'rox' }),
       event({ addConference: true }),
       true
     );
-    expect(macro.addMacroCall).toBe(true);
-    expect(macro.addConference).toBe(false);
+    expect(rox.addMacroCall).toBe(true);
+    expect(rox.addConference).toBe(false);
 
     const meet = editorSubmitValuesToCreateCalendarEvent(
       submitValues({
@@ -191,7 +191,7 @@ describe('editorSubmitValuesToCreateCalendarEvent', () => {
   it('drops the Rox call from an out-of-office event', () => {
     const merged = editorSubmitValuesToCreateCalendarEvent(
       submitValues({
-        conferenceChoice: 'macro',
+        conferenceChoice: 'rox',
         outOfOffice: { autoDeclineMode: 'decline_none' },
       }),
       event({ addMacroCall: true }),

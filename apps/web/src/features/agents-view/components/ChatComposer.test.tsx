@@ -926,7 +926,7 @@ it.each(['Repository', 'Branch'])(
         drawer={
           <RepositoryPicker
             onOpenChange={setControlsOpen}
-            repoUrl="https://github.com/macro-inc/macro"
+            repoUrl="https://github.com/rox-inc/rox"
             branch="main"
             repositories={[]}
             repositoriesLoading={false}

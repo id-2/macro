@@ -1,6 +1,6 @@
 import type { InputAttachmentData } from '@channel/Input/types';
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_CODER_BOT_ID } from '@core/constant/roxCoder';
 import {
   cleanup,
   fireEvent,
@@ -275,7 +275,7 @@ function page(
         runtimes,
         cursorConnected: connected,
         cursorNeedsConnection: !connected,
-        macroDefaultModel: 'chat-default',
+        roxDefaultModel: 'chat-default',
         cursorDefaultModel: 'cursor-default',
       })}
       rosterLoading={false}
@@ -340,7 +340,7 @@ describe('agent-led new conversation', () => {
     mocks.recentUrls = [];
     mocks.preferredInmemModel = undefined;
     mocks.repositories = [
-      { url: 'https://github.com/macro-inc/macro', defaultBranch: 'develop' },
+      { url: 'https://github.com/rox-inc/rox', defaultBranch: 'develop' },
     ];
     vi.clearAllMocks();
     mocks.rememberInmemModel.mockImplementation((id: string) => {
@@ -582,7 +582,7 @@ describe('agent-led new conversation', () => {
     ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
-    fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
+    fireEvent.click(screen.getByRole('option', { name: 'rox-inc/rox' }));
     // The listed repository's own default branch, until one is chosen.
     expect(
       screen.getByRole('button', { name: 'Branch' }).textContent
@@ -609,7 +609,7 @@ describe('agent-led new conversation', () => {
       botId: CURSOR_BOT_ID,
       onFailure: expect.any(Function),
       prompt: 'Shared draft',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'feature/home',
     });
   });
@@ -681,7 +681,7 @@ describe('agent-led new conversation', () => {
             runtimes: [],
             cursorConnected: true,
             cursorNeedsConnection: false,
-            macroDefaultModel: 'chat-default',
+            roxDefaultModel: 'chat-default',
             cursorDefaultModel: 'cursor-default',
           })}
           rosterLoading={false}
@@ -712,7 +712,7 @@ describe('agent-led new conversation', () => {
       runtimes: [],
       cursorConnected: true,
       cursorNeedsConnection: false,
-      macroDefaultModel: 'chat-default',
+      roxDefaultModel: 'chat-default',
       cursorDefaultModel: 'cursor-default',
     });
     render(() => {
@@ -790,7 +790,7 @@ describe('agent-led new conversation', () => {
             runtimes: [],
             cursorConnected: true,
             cursorNeedsConnection: false,
-            macroDefaultModel: 'chat-default',
+            roxDefaultModel: 'chat-default',
             cursorDefaultModel: 'cursor-default',
           })}
           rosterLoading={false}
@@ -803,14 +803,14 @@ describe('agent-led new conversation', () => {
   });
   it('starts a new conversation on Auto-detect, not the last used one', async () => {
     mocks.recentIds = [CURSOR_BOT_ID];
-    mocks.recentUrls = ['https://github.com/macro-inc/macro'];
+    mocks.recentUrls = ['https://github.com/rox-inc/rox'];
     const send = page(true, [], false, [], 'code');
     expect(
       screen.getByRole('button', { name: 'Repository' }).textContent
     ).toContain('Auto-detect');
     expect(
       screen.getByRole('button', { name: 'Repository' }).textContent
-    ).not.toContain('macro-inc/macro');
+    ).not.toContain('rox-inc/rox');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -822,7 +822,7 @@ describe('agent-led new conversation', () => {
   it('preselects the saved default and sends its default branch', () => {
     createRoot((dispose) => {
       createPreferredRepository('user').select(
-        'https://github.com/macro-inc/macro'
+        'https://github.com/rox-inc/rox'
       );
       dispose();
     });
@@ -830,13 +830,13 @@ describe('agent-led new conversation', () => {
     const send = page(true, [], false, [], 'code');
     expect(
       screen.getByRole('button', { name: 'Repository' }).textContent
-    ).toContain('macro-inc/macro');
+    ).toContain('rox-inc/rox');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
       onFailure: expect.any(Function),
       prompt: 'Prompt',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'develop',
     });
   });
@@ -844,7 +844,7 @@ describe('agent-led new conversation', () => {
   it('lets a conversation override the default with Auto-detect without changing settings', () => {
     createRoot((dispose) => {
       createPreferredRepository('user').select(
-        'https://github.com/macro-inc/macro'
+        'https://github.com/rox-inc/rox'
       );
       dispose();
     });
@@ -861,7 +861,7 @@ describe('agent-led new conversation', () => {
     });
     createRoot((dispose) => {
       expect(createPreferredRepository('user').repository()).toBe(
-        'https://github.com/macro-inc/macro'
+        'https://github.com/rox-inc/rox'
       );
       dispose();
     });
@@ -895,14 +895,14 @@ describe('agent-led new conversation', () => {
       ...createPreferredRepository('user'),
       dispose,
     }));
-    settings.select('https://github.com/macro-inc/macro');
+    settings.select('https://github.com/rox-inc/rox');
     expect(
       screen.getByRole('button', { name: 'Repository' }).textContent
-    ).toContain('macro-inc/macro');
+    ).toContain('rox-inc/rox');
     fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
     fireEvent.click(screen.getByRole('option', { name: 'Auto-detect' }));
     settings.select(undefined);
-    settings.select('https://github.com/macro-inc/macro');
+    settings.select('https://github.com/rox-inc/rox');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -920,18 +920,18 @@ describe('agent-led new conversation', () => {
     fireEvent.input(
       screen.getByRole('combobox', { name: 'Search repositories' }),
       {
-        target: { value: 'macro-inc/other' },
+        target: { value: 'rox-inc/other' },
       }
     );
     expect(screen.queryAllByRole('option')).toHaveLength(0);
     expect(screen.getByText(/No repositories match/).textContent).toContain(
-      'macro-inc/other'
+      'rox-inc/other'
     );
     fireEvent.input(
       screen.getByRole('combobox', { name: 'Search repositories' }),
       { target: { value: '' } }
     );
-    fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
+    fireEvent.click(screen.getByRole('option', { name: 'rox-inc/rox' }));
     expect(
       screen.getByRole('button', { name: 'Branch' }).textContent
     ).toContain('develop');
@@ -945,7 +945,7 @@ describe('agent-led new conversation', () => {
       botId: CURSOR_BOT_ID,
       onFailure: expect.any(Function),
       prompt: 'Prompt',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'feature/other',
     });
   });
@@ -990,7 +990,7 @@ describe('agent-led new conversation', () => {
       );
       await selectAgent(/Cursor/);
       fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
-      fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
+      fireEvent.click(screen.getByRole('option', { name: 'rox-inc/rox' }));
       await selectAgent(/Cloud reviewer/);
       expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
       expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
@@ -1022,7 +1022,7 @@ describe('agent-led new conversation', () => {
     );
     await selectAgent(/Cursor/);
     fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
-    fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
+    fireEvent.click(screen.getByRole('option', { name: 'rox-inc/rox' }));
     expect(
       screen.getByRole('button', { name: 'Branch' }).textContent
     ).toContain('develop');
@@ -1035,7 +1035,7 @@ describe('agent-led new conversation', () => {
       onFailure: expect.any(Function),
       prompt: 'Prompt',
       botId: 'local-agent',
-      repoUrl: 'https://github.com/macro-inc/macro',
+      repoUrl: 'https://github.com/rox-inc/rox',
       repoBranch: 'main',
     });
   });
@@ -1366,15 +1366,15 @@ describe('agent-led new conversation', () => {
       cursorConnected: true,
       cursorNeedsConnection: false,
     });
-    const macro = {
+    const rox = {
       ...roster[0],
       unavailableReason: 'Temporarily unavailable',
     };
     const onSelect = vi.fn();
     render(() => (
       <AgentPicker
-        agents={[macro]}
-        selected={macro}
+        agents={[rox]}
+        selected={rox}
         loading={false}
         onSelect={onSelect}
         onSelectEffort={onSelect}

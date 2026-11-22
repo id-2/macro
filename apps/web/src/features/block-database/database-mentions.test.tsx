@@ -61,7 +61,7 @@ const ada: UserItem = {
   kind: 'user',
   bucket: 'person',
   id: 'search-index-ada',
-  data: { id: 'macro|ada@example.com', name: 'Ada', email: 'ada@example.com' },
+  data: { id: 'rox|ada@example.com', name: 'Ada', email: 'ada@example.com' },
   searchText: 'Ada',
   sortTimestamp: 0,
   timestamps: {},
@@ -130,7 +130,7 @@ describe('native database mention adapter', () => {
 
   it('uses canonical data IDs for users and tasks, not search index IDs', () => {
     expect(databaseMentionFromItem(ada)).toEqual({
-      id: 'macro|ada@example.com',
+      id: 'rox|ada@example.com',
       entityType: 'USER',
       label: 'Ada',
     });
@@ -157,7 +157,7 @@ describe('native database mention adapter', () => {
     );
     menu.onPick?.(ada);
     expect(select).toHaveBeenCalledExactlyOnceWith({
-      id: 'macro|ada@example.com',
+      id: 'rox|ada@example.com',
       entityType: 'USER',
       label: 'Ada',
     });

@@ -123,7 +123,7 @@ function PipelineRecords(props: {
   const storedViews = () =>
     queryReadyGate(tableQuery) ? tableQuery.data.views : [];
   const [selectedViewId, setSelectedViewId] = usePreference<string | undefined>(
-    `macro:pref:crm:pipeline-view:${props.pipeline.id}`,
+    `rox:pref:crm:pipeline-view:${props.pipeline.id}`,
     {
       default: undefined,
     }

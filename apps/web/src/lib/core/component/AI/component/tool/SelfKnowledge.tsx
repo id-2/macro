@@ -1,4 +1,4 @@
-import RoxLogo from '@icon/macro.svg';
+import RoxLogo from '@icon/rox.svg';
 import { BaseTool } from './BaseTool';
 import { createToolRenderer } from './ToolRenderer';
 

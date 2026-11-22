@@ -33,7 +33,7 @@ export function codeExecutionReceipt(part: MessagePart) {
   const raw =
     detail?.kind === 'other'
       ? (detail.result ?? detail.output)
-      : detail?.kind === 'macro'
+      : detail?.kind === 'rox'
         ? detail.output
         : undefined;
   const parsed = ExecutionReceipt.safeParse(raw);

@@ -67,7 +67,7 @@ vi.mock('@channel/Thread/utils/message-actions', async (importOriginal) => ({
     typeof import('@channel/Thread/utils/message-actions')
   >()),
   buildMessageLink: (channelId: string, messageId: string) =>
-    `https://macro.test/app/channel/${channelId}?channel_message_id=${messageId}`,
+    `https://rox.test/app/channel/${channelId}?channel_message_id=${messageId}`,
 }));
 vi.mock('@queries/messages/mutations', () => ({
   useDeleteMessageMutation: () => ({}),
@@ -185,7 +185,7 @@ describe('document message touch actions', () => {
         canWrite
         onEditingChange={editing}
         buildLink={(item) =>
-          `https://macro.test/app/md/document?comment_id=${item.id}`
+          `https://rox.test/app/md/document?comment_id=${item.id}`
         }
       />
     ));
@@ -201,7 +201,7 @@ describe('document message touch actions', () => {
     });
     fireEvent.click(view.getByRole('button', { name: 'Copy link' }));
     expect(mocks.clipboard).toHaveBeenCalledWith(
-      'https://macro.test/app/md/document?comment_id=root'
+      'https://rox.test/app/md/document?comment_id=root'
     );
   });
 });
@@ -371,7 +371,7 @@ it('offers a durable copy link without write actions for saved call chat', () =>
     ...message,
     parent: { type: 'call', id: 'call-id' },
   };
-  const link = 'https://macro.test/app/call/call-id?call_message_id=root';
+  const link = 'https://rox.test/app/call/call-id?call_message_id=root';
   const view = render(() => (
     <MessageThread data={callMessage} canWrite={false} buildLink={() => link} />
   ));
@@ -485,7 +485,7 @@ it('does not offer deletion of another sender’s bot message outside a channel'
       data={{
         ...message,
         parent: { type: 'call', id: 'call-id' },
-        sender_id: 'bot|macro',
+        sender_id: 'bot|rox',
       }}
       canWrite
     />

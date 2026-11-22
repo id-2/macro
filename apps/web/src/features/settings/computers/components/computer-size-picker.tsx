@@ -25,7 +25,7 @@ export function ComputerSizePicker(props: {
       >
         {(offer) => (
           <ChoiceRow
-            name="macro-computer-size"
+            name="rox-computer-size"
             value={offer.size}
             checked={props.selected === offer.size}
             title={sizeLabel(offer.size)}

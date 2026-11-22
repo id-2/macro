@@ -40,7 +40,7 @@ vi.mock('@queries/email/link', () => ({
     refetch: mocks.refetchLinks,
   }),
 }));
-vi.mock('@core/context/user', () => ({ useUserId: () => () => 'macro|self' }));
+vi.mock('@core/context/user', () => ({ useUserId: () => () => 'rox|self' }));
 vi.mock('@core/email-link', () => ({
   useAddInboxFlow: () => mocks.startAddInbox,
 }));
@@ -70,14 +70,14 @@ vi.mock('@app/features/calendar/components/composer/EventForm', () => ({
         </For>
       </select>
       <output aria-label="Rox calls enabled">
-        {String(props.macroCallsEnabled)}
+        {String(props.roxCallsEnabled)}
       </output>
       <output aria-label="Conference">
         {props.controller.state().conference}
       </output>
       <button
         type="button"
-        onClick={() => props.controller.setField('conference', 'macro')}
+        onClick={() => props.controller.setField('conference', 'rox')}
       >
         Pick Rox call
       </button>
@@ -104,7 +104,7 @@ import {
 const link = (id: string, overrides: Partial<Link> = {}): Link =>
   ({
     id,
-    rox_id: 'macro|self',
+    rox_id: 'rox|self',
     email_address: `${id}@example.com`,
     is_primary: id === 'work',
     needs_reauth: false,
@@ -298,7 +298,7 @@ describe('AI calendar draft Rox calls', () => {
 
   it('opens on the conferencing the agent drafted', () => {
     showDraft(undefined, { addMacroCall: true });
-    expect(screen.getByLabelText('Conference').textContent).toBe('macro');
+    expect(screen.getByLabelText('Conference').textContent).toBe('rox');
   });
 
   it('executes the tool with addMacroCall when the user picks a Rox call', async () => {
@@ -310,7 +310,7 @@ describe('AI calendar draft Rox calls', () => {
     await fireEvent.click(
       screen.getByRole('button', { name: 'Pick Rox call' })
     );
-    expect(screen.getByLabelText('Conference').textContent).toBe('macro');
+    expect(screen.getByLabelText('Conference').textContent).toBe('rox');
     await fireEvent.click(screen.getByRole('button', { name: 'Create event' }));
     expect(mocks.execute).toHaveBeenCalledWith(
       expect.objectContaining({

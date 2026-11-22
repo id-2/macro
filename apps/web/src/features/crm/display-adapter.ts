@@ -9,7 +9,7 @@ import { createCrmDisplayOptions } from './primitives/display-options';
 // One app preference keeps every mounted CRM surface in sync.
 const [options, setOptions] = makePersisted(
   createSignal<CrmDisplayOptions>(DEFAULT_CRM_DISPLAY_OPTIONS),
-  { name: 'macro:pref:crm:display' }
+  { name: 'rox:pref:crm:display' }
 );
 export const createAppCrmDisplayOptions = () =>
   createCrmDisplayOptions(options, setOptions);

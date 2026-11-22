@@ -526,7 +526,7 @@ export function ExternalChatView(props: {
                       <div class="flex w-full justify-center">
                         <div
                           ref={(content) => grown.observe(content)}
-                          class="macro-message-width relative"
+                          class="rox-message-width relative"
                         >
                           <Show
                             when={
@@ -776,7 +776,7 @@ export function ExternalChatView(props: {
                       when={group().canSend && !stopped()}
                       fallback={
                         <ChannelInputContainer>
-                          <div class="macro-message-width flex shrink-0 flex-wrap items-center gap-2 border-t border-edge-muted px-4 pt-3 text-sm text-ink-muted touch:rounded-2xl touch:border-0 touch:island touch:px-3 touch:py-2">
+                          <div class="rox-message-width flex shrink-0 flex-wrap items-center gap-2 border-t border-edge-muted px-4 pt-3 text-sm text-ink-muted touch:rounded-2xl touch:border-0 touch:island touch:px-3 touch:py-2">
                             <span role="status">
                               {stopped()
                                 ? 'This chat is no longer syncing'

@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StatusBanner } from '../components/StatusBanner';
 import { useBannerStatus } from './use-banner-status';
 
-const DISMISSED_STORAGE_KEY = 'macro:system-status:dismissed';
+const DISMISSED_STORAGE_KEY = 'rox:system-status:dismissed';
 
 const [query, setQuery] = createStore<{
   isPending: boolean;

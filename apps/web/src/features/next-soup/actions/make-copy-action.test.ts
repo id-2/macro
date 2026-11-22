@@ -16,7 +16,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 import { makeCopyAction } from './make-copy-action';
 
 const entity = (type: EntityData['type']) =>
-  ({ type, id: 'e1', name: 'Thing', ownerId: 'macro|me' }) as EntityData;
+  ({ type, id: 'e1', name: 'Thing', ownerId: 'rox|me' }) as EntityData;
 
 const { canExecute } = makeCopyAction();
 

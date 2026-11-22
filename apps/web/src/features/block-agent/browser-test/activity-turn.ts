@@ -382,7 +382,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
         },
         status: 'running',
         detail: {
-          kind: 'macro',
+          kind: 'rox',
           input: { query: 'email drafts' },
           output: null,
           error: null,
@@ -403,10 +403,10 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
       model.parts.push({
         kind: 'tool_use',
         id,
-        name: { kind: 'mcp', server: 'macro', tool: beat.tool },
+        name: { kind: 'mcp', server: 'rox', tool: beat.tool },
         status: 'running',
         detail: {
-          kind: 'macro',
+          kind: 'rox',
           input: { query: beat.detail },
           output: null,
           error: null,
@@ -426,7 +426,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
     update(index, {
       status: 'completed',
       detail: {
-        kind: 'macro',
+        kind: 'rox',
         input: { query: beat.detail },
         output: { results: [] },
         error: null,
@@ -450,7 +450,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
   ) {
     const id = `call-${n}`;
     const execution = executionId(n);
-    const source = `// program ${n}\nconst found = await macro.search(${JSON.stringify(beat.line ?? 'drafts')});\nreturn found;`;
+    const source = `// program ${n}\nconst found = await rox.search(${JSON.stringify(beat.line ?? 'drafts')});\nreturn found;`;
     const input = { source, execution_id: execution };
     if (beat.line && options.summarize)
       publishSessionActivity(SESSION_ID, beat.line);
@@ -461,7 +461,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
         id,
         name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
         status: 'pending',
-        detail: { kind: 'macro', input: {}, output: null, error: null },
+        detail: { kind: 'rox', input: {}, output: null, error: null },
       }) - 1;
     commit();
     await sleep(400);
@@ -478,7 +478,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
     save({});
     update(index, {
       status: 'running',
-      detail: { kind: 'macro', input, output: null, error: null },
+      detail: { kind: 'rox', input, output: null, error: null },
     });
     model.rows.set(id, [
       {
@@ -498,7 +498,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
       update(index, {
         status: 'failed',
         detail: {
-          kind: 'macro',
+          kind: 'rox',
           input,
           output: {
             executionId: execution,
@@ -554,7 +554,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
     update(index, {
       status: 'completed',
       detail: {
-        kind: 'macro',
+        kind: 'rox',
         input,
         output: {
           executionId: execution,

@@ -6,12 +6,12 @@ import { createMeetingSessionLifecycle } from './meeting-session-lifecycle';
 import { createNewMeeting } from './new-meeting';
 
 const alice = {
-  id: 'macro|alice@example.com',
+  id: 'rox|alice@example.com',
   name: 'Alice',
   email: 'alice@example.com',
 };
 const bob = {
-  id: 'macro|bob@example.com',
+  id: 'rox|bob@example.com',
   name: 'Bob',
   email: 'bob@example.com',
 };
@@ -298,7 +298,7 @@ describe('new meeting setup', () => {
 
   it('bounds the batch without silently replacing the previous selection', () => {
     const people = Array.from({ length: 51 }, (_, index) => ({
-      id: `macro|user${index}@example.com`,
+      id: `rox|user${index}@example.com`,
       name: `User ${index}`,
       email: `user${index}@example.com`,
     }));

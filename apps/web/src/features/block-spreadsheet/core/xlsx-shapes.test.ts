@@ -251,7 +251,7 @@ describe('shape parts', () => {
   it('reads custom outlines, theme text and newer content as its fallback', () => {
     const shape = readShape(
       element(
-        `<xdr:sp ${NAMESPACES} macro="" textlink=""><xdr:nvSpPr><xdr:cNvPr id="2" name="Freeform"><a:hlinkClick r:id="rId9"/></xdr:cNvPr><xdr:cNvSpPr/></xdr:nvSpPr><xdr:spPr><a:xfrm rot="5400000"><a:off x="0" y="0"/><a:ext cx="200" cy="100"/></a:xfrm><a:custGeom><a:pathLst><a:path w="200" h="100"><a:moveTo><a:pt x="0" y="100"/></a:moveTo><a:lnTo><a:pt x="100" y="0"/></a:lnTo><a:arcTo wR="50" hR="50" stAng="10800000" swAng="10800000"/><a:close/></a:path></a:pathLst></a:custGeom><a:solidFill><a:schemeClr val="accent1"><a:alpha val="50000"/></a:schemeClr></a:solidFill><a:ln w="9525"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:prstDash val="sysDot"/></a:ln></xdr:spPr><xdr:txBody><a:bodyPr wrap="none" vert="vert270"/><a:lstStyle><a:lvl1pPr><a:defRPr sz="900"/></a:lvl1pPr></a:lstStyle><a:p><mc:AlternateContent><mc:Choice Requires="a14"><a:r><a:t>new</a:t></a:r></mc:Choice><mc:Fallback><a:r><a:t>old</a:t></a:r></mc:Fallback></mc:AlternateContent></a:p></xdr:txBody></xdr:sp>`
+        `<xdr:sp ${NAMESPACES} rox="" textlink=""><xdr:nvSpPr><xdr:cNvPr id="2" name="Freeform"><a:hlinkClick r:id="rId9"/></xdr:cNvPr><xdr:cNvSpPr/></xdr:nvSpPr><xdr:spPr><a:xfrm rot="5400000"><a:off x="0" y="0"/><a:ext cx="200" cy="100"/></a:xfrm><a:custGeom><a:pathLst><a:path w="200" h="100"><a:moveTo><a:pt x="0" y="100"/></a:moveTo><a:lnTo><a:pt x="100" y="0"/></a:lnTo><a:arcTo wR="50" hR="50" stAng="10800000" swAng="10800000"/><a:close/></a:path></a:pathLst></a:custGeom><a:solidFill><a:schemeClr val="accent1"><a:alpha val="50000"/></a:schemeClr></a:solidFill><a:ln w="9525"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:prstDash val="sysDot"/></a:ln></xdr:spPr><xdr:txBody><a:bodyPr wrap="none" vert="vert270"/><a:lstStyle><a:lvl1pPr><a:defRPr sz="900"/></a:lvl1pPr></a:lstStyle><a:p><mc:AlternateContent><mc:Choice Requires="a14"><a:r><a:t>new</a:t></a:r></mc:Choice><mc:Fallback><a:r><a:t>old</a:t></a:r></mc:Fallback></mc:AlternateContent></a:p></xdr:txBody></xdr:sp>`
       ),
       []
     );
@@ -354,7 +354,7 @@ describe('shape parts', () => {
     expect(xml).toContain('<a:gd name="adj" fmla="val 10000"/>');
     expect(xml).toContain(`textlink="'My sheet'!$A$1"`);
     expect(xml).toContain('<a:t>A &amp; B</a:t></a:r><a:br>');
-    expect(xml).toContain('<xdr:cxnSp macro="">');
+    expect(xml).toContain('<xdr:cxnSp rox="">');
     expect(xml).toContain(
       '<a:prstDash val="lgDash"/><a:tailEnd type="arrow"/>'
     );

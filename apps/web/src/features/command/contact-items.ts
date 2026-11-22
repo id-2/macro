@@ -7,7 +7,7 @@ import {
   resolveContactPeople,
   toCrmContactItem,
 } from '@core/context/quickAccess/crm-contacts';
-import { emailToMacroId } from '@core/user/macroId';
+import { emailToMacroId } from '@core/user/roxId';
 import type { CrmContactEntity } from '@entity';
 import { crmContactEmailKey } from '@entity/types/entity';
 import type { CommandMenuItem } from './useCommandItems';

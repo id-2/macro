@@ -7,17 +7,17 @@ const SCOPE_LABEL: Record<CapabilityScope, string> = {
 
 /**
  * With no row, names what would serve the provider once connected. Gated on
- * the `macro-connect` flag: without it every connection is labeled Pipedream.
+ * the `rox-connect` flag: without it every connection is labeled Pipedream.
  */
 export function capabilityFacts(
   row:
     | Pick<Capability, 'account' | 'scope' | 'mechanism' | 'grantProvider'>
     | undefined,
-  macroConnectEnabled: boolean
+  roxConnectEnabled: boolean
 ): string {
   if (!row || row.mechanism === 'pipedream') {
     const onConnect =
-      macroConnectEnabled && (!row || row.grantProvider === 'connect');
+      roxConnectEnabled && (!row || row.grantProvider === 'connect');
     return onConnect ? 'Powered by Rox Connect' : 'Powered by Pipedream';
   }
   return [row.account, SCOPE_LABEL[row.scope]].filter(Boolean).join(' · ');

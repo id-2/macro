@@ -97,10 +97,10 @@ describe('repository listing', () => {
 
   it("asks the harness for one repository's branches", async () => {
     await agentHarnessServiceClient.listRepositoryBranches(
-      'https://github.com/macro-inc/macro'
+      'https://github.com/rox-inc/rox'
     );
     expect(fetchWithToken).toHaveBeenCalledWith(
-      'https://harness.example.com/agent-repositories/branches?repoUrl=https%3A%2F%2Fgithub.com%2Fmacro-inc%2Fmacro',
+      'https://harness.example.com/agent-repositories/branches?repoUrl=https%3A%2F%2Fgithub.com%2Frox-inc%2Frox',
       { method: 'GET' }
     );
   });

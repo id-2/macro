@@ -235,7 +235,7 @@ function AgentBlockContent(props: {
                   holdsPrompts={!isTouchDevice()}
                   class="flex w-full justify-center shrink-0 px-4 pb-2.5 pointer-events-auto touch:px-(--mobile-chrome-gutter) touch:pb-0 @min-[900px]/agent-session:pr-(--details-clearance)"
                 >
-                  <div class="macro-message-width mx-auto flex flex-col gap-2">
+                  <div class="rox-message-width mx-auto flex flex-col gap-2">
                     <Show
                       when={!isSessionArchived(session())}
                       fallback={

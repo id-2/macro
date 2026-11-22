@@ -858,7 +858,7 @@ export type ToolCalendarEvent = {
    *  Join URL of the event's Rox call, when CreateCalendarEvent or
    *  UpdateCalendarEvent was asked for one.
    */
-  macroCallUrl: string | null;
+  roxCallUrl: string | null;
   /**  Whether the user's calendar prohibits modifying this event. */
   isReadOnly: boolean;
   /**  Calendar the event belongs to, when known. */

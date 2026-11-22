@@ -55,7 +55,7 @@ export function AgentDmComposer(
     >
       <Show when={conversation()}>
         {(data) => (
-          <div class="macro-message-width">
+          <div class="rox-message-width">
             <AgentConversationControls
               conversation={data()}
               onChanged={() =>
@@ -68,7 +68,7 @@ export function AgentDmComposer(
       <Show
         when={inputShown()}
         fallback={
-          <div class="macro-message-width">
+          <div class="rox-message-width">
             <ConversationNotice
               state={notice()}
               onRetry={() =>

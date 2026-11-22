@@ -19,7 +19,7 @@ export const queryPersistence = { restoreQuery: async () => {} };
 export const link: Link = {
   id: 'signature-fixture-inbox',
   email_address: 'alex@example.com',
-  rox_id: 'macro|alex@example.com',
+  rox_id: 'rox|alex@example.com',
   fusionauth_user_id: 'fixture-user',
   calendar_disabled: false,
   has_calendar_data: false,
@@ -67,10 +67,10 @@ export function switchFixtureAccount() {
   holdSources = false;
   batch(() => {
     queryClient.setQueryData(authKeys.userInfo.queryKey, {
-      id: 'macro|other@example.com',
+      id: 'rox|other@example.com',
       authenticated: true,
     });
-    setActiveViewer('macro|other@example.com');
+    setActiveViewer('rox|other@example.com');
   });
 }
 export function releaseAccountSources() {
@@ -97,7 +97,7 @@ export const storageServiceClient = {
           updated_at: '2026-01-01T00:00:00Z',
           participants: [
             { user_id: owner },
-            { user_id: 'macro|peer@example.com' },
+            { user_id: 'rox|peer@example.com' },
           ],
         },
       ],

@@ -20,7 +20,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 
 vi.mock('@app/lib/analytics/posthog', () => ({
   useFeatureFlag: (flag: { key: string }) => () =>
-    flag.key === 'enable-macro-computers'
+    flag.key === 'enable-rox-computers'
       ? mocks.computersFlag()
       : mocks.flag(),
 }));

@@ -54,12 +54,12 @@ const SELF_RENDERING_TOOLS: ReadonlySet<string> = new Set([
 export function rendersOwnView(part: MessagePart | undefined): boolean {
   if (part?.kind !== 'tool_use') return false;
   if (presentedReviewId(part) || part.detail.kind === 'view') return true;
-  const macroTool =
-    part.detail.kind === 'macro' ||
+  const roxTool =
+    part.detail.kind === 'rox' ||
     (part.detail.kind === 'other' &&
       part.name.kind === 'mcp' &&
-      part.name.server === 'macro');
-  if (!macroTool) return false;
+      part.name.server === 'rox');
+  if (!roxTool) return false;
   // The tool's own name, without the MCP server namespace the fold already
   // separated out (mirrors `toolLabel` in `component/parts/shared.ts`).
   const name = part.name.kind === 'mcp' ? part.name.tool : part.name.name;

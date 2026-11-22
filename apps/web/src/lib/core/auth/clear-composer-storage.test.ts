@@ -19,11 +19,11 @@ it('clears scoped and legacy drafts and attachments while retaining preferences'
     'attachment-tracker-agents-new-conversation-persist-v0:alice',
   ];
   for (const key of keys) localStorage.setItem(key, 'private draft');
-  localStorage.setItem('macro-selected-theme', 'dark');
+  localStorage.setItem('rox-selected-theme', 'dark');
   localStorage.setItem('task-composer-share-with-team', 'false');
   clearComposerStorage();
   for (const key of keys) expect(localStorage.getItem(key)).toBeNull();
-  expect(localStorage.getItem('macro-selected-theme')).toBe('dark');
+  expect(localStorage.getItem('rox-selected-theme')).toBe('dark');
   expect(localStorage.getItem('task-composer-share-with-team')).toBe('false');
 });
 

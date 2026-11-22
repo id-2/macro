@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearFlowProgress, readSavedStep, saveStep } from './flow-storage';
 
-const VIEWER = 'macro|ada@acme.com';
+const VIEWER = 'rox|ada@acme.com';
 const realLocalStorage = window.localStorage;
 
 function blockLocalStorage() {

@@ -8,12 +8,12 @@ vi.mock('@service-auth/client', () => ({
 }));
 
 const reference = {
-  owner: 'macro-inc',
-  repo: 'macro',
+  owner: 'rox-inc',
+  repo: 'rox',
   number: 42,
-  githubKey: 'macro-inc/macro/pull/42',
-  displayName: 'macro-inc/macro#42',
-  url: 'https://github.com/macro-inc/macro/pull/42',
+  githubKey: 'rox-inc/rox/pull/42',
+  displayName: 'rox-inc/rox#42',
+  url: 'https://github.com/rox-inc/rox/pull/42',
 };
 const enrich = vi.mocked(authServiceClient.enrichGithubPullRequests);
 
@@ -111,7 +111,7 @@ describe('GitHub PR statistics', () => {
     );
     expect(first.queryKey).not.toEqual(
       pullRequestStatsQueryOptions(
-        'https://github.com/macro-inc/macro/pull/43',
+        'https://github.com/rox-inc/rox/pull/43',
         'capture-1'
       ).queryKey
     );

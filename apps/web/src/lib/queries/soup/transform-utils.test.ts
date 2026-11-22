@@ -236,7 +236,7 @@ describe('chat soup entities', () => {
           id: 'chat-model',
           name: 'Chat',
           model,
-          ownerId: 'macro|owner@example.com',
+          ownerId: 'rox|owner@example.com',
           isPersistent: true,
           properties: [],
           createdAt: '2026-09-11T00:00:00Z',
@@ -266,7 +266,7 @@ describe('document soup entities', () => {
       data: {
         id,
         name: 'Same title',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         fileType: 'md',
         subType,
         documentVersionId: 1,
@@ -285,7 +285,7 @@ describe('document soup entities', () => {
       data: {
         id: 'folder',
         name: 'Same title',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         properties: [],
         createdAt: '2026-09-11T00:00:00Z',
         updatedAt: '2026-09-11T00:00:00Z',
@@ -323,7 +323,7 @@ describe('document soup entities', () => {
         data: {
           id: 'doc-sub-type',
           name: 'Plan',
-          ownerId: 'macro|owner@example.com',
+          ownerId: 'rox|owner@example.com',
           fileType: 'md',
           subType,
           documentVersionId: 1,

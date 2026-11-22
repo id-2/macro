@@ -83,7 +83,7 @@ export function ArtifactFrame(props: {
     const forwardKey = (event: MessageEvent) => {
       if (!frame || event.source !== frame.contentWindow) return;
 
-      const key: unknown = event.data?.macroArtifactKey;
+      const key: unknown = event.data?.roxArtifactKey;
       if (typeof key === 'string') props.onKey?.(key);
     };
     window.addEventListener('message', forwardKey);

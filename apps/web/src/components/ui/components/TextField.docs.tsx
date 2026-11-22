@@ -52,7 +52,7 @@ function StatesDemo() {
         </TextField.Description>
       </TextField>
 
-      <TextField validationState="invalid" defaultValue="macro">
+      <TextField validationState="invalid" defaultValue="rox">
         <TextField.Label>Workspace URL</TextField.Label>
         <TextField.Input />
         <TextField.ErrorMessage>

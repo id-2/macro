@@ -38,7 +38,7 @@ function reviewComment(
   });
 }
 
-function macroThread(id: string, createdAt: string): DiscussionThread {
+function roxThread(id: string, createdAt: string): DiscussionThread {
   const first: DiscussionComment = {
     id: `${id}-c1`,
     threadId: id,
@@ -176,15 +176,15 @@ describe('buildTimeline', () => {
     );
   });
 
-  it('merges macro threads by their first comment timestamp', () => {
+  it('merges rox threads by their first comment timestamp', () => {
     const entries = buildTimeline(
       [comment(1, { createdAt: at(0) }), comment(2, { createdAt: at(4) })],
-      [macroThread('t1', at(2))]
+      [roxThread('t1', at(2))]
     );
 
     expect(entries.map((entry) => entry.kind)).toEqual([
       'github-comment',
-      'macro-thread',
+      'rox-thread',
       'github-comment',
     ]);
   });

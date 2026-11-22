@@ -18,7 +18,7 @@ vi.mock('@core/mobile/virtualKeyboard', () => ({
   virtualKeyboardVisible: () => false,
 }));
 vi.mock('@core/context/user', () => ({
-  useUserId: () => () => 'macro|viewer@example.com',
+  useUserId: () => () => 'rox|viewer@example.com',
 }));
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { success: vi.fn() },

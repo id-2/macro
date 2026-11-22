@@ -2,7 +2,7 @@ import type { ScheduleDraft } from './core/draft';
 import { saveRoutineComposerDraft } from './draft-storage';
 
 /** Tells an open new routine's page that a newer start replaced its draft. */
-const ROUTINE_DRAFT_STARTED = 'macro:routine-draft-started';
+const ROUTINE_DRAFT_STARTED = 'rox:routine-draft-started';
 
 /**
  * Stores a new routine's first draft for its page, which reads it on open,

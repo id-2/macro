@@ -81,7 +81,7 @@ describe('authored group references', () => {
         },
         { itemType: 'skill', itemId: 'builtin:review' },
         { itemType: 'document', itemId: 'doc-1' },
-        { itemType: 'user', itemId: 'macro|a@example.com' },
+        { itemType: 'user', itemId: 'rox|a@example.com' },
       ]),
       value:
         'Review the PR with this contact on <m-date-mention>{"date":"2026-09-09"}</m-date-mention>.',
@@ -90,20 +90,20 @@ describe('authored group references', () => {
     expect(result.content).toBe(snapshot.value);
     expect(result.mentions).toEqual([
       { entity_type: 'document', entity_id: 'doc-1' },
-      { entity_type: 'user', entity_id: 'macro|a@example.com' },
+      { entity_type: 'user', entity_id: 'rox|a@example.com' },
     ]);
   });
 
   it('retains @here and explicit users without depending on a cached participant roster', () => {
     const result = buildPostMessageRequest({
       snapshot: snap([
-        { itemType: 'user', itemId: 'macro|a@example.com' },
+        { itemType: 'user', itemId: 'rox|a@example.com' },
         { itemType: 'group', itemId: 'here', groupAlias: 'here' },
         { itemType: 'group', itemId: 'here', groupAlias: 'here' },
       ]),
     });
     expect(result.mentions).toEqual([
-      { entity_type: 'user', entity_id: 'macro|a@example.com' },
+      { entity_type: 'user', entity_id: 'rox|a@example.com' },
       { entity_type: 'group', entity_id: 'here' },
     ]);
   });
@@ -131,14 +131,14 @@ describe('buildPostMessageRequest — bot mentions', () => {
     const result = buildPostMessageRequest({
       snapshot: snap([
         { itemType: 'user', itemId: BOT_PRINCIPAL },
-        { itemType: 'user', itemId: 'macro|human@example.com' },
+        { itemType: 'user', itemId: 'rox|human@example.com' },
         { itemType: 'user', itemId: ROX_AI_PRINCIPAL },
       ]),
     });
 
     expect(result.mentions).toEqual([
       { entity_type: 'bot', entity_id: BOT_PRINCIPAL },
-      { entity_type: 'user', entity_id: 'macro|human@example.com' },
+      { entity_type: 'user', entity_id: 'rox|human@example.com' },
       { entity_type: 'bot', entity_id: ROX_AI_PRINCIPAL },
     ]);
   });

@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   assignUrl: vi.fn(),
   linkGithub: vi.fn(),
   completeConnect: vi.fn(),
-  macroConnect: false,
+  roxConnect: false,
   overlays: [] as { app_slug: string; server_url: string }[],
   overlaysUnavailable: false,
   cachedOverlays: undefined as
@@ -28,8 +28,8 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('@core/util/platform', () => ({ isTauri: () => mocks.native }));
 vi.mock('@core/constant/featureFlags', () => ({
-  macroConnect: { key: 'macro-connect' },
-  isFeatureEnabled: () => mocks.macroConnect,
+  roxConnect: { key: 'rox-connect' },
+  isFeatureEnabled: () => mocks.roxConnect,
 }));
 vi.mock('@core/auth/authorize-github', () => ({
   linkGithubAccount: mocks.linkGithub,
@@ -77,7 +77,7 @@ beforeEach(() => {
   mocks.overlays = [];
   mocks.overlaysUnavailable = false;
   mocks.cachedOverlays = undefined;
-  mocks.macroConnect = false;
+  mocks.roxConnect = false;
   mocks.token.mockImplementation(async () => ok({ token: 'fixture' }));
   mocks.open.mockImplementation(() => ({ close: mocks.close }));
   mocks.openNative.mockImplementation(() => ({ close: mocks.close }));
@@ -336,7 +336,7 @@ describe('apps Rox Connect serves', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     popup.closed = false;
-    mocks.macroConnect = true;
+    mocks.roxConnect = true;
     mocks.reservePopup.mockReturnValue(popup);
     mocks.token.mockResolvedValue(
       ok({ provider: 'connect', connect_url: 'https://connect.test/c/tok' })

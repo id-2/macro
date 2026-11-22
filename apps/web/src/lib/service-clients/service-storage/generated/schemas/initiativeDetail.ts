@@ -8,7 +8,7 @@
 import type { AccessLevel } from './accessLevel';
 import type { InitiativeDetailAppearance } from './initiativeDetailAppearance';
 import type { InitiativeId } from './initiativeId';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { SharePermissionV2 } from './sharePermissionV2';
 
 /**

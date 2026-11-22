@@ -16,7 +16,7 @@ const input = {
   senderEmail: 'sender@example.com',
 };
 
-it.each(['macro|self@example.com', 'macro|delegated@example.com'])(
+it.each(['rox|self@example.com', 'rox|delegated@example.com'])(
   'creates a queued Mail thread from inbox owner %s without viewer metadata',
   async (owner) => {
     const operations: Operation[] = [];
@@ -84,9 +84,9 @@ it.each([undefined, { rox_id: '' }])(
     expect(
       queuedDraftSaveArgs({
         ...input,
-        senderAccount: { rox_id: 'macro|owner' },
+        senderAccount: { rox_id: 'rox|owner' },
       }).newThreadOwnerId
-    ).toBe('macro|owner');
+    ).toBe('rox|owner');
   }
 );
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { frontendInstanceId } from './frontend-instance';
 
-const KEY = 'macro-document-lifecycle';
+const KEY = 'rox-document-lifecycle';
 const count = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const navigationSchema = z.object({
   commits: count,

@@ -1,4 +1,4 @@
-import IconApple from '@icon/macro-apple.svg';
+import IconApple from '@icon/rox-apple.svg';
 import { Show } from 'solid-js';
 import { AuthButton } from './form-fields';
 

@@ -90,7 +90,7 @@ export function createLocalCommentDraft(options: {
     if (!userId) return;
     return createCommentMarkCleanup(
       new BrowserWALStore<string>(
-        'macro-comment-mark-cleanup',
+        'rox-comment-mark-cleanup',
         JSON.stringify([userId, manager.documentId])
       ),
       async (markId) => {

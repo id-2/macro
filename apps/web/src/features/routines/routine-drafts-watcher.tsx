@@ -25,7 +25,7 @@ import {
 } from './queries/draft-jobs';
 
 // Closing a ready draft's toast keeps it for New routine; it stays closed.
-const CLOSED_TOASTS_KEY = 'macro:routine-draft-toasts:closed';
+const CLOSED_TOASTS_KEY = 'rox:routine-draft-toasts:closed';
 
 function activityLabel(activity: DraftActivity): string {
   return match(activity)

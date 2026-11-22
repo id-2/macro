@@ -10,8 +10,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { ToggleSwitch } from '@ui';
 import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
 import { render } from 'solid-js/web';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { themeCssVars } from '../../theme/utils/themeCssVars';
 import { Appearance } from '../Appearance';
 import { AppInfo } from '../components/app-info';
@@ -45,7 +45,7 @@ function Fixture() {
   const applyTheme = (value: boolean) => {
     setDark(value);
     for (const [key, token] of Object.entries(
-      themeCssVars(value ? macroDarkTheme : macroLightTheme)
+      themeCssVars(value ? roxDarkTheme : roxLightTheme)
     ))
       document.documentElement.style.setProperty(key, token);
     document.documentElement.style.colorScheme = value ? 'dark' : 'light';

@@ -57,7 +57,7 @@ vi.mock('@core/component/AI/component/tool/handler', () => ({
     };
   }) => (
     <div
-      data-testid="macro-tool"
+      data-testid="rox-tool"
       data-response={JSON.stringify(props.response?.json)}
       data-error={props.error}
       data-stopped={String(props.stopped ?? false)}
@@ -235,12 +235,12 @@ describe('ToolCallPart routing', () => {
             result: { content: { text: 'Q3 plan' }, comments: [] },
             error: null,
           }),
-          name: { kind: 'mcp', server: 'macro', tool: 'ReadContent' },
+          name: { kind: 'mcp', server: 'rox', tool: 'ReadContent' },
         }}
         context={context(false)}
       />
     ));
-    expect(rendered.getByTestId('macro-tool').textContent).toBe('ReadContent');
+    expect(rendered.getByTestId('rox-tool').textContent).toBe('ReadContent');
     expect(rendered.queryByTestId('tool-card')).toBeNull();
   });
 
@@ -288,7 +288,7 @@ describe('ToolCallPart routing', () => {
         context={context(false)}
       />
     ));
-    expect(rendered.queryByTestId('macro-tool')).toBeNull();
+    expect(rendered.queryByTestId('rox-tool')).toBeNull();
     expect(rendered.getAllByTestId('subtitle')[0]?.textContent).toBe('');
     expect(rendered.getByTestId('tool-card').dataset.expandable).toBe('false');
     expect(rendered.getByTestId('body').textContent).toBe('');
@@ -306,12 +306,12 @@ describe('ToolCallPart routing', () => {
             input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
             result: { unexpected: 'payload' },
           }),
-          name: { kind: 'mcp', server: 'macro', tool: 'ReadContent' },
+          name: { kind: 'mcp', server: 'rox', tool: 'ReadContent' },
         }}
         context={context(false)}
       />
     ));
-    expect(rendered.queryByTestId('macro-tool')).toBeNull();
+    expect(rendered.queryByTestId('rox-tool')).toBeNull();
     expect(rendered.getByTestId('tool-card').dataset.expandable).toBe('false');
     expect(rendered.getByTestId('body').textContent).toBe('');
   });
@@ -326,15 +326,15 @@ describe('ToolCallPart routing', () => {
         input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
         result: { content: { text }, comments: [] },
       }),
-      name: { kind: 'mcp', server: 'macro', tool: 'ReadContent' },
+      name: { kind: 'mcp', server: 'rox', tool: 'ReadContent' },
     });
     const [part, setPart] = createSignal(call('First result'));
     const rendered = render(() => (
       <ToolCallPart part={part()} context={context(false)} />
     ));
-    const result = rendered.getByTestId('macro-tool');
+    const result = rendered.getByTestId('rox-tool');
     setPart(call('Updated result'));
-    expect(rendered.getByTestId('macro-tool')).toBe(result);
+    expect(rendered.getByTestId('rox-tool')).toBe(result);
     expect(JSON.parse(result.dataset.response ?? '')).toEqual({
       content: { text: 'Updated result' },
       comments: [],
@@ -409,7 +409,7 @@ describe('ToolCallPart Rox tools', () => {
   const readContent = (overrides?: Partial<Omit<ToolUsePart, 'name'>>) =>
     toolUse(
       {
-        kind: 'macro',
+        kind: 'rox',
         input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
         output: null,
         error: null,
@@ -421,7 +421,7 @@ describe('ToolCallPart Rox tools', () => {
     const rendered = render(() => (
       <ToolCallPart part={readContent()} context={context(true)} />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(richTool.dataset.complete).toBe('false');
     expect(richTool.dataset.streaming).toBe('true');
     expect(richTool.dataset.stopped).toBe('false');
@@ -435,7 +435,7 @@ describe('ToolCallPart Rox tools', () => {
     const rendered = render(() => (
       <ToolCallPart part={readContent()} context={context(false)} />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(richTool.dataset.stopped).toBe('true');
     expect(richTool.dataset.complete).toBe('true');
     expect(richTool.dataset.streaming).toBe('false');
@@ -446,7 +446,7 @@ describe('ToolCallPart Rox tools', () => {
       <ToolCallPart
         part={readContent({
           detail: {
-            kind: 'macro',
+            kind: 'rox',
             input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
             output: { content: { text: 'partial' }, comments: [] },
             error: null,
@@ -455,7 +455,7 @@ describe('ToolCallPart Rox tools', () => {
         context={context(false)}
       />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(richTool.dataset.stopped).toBe('true');
     expect(richTool.dataset.response).toBeUndefined();
   });
@@ -466,7 +466,7 @@ describe('ToolCallPart Rox tools', () => {
         part={readContent({
           status: 'completed',
           detail: {
-            kind: 'macro',
+            kind: 'rox',
             input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
             output: { content: { text: 'hi' }, comments: [] },
             error: null,
@@ -475,7 +475,7 @@ describe('ToolCallPart Rox tools', () => {
         context={context(false)}
       />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(JSON.parse(richTool.dataset.response ?? '')).toEqual({
       content: { text: 'hi' },
       comments: [],
@@ -490,7 +490,7 @@ describe('ToolCallPart Rox tools', () => {
       <ToolCallPart
         part={toolUse(
           {
-            kind: 'macro',
+            kind: 'rox',
             input: { anything: 1 },
             output: { result: 'ok' },
             error: null,
@@ -511,7 +511,7 @@ describe('ToolCallPart Rox tools', () => {
         part={readContent({
           status: 'completed',
           detail: {
-            kind: 'macro',
+            kind: 'rox',
             input: { documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46' },
             output: { unexpected: true },
             error: null,
@@ -530,7 +530,7 @@ describe('ToolCallPart Rox tools', () => {
       <ToolCallPart
         part={readContent({
           detail: {
-            kind: 'macro',
+            kind: 'rox',
             input: { documentId: 'not-a-uuid' },
             output: null,
             error: null,
@@ -547,7 +547,7 @@ describe('ToolCallPart Rox tools', () => {
       <ToolCallPart
         part={toolUse(
           {
-            kind: 'macro',
+            kind: 'rox',
             input: { limit: 5 },
             output: 'Failed to list entities: permission denied',
             error: 'Failed to list entities: permission denied',
@@ -557,7 +557,7 @@ describe('ToolCallPart Rox tools', () => {
         context={context(false)}
       />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(richTool.textContent).toBe('ListEntities');
     expect(richTool.dataset.error).toBe(
       'Failed to list entities: permission denied'
@@ -571,7 +571,7 @@ describe('ToolCallPart Rox tools', () => {
       <ToolCallPart
         part={toolUse(
           {
-            kind: 'macro',
+            kind: 'rox',
             input: {
               documentId: '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e46',
               documentName: 'Plan',
@@ -588,7 +588,7 @@ describe('ToolCallPart Rox tools', () => {
         context={context(false)}
       />
     ));
-    const richTool = rendered.getByTestId('macro-tool');
+    const richTool = rendered.getByTestId('rox-tool');
     expect(richTool.dataset.error).toBe('Only the owner can rename');
     expect(richTool.dataset.response).toBeUndefined();
   });
@@ -599,7 +599,7 @@ describe('ToolCallPart Rox tools', () => {
         part={readContent({
           status: 'failed',
           detail: {
-            kind: 'macro',
+            kind: 'rox',
             input: { documentId: 'not-a-uuid' },
             output: null,
             error: 'not found',
@@ -608,7 +608,7 @@ describe('ToolCallPart Rox tools', () => {
         context={context(false)}
       />
     ));
-    expect(rendered.queryByTestId('macro-tool')).toBeNull();
+    expect(rendered.queryByTestId('rox-tool')).toBeNull();
     expect(rendered.getByTestId('tool-card').dataset.muted).toBe('true');
     expect(rendered.getByTestId('trailing').textContent).toBe('Failed');
   });
@@ -860,7 +860,7 @@ describe('ToolCallPart inline results', () => {
       JSON.stringify(view)
     );
     expect(rendered.queryByTestId('tool-card')).toBeNull();
-    expect(rendered.queryByTestId('macro-tool')).toBeNull();
+    expect(rendered.queryByTestId('rox-tool')).toBeNull();
   });
 
   it('waits for a running view tool to return its view', () => {
@@ -1171,13 +1171,13 @@ describe('ToolCallPart result summaries', () => {
       const rendered = render(() => (
         <ToolCallPart
           part={toolUse(
-            { kind: 'macro', input, output, error: null },
+            { kind: 'rox', input, output, error: null },
             { name }
           )}
           context={context(false)}
         />
       ));
-      const richTool = rendered.getByTestId('macro-tool');
+      const richTool = rendered.getByTestId('rox-tool');
       expect(richTool.dataset.error).toBe(reason);
       expect(richTool.dataset.response).toBeUndefined();
       expect(rendered.queryByTestId('tool-card')).toBeNull();
@@ -1268,7 +1268,7 @@ describe('ToolCallPart result summaries', () => {
         <ToolCallPart
           part={toolUse(
             {
-              kind: 'macro',
+              kind: 'rox',
               input: {},
               output: {
                 results: Array.from({ length: count }, () => ({
@@ -1283,7 +1283,7 @@ describe('ToolCallPart result summaries', () => {
           context={context(false)}
         />
       ));
-      expect(rendered.queryByTestId('macro-tool')).toBeNull();
+      expect(rendered.queryByTestId('rox-tool')).toBeNull();
       expect(rendered.getByTestId('trailing').textContent).toBe(
         `${count} ${count === 1 ? 'result' : 'results'}`
       );
@@ -1295,7 +1295,7 @@ describe('ToolCallPart result summaries', () => {
       <ToolCallPart
         part={toolUse(
           {
-            kind: 'macro',
+            kind: 'rox',
             input: { name: 'launch checklist' },
             output: { results: ['a', 'b', 'c'] },
             error: null,
@@ -1340,10 +1340,10 @@ describe('generated image dispatch', () => {
         name:
           kind === 'native'
             ? { kind, name: 'GenerateImage' }
-            : { kind, server: 'macro', tool: 'GenerateImage' },
+            : { kind, server: 'rox', tool: 'GenerateImage' },
         detail:
           kind === 'native'
-            ? { kind: 'macro', input, output, error: null }
+            ? { kind: 'rox', input, output, error: null }
             : {
                 kind: 'other',
                 acpKind: 'other',
@@ -1356,7 +1356,7 @@ describe('generated image dispatch', () => {
       const view = render(() => (
         <ToolCallPart part={part} context={context(false)} />
       ));
-      const image = view.getByTestId('macro-tool');
+      const image = view.getByTestId('rox-tool');
       expect(image.textContent).toBe('GenerateImage');
       expect(image.dataset.grouped).toBe('false');
       expect(JSON.parse(image.dataset.response ?? '')).toEqual(output);
@@ -1386,10 +1386,10 @@ describe('coding agent dispatch', () => {
         name:
           kind === 'native'
             ? { kind, name: 'DispatchCodingAgent' }
-            : { kind, server: 'macro', tool: 'DispatchCodingAgent' },
+            : { kind, server: 'rox', tool: 'DispatchCodingAgent' },
         detail:
           kind === 'native'
-            ? { kind: 'macro', input, output, error: null }
+            ? { kind: 'rox', input, output, error: null }
             : {
                 kind: 'other',
                 acpKind: 'other',
@@ -1402,7 +1402,7 @@ describe('coding agent dispatch', () => {
       const view = render(() => (
         <ToolCallPart part={part} context={context(false)} />
       ));
-      const dispatched = view.getByTestId('macro-tool');
+      const dispatched = view.getByTestId('rox-tool');
       expect(dispatched.textContent).toBe('DispatchCodingAgent');
       expect(dispatched.dataset.grouped).toBe('false');
       expect(JSON.parse(dispatched.dataset.response ?? '')).toEqual(output);
@@ -1548,9 +1548,9 @@ describe('code execution results', () => {
     // The failure the agent recovered from stays on the step, not the program.
     expect(rendered.container.textContent).not.toContain('Failed');
     expect(rendered.container.textContent).toContain('Outcome unknown');
-    expect(rendered.getByTestId('macro-tool').textContent).toBe('ReadContent');
+    expect(rendered.getByTestId('rox-tool').textContent).toBe('ReadContent');
     expect(
-      JSON.parse(rendered.getByTestId('macro-tool').dataset.response ?? '')
+      JSON.parse(rendered.getByTestId('rox-tool').dataset.response ?? '')
     ).toEqual({ content: { text: 'saved contents' }, comments: [] });
   });
 
@@ -1565,7 +1565,7 @@ describe('code execution results', () => {
       <ToolCallPart part={part} context={context(false)} />
     ));
     expect(codeQuery.read).toHaveBeenCalledWith('session', executionId);
-    expect(rendered.getByTestId('macro-tool').textContent).toBe('ReadContent');
+    expect(rendered.getByTestId('rox-tool').textContent).toBe('ReadContent');
   });
 
   it('explains unavailable results when an execution ID belongs to another program', () => {
@@ -1579,7 +1579,7 @@ describe('code execution results', () => {
         context={context(false)}
       />
     ));
-    expect(rendered.queryByTestId('macro-tool')).toBeNull();
+    expect(rendered.queryByTestId('rox-tool')).toBeNull();
     expect(rendered.queryByTestId('dashboard-view')).toBeNull();
     expect(rendered.getByRole('status').textContent).toContain(
       'Tool results are unavailable.'
@@ -1595,7 +1595,7 @@ describe('code execution results', () => {
       <ToolCallPart part={part} context={context(false)} />
     ));
     expect(codeQuery.read).toHaveBeenCalledWith('session', executionId);
-    expect(rendered.getByTestId('macro-tool').textContent).toBe('ReadContent');
+    expect(rendered.getByTestId('rox-tool').textContent).toBe('ReadContent');
   });
 
   it('loads server-accepted UUIDs with reserved variant bits', () => {
@@ -1610,7 +1610,7 @@ describe('code execution results', () => {
       <ToolCallPart part={part} context={context(false)} />
     ));
     expect(codeQuery.read).toHaveBeenCalledWith('session', id);
-    expect(rendered.getByTestId('macro-tool').textContent).toBe('ReadContent');
+    expect(rendered.getByTestId('rox-tool').textContent).toBe('ReadContent');
   });
 
   it('does not let an external MCP server select the code-mode record view', () => {
@@ -1686,7 +1686,7 @@ describe('code-mode lookups', () => {
     for (const name of [
       { kind: 'mcp', server: 'rox_internal', tool: 'DescribeCodeTools' },
       { kind: 'mcp', server: 'rox_internal', tool: 'ReadCodeDocs' },
-      { kind: 'mcp', server: 'macro', tool: 'SearchTools' },
+      { kind: 'mcp', server: 'rox', tool: 'SearchTools' },
       { kind: 'native', name: 'LoadTools' },
     ] as const) {
       const view = render(() => (

@@ -30,7 +30,7 @@ export type EventType = {
   durationMinutes: number;
   location: string;
   /** Create a Rox call and attach its join link when someone books. */
-  macroCall: boolean;
+  roxCall: boolean;
   googleMeet: boolean;
   enabled: boolean;
   scheduleId: string;
@@ -145,7 +145,7 @@ export type PublicEvent = Pick<
   | 'description'
   | 'durationMinutes'
   | 'location'
-  | 'macroCall'
+  | 'roxCall'
   | 'googleMeet'
   | 'questions'
   | 'requiresConfirmation'
@@ -206,7 +206,7 @@ export function newEventType(
     description: '',
     durationMinutes: 30,
     location: '',
-    macroCall: true,
+    roxCall: true,
     googleMeet: false,
     enabled: false,
     scheduleId,
@@ -232,7 +232,7 @@ export function newDefaultBookingLink(
     description: `Book a meeting with ${displayName}`,
     durationMinutes: 30,
     location: '',
-    macroCall: true,
+    roxCall: true,
     googleMeet: false,
     enabled: true,
     scheduleId,
@@ -251,11 +251,11 @@ export function newDefaultBookingLink(
 
 /** What guests see as the meeting place before a join link exists. */
 export function meetingPlaceLabel(event: {
-  macroCall?: boolean;
+  roxCall?: boolean;
   googleMeet: boolean;
   location: string;
 }): string {
-  if (event.macroCall) return 'Rox call';
+  if (event.roxCall) return 'Rox call';
   if (event.googleMeet) return 'Video meeting';
   return event.location || 'Meeting';
 }

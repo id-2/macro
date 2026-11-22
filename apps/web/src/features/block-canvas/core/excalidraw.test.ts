@@ -32,7 +32,7 @@ const shape = (overrides: Record<string, unknown>) => ({
 it('rejects payloads that are not Excalidraw scenes', () => {
   expect(importExcalidraw('not json')).toBeUndefined();
   expect(
-    importExcalidraw(JSON.stringify({ kind: 'macro-graphics-fragment' }))
+    importExcalidraw(JSON.stringify({ kind: 'rox-graphics-fragment' }))
   ).toBeUndefined();
   expect(importExcalidraw(wrap([]))).toBeUndefined();
   expect(

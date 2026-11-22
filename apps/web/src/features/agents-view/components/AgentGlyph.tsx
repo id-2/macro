@@ -1,6 +1,6 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/roxCoder';
 import { RoxMark } from '@core/component/RoxMark';
 import CodeIcon from '@icon/system/regular/code.svg';
 import RobotIcon from '@icon/system/regular/robot.svg';

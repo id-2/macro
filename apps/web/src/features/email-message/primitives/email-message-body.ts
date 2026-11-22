@@ -49,7 +49,7 @@ export function createEmailMessageBody(
       html: props.message.body_html_sanitized,
       replylessHtml: props.message.body_replyless,
       text: props.message.body_text,
-      macro: props.message.body_rox,
+      rox: props.message.body_rox,
       attachments: props.message.attachments,
       isPersonal: props.isPersonal,
       showFullContent: props.showFullContent,
@@ -75,7 +75,7 @@ export function createEmailMessageBody(
   const rendered = createMemo(() => {
     // Preserve the app's existing Markdown paths without starting hidden HTML
     // resources behind them. Their Lexical semantics stay at the app boundary.
-    if ((!showFullHTML() && content().macro) || !content().html) return;
+    if ((!showFullHTML() && content().rox) || !content().html) return;
     const body = prepared();
     const attachments = content().attachments;
     const host = document.createElement('div');

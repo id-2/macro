@@ -67,7 +67,7 @@ import type { GtmInviteOffer } from './generated/schemas/gtmInviteOffer';
 import type { GtmInviteOfferStatus } from './generated/schemas/gtmInviteOfferStatus';
 import type { InviteToTeamRequest } from './generated/schemas/inviteToTeamRequest';
 import type { JoinTeamByInviteLinkResponse } from './generated/schemas/joinTeamByInviteLinkResponse';
-import type { RoxApiTokenResponse } from './generated/schemas/macroApiTokenResponse';
+import type { RoxApiTokenResponse } from './generated/schemas/roxApiTokenResponse';
 import type { PasswordRequest } from './generated/schemas/passwordRequest';
 import type { PatchTeamRequest } from './generated/schemas/patchTeamRequest';
 import type { PatchUserGroupRequest } from './generated/schemas/patchUserGroupRequest';
@@ -124,7 +124,7 @@ type Token = {
 const [accessTokenData, setAccessTokenData] = makePersisted(
   createSignal<Token | null>(null),
   {
-    name: 'macroAccessToken',
+    name: 'roxAccessToken',
   }
 );
 
@@ -565,7 +565,7 @@ export const authServiceClient = {
       )
     ).map((result) => result);
   },
-  async macroApiToken() {
+  async roxApiToken() {
     const accessToken = await getAccessToken();
     if (!accessToken) {
       Telemetry.warn('No access token found, fetching with cookies');

@@ -166,7 +166,7 @@ const highlights = HighlightStyle.define([
   { tag: t.moduleKeyword, color: base.c5 },
 
   // Names and variables
-  { tag: [t.name, t.deleted, t.character, t.macroName], color: base.fg },
+  { tag: [t.name, t.deleted, t.character, t.roxName], color: base.fg },
   { tag: [t.variableName], color: base.fg },
   { tag: [t.propertyName], color: base.c2 },
 
@@ -255,7 +255,7 @@ const highlights = HighlightStyle.define([
 
 /**
  */
-export const macroThemeExtension: Extension = [
+export const roxThemeExtension: Extension = [
   theme,
   syntaxHighlighting(highlights),
 ];

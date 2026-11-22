@@ -282,7 +282,7 @@ export const SoupView = (props: SoupViewProps) => {
     | undefined;
 
   const [sortPref, setSortPref] = usePreference<string[]>(
-    `macro:pref:soup:${contentId}:sort`,
+    `rox:pref:soup:${contentId}:sort`,
     { default: [] }
   );
   // We handle the restore of the persistence here instead of within the context

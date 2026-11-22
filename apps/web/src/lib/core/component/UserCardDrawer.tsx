@@ -1,6 +1,6 @@
 import { AgentRuntime } from '@app/features/runtime-sharing/views/AgentRuntime';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
-import { isBotPrincipalId } from '@core/constant/macroAgent';
+import { isBotPrincipalId } from '@core/constant/roxAgent';
 import { isAgentAccount, tryMacroId } from '@core/user';
 import { createSignal, For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';

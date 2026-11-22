@@ -28,7 +28,7 @@ import { isTimedPointEvent } from '../../utils/calendar-date';
 import {
   calendarMacroCallUrl,
   removeCalendarMacroCall,
-} from '../../utils/macro-call-link';
+} from '../../utils/rox-call-link';
 import {
   buildRecurrenceLines,
   defaultCustomConfig,
@@ -73,7 +73,7 @@ function defaultEditorTimes(reference: Date) {
 /** Conferencing displayed by the editor before it is submitted. */
 export type EventEditorConferenceChoice =
   | 'none'
-  | 'macro'
+  | 'rox'
   | 'google_meet'
   | 'microsoft_teams'
   | 'existing';
@@ -172,7 +172,7 @@ export interface EventEditorSubmitValues {
 
 export function defaultEditorInitialValues(
   reference = new Date(),
-  macroCallsEnabled = false
+  roxCallsEnabled = false
 ): EventEditorInitialValues {
   const { start, end } = defaultEditorTimes(reference);
   return {
@@ -185,7 +185,7 @@ export function defaultEditorInitialValues(
     guests: '',
     location: '',
     description: '',
-    conference: macroCallsEnabled ? 'macro' : 'none',
+    conference: roxCallsEnabled ? 'rox' : 'none',
     reminders: undefined,
     eventType: undefined,
     outOfOffice: undefined,
@@ -199,11 +199,11 @@ export function calendarSelectionToEditorInitialValues(
     end: Date;
     allDay: boolean;
   },
-  macroCallsEnabled = false
+  roxCallsEnabled = false
 ): EventEditorInitialValues {
   const initialValues = defaultEditorInitialValues(
     selection.start,
-    macroCallsEnabled
+    roxCallsEnabled
   );
   if (selection.allDay) {
     return {
@@ -224,7 +224,7 @@ export function calendarSelectionToEditorInitialValues(
 function initialConferenceChoice(
   event: CalendarEvent
 ): EventEditorConferenceChoice {
-  if (calendarMacroCallUrl(event)) return 'macro';
+  if (calendarMacroCallUrl(event)) return 'rox';
   if (!event.conferenceUrl) return 'none';
   return event.conferenceProvider === 'google_meet' ||
     event.conferenceProvider === 'microsoft_teams'
@@ -398,7 +398,7 @@ export function initialGuestOptions(
     return (
       existing ??
       recipientEntityMapper('custom')({
-        id: `macro|${email}`,
+        id: `rox|${email}`,
         email,
         invalid: false,
       })

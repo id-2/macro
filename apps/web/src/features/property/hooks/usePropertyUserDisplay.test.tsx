@@ -17,7 +17,7 @@ vi.mock('@service-storage/client', () => ({
 }));
 vi.mock('@core/user', () => ({
   getDisplayName: () => 'Alice Example',
-  tryMacroId: (id: string) => (id.startsWith('macro|') ? id : undefined),
+  tryMacroId: (id: string) => (id.startsWith('rox|') ? id : undefined),
   getDisplayNameParts: () => ({
     firstName: 'Alice',
     fullName: 'Alice Example',
@@ -74,7 +74,7 @@ afterEach(() => {
 describe('property user identity', () => {
   it('preserves human names without fetching a bot', () => {
     const display = renderHook(() =>
-      usePropertyUserDisplay(() => 'macro|alice@example.com')
+      usePropertyUserDisplay(() => 'rox|alice@example.com')
     );
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
     expect(display.name()).toBe('Alice Example');
@@ -99,7 +99,7 @@ describe('property user identity', () => {
     });
     expect(storageServiceClient.getBot).not.toHaveBeenCalled();
 
-    setId('macro|alice@example.com');
+    setId('rox|alice@example.com');
     expect(display.name()).toBe('Alice Example');
     expect(display.photoUrl()).toBeUndefined();
   });

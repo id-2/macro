@@ -12,7 +12,7 @@ export type TimelineEntry =
       /** Review-thread replies to `item`, oldest first. */
       replies: GithubPullRequestComment[];
     }
-  | { kind: 'macro-thread'; ts: number; thread: DiscussionThread };
+  | { kind: 'rox-thread'; ts: number; thread: DiscussionThread };
 
 function timestamp(value: string | null | undefined): number {
   if (!value) return 0;
@@ -51,7 +51,7 @@ function threadRootId(
  */
 export function buildTimeline(
   githubItems: GithubPullRequestComment[],
-  macroThreads: DiscussionThread[],
+  roxThreads: DiscussionThread[],
   options: { hideBots?: boolean } = {}
 ): TimelineEntry[] {
   const entries: TimelineEntry[] = [];
@@ -117,9 +117,9 @@ export function buildTimeline(
     entry.ts = anchor + ++anchorOffset;
   }
 
-  for (const thread of macroThreads) {
+  for (const thread of roxThreads) {
     entries.push({
-      kind: 'macro-thread',
+      kind: 'rox-thread',
       ts: timestamp(thread.comments[0]?.createdAt),
       thread,
     });

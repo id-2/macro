@@ -28,7 +28,7 @@ test('agent URLs navigate and removed links survive save and reopen', async ({
   await page.goto(
     '/src/lib/core/component/LexicalMarkdown/component/core/browser-test/links.html'
   );
-  const url = 'https://apps.apple.com/us/app/macro-app/id6743133649';
+  const url = 'https://apps.apple.com/us/app/rox-app/id6743133649';
   const link = page
     .getByTestId('original')
     .getByRole('link', { name: url, exact: true });

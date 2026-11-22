@@ -256,7 +256,7 @@ function Fixture() {
               aria-label="Compose email"
             >
               <div class="border-b border-edge-muted py-2 text-sm">
-                <span class="mr-2 text-ink-muted">From</span> me@macro.test
+                <span class="mr-2 text-ink-muted">From</span> me@rox.test
               </div>
               <div class="border-b border-edge-muted py-2 text-sm">
                 <span class="mr-2 text-ink-muted">To</span> peter@example.test

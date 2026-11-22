@@ -65,7 +65,7 @@ vi.mock('@macro-inc/collaboration/websocket', () => ({
   createSocketEffect: vi.fn(),
 }));
 
-// Resolve as a macrotask like a network response; a microtask chain would let a
+// Resolve as a roxtask like a network response; a microtask chain would let a
 // pagination loop starve the timers this test waits on.
 function respond<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), 0));

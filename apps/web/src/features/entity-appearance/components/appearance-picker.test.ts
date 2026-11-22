@@ -153,7 +153,7 @@ describe('appearance picker interaction', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Blue' }));
     expect(change).toHaveBeenLastCalledWith({
-      icon: { kind: 'macro', name: 'star' },
+      icon: { kind: 'rox', name: 'star' },
       color: 'blue',
     });
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
@@ -173,7 +173,7 @@ describe('appearance picker interaction', () => {
       await screen.findByLabelText(label, { selector: 'button' })
     );
     expect(change).toHaveBeenLastCalledWith({
-      icon: { kind: 'macro', name },
+      icon: { kind: 'rox', name },
       color: null,
     });
   });
@@ -197,7 +197,7 @@ describe('appearance picker interaction', () => {
     await waitFor(() =>
       expect(
         document.activeElement?.getAttribute('data-appearance-option')
-      ).toContain('macro')
+      ).toContain('rox')
     );
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' });
     await waitFor(() => expect(document.activeElement).toBe(rocket));
@@ -280,12 +280,12 @@ describe('appearance picker interaction', () => {
 
   it.each([
     {
-      type: 'macro',
+      type: 'rox',
       label: 'Flag',
       icons: [
-        { kind: 'macro', name: 'star' },
-        { kind: 'macro', name: 'flag' },
-        { kind: 'macro', name: 'heart' },
+        { kind: 'rox', name: 'star' },
+        { kind: 'rox', name: 'flag' },
+        { kind: 'rox', name: 'heart' },
       ],
     },
     {
@@ -298,7 +298,7 @@ describe('appearance picker interaction', () => {
       ],
     },
     {
-      type: 'macro',
+      type: 'rox',
       mobile: true,
       label: 'Code',
       icons: [
@@ -311,7 +311,7 @@ describe('appearance picker interaction', () => {
         'table',
         'database',
         'code',
-      ].map((name) => ({ kind: 'macro' as const, name })),
+      ].map((name) => ({ kind: 'rox' as const, name })),
     },
   ] satisfies {
     type: string;

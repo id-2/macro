@@ -155,7 +155,7 @@ test('stops an artifact that keeps navigating away', async ({ page }) => {
 test('expands shared styles and components', async ({ page }) => {
   const frame = await renderArtifact(
     page,
-    '<macro-style name="brand"></macro-style><macro-component name="card">Hello</macro-component>',
+    '<rox-style name="brand"></rox-style><rox-component name="card">Hello</rox-component>',
     {
       styles: { brand: '#card { color: rgb(255, 0, 0); }' },
       components: { card: '<p id="card"><slot></slot></p>' },

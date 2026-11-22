@@ -105,7 +105,7 @@ describe('model effort submenu', () => {
     expect(f.effort).not.toHaveBeenCalled();
   });
   it('discovers only the opened model and selects its opaque effort, closing the catalog', async () => {
-    const f = mount('macro-inmem');
+    const f = mount('rox-inmem');
     expect(state.targets.every((target) => !target())).toBe(true);
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'GPT' }), {
       key: 'ArrowRight',

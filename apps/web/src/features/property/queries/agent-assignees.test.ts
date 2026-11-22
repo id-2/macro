@@ -1,8 +1,8 @@
 import { CODEX_BOT_PRINCIPAL_ID } from '@core/constant/codexAgent';
 import { CURSOR_BOT_PRINCIPAL_ID } from '@core/constant/cursorAgent';
-import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/roxCoder';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
 import type { Agent } from '@service-storage/generated/schemas/agent';
 import type { Bot } from '@service-storage/generated/schemas/bot';
 import { createRoot } from 'solid-js';

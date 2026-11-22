@@ -93,7 +93,7 @@ export function PrTimeline(props: {
                         />
                       )}
                     </Match>
-                    <Match when={entry.kind === 'macro-thread' && entry}>
+                    <Match when={entry.kind === 'rox-thread' && entry}>
                       {(threadEntry) => (
                         <DiscussionThreadView thread={threadEntry().thread} />
                       )}

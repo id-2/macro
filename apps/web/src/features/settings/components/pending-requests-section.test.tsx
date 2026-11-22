@@ -6,8 +6,8 @@ import { ok } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PendingRequestsSection } from './pending-requests-section';
 
-const VIEWER = 'macro|owner@x.test';
-const ALICE = 'macro|alice@x.test';
+const VIEWER = 'rox|owner@x.test';
+const ALICE = 'rox|alice@x.test';
 const MINE = '0198a4cc-e138-7670-a308-a6b766602701';
 const ALICES = '0198a4cc-e138-7670-a308-a6b766602702';
 

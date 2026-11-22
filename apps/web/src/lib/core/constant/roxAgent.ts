@@ -18,13 +18,13 @@ export const ROX_AGENT_PRINCIPAL_ID = `bot|${ROX_AGENT_BOT_ID}`;
 export const ROX_AGENT_NAME = displayName;
 
 /**
- * User-facing name for Rox's built-in harness (`in-memory` / `macro-inmem`).
+ * User-facing name for Rox's built-in harness (`in-memory` / `rox-inmem`).
  * Wire slugs stay as they are; this is only what the UI prints.
  */
 export const ROX_HARNESS_NAME = `${displayName} Agent`;
 
-/** Handle used to find Rox in the mention typeahead (`@macro`). */
-export const ROX_AGENT_HANDLE = 'macro';
+/** Handle used to find Rox in the mention typeahead (`@rox`). */
+export const ROX_AGENT_HANDLE = 'rox';
 
 /**
  * Whether an id refers to the Rox bot. Accepts both the bare UUID and

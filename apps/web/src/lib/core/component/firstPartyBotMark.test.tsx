@@ -3,9 +3,9 @@ import {
   CURSOR_BOT_ID,
   CURSOR_BOT_PRINCIPAL_ID,
 } from '@core/constant/cursorAgent';
-import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
-import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/roxAgent';
+import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/roxCoder';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/roxNew';
 import { RoxMark } from '@core/component/RoxMark';
 import CodexIcon from '@icon/wide-codex-ide.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
@@ -27,7 +27,7 @@ vi.mock('@core/user', () => ({
   getDisplayNameParts: nameReads.parts,
   getInitials: () => '?',
   getInitialsFromName: nameReads.initials,
-  macroIdToEmail: (id: string) => id,
+  roxIdToEmail: (id: string) => id,
   tryMacroId: () => undefined,
   useIsConnectedSecondaryInbox: () => () => false,
 }));
@@ -61,7 +61,7 @@ describe('firstPartyBotMark', () => {
     expect(
       firstPartyBotMark('bot|11111111-2222-3333-4444-555555555555')
     ).toBeUndefined();
-    expect(firstPartyBotMark('macro|peter@rox.one')).toBeUndefined();
+    expect(firstPartyBotMark('rox|peter@rox.one')).toBeUndefined();
     expect(firstPartyBotMark(undefined)).toBeUndefined();
   });
 });
@@ -71,7 +71,7 @@ it('uses supplied contact names without populating the global name store', () =>
   nameReads.full.mockClear();
   const { container } = render(() => (
     <UserIcon
-      id="macro|person@example.com"
+      id="rox|person@example.com"
       name="Person Name"
       suppressClick
       showTooltip={false}
@@ -98,10 +98,10 @@ describe('UserIcon for first-party bots', () => {
   });
 
   it('draws the Rox eye for the agent-session Rox bot', () => {
-    const { container: macro } = render(() => (
+    const { container: rox } = render(() => (
       <UserIcon id={ROX_NEW_PRINCIPAL_ID} />
     ));
-    expect(macro.querySelector('img')?.getAttribute('src')).toContain(
+    expect(rox.querySelector('img')?.getAttribute('src')).toContain(
       'rox-mark.png'
     );
   });

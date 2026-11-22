@@ -41,7 +41,7 @@ to the requester's primary inbox. */
   /** Mint a Rox call and write its join link into the description and
 location before creating the event, so the invitation carries it.
 Cannot be combined with `conference`. */
-  macroCall?: boolean;
+  roxCall?: boolean;
   outOfOffice?: CreateCalendarEventRequestOutOfOffice;
   /** Raw RFC 5545 recurrence properties (`RRULE`, `RDATE`, `EXDATE`). */
   recurrenceLines?: string[];

@@ -20,7 +20,7 @@ Prefer [`CallFilters::status`] for new callers.
   call_ids?: string[];
   /** Channel IDs to filter calls by. Empty to include all calls. */
   channel_ids?: string[];
-  /** Speaker macro user ids. Empty to include all. */
+  /** Speaker rox user ids. Empty to include all. */
   speaker_ids?: string[];
   status?: CallFiltersStatus;
 }

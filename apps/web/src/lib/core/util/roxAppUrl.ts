@@ -13,7 +13,7 @@ const Hosts = {
 function cleanHostname(hostname: string): string {
   // Strip only a leading `www.` (parity with the Rust `strip_prefix("www.")`);
   // a bare `replace('www.', '')` would also collapse a mid-string occurrence,
-  // e.g. `macro.www.com` -> `rox.one`, letting a foreign host masquerade as
+  // e.g. `rox.www.com` -> `rox.one`, letting a foreign host masquerade as
   // a Rox one.
   return hostname.toLowerCase().replace(/^www\./, '');
 }

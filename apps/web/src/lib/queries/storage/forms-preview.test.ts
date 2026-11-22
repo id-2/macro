@@ -57,7 +57,7 @@ it('updates an already cached card title after renaming a form', async () => {
       id: 'workshop',
       name: 'Untitled form',
       description: '',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       databaseId: 'workshop-database',
       tableId: 'responses',
       submittedColumnId: null,
@@ -84,7 +84,7 @@ it('updates an already cached card title after renaming a form', async () => {
     access: 'access',
     name: 'Untitled form',
     rawName: 'Untitled form',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   const result = await renameForm(
     {
@@ -120,7 +120,7 @@ it('refreshes only this form’s card preview when its shared facts change', () 
     access: 'access',
     name: 'Workshop ideas',
     rawName: 'Workshop ideas',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   queryClient.setQueryData<PreviewItem>(other, {
     id: 'offsite',
@@ -129,7 +129,7 @@ it('refreshes only this form’s card preview when its shared facts change', () 
     access: 'access',
     name: 'Offsite',
     rawName: 'Offsite',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   const dispose = createRoot((dispose) => {
     useFormChangedSync(() => 'workshop');
@@ -152,7 +152,7 @@ it('refreshes the linked database’s card after renaming a form, without guessi
       id: 'workshop',
       name: 'Untitled form',
       description: '',
-      ownerId: 'macro|owner@example.com',
+      ownerId: 'rox|owner@example.com',
       databaseId: 'workshop-database',
       tableId: 'responses',
       submittedColumnId: null,
@@ -180,7 +180,7 @@ it('refreshes the linked database’s card after renaming a form, without guessi
     access: 'access',
     name: 'Untitled form',
     rawName: 'Untitled form',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   queryClient.setQueryData<PreviewItem>(unrelated, {
     id: 'budget-database',
@@ -189,7 +189,7 @@ it('refreshes the linked database’s card after renaming a form, without guessi
     access: 'access',
     name: 'Budget',
     rawName: 'Budget',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
 
   const result = await renameForm(
@@ -225,7 +225,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
         id: 'workshop',
         name: 'Workshop ideas',
         description: '',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         databaseId: 'workshop-database',
         tableId: 'responses',
         submittedColumnId: null,
@@ -252,7 +252,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
         id: 'feedback',
         name: 'Session feedback',
         description: '',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         databaseId: 'workshop-database',
         tableId: 'responses',
         submittedColumnId: null,
@@ -277,7 +277,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
         id: 'offsite',
         name: 'Offsite',
         description: '',
-        ownerId: 'macro|owner@example.com',
+        ownerId: 'rox|owner@example.com',
         databaseId: 'offsite-database',
         tableId: 'responses',
         submittedColumnId: null,
@@ -307,7 +307,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
     access: 'access',
     name: 'Workshop ideas',
     rawName: 'Workshop ideas',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   queryClient.setQueryData<PreviewItem>(feedback, {
     id: 'feedback',
@@ -316,7 +316,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
     access: 'access',
     name: 'Session feedback',
     rawName: 'Session feedback',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
   queryClient.setQueryData<PreviewItem>(offsite, {
     id: 'offsite',
@@ -325,7 +325,7 @@ it('refreshes the cards of the forms over a renamed database, and only theirs', 
     access: 'access',
     name: 'Offsite',
     rawName: 'Offsite',
-    owner: 'macro|owner@example.com',
+    owner: 'rox|owner@example.com',
   });
 
   const result = await renameDatabase(

@@ -50,7 +50,7 @@ beforeEach(() => {
     channelOrigins: [],
     companyIds: [],
     priority: { id: 'none' },
-    origin: { tool: 'macro', signal: 'agent-session', sessionId: 'session-1' },
+    origin: { tool: 'rox', signal: 'agent-session', sessionId: 'session-1' },
   };
 });
 

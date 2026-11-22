@@ -42,7 +42,7 @@ export type SuggestionRow = {
 /** Who suggests it: AI for this person with its reason, or Rox's template. */
 export type SuggestionByline =
   | { from: 'for_you'; reason?: string }
-  | { from: 'macro' };
+  | { from: 'rox' };
 
 /** What the person can change on a row before it is created. */
 export type SuggestionEdits = {
@@ -54,14 +54,14 @@ export type SuggestionEdits = {
 export function suggestionByline(
   suggestion: RoutineSuggestion
 ): SuggestionByline {
-  if (suggestion.from === 'macro') return { from: 'macro' };
+  if (suggestion.from === 'rox') return { from: 'rox' };
   const reason = suggestion.reason?.trim();
   return reason ? { from: 'for_you', reason } : { from: 'for_you' };
 }
 
 /** The line under a suggestion's name that says who suggests it. */
 export function bylineText(byline: SuggestionByline): string {
-  if (byline.from === 'macro') return 'Template from Rox';
+  if (byline.from === 'rox') return 'Template from Rox';
   return byline.reason ? `For you · ${byline.reason}` : 'For you';
 }
 

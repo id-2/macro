@@ -1,8 +1,8 @@
 import { BlockRegistry } from '@core/block';
 import { EntityIcon } from '@core/component/EntityIcon';
 import { LiveIndicators } from '@core/component/LiveIndicators';
-import RoxBrandLoader from '@icon/macro-brand-loader.svg';
-import RoxGridLoader from '@icon/macro-grid-noise-loader.svg';
+import RoxBrandLoader from '@icon/rox-brand-loader.svg';
+import RoxGridLoader from '@icon/rox-grid-noise-loader.svg';
 import Acorn from '@icon/system/regular/acorn.svg?component-solid';
 import CaretDown from '@icon/system/regular/caret-down.svg';
 import Subtract from '@icon/system/regular/subtract.svg?component-solid';
@@ -135,7 +135,7 @@ const App: Component = () => {
             contentEditable
             class="w-64 p-0.5 border border-edge rounded-lg"
           >
-            macro
+            rox
           </span>
         </div>
       </div>
@@ -195,11 +195,11 @@ const App: Component = () => {
       <div class="flex flex-wrap gap-2 justify-center">
         <LiveIndicators
           userIds={[
-            'macro|teo@rox.one',
-            'macro|hutch@rox.one',
-            'macro|jacob@rox.one',
-            'macro|seamus@rox.one',
-            'macro|gab@rox.one',
+            'rox|teo@rox.one',
+            'rox|hutch@rox.one',
+            'rox|jacob@rox.one',
+            'rox|seamus@rox.one',
+            'rox|gab@rox.one',
           ]}
         />
       </div>

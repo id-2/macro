@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { parseActor } from './actor';
 
 describe('parseActor', () => {
-  it('parses users from macro ids', () => {
-    expect(parseActor('macro|sarah@example.com')).toEqual({
+  it('parses users from rox ids', () => {
+    expect(parseActor('rox|sarah@example.com')).toEqual({
       kind: 'user',
-      id: 'macro|sarah@example.com',
+      id: 'rox|sarah@example.com',
     });
   });
 
@@ -22,9 +22,9 @@ describe('parseActor', () => {
       raw: 'system:nightly',
     });
     expect(parseActor('bot|')).toEqual({ kind: 'unknown', raw: 'bot|' });
-    expect(parseActor('macro|no-at-sign')).toEqual({
+    expect(parseActor('rox|no-at-sign')).toEqual({
       kind: 'unknown',
-      raw: 'macro|no-at-sign',
+      raw: 'rox|no-at-sign',
     });
   });
 });

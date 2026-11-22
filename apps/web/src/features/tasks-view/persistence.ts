@@ -210,7 +210,7 @@ export function createTasksViewPersistence(
   return {
     storages: [
       createCollapsedSidebarSectionsStorage({
-        key: 'macro:tasks:preferences:v1',
+        key: 'rox:tasks:preferences:v1',
         userId: options.userId,
         restore: options.restorePreferences ?? true,
       }),

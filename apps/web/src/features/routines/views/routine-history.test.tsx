@@ -537,7 +537,7 @@ describe('routine history steps', () => {
           steps,
           run: {
             at: '2026-11-01T09:00:00Z',
-            started_by: { kind: 'manual', by: 'macro|owner@example.com' },
+            started_by: { kind: 'manual', by: 'rox|owner@example.com' },
             ...(codeActsAs ? { code_acts_as: codeActsAs } : {}),
           },
         },

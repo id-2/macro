@@ -93,7 +93,7 @@ export function response(ids: readonly number[]): SoupQuery {
       emailLinks: [
         {
           id: id(1000),
-          macroId: VIEWER,
+          roxId: VIEWER,
           provider: 'GMAIL',
           emailAddress: 'mail@example.com',
           photoUrl: null,

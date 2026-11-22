@@ -1,7 +1,7 @@
 /**
  * The blocks that have a "Learn how to use" tutorial video. The id names the
  * block, keys its assets and messages, and is sent with analytics as
- * `macro-<id>`.
+ * `rox-<id>`.
  */
 export const TUTORIAL_IDS = [
   'mail',

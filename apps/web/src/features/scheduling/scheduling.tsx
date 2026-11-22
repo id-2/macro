@@ -12,7 +12,7 @@ import { enableCalendarScheduling } from '@core/constant/featureFlags';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserContext } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { getDisplayName, macroIdToEmail, tryMacroId } from '@core/user';
+import { getDisplayName, roxIdToEmail, tryMacroId } from '@core/user';
 import { writeClipboardData } from '@core/util/dataTransfer';
 import { getWebOrigin } from '@core/util/webOrigin';
 import { useCurrentTeamQuery } from '@queries/team/teams';
@@ -48,7 +48,7 @@ function SchedulingHost(props: ParentProps) {
       return {
         id: member.user_id,
         name: id ? getDisplayName(id) : member.user_id,
-        email: id ? macroIdToEmail(id) : member.user_id,
+        email: id ? roxIdToEmail(id) : member.user_id,
       };
     });
     const userId = user.userId();
@@ -57,7 +57,7 @@ function SchedulingHost(props: ParentProps) {
       result.push({
         id: userId,
         name: id ? getDisplayName(id) : userId,
-        email: id ? macroIdToEmail(id) : userId,
+        email: id ? roxIdToEmail(id) : userId,
       });
     }
     return result;

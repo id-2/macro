@@ -51,7 +51,7 @@ function favoritesResult(favorites: ReturnType<typeof graphqlFavorite>[]) {
   return {
     data: {
       user: {
-        id: 'macro|favorites@example.com',
+        id: 'rox|favorites@example.com',
         favorites,
       },
     },

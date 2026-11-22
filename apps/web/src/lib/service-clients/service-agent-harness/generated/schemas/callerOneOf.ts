@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { CallerOneOfType } from './callerOneOfType';
-import type { RoxUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 /**
  * A person.

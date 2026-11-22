@@ -71,7 +71,7 @@ describe('AgentChangesProvider', () => {
     setSession(
       sessionWith({
         harness: 'cursor',
-        pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+        pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       })
     );
     setStats({
@@ -112,7 +112,7 @@ describe('AgentChangesProvider', () => {
     setSession(
       sessionWith({
         harness: 'cursor',
-        pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+        pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       })
     );
     expect(screen.getByRole('button', { name: /Changes/ })).toBeTruthy();
@@ -124,7 +124,7 @@ describe('AgentChangesProvider', () => {
     setSession(
       sessionWith({
         harness: 'in-memory',
-        pullRequestUrl: 'https://github.com/macro-inc/macro/pull/42',
+        pullRequestUrl: 'https://github.com/rox-inc/rox/pull/42',
       })
     );
     render(() => (

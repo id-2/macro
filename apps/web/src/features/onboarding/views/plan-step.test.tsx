@@ -156,7 +156,7 @@ describe('live trial checkout', () => {
   it('lets existing paid members finish without buying again', async () => {
     const { finish, checkout } = setup(undefined, {
       viewer: {
-        id: 'macro|paid@acme.com',
+        id: 'rox|paid@acme.com',
         email: 'paid@acme.com',
         tutorialComplete: false,
         licensed: true,

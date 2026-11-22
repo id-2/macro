@@ -2,7 +2,7 @@ import { useUserId } from '@core/context/user';
 import {
   getDisplayName,
   getDisplayNameParts,
-  macroIdToEmail,
+  roxIdToEmail,
   tryMacroId,
 } from '@core/user';
 import {
@@ -99,7 +99,7 @@ function AccessRequestActivity(props: {
   const resolve = useResolveChannelAccessRequestMutation();
   const requesterEmail = () => {
     const id = tryMacroId(props.event.actorId);
-    return id ? macroIdToEmail(id) : undefined;
+    return id ? roxIdToEmail(id) : undefined;
   };
   const isParticipant = () =>
     !participants.isPending &&

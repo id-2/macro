@@ -158,7 +158,7 @@ describe('Spreadsheet draft title menu', () => {
     expect(mocks.menuTrigger).toHaveBeenCalledWith(expect.any(Function));
     expect(mocks.menuActions).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        macro: [expect.objectContaining({ label: 'Ask Rox' })],
+        rox: [expect.objectContaining({ label: 'Ask Rox' })],
         sharing: [expect.objectContaining({ label: 'Share' })],
         file: [expect.objectContaining({ label: 'Rename' })],
       })

@@ -20,7 +20,7 @@ export type InboxRowType =
 export type InboxActor =
   | { kind: 'user'; id: string }
   | { kind: 'agent'; name?: string }
-  | { kind: 'macro' }
+  | { kind: 'rox' }
   /** A kind this build doesn't know; the row names no author. */
   | { kind: 'other' };
 

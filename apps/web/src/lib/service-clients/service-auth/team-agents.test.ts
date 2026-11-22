@@ -80,22 +80,22 @@ describe('teamAgentsClient', () => {
 
   it('removes an agent by its encoded user id', async () => {
     fetchWithToken.mockClear();
-    await teamAgentsClient.remove('macro|ada@agents.macro.invalid');
+    await teamAgentsClient.remove('rox|ada@agents.rox.invalid');
 
     expect(fetchWithToken).toHaveBeenCalledWith(
-      `${SERVER_HOSTS['auth-service']}/team_agents/macro%7Cada%40agents.macro.invalid`,
+      `${SERVER_HOSTS['auth-service']}/team_agents/rox%7Cada%40agents.rox.invalid`,
       { method: 'DELETE' }
     );
   });
 
   it('reads a missing voice as none, and keeps other failures', async () => {
-    const voiceUrl = `${SERVER_HOSTS['auth-service']}/team_agents/macro%7Cada%40agents.macro.invalid/voice`;
+    const voiceUrl = `${SERVER_HOSTS['auth-service']}/team_agents/rox%7Cada%40agents.rox.invalid/voice`;
     fetchWithToken.mockReset();
     fetchWithToken.mockResolvedValueOnce(
       err([{ code: 'NOT_FOUND', message: 'Resource not found' }])
     );
     const missing = await teamAgentsClient.voice(
-      'macro|ada@agents.macro.invalid'
+      'rox|ada@agents.rox.invalid'
     );
     expect(missing.isOk() && missing.value).toBeNull();
     expect(fetchWithToken).toHaveBeenCalledWith(voiceUrl);
@@ -104,20 +104,20 @@ describe('teamAgentsClient', () => {
       err([{ code: 'FORBIDDEN', message: 'Forbidden' }])
     );
     const forbidden = await teamAgentsClient.voice(
-      'macro|ada@agents.macro.invalid'
+      'rox|ada@agents.rox.invalid'
     );
     expect(forbidden.isErr()).toBe(true);
 
     fetchWithToken.mockResolvedValueOnce(ok({ model: 'aura-2-thalia-en' }));
     const saved = await teamAgentsClient.voice(
-      'macro|ada@agents.macro.invalid'
+      'rox|ada@agents.rox.invalid'
     );
     expect(saved.isOk() && saved.value).toEqual({ model: 'aura-2-thalia-en' });
   });
 
   it('puts the voice and names an unknown voice apart from a repository failure', async () => {
     fetchWithToken.mockReset();
-    await teamAgentsClient.setVoice('macro|ada@agents.macro.invalid', {
+    await teamAgentsClient.setVoice('rox|ada@agents.rox.invalid', {
       model: 'aura-2-arcas-en',
     });
     const [url, init] = fetchWithToken.mock.calls[0] as [
@@ -125,7 +125,7 @@ describe('teamAgentsClient', () => {
       { method: string; body: string; errorResponseHandler: ErrorHandler },
     ];
     expect(url).toBe(
-      `${SERVER_HOSTS['auth-service']}/team_agents/macro%7Cada%40agents.macro.invalid/voice`
+      `${SERVER_HOSTS['auth-service']}/team_agents/rox%7Cada%40agents.rox.invalid/voice`
     );
     expect(init).toMatchObject({
       method: 'PUT',

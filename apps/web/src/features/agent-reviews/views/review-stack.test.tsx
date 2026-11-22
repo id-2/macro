@@ -158,7 +158,7 @@ function setup(
   let record: Review = {
     id: 'review',
     sessionId: 'session',
-    actingUser: 'macro|owner@macro.local',
+    actingUser: 'rox|owner@rox.local',
     executionId: 'execution',
     title: 'Drafts to review',
     revision: 0,
@@ -411,7 +411,7 @@ describe('review deck', () => {
     let server: EmailReview = {
       id: 'review',
       sessionId: 'session',
-      actingUser: 'macro|owner@macro.local',
+      actingUser: 'rox|owner@rox.local',
       executionId: null,
       decision: null,
       kind: 'email',
@@ -507,7 +507,7 @@ describe('review deck', () => {
     const initial: EmailReview = {
       id: 'review',
       sessionId: 'session',
-      actingUser: 'macro|owner@macro.local',
+      actingUser: 'rox|owner@rox.local',
       executionId: null,
       decision: null,
       kind: 'email',
@@ -566,7 +566,7 @@ describe('review deck', () => {
     const initial: EmailReview = {
       id: 'review',
       sessionId: 'session',
-      actingUser: 'macro|owner@macro.local',
+      actingUser: 'rox|owner@rox.local',
       executionId: null,
       decision: null,
       kind: 'email',
@@ -624,7 +624,7 @@ describe('review deck', () => {
         review={{
           id: 'review',
           sessionId: 'session',
-          actingUser: 'macro|owner@macro.local',
+          actingUser: 'rox|owner@rox.local',
           executionId: null,
           kind: 'email',
           title: 'Follow-ups',

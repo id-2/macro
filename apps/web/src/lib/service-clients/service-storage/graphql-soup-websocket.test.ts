@@ -58,7 +58,7 @@ describe('GraphQL Soup websocket auth', () => {
     expect(
       buildGraphqlSoupWebSocketUrl('https://gateway.rox.one/dss', 'token+/=')
     ).toBe(
-      'wss://gateway.rox.one/dss/items/soup/graphql/ws?macro-api-token=token%2B%2F%3D'
+      'wss://gateway.rox.one/dss/items/soup/graphql/ws?rox-api-token=token%2B%2F%3D'
     );
     expect(buildGraphqlSoupWebSocketUrl('http://localhost:8086')).toBe(
       'ws://localhost:8086/items/soup/graphql/ws'
@@ -95,8 +95,8 @@ describe('GraphQL Soup websocket auth', () => {
       refreshCookieAuth,
     });
 
-    await expect(resolveUrl()).resolves.toContain('macro-api-token=first');
-    await expect(resolveUrl()).resolves.toContain('macro-api-token=second');
+    await expect(resolveUrl()).resolves.toContain('rox-api-token=first');
+    await expect(resolveUrl()).resolves.toContain('rox-api-token=second');
     expect(refreshCookieAuth).not.toHaveBeenCalled();
   });
 

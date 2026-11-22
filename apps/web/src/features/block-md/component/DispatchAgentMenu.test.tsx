@@ -22,7 +22,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 }));
 vi.mock('@core/user', () => ({
   tryMacroId: () => undefined,
-  macroIdToEmail: (id: string) => id,
+  roxIdToEmail: (id: string) => id,
 }));
 vi.mock('@core/util/branchName', () => ({
   copyBranchNameToClipboard: vi.fn(),

@@ -227,7 +227,7 @@ function convertElements(
 
   const scene: GraphicsDocument = freezeDocument({ rootId: SCENE_ROOT, items });
   return {
-    fragment: { kind: 'macro-graphics-fragment', scene },
+    fragment: { kind: 'rox-graphics-fragment', scene },
     imported,
     skipped,
     approximated,

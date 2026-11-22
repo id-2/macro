@@ -15,5 +15,5 @@ export type SuggestionFrom =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SuggestionFrom = {
   for_you: 'for_you',
-  macro: 'macro',
+  rox: 'rox',
 } as const;

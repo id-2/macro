@@ -5,8 +5,8 @@ import type { UnifiedNotification } from '@notifications/types';
 import { onMount } from 'solid-js';
 import { render } from 'solid-js/web';
 import { SettingsPage } from '../../settings/primitives';
-import { macroDarkTheme } from '../../theme/themes/macro-dark';
-import { macroLightTheme } from '../../theme/themes/macro-light';
+import { roxDarkTheme } from '../../theme/themes/rox-dark';
+import { roxLightTheme } from '../../theme/themes/rox-light';
 import { themeCssVars } from '../../theme/utils/themeCssVars';
 import { NotificationSoundSection } from '../components/NotificationSoundSection';
 import { QuietHoursSection } from '../components/QuietHoursSection';
@@ -47,7 +47,7 @@ function Fixture() {
   onMount(() => {
     const dark = new URLSearchParams(location.search).has('dark');
     for (const [key, value] of Object.entries(
-      themeCssVars(dark ? macroDarkTheme : macroLightTheme)
+      themeCssVars(dark ? roxDarkTheme : roxLightTheme)
     ))
       document.documentElement.style.setProperty(key, value);
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';

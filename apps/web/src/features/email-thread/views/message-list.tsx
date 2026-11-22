@@ -130,7 +130,7 @@ export function MessageList(props: MessageListProps) {
       <Show when={viewContext.thread.isTouch() && props.title}>
         {(title) => (
           <div class="shrink-0 w-full flex justify-center">
-            <div class="macro-message-width macro-message-padding w-full pt-6 pb-3">
+            <div class="rox-message-width rox-message-padding w-full pt-6 pb-3">
               <EmailThreadTitle
                 onCopy={viewContext.copySubject}
                 title={title()}
@@ -228,7 +228,7 @@ export function MessageList(props: MessageListProps) {
                     }
                   >
                     <div class="shrink-0 w-full flex justify-center">
-                      <div class="macro-message-width macro-message-padding w-full">
+                      <div class="rox-message-width rox-message-padding w-full">
                         <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
                           <span
                             aria-hidden="true"

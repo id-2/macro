@@ -118,10 +118,10 @@ function archiveEntries(
     !names.has('xl/workbook.xml')
   )
     throw invalid();
-  // Imports drop macros with a warning; Rox's own exports must never
+  // Imports drop roxs with a warning; Rox's own exports must never
   // contain them.
   if (!allowMacros && [...names].some(isMacroPart))
-    throw new Error('Workbooks written by Rox must not contain macros.');
+    throw new Error('Workbooks written by Rox must not contain roxs.');
   return { entries, centralStart };
 }
 
@@ -192,11 +192,11 @@ export function openXlsxArchive(bytes: Uint8Array): XlsxArchive {
   };
 }
 
-/** VBA projects, their signatures, and Excel 4.0 macro sheets. */
+/** VBA projects, their signatures, and Excel 4.0 rox sheets. */
 function isMacroPart(name: string) {
   return (
     /(^|\/)vbaProject(Signature(Agile|V3)?)?\.bin$/i.test(name) ||
-    /^xl\/macrosheets\//i.test(name)
+    /^xl\/roxsheets\//i.test(name)
   );
 }
 
@@ -210,10 +210,10 @@ export function xlsxFeatureWarnings(names: string[]): string[] {
       );
     if (/(^|\/)vbaProject\.bin$/i.test(name))
       warnings.add(
-        'VBA macros are not imported. Cells, formulas and formatting are; the macros do not run in Rox.'
+        'VBA roxs are not imported. Cells, formulas and formatting are; the roxs do not run in Rox.'
       );
-    if (/^xl\/macrosheets\//i.test(name))
-      warnings.add('Excel 4.0 macro sheets are not imported.');
+    if (/^xl\/roxsheets\//i.test(name))
+      warnings.add('Excel 4.0 rox sheets are not imported.');
     if (/^xl\/(activeX|ctrlProps)\//i.test(name))
       warnings.add('Form and ActiveX controls are not imported.');
   }

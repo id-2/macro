@@ -13,7 +13,7 @@ const host = createRetirableCacheHost(
 );
 window.addEventListener('pagehide', () => host.dispose(), { once: true });
 try {
-  const viewer = 'macro|viewer@example.com';
+  const viewer = 'rox|viewer@example.com';
   const scope = {
     identity: viewer,
     storageGeneration: await host.currentStorageGeneration(),
@@ -35,10 +35,10 @@ try {
         contacts: {
           nodes: ['one', 'two'].map((name) => ({
             __typename: 'GraphqlContact',
-            id: contactRecordKey(viewer, `macro|${name}@example.com`).slice(
+            id: contactRecordKey(viewer, `rox|${name}@example.com`).slice(
               'GraphqlContact:'.length
             ),
-            userId: `macro|${name}@example.com`,
+            userId: `rox|${name}@example.com`,
             email: `${name}@example.com`,
             name: `Sam ${name}`,
           })),
@@ -69,7 +69,7 @@ try {
   try {
     await people.resolveReferences({
       ...request,
-      scope: { ...scope, identity: 'macro|other@example.com' },
+      scope: { ...scope, identity: 'rox|other@example.com' },
     });
   } catch (error) {
     if (!isStaleHydrationScopeError(error)) throw error;

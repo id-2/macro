@@ -98,7 +98,7 @@ describe('live database charts', () => {
         .getByRole('img')
         .querySelector<
           SVGSVGElement & { scale(name: 'x'): { domain: number[] } }
-        >('svg.macro-chart')
+        >('svg.rox-chart')
         ?.scale('x').domain;
     await waitFor(() => expect(valueDomain()).toEqual([0, 5]));
     setAnswer(result(8));

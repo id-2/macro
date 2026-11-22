@@ -399,7 +399,7 @@ function controlledClient() {
               ...(cached
                 ? {
                     extensions: {
-                      __macroNormalizedCache: {
+                      __roxNormalizedCache: {
                         source: 'normalized-cache-hit',
                       },
                     },

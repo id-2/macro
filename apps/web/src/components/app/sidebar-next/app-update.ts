@@ -86,7 +86,7 @@ export const UPDATE_COPY = {
 function runningBuild(): string {
   return (
     document
-      .querySelector<HTMLMetaElement>('meta[name="macro-bundle-build"]')
+      .querySelector<HTMLMetaElement>('meta[name="rox-bundle-build"]')
       ?.getAttribute('content') ?? ''
   );
 }

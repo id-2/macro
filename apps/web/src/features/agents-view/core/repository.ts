@@ -32,7 +32,7 @@ export function parseRepositoryInput(input: string): string | undefined {
   return undefined;
 }
 
-/** `https://github.com/macro-inc/macro` → `macro-inc/macro`. */
+/** `https://github.com/rox-inc/rox` → `rox-inc/rox`. */
 export function repositoryLabel(url: string): string {
   const path = url
     .replace(/\.git$/i, '')
@@ -45,7 +45,7 @@ export function repositoryLabel(url: string): string {
     : (repo ?? url);
 }
 
-/** `https://github.com/macro-inc/macro` → `macro`; used where the owner is noise. */
+/** `https://github.com/rox-inc/rox` → `rox`; used where the owner is noise. */
 export function repositoryShortName(url: string): string {
   return repositoryLabel(url).split('/').at(-1) ?? url;
 }

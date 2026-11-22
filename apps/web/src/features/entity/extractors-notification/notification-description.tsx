@@ -73,7 +73,7 @@ export function NotificationDescription(props: NotificationDescriptionProps) {
     return 1;
   };
 
-  const macroFirstName = (id: string) => {
+  const roxFirstName = (id: string) => {
     const parts = getDisplayNameParts(tryMacroId(id), {
       emailFallback: 'local-part',
     });
@@ -102,7 +102,7 @@ export function NotificationDescription(props: NotificationDescriptionProps) {
         return login ? [login] : [];
       }
       if (props.notification.sender_id) {
-        return [macroFirstName(props.notification.sender_id)];
+        return [roxFirstName(props.notification.sender_id)];
       }
       const agent = getNotificationAgentSender(props.notification);
       return agent ? [agent.name] : [];
@@ -122,7 +122,7 @@ export function NotificationDescription(props: NotificationDescriptionProps) {
               )
                 return [meta.content.senderDisplayName];
               return notification.sender_id
-                ? [macroFirstName(notification.sender_id)]
+                ? [roxFirstName(notification.sender_id)]
                 : [];
             })
           ),
@@ -131,10 +131,10 @@ export function NotificationDescription(props: NotificationDescriptionProps) {
       if (isGithubNotificationType(props.stack.type)) {
         return getUniqueGithubLogins(props.stack.notifications);
       }
-      const macroIds = getUniqueSenderIds(props.stack.notifications);
+      const roxIds = getUniqueSenderIds(props.stack.notifications);
       const agents = getUniqueAgentSenders(props.stack.notifications);
       return [
-        ...macroIds.map(macroFirstName),
+        ...roxIds.map(roxFirstName),
         ...agents.map((agent) => agent.name),
       ];
     }

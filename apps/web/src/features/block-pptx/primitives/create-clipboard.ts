@@ -12,7 +12,7 @@ import type { EditorCommands } from './create-editor-commands';
 import type { PresentationSession } from './create-presentation-session';
 import type { SlideEditor } from './create-slide-editor';
 
-const MARKER = 'data-macro-pptx-clip';
+const MARKER = 'data-rox-pptx-clip';
 
 interface Clip {
   token: string;

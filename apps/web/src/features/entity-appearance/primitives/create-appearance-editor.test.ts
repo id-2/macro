@@ -5,7 +5,7 @@ import type { EntityAppearance } from '../core/appearance';
 import { createAppearanceEditor } from './create-appearance-editor';
 
 const BLUE: EntityAppearance = {
-  icon: { kind: 'macro', name: 'star' },
+  icon: { kind: 'rox', name: 'star' },
   color: 'blue',
 };
 const RED: EntityAppearance = { ...BLUE, color: 'red' };

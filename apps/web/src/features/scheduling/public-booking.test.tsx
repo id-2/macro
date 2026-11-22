@@ -134,7 +134,7 @@ describe('public booking route in the website dialog', () => {
     fireEvent.click(await screen.findByText('Choose an event'));
 
     expect(website.postMessage).toHaveBeenCalledWith(
-      { type: 'macro:booking-made' },
+      { type: 'rox:booking-made' },
       window.location.origin
     );
   });
