@@ -201,12 +201,12 @@ inbox.
 
 ### Google sign-in and Gmail without a Google account
 
-A stack whose environment names no real Google OAuth client (`--no-doppler`
-without Google keys in `--env-file`) starts the Gmail emulator
-(`crates/gmail_emulator`) as the `gmail_emulator` service. FusionAuth's `google`
-and `google_gmail` identity providers and the services' Google URLs
-(`OVERRIDE_GMAIL_API_URL`, `OVERRIDE_GOOGLE_OAUTH_TOKEN_URL` and the rest, in
-`xtask_local`'s `google_emulator.rs`) point at it. Nothing talks to Google.
+The stack no longer starts the Gmail emulator and no longer rewrites the
+services' Google URLs, so a stack without real Google keys simply has no Google
+sign-in. The emulator still lives in `crates/gmail_emulator`; to use it, add the
+service yourself and point FusionAuth's `google` and `google_gmail` identity
+providers and the services' Google URLs at its address. Nothing then talks to
+Google.
 
 - **Continue with Google** opens the emulator's page in place of Google's. Pick
   one of the seeded users (`ada@example.com`, `bob@example.com`,
