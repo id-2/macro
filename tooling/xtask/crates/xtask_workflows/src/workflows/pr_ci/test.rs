@@ -17,8 +17,9 @@ fn called(call: &Call) -> serde_yaml::Value {
 }
 
 /// A called workflow the gate doesn't wait for could fail after the gate passed.
+/// The brand guard is an inline job, not a call, so it is named separately.
 #[test]
-fn the_gate_waits_for_start_and_every_call() {
+fn the_gate_waits_for_start_every_call_and_the_brand_guard() {
     let workflow = rendered();
     let needs: Vec<&str> = workflow["jobs"]["gate"]["needs"]
         .as_sequence()
@@ -29,9 +30,10 @@ fn the_gate_waits_for_start_and_every_call() {
 
     assert_eq!(needs[0], "start");
     assert_eq!(
-        &needs[1..],
+        &needs[1..needs.len() - 1],
         CALLS.iter().map(|call| call.id).collect::<Vec<_>>()
     );
+    assert_eq!(needs[needs.len() - 1], BRAND_JOB);
 }
 
 /// GitHub refuses to call a workflow without a `workflow_call` trigger.

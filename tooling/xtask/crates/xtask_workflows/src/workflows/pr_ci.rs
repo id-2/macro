@@ -7,6 +7,9 @@
 //! `CI gate` then sets the [`GATE_CONTEXT`] commit status on the PR head, which
 //! `main` requires: a new push has no status until CI runs on it.
 //!
+//! The rebrand guard (`brand`) runs `scripts/check-old-brand.sh` on every
+//! requested run, so a reintroduced old product name fails the gate.
+//!
 //! The gate waits for every job, so every job sets `timeout-minutes`; GitHub's
 //! default is six hours. A job's limit is the larger of twice its p99 run time
 //! and 1.2 times its slowest run that no platform stall slowed, from the CI
@@ -52,6 +55,10 @@ const REQUESTED: &str = "github.event.label.name == 'run-ci'";
 /// Job names the fork step reads back from a finished run (`ci_gate.ts`).
 const START_JOB: &str = "Start";
 const GATE_JOB: &str = "CI gate";
+
+/// The rebrand guard's job id. It runs on every requested run, and the gate
+/// waits for it, so the old product name reappearing blocks the merge.
+const BRAND_JOB: &str = "brand";
 
 /// A check workflow `PR CI` calls.
 struct Call {
@@ -161,6 +168,7 @@ pub fn pr_ci() -> Workflow {
         .fold(workflow, |workflow, call| {
             workflow.add_job(call.id, call_job(call))
         })
+        .add_job(BRAND_JOB, brand())
         .add_job("gate", gate())
 }
 
@@ -275,11 +283,34 @@ fn call_job(call: &Call) -> Job {
     }
 }
 
+/// The rebrand guard behind `У-11`: `scripts/check-old-brand.sh` scans the
+/// tracked tree for the old product name and fails on every place the
+/// allowlist (`docs/old-brand-allowlist.md`) does not justify. It takes under a
+/// minute, so it runs on every request and needs no path filter.
+fn brand() -> Job {
+    Job::default()
+        .name("No old brand name")
+        .needs(vec!["start".to_string()])
+        .runs_on(runners::Runner::Small.to_string())
+        .timeout_minutes(10u32)
+        .permissions(Permissions {
+            contents: Some(Level::Read),
+            ..Default::default()
+        })
+        .add_step(steps::checkout(false, false))
+        .add_step(
+            Step::new("Scan the tree for the old brand name")
+                .run("bash scripts/check-old-brand.sh")
+                .shell("bash"),
+        )
+}
+
 /// Runs unless the run was cancelled (a newer request superseded it) or was
 /// never a request. A skipped call is a path filter that didn't match.
 fn gate() -> Job {
     let needs = std::iter::once("start")
         .chain(CALLS.iter().map(|call| call.id))
+        .chain(std::iter::once(BRAND_JOB))
         .map(str::to_string)
         .collect::<Vec<_>>();
 

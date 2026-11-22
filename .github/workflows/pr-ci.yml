@@ -614,6 +614,23 @@ jobs:
     name: roxd update
     uses: ./.github/workflows/test_roxd_update.yml
     secrets: inherit
+  brand:
+    needs:
+    - start
+    name: No old brand name
+    runs-on: namespace-profile-linux-small
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+    - name: Checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        clean: 'false'
+        persist-credentials: 'false'
+    - name: Scan the tree for the old brand name
+      run: bash scripts/check-old-brand.sh
+      shell: bash
   gate:
     needs:
     - start
@@ -629,6 +646,7 @@ jobs:
     - sdk
     - observability-image
     - roxd-update
+    - brand
     if: '!cancelled() && needs.start.result != ''skipped'''
     name: CI gate
     runs-on: namespace-profile-linux-tiny-no-cache
