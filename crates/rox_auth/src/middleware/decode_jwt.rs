@@ -261,6 +261,9 @@ fn validate_rox_api_token(
     public_key: &LocalOrRemoteSecret<RoxApiTokenPublicKey>,
     issuer: &RoxApiTokenIssuer,
 ) -> Result<RoxApiToken, RoxAuthError> {
+    // Tolerate the issuer prefix and bare JWTs from older clients alike.
+    let rox_api_token = crate::rox_api_token::strip_api_token_prefix(rox_api_token);
+
     // Verify and decode the JWT
     let mut validation = Validation::new(Algorithm::RS256);
 
@@ -299,6 +302,8 @@ pub fn handler(
     jwt_validation_args: &JwtValidationArgs,
     access_token: &str,
 ) -> Result<JwtToken, RoxAuthError> {
+    // Issued API tokens carry `API_TOKEN_PREFIX`; bare JWTs still parse.
+    let access_token = crate::rox_api_token::strip_api_token_prefix(access_token);
     let token = jsonwebtoken::decode_header(access_token).context("unable to decode token")?;
 
     let kid = token.kid.context("expected kid")?;

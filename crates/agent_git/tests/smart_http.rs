@@ -259,7 +259,7 @@ async fn agents_push_their_own_repo_and_admins_read_it(pool: PgPool) {
         work.path(),
         &[
             "clone",
-            &with_password(&repo_a.clone_url, "mrt_wrong"),
+            &with_password(&repo_a.clone_url, "rox_wrong"),
             "wrong",
         ],
     )

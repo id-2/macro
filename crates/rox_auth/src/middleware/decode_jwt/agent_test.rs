@@ -1,5 +1,7 @@
 use super::*;
-use crate::rox_api_token::{EncodeMacroApiTokenArgs, encode_rox_api_token};
+use crate::rox_api_token::{
+    API_TOKEN_PREFIX, EncodeMacroApiTokenArgs, encode_rox_api_token, strip_api_token_prefix,
+};
 
 #[test]
 fn signed_execution_token_preserves_owner_agent_and_lifetime() {
@@ -76,6 +78,47 @@ fn legacy_user_token_has_no_agent_attribution() {
 }
 
 #[test]
+fn issued_token_is_rox_prefixed_and_bare_jwts_still_decode() {
+    let token = encode_rox_api_token(EncodeMacroApiTokenArgs {
+        fusionauth_id: "fusion-owner".into(),
+        rox_user_id: "rox|owner@example.com".into(),
+        organization_id: None,
+        issuer: "prefix-test".into(),
+        private_key: tests::PRIVATE_KEY.into(),
+        expiry_seconds: 60,
+        agent_id: None,
+        agent_via: None,
+        agent_correlation_id: None,
+        agent_session_id: None,
+        routine_id: None,
+        agent_scope: None,
+    })
+    .unwrap();
+    assert!(token.starts_with(API_TOKEN_PREFIX));
+    let args = JwtValidationArgs {
+        audience: Audience::new_testing(""),
+        issuer: Issuer::new_testing(""),
+        jwt_secret: LocalOrRemoteSecret::Local(JwtSecretKey::new_testing("")),
+        rox_api_token_issuer: RoxApiTokenIssuer::new_testing("prefix-test"),
+        rox_api_token_public_key: LocalOrRemoteSecret::Local(
+            RoxApiTokenPublicKey::new_testing(tests::PUBLIC_KEY),
+        ),
+    };
+    let JwtToken::RoxApiToken(claims) = handler(&args, &token).unwrap() else {
+        panic!("expected Rox API token");
+    };
+    assert_eq!(claims.rox_user_id, "rox|owner@example.com");
+
+    // Older clients hold the same token without the prefix.
+    let JwtToken::RoxApiToken(bare_claims) =
+        handler(&args, strip_api_token_prefix(&token)).unwrap()
+    else {
+        panic!("expected Rox API token");
+    };
+    assert_eq!(bare_claims.rox_user_id, claims.rox_user_id);
+}
+
+#[test]
 fn signed_routine_token_carries_its_routine_and_rejects_a_forged_one() {
     let routine = uuid::Uuid::from_u128(0x7001);
     let token = encode_rox_api_token(EncodeMacroApiTokenArgs {
@@ -124,9 +167,15 @@ fn signed_routine_token_carries_its_routine_and_rejects_a_forged_one() {
         agent_scope: None,
     })
     .unwrap();
-    let [header, _, signature]: [&str; 3] =
-        token.split('.').collect::<Vec<_>>().try_into().unwrap();
-    let plain_payload = plain_token.split('.').nth(1).unwrap();
+    let [header, _, signature]: [&str; 3] = strip_api_token_prefix(&token)
+        .split('.')
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap();
+    let plain_payload = strip_api_token_prefix(&plain_token)
+        .split('.')
+        .nth(1)
+        .unwrap();
     let spliced = format!("{header}.{plain_payload}.{signature}");
     assert!(handler(&args, &spliced).is_err());
 
@@ -184,8 +233,15 @@ fn a_signed_scope_survives_decoding_and_cannot_be_dropped() {
     assert_eq!(unscoped.agent_scope, None);
 
     // The scoped token's signature does not cover a payload without the scope.
-    let [header, _, signature]: [&str; 3] =
-        scoped.split('.').collect::<Vec<_>>().try_into().unwrap();
-    let unscoped_payload = mint(None).split('.').nth(1).unwrap().to_owned();
+    let [header, _, signature]: [&str; 3] = strip_api_token_prefix(&scoped)
+        .split('.')
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap();
+    let unscoped_payload = strip_api_token_prefix(&mint(None))
+        .split('.')
+        .nth(1)
+        .unwrap()
+        .to_owned();
     assert!(handler(&args, &format!("{header}.{unscoped_payload}.{signature}")).is_err());
 }

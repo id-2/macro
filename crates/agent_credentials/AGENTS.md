@@ -3,7 +3,7 @@
 ## What it is
 
 Validated bootstrap credentials shared by agent git, team-agent provisioning and
-the standalone brain gateway, and the agent teammates rollout for agent accounts. Repo tokens keep the existing `mrt_` + 64 hex format;
+the standalone brain gateway, and the agent teammates rollout for agent accounts. Repo tokens keep the existing `rox_` + 64 hex format;
 agent API keys accept the existing user API key format after validating `mak_` + 64 hex.
 
 ## Boundaries

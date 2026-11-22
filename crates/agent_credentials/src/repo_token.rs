@@ -7,7 +7,7 @@ use zeroize::Zeroizing;
 
 use crate::InvalidAgentCredential;
 
-const TOKEN_PREFIX: &str = "mrt_";
+const TOKEN_PREFIX: &str = "rox_";
 const TOKEN_SECRET_BYTES: usize = 32;
 
 /// A random repo-scoped HTTP Basic password. Debug never reveals the secret.
@@ -29,7 +29,7 @@ impl RepoToken {
     /// Validate a presented, returned or saved token at its boundary.
     pub fn parse(raw: String) -> Result<Self, InvalidAgentCredential> {
         let raw = Zeroizing::new(raw);
-        if !lazy_regex::regex_is_match!(r"^mrt_[0-9a-f]{64}$", raw.as_str()) {
+        if !lazy_regex::regex_is_match!(r"^rox_[0-9a-f]{64}$", raw.as_str()) {
             return Err(InvalidAgentCredential);
         }
         Ok(Self(raw))

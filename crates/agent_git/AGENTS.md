@@ -14,7 +14,7 @@ template's files, `agent.json` rendered from `agent.example.json` (owner =
 the seed's `creator_id`, `me` = the agent's user id, its name and email), and
 `state/memory/identity/identity.md` when the invite gave a job or a
 personality (none means the agent asks its owner). It upserts the
-`agent_repos` row with the SHA-256 of a new `mrt_` token, returned once. Git
+`agent_repos` row with the SHA-256 of a new `rox_` token, returned once. Git
 requests (`/{agent_user_id}.git/...`, id percent-encoded) go through
 `AgentGitService::serve_git`, which authorizes, enforces limits, and hands the
 request to `git http-backend` (CGI, both bodies streamed).

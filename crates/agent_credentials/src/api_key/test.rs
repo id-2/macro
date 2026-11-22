@@ -12,7 +12,7 @@ fn accepts_current_user_keys_but_rejects_legacy_or_malformed_agent_keys() {
         serde_json::from_str::<AgentApiKey>(&json).expect("valid key"),
         key
     );
-    for raw in ["", "legacy-key", "mak_short", "mrt_wrong-prefix"] {
+    for raw in ["", "legacy-key", "mak_short", "rox_wrong-prefix"] {
         assert!(AgentApiKey::parse(raw.to_owned()).is_err());
         assert!(serde_json::from_value::<AgentApiKey>(serde_json::json!(raw)).is_err());
     }

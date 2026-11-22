@@ -384,7 +384,7 @@ async fn the_agent_token_pushes_and_an_admin_session_only_reads() {
         .create_repo(agent.clone(), TEAM, &seed())
         .await
         .unwrap();
-    assert!(created.token.expose().starts_with("mrt_"));
+    assert!(created.token.expose().starts_with("rox_"));
 
     service
         .serve_git(

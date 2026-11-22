@@ -3,6 +3,18 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::Context;
 use uuid::Uuid;
 
+/// Prefix every newly issued API token carries, ahead of the JWT itself, so a
+/// token is recognizable as ours and never mistaken for another bearer.
+pub const API_TOKEN_PREFIX: &str = "rox-key-";
+
+/// Remove the issuer prefix from a presented API token.
+///
+/// Tokens minted before the prefix existed are accepted bare, so this returns
+/// the input unchanged when the prefix is absent.
+pub fn strip_api_token_prefix(token: &str) -> &str {
+    token.strip_prefix(API_TOKEN_PREFIX).unwrap_or(token)
+}
+
 /// A Rox-signed API token with optional agent attribution for SDK messages.
 #[derive(serde::Serialize, serde::Deserialize, Eq, PartialEq, Debug, Clone)]
 pub struct RoxApiToken {
@@ -103,5 +115,23 @@ pub fn encode_rox_api_token(args: EncodeMacroApiTokenArgs) -> anyhow::Result<Str
     )
     .context("failed to encode token")?;
 
-    Ok(token)
+    Ok(format!("{API_TOKEN_PREFIX}{token}"))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn issued_token_carries_the_rox_prefix_and_bare_legacy_tokens_still_parse() {
+        assert_eq!(strip_api_token_prefix(API_TOKEN_PREFIX), "");
+        assert_eq!(
+            strip_api_token_prefix("rox-key-header.payload.signature"),
+            "header.payload.signature"
+        );
+        assert_eq!(
+            strip_api_token_prefix("header.payload.signature"),
+            "header.payload.signature"
+        );
+    }
 }

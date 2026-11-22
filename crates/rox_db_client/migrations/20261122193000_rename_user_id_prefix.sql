@@ -128,6 +128,7 @@ BEGIN
         ('public.scheduled_action', 'owner'),
         ('public.activity_events', 'actor_id'),
         ('public.activity_events', 'subject_id'),
+        ('public.calendar_events', 'owner_id'),
         ('public.email_scheduled_messages', 'actor_id'),
         ('public.comms_messages', 'sender_id'),
         ('public.comms_entity_mentions', 'entity_id'),
@@ -140,6 +141,14 @@ BEGIN
      AND a.attnum > 0
      AND NOT a.attisdropped
     ON CONFLICT DO NOTHING;
+
+    -- contacts_connections держит строгий порядок (user1 < user2): обе колонки
+    -- переписываются одним оператором, чтобы проверка не увидела половину строки.
+    UPDATE contacts_connections
+       SET user1 = replace(user1, 'mac' || 'ro|', 'rox|'),
+           user2 = replace(user2, 'mac' || 'ro|', 'rox|')
+     WHERE user1 LIKE 'mac' || 'ro|' || '%' OR user2 LIKE 'mac' || 'ro|' || '%';
+    DELETE FROM _rename_targets WHERE tbl = to_regclass('public.contacts_connections');
 
     -- Внешние ключи снимаются по замыканию: ключ, который ссылается на уже
     -- переименованную колонку, сам становится переименованным, и его снимают

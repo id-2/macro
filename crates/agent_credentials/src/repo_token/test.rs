@@ -2,18 +2,18 @@ use super::*;
 
 #[test]
 fn rejects_malformed_tokens_and_hashes_including_serde() {
-    for raw in ["", "weak", "mrt_", "mak_012345", "mrt_abcdef/"] {
+    for raw in ["", "weak", "rox_", "mak_012345", "rox_abcdef/"] {
         assert!(RepoToken::parse(raw.to_owned()).is_err());
         assert!(serde_json::from_value::<RepoToken>(serde_json::json!(raw)).is_err());
         assert!(RepoTokenHash::from_stored(raw.to_owned()).is_err());
         assert!(serde_json::from_value::<RepoTokenHash>(serde_json::json!(raw)).is_err());
     }
-    assert!(RepoToken::parse(format!("mrt_{}", "a".repeat(63))).is_err());
-    assert!(RepoToken::parse(format!("mrt_{}", "g".repeat(64))).is_err());
+    assert!(RepoToken::parse(format!("rox_{}", "a".repeat(63))).is_err());
+    assert!(RepoToken::parse(format!("rox_{}", "g".repeat(64))).is_err());
     assert!(RepoTokenHash::from_stored("g".repeat(64)).is_err());
     for raw in [
-        format!("mrt_{}", "A".repeat(64)),
-        format!("mrt_{}\n", "a".repeat(64)),
+        format!("rox_{}", "A".repeat(64)),
+        format!("rox_{}\n", "a".repeat(64)),
     ] {
         assert!(RepoToken::parse(raw).is_err());
     }
