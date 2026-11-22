@@ -225,7 +225,7 @@ function parseEmailContent(
   const signatureNode = nodes.find(
     (node) =>
       hasClass(node, 'gmail_signature') ||
-      hasClass(node, 'macro-email-signature')
+      (hasClass(node, 'rox-email-signature') || hasClass(node, 'macro-email-signature'))
   );
   if (!showQuotedContent) {
     if (signatureNode) {

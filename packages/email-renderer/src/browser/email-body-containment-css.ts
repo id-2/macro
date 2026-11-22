@@ -7,7 +7,7 @@
  */
 export const EMAIL_BODY_CONTAINMENT_CSS = [
   'img{display: var(--macro-email-img-display, initial); max-width: 100% !important; height: auto !important;}',
-  '.macro-email-signature{max-width:100%;overflow-x:auto;overflow-wrap:anywhere;}',
+  '.rox-email-signature,.macro-email-signature{max-width:100%;overflow-x:auto;overflow-wrap:anywhere;}',
   'blockquote{margin-block:0.75em!important;margin-inline-start:1.5em!important;margin-inline-end:0!important;max-width:100%!important;box-sizing:border-box;}',
   'pre,code{white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:break-word;max-width:100%!important;box-sizing:border-box;}',
 ].join('');

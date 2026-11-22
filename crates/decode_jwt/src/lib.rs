@@ -45,10 +45,10 @@ pub struct Params {
 pub struct DecodedJwt {
     /// The user context extracted from the token.
     pub user_context: UserContext,
-    /// Present only when the token is a macro-access-token.
+    /// Present only when the token came from the session access-token cookie.
     pub jwt_context: Option<JwtContext>,
 
-    /// the parsed macro user id of the user
+    /// the parsed rox user id of the user
     pub rox_user_id: RoxUserIdStr<'static>,
 }
 

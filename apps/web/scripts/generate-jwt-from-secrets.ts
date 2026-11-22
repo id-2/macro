@@ -29,8 +29,8 @@ const ENV_CONFIG = {
     fusionauthClientId: "fusionauth-client-id-key-dev",
     issuer: "fusionauth-dev.rox.one",
     roxApiTokenIssuer: "authentication-service-dev.rox.one",
-    accessTokenCookie: "dev-macro-access-token",
-    refreshTokenCookie: "dev-macro-refresh-token",
+    accessTokenCookie: "dev-rox-access-token",
+    refreshTokenCookie: "dev-rox-refresh-token",
     tid: "tenant-dev",
   },
   prod: {

@@ -2,7 +2,9 @@ use super::{
     context::{ApiContext, AuthorizationService},
     jwt_session::JwtSessionContext,
 };
-use crate::api::utils::{create_access_token_cookie, create_refresh_token_cookie};
+use crate::api::utils::{
+    create_access_token_cookie, create_refresh_token_cookie, expired_legacy_session_cookies,
+};
 use axum::{
     Json, Router,
     extract::State,

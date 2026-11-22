@@ -574,7 +574,7 @@ infra/local/generated/<instance>
 Instances on one machine do not share sessions, even though browsers ignore the
 port when they scope cookies. The HTTPS proxy stores each instance's cookies
 under its own prefix, after any `__Host-` or `__Secure-`
-(`macro-<instance>--local-macro-access-token`,
+(`macro-<instance>--local-rox-access-token`,
 `__Host-macro-<instance>--rox_mcp_oauth`). It forwards a service only that
 instance's cookies, under their real names, so services and the app behave as
 usual on `localhost`, the machine hostname, a tailnet name, or a tunnel. Every

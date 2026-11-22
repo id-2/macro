@@ -133,7 +133,7 @@ accounts still sign in. See the
 ## GraphQL cache session lifecycle
 
 For local browser checks signed in through the passwordless HTTP API, copy the
-returned cookies into the browser context and set localStorage `macro:login` to
+returned cookies into the browser context and set localStorage `rox:login` to
 `true` before the app loads. The app uses that hint to start its identity check;
 the HttpOnly session cookie alone does not start it. Normal UI login sets the
 hint automatically. The backend still verifies the session.
@@ -155,8 +155,8 @@ placeholder data, or a later query reset.
 ## CI deploy-preview authentication
 
 PR previews at `https://<id>.preview.rox.one/app` use the dev backend and
-its shared `.rox.one` HttpOnly cookies (`dev-macro-access-token` and
-`dev-macro-refresh-token`). The `login` hint is host-only and `macro:login`
+its shared `.rox.one` HttpOnly cookies (`dev-rox-access-token` and
+`dev-rox-refresh-token`). The `login` hint is host-only and `rox:login`
 localStorage is origin-scoped, so a fresh preview has neither. Preview startup
 must check identity anyway; the hostname is not proof of authentication.
 Account queries and WebSockets still wait for a confirmed authenticated user.
@@ -465,9 +465,9 @@ fully recoverable: click the dialog's `Home` button, then wait for the sidebar t
 
 ## Session persistence
 
-The session lives in cookies. Services use `local-macro-access-token` and
-`local-macro-refresh-token`; the local proxy stores them in the browser as
-`macro-<instance>--local-macro-access-token`, so stacks on one machine don't share sessions
+The session lives in cookies. Services use `local-rox-access-token` and
+`local-rox-refresh-token`; the local proxy stores them in the browser as
+`macro-<instance>--local-rox-access-token`, so stacks on one machine don't share sessions
 ([details](../development/running-locally.md#run-more-than-one-stack)). When copying cookies
 into a browser context, copy the names the proxy returned. The session survives page reloads but not a browser-profile restart — if the shared Chromium is restarted
 with a fresh profile you must log in again. Workspace data (docs, channels, tasks) persists on
