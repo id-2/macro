@@ -46,6 +46,14 @@ export function isNewer(candidate, current) {
   return false;
 }
 
+/** The checked-in flag only decides whether a build may publish the update feed. */
+export function updateFeedEnabled(directory) {
+  return Object.keys(TARGETS).every((target) => {
+    const metadata = JSON.parse(readFileSync(join(directory, `${target}.release.json`), 'utf8'));
+    return metadata.enabled === true;
+  });
+}
+
 export function createManifest(directory, tag, repository) {
   const identity = releaseIdentity(tag);
   if (!/^[\w.-]+\/[\w.-]+$/.test(repository)) throw new Error('Invalid release repository');
@@ -53,7 +61,7 @@ export function createManifest(directory, tag, repository) {
   const platforms = {};
   for (const [target, suffix] of Object.entries(TARGETS)) {
     const metadata = JSON.parse(readFileSync(join(directory, `${target}.release.json`), 'utf8'));
-    if (!metadata.enabled || metadata.version !== identity.version || metadata.nativeBuild !== identity.nativeBuild) {
+    if (metadata.version !== identity.version || metadata.nativeBuild !== identity.nativeBuild) {
       throw new Error(`Packaged identity disagrees with release tag for ${target}`);
     }
     const matches = files.filter((name) => name === `Rox-${identity.version}${suffix}`);
@@ -86,7 +94,15 @@ function main([command, ...args]) {
     writeFileSync(CONFIG, `${JSON.stringify(config, null, 2)}\n`);
   } else if (command === 'manifest') {
     const [directory, tag, repository] = args;
-    writeFileSync(join(directory, 'latest.json'), `${JSON.stringify(createManifest(directory, tag, repository), null, 2)}\n`);
+    const description = `${JSON.stringify(createManifest(directory, tag, repository), null, 2)}\n`;
+    // The release description is produced either way; the flag decides only
+    // whether this build may publish the feed that installed apps follow.
+    if (!updateFeedEnabled(directory)) {
+      process.stdout.write(description);
+      process.stderr.write('Updater disabled for this build: printed the release description instead of writing latest.json\n');
+      return;
+    }
+    writeFileSync(join(directory, 'latest.json'), description);
   } else if (command === 'newer') {
     const [candidatePath, currentPath] = args;
     const candidate = JSON.parse(readFileSync(candidatePath, 'utf8'));
