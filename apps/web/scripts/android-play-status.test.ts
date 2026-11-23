@@ -104,7 +104,7 @@ describe('readTracks', () => {
   it('lists production releases, then reads both tracks through a discarded edit', async () => {
     const calls: string[] = [];
     const request = vi.fn(async (url: string, init: RequestInit) => {
-      const path = url.split('/applications/com.macro.workspace.mobile')[1];
+      const path = url.split('/applications/com.rox.one.mobile')[1];
       calls.push(`${init.method} ${path}`);
       const body = path === '/tracks/production/releases'
         ? published

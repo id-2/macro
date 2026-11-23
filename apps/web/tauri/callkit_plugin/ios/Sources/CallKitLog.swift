@@ -1,7 +1,7 @@
 import Foundation
 import os
 
-private let callKitLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.macro.app", category: "CallKit")
+private let callKitLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.rox.one", category: "CallKit")
 
 /// Writes a `[CallKit]` line to the unified log. `print` output is discarded on
 /// a device without an attached debugger; `.default` (notice) and `.error`

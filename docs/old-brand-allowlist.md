@@ -32,7 +32,7 @@
 | `macro-connect` | `apps/web/*`, `crates/connect_client/*`, `crates/pipedream_mcp/*`, `packages/sdk/*` | имя службы подключений в описании API и в документации |
 | `macro-computers` | `apps/web/*`, `crates/feature_flags/*`, `crates/hosted_runtimes/*`, `docs/*`, `infra/stacks/*`, `nix/hosts/*`, `services/agent_harness_service/*`, `services/authentication_service/*` | имя подсистемы удалённых компьютеров и её флага `enable-macro-computers` |
 | `macro-local` | `apps/web/*`, `crates/openbao_client/*`, `docs/*`, `infra/local/*`, `tooling/xtask/*` | имена локального стенда: кэш пакетов, профиль compose и путь OpenBao |
-| `macro-free`, `macro.app` | `apps/web/*`, `docs/*` | термин про таблицы без макросов и идентификатор приложения `com.macro.app.prod` в конфигурации сборки |
+| `macro-free`, `macro.app` | `apps/web/*`, `docs/*` | «macro-free» — про таблицы Excel без макросов; `macro.app` осталось только в отдельном идентификаторе проверочной сборки `com.macro.app.e2e` |
 | `macro-component`, `macro-style` | `apps/web/*`, `docs/*`, `services/ai-editing-worker/*` | имена директив разметки холста блоков в описании и подсказке |
 | `macro-access`, `macro-api` | `apps/web/*`, `packages/sdk/*` | имена заголовков доступа в описаниях API; клиенты их уже отправляют |
 | `macro-agent` | `crates/agent_harness/*`, `crates/coding_agent_worker/*`, `nix/macro-box/*`, `packages/starter-agent/*` | имя службы агента внутри MicroVM и её файлов запуска |

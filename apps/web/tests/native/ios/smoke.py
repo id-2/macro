@@ -14,7 +14,7 @@ import tempfile
 import time
 import uuid
 
-APP = "com.macro.app.prod"
+APP = "com.rox.one"
 COLD_SOURCE = "scene:willConnectToSession:options:"
 WARM_SOURCE = "scene:openURLContexts:"
 

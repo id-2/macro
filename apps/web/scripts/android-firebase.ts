@@ -42,10 +42,10 @@ export function validateAndroidFirebase(
     !parsed.data.client.some(
       (client) =>
         client.client_info.android_client_info.package_name ===
-        'com.macro.workspace.mobile'
+        'com.rox.one.mobile'
     )
   )
-    throw new Error('Firebase config must contain com.macro.workspace.mobile');
+    throw new Error('Firebase config must contain com.rox.one.mobile');
   const project = parsed.data.project_info.project_id;
   if (
     project !== projects[action] &&

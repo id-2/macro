@@ -194,7 +194,7 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
 
     #[cfg(target_os = "ios")]
     let registry = registry.with(tracing_oslog::OsLogger::new(
-        "com.macro.app.prod",
+        "com.rox.one",
         "default",
     ));
 

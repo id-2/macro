@@ -18,7 +18,7 @@ vi.mock('node:child_process', async (importOriginal) => ({
 
 afterEach(() => vi.mocked(execFileSync).mockReset());
 
-const config = (project: string, packageName = 'com.macro.workspace.mobile') => ({
+const config = (project: string, packageName = 'com.rox.one.mobile') => ({
   project_info: { project_id: project, project_number: '123456789' },
   client: [
     {
@@ -59,7 +59,7 @@ describe('Android Firebase environment selection', () => {
     ).toThrow('must use macro-app-prod');
     expect(() =>
       validateAndroidFirebase(config('my-fork', 'wrong.package'), 'build', true)
-    ).toThrow('must contain com.macro.workspace.mobile');
+    ).toThrow('must contain com.rox.one.mobile');
   });
 
   it.each([undefined, ''])(
@@ -121,19 +121,19 @@ describe('Android Firebase environment selection', () => {
         config('macro-app-dev-12ae0', 'com.tauri.dev'),
         'dev'
       )
-    ).toThrow('must contain com.macro.workspace.mobile');
+    ).toThrow('must contain com.rox.one.mobile');
     expect(() => validateAndroidFirebase(null, 'dev')).toThrow(
       'Invalid Android Firebase configuration'
     );
   });
 
-  it('rejects the previous package and production project', () => {
+  it('rejects the desktop bundle identifier and the production project', () => {
     expect(() =>
       validateAndroidFirebase(
-        config('macro-app-prod', 'com.macro.app.prod'),
+        config('macro-app-prod', 'com.rox.one'),
         'build'
       )
-    ).toThrow('must contain com.macro.workspace.mobile');
+    ).toThrow('must contain com.rox.one.mobile');
     expect(() =>
       validateAndroidFirebase(config('macro-app-955f1'), 'build')
     ).toThrow('must use macro-app-prod');

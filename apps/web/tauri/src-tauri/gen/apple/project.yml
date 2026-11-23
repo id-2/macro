@@ -1,6 +1,6 @@
 name: app
 options:
-  bundleIdPrefix: com.macro.app.prod
+  bundleIdPrefix: com.rox.one
   deploymentTarget:
     iOS: 15.0
 packages:
@@ -14,7 +14,7 @@ settingGroups:
   app:
     base:
       PRODUCT_NAME: macro
-      PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod
+      PRODUCT_BUNDLE_IDENTIFIER: com.rox.one
       DEVELOPMENT_TEAM: TY74Q77JBD
       CODE_SIGN_STYLE: Automatic
       CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
@@ -97,7 +97,7 @@ targets:
         com.apple.developer.usernotifications.communication: true
         com.apple.developer.usernotifications.time-sensitive: true
         com.apple.security.application-groups:
-          - group.com.macro.app.prod
+          - group.com.rox.one
     scheme:
       environmentVariables:
         RUST_BACKTRACE: full
@@ -164,10 +164,10 @@ targets:
       path: ShareExtension/ShareExtension.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.com.macro.app.prod
+          - group.com.rox.one
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod.ShareExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.rox.one.ShareExtension
         DEVELOPMENT_TEAM: TY74Q77JBD
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
@@ -190,7 +190,7 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod.NotificationServiceExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.rox.one.NotificationServiceExtension
         DEVELOPMENT_TEAM: TY74Q77JBD
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES

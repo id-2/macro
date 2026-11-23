@@ -32,7 +32,7 @@ on:
 
 # All edits for this package must be serialized, even for different releases.
 concurrency:
-  group: google-play-com-macro-workspace-mobile
+  group: google-play-com-rox-one-mobile
   cancel-in-progress: false
 
 permissions:
@@ -100,7 +100,7 @@ jobs:
         uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
         with:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
-          packageName: com.macro.workspace.mobile
+          packageName: com.rox.one.mobile
           releaseFiles: ${{ steps.artifact.outputs.bundle }}
           mappingFile: ${{ steps.artifact.outputs.mapping }}
           releaseName: ${{ inputs.release_tag }}

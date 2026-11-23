@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const api =
-  'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.macro.workspace.mobile/edits';
+  'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.rox.one.mobile/edits';
 
 export function validateVersionCode(value) {
   if (

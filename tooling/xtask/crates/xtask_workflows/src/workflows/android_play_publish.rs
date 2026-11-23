@@ -271,7 +271,7 @@ fn upload_internal() -> Step<Use> {
             "serviceAccountJson",
             "${{ steps.auth.outputs.credentials_file_path }}",
         ))
-        .add_with(("packageName", "com.macro.workspace.mobile"))
+        .add_with(("packageName", "com.rox.one.mobile"))
         .add_with(("releaseFiles", "${{ steps.artifact.outputs.bundle }}"))
         .add_with(("mappingFile", "${{ steps.artifact.outputs.mapping }}"))
         .add_with(("releaseName", "${{ needs.check.outputs.release_name }}"))

@@ -888,7 +888,7 @@ async fn run_server() -> anyhow::Result<()> {
     }
 
     // VoIP push is optional: enabled only when both env vars are present.
-    // APPLE_BUNDLE_ID:           the app bundle ID (e.g. "com.macro.app.prod")
+    // APPLE_BUNDLE_ID:           the app bundle ID (e.g. "com.rox.one")
     // SNS_APNS_VOIP_PLATFORM_ARN: SNS platform app ARN for APNS_VOIP
     //
     // Option<VoipPushServiceImpl<...>> is used as the type parameter so the

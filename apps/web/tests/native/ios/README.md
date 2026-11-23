@@ -106,7 +106,7 @@ temporary `.apns` file, replacing `<notification-id>` with the real ID:
 }
 ```
 
-Send it with `xcrun simctl push <udid> com.macro.app.prod <payload.apns>`.
+Send it with `xcrun simctl push <udid> com.rox.one <payload.apns>`.
 Grant notification permission, background the app, open Notification Center,
 and tap the notification. Verify the correct channel opens, the parent thread
 expands, and the specific reply is visible. Repeat after terminating the app and

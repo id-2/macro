@@ -18,10 +18,10 @@ import { appendFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const packageName = 'com.macro.workspace.mobile';
+const packageName = 'com.rox.one.mobile';
 const api = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}`;
 export const consoleUrl =
-  'https://play.google.com/console/developers/app/com.macro.workspace.mobile/tracks/production';
+  'https://play.google.com/console/developers/app/com.rox.one.mobile/tracks/production';
 
 export const STAMP_RE = /native tree ([0-9a-f]{40})/;
 export const STAMP_PR_RE = /for PR #(\d+)/;

@@ -130,7 +130,7 @@ xcrun simctl boot "$DEVICE"
 xcrun simctl bootstatus "$DEVICE" -b
 
 xcrun simctl install "$DEVICE" "$ROUNDTRIP_APP"
-xcrun simctl launch "$DEVICE" com.macro.app.prod
+xcrun simctl launch "$DEVICE" com.rox.one
 
 # The webview needs a moment to load and paint before the shot is worth taking.
 sleep 25

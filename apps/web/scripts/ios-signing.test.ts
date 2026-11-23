@@ -3,9 +3,9 @@ import { expect, test, vi } from 'vitest';
 import { manualSigningProject, signingProfiles } from './ios-signing.mjs';
 
 const identifiers = [
-  'com.macro.app.prod',
-  'com.macro.app.prod.ShareExtension',
-  'com.macro.app.prod.NotificationServiceExtension',
+  'com.rox.one',
+  'com.rox.one.ShareExtension',
+  'com.rox.one.NotificationServiceExtension',
 ];
 const bundles = identifiers.map((identifier, index) => ({
   id: `bundle-${index}`,

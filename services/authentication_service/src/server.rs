@@ -1099,7 +1099,7 @@ const MICROSOFT_GRANT_CLEANUP_INTERVAL: Duration = Duration::from_secs(5 * 60);
 // SAFETY: this is not a secret value
 const IOS_DEVELOPMENT_TEAM_ID: &str = "TY74Q77JBD";
 // SAFETY: this is not a secret value
-const IOS_APP_BUNDLE_ID: &str = "com.macro.app.prod";
+const IOS_APP_BUNDLE_ID: &str = "com.rox.one";
 
 /// How often due computer billing effects are carried out.
 const COMPUTER_BILLING_TICK: std::time::Duration = std::time::Duration::from_secs(10);

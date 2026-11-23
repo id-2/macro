@@ -48,7 +48,7 @@ async fn send_first(
             &apns,
             MessageAttributes {
                 push_type: sns_client::PushType::Alert,
-                apns_bundle_id: "com.macro.app.prod",
+                apns_bundle_id: "com.rox.one",
                 collapse_key,
             },
         )
@@ -84,7 +84,7 @@ async fn send_empty(
             &apns,
             MessageAttributes {
                 push_type: sns_client::PushType::Alert,
-                apns_bundle_id: "com.macro.app.prod",
+                apns_bundle_id: "com.rox.one",
                 collapse_key,
             },
         )

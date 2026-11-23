@@ -142,7 +142,7 @@ async fn main() -> Result<(), Report> {
             endpoint_arn: _,
         } => SandboxMobileSender::Real(MobilePushAdapter {
             push_service: sns_client.clone(),
-            apns_bundle_id: "com.macro.app.prod".to_string(),
+            apns_bundle_id: "com.rox.one".to_string(),
             voip_bundle_id: None,
         }),
     };

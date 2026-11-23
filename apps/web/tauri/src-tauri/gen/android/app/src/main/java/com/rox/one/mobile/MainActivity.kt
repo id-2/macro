@@ -1,4 +1,4 @@
-package com.macro.workspace.mobile
+package com.rox.one.mobile
 
 import android.os.Bundle
 import android.content.Context
