@@ -229,8 +229,8 @@ summary_text() {
   else
     free="диск: н/д"
   fi
-  printf 'Rox, %s (студия)\nимена: %s\nслужбы: %s\n%s\n' \
-    "$(date '+%d.%m %H:%M')" "$names" "$services" "$free"
+  printf 'Rox, %s (%s)\nимена: %s\nслужбы: %s\n%s\n' \
+    "$(date '+%d.%m %H:%M')" "$(hostname)" "$names" "$services" "$free"
 }
 
 # Watch pass: one line per name, one history line, one alert at threshold.
