@@ -37,7 +37,10 @@ pub struct LivekitRtcClient {
     room_client: RoomClient,
     egress_client: EgressClient,
     agent_dispatch_client: AgentDispatchClient,
-    webhook_receiver: WebhookReceiver,
+    /// One receiver per signing pair. The provider signs webhooks with the
+    /// key the webhook was registered under, and a project may rotate keys
+    /// while old webhooks keep signing with the previous one.
+    webhook_receivers: Vec<WebhookReceiver>,
     token_verifier: TokenVerifier,
     api_key: String,
     api_secret: String,
@@ -72,12 +75,24 @@ impl LivekitRtcClient {
         let agent_dispatch_client =
             AgentDispatchClient::with_api_key(&http_url, &api_key, &api_secret);
         let token_verifier = TokenVerifier::with_api_key(&api_key, &api_secret);
-        let webhook_receiver = WebhookReceiver::new(token_verifier.clone());
+        let mut webhook_receivers = vec![WebhookReceiver::new(token_verifier.clone())];
+        // Extra signing pairs, `key:secret` separated by commas, so a webhook
+        // registered under a rotated key still verifies.
+        if let Ok(extra) = std::env::var("LIVEKIT_WEBHOOK_KEYS") {
+            for pair in extra.split(',').filter(|p| !p.trim().is_empty()) {
+                let Some((k, sec)) = pair.split_once(':') else { continue };
+                let (k, sec) = (k.trim(), sec.trim());
+                if k.is_empty() || sec.is_empty() || k == api_key {
+                    continue;
+                }
+                webhook_receivers.push(WebhookReceiver::new(TokenVerifier::with_api_key(k, sec)));
+            }
+        }
         Self {
             room_client,
             egress_client,
             agent_dispatch_client,
-            webhook_receiver,
+            webhook_receivers,
             token_verifier,
             api_key,
             api_secret,
@@ -543,13 +558,23 @@ impl CallRtcClient for LivekitRtcClient {
     }
 
     fn receive_webhook(&self, body: &str, auth_token: &str) -> Result<CallWebhookEvent, CallError> {
-        let event = self
-            .webhook_receiver
-            .receive(body, auth_token)
-            .map_err(|e| {
+        let mut last_error = None;
+        let mut event = None;
+        for receiver in &self.webhook_receivers {
+            match receiver.receive(body, auth_token) {
+                Ok(parsed) => {
+                    event = Some(parsed);
+                    break;
+                }
+                Err(e) => last_error = Some(e),
+            }
+        }
+        let event = event.ok_or_else(|| {
+            if let Some(e) = last_error {
                 tracing::warn!(error=?e, "webhook signature validation failed");
-                CallError::Auth
-            })?;
+            }
+            CallError::Auth
+        })?;
 
         // Extract file URL from egress info if available. Earlier egress
         // events list the planned file before anything is uploaded.
